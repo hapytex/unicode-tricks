@@ -1,8 +1,11 @@
-{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable #-}
+{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable, PatternSynonyms #-}
 
 module Data.Char.Frame where
 
 import Data.Bool(bool)
+
+import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
+-- import Test.QuickCheck.Gen()
 
 data Horizontal a = Horizontal { left :: a, right :: a } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 data Vertical a = Vertical { up :: a, down :: a } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
@@ -27,6 +30,18 @@ instance Monoid a => Monoid (Vertical a) where
 instance Monoid a => Monoid (Parts a) where
     mempty = Parts mempty mempty
 
+instance Arbitrary Weight where
+    arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary a => Arbitrary (Horizontal a) where
+    arbitrary = Horizontal <$> arbitrary <*> arbitrary
+
+instance Arbitrary a => Arbitrary (Vertical a) where
+    arbitrary = Vertical <$> arbitrary <*> arbitrary
+
+instance Arbitrary a => Arbitrary (Parts a) where
+    arbitrary = Parts <$> arbitrary <*> arbitrary
+
 instance Applicative Horizontal where
     pure x = Horizontal x x
     Horizontal fa fb <*> Horizontal xa xb = Horizontal (fa xa) (fb xb)
@@ -38,6 +53,9 @@ instance Applicative Vertical where
 instance Applicative Parts where
     pure x = Parts (pure x) (pure x)
     Parts fa fb <*> Parts xa xb = Parts (fa <*> xa) (fb <*> xb)
+
+pattern Frame :: a -> a -> a -> a -> Parts a
+pattern Frame u d l r = Parts (Vertical u d) (Horizontal l r)
 
 type Simple = Parts Bool
 type Weighted = Parts Weight
