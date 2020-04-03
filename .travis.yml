@@ -1,0 +1,37 @@
+sudo: false
+os:
+- linux
+language: haskell
+cache:
+  directories:
+  - "$HOME/.stack"
+before_install:
+- sudo add-apt-repository -y ppa:hvr/ghc
+- sudo apt-get update
+- sudo apt-get install cabal-install-3.0
+- mkdir -p ~/.local/bin
+- export PATH=$HOME/.local/bin:$PATH
+- travis_retry curl -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+install:
+- stack build
+- stack haddock
+script:
+- stack --no-terminal --skip-ghc-check test
+- curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/run.sh | sh -s .
+deploy:
+- provider: script
+  script: bash deploy.sh "$HACKAGE_USER" "$HACKAGE_PASSWORD"
+  on:
+    tags: true
+- provider: pages
+  local_dir: "$(stack path --local-doc-root)"
+  skip_cleanup: true
+  github_token: "$GITHUB_TOKEN"
+  keep_history: true
+  on:
+    tags: true
+env:
+  global:
+  - secure: OPsdPj3lqRt+vUZI6/PIy2wW7GsLtMHjTi+kLRd6cFiSV+2fdM8K0oKpJ2vevA1XcnqPQ6ymcvOcTQZBJfYZFGFKZOJ0BwhnPjZpSQix6FOr19Mjiy2hrRyYX7EpRwsnO58wwLLGWJeIk5cFPqEH+xbhcb2shNogpLpIYUpWGMpe6Gu6QPu5ZpkKp4ypSa/v/nIKDQi7qGA4HO3L6yb7Iz6aGT4Okq5sbZ4uItzhGAt7OdnAa8dfmWCJmHxrOYbHnga88f8aJ43S5Tfy/XCxzk85e+RYRvGLzdEeHv2Old4svwGmI+mwIIy6MA7uil/O5V6TdS0jNVXBKtcyCsCddoPhJTeNy03CORpR7QUx8w2+fj6N9+UpZGh0EPS+k5Kjj/hP+TpO9xJt/nKMxcYV4a/8I56SI+AaJUkiDSpqCFV/AkD2S4HT3qcZZoWx69JU6bz3JIPNQswmre2f/6fC24xDU5/B6f8MWSubej6l5bGXIZ9R6QYcY8hs6K7LxyPkuBUMnLgiOCjgEKrUrulM62FN6LC3ApU/Ijg+I4Z41YbWYjkgeI2PwvQd6pza7qiuk9NH4Odv1e3RM5DYLf2XydnsnugQjd7lp/jckJ6MhUtSCQk2ScKfYS2xDJOPm60owNhQrUXcfSt1zH+tRiyhdTGU3h5mP0Uvw7l8/yMSdNQ=
+  - secure: ySL6xT4nwfJWe73E87A3P+Td7z7a8ZR1ziJfs8f7sZY+5M07GQZ5J6bWJ/P/UoCoqQ1wnh4DyZ/8LEsGkjEB5uXSveor8EGf/VWKzFa6ZHOLpEDkt+QhhwOjVrAd6TP2NNR+bmv38G/rqhggrB8wsr+ClYHQ6NbpuGgHn5kxQ0mN9ba2Pest8UIAKq21ZWz83el1DYatBpA0ii0OVyu/2+Aa2RvAHBt7632LwjsrMxnaTpdvW5BGZdASPiaN7Ag+KC2j8i/s6oTBTzdkTIz6OCji2izfGx4QfkF1mIkxgf4jovQfka3qiYBDNTRKNTYV81abCaJZs31KpBqXIvfrWS1H/mhE92XNBQEq3F7bYpk985b8GkFb84Jr60CmXaW+982xDvckaUzKGGOVwt6CDHNP90LJtCYqdVzQehM12XIaTIUUHlf0rJxPRE05EoEkZj6IyYG5b7rCGxUOY9cW7WLu+0X5dymiYtP/pnZGy5j6KxFekGBeEAJcTsRyh381zeFut2MicpikKjHQAdutnTtMQWYTFnN2XEbTAI852fCTArP3G6egAtbJQfUlELIpFey6bR9/9pLlLChA+IqDJgI/A5P7QxcLyPCZpvYV8GwWIrhGgWJYqQVQB6O2alq6uek1BocOaX65mC71qgtU302/7ViiUaRFHwS1QQgaB2Y=
+  - secure: QGNXKBQtoPHXaxInDKrPjVUY5ARn0W89ZCl7XHaIUVwDyLpQjyydOdBHCPmbzoATp9Sny0Wl60j96VSQwxteSQcWE09JPc57PHhsp+rHQzgAinrKU698u6A1tHd4ONHeYDDDfBwN3zY1AacvvHftwAInRQwStu0ggsNQCMkhBOhmLThKiap5lQHVHk2A6Rqm9jXM7bu8K+PwNWYsdVizdr2oFPX9cQwaq/11O9N73GpZqSDOUt8hoLHKSXdHv1NwLPgPq9epPGvFHDQ7E4+ZLZz1kmEjNzIy6yIMfZK+mKvPeD9A7R8gQzScxV1rzhYiIPhQ9uMIsaf8CxRHXUBCfKepey0upqLzzEvoMnuOIpGqE9S+1P0U7Wxt0wPO2azFjz4Syvqxw3cO4Hb0dOMV1ut3eqDadnW93MIfy2CZZPXpRhodyEVdXsLvBFkuFuKUEwPdZsEcnHYOdINly8S89n0EnMB+P1Ja8v5jl/aiNKqmvmjUXgb9wT4yue3PHwByChhsHALHI1RAcweoQFRoVCjVX2jHhut9IXtArco8cUJE0bl3nP69oAcr3ib1bI4I1HGlrNWtLj6SGd20MLgZN+BLSrCx6lDJo9tiY95dZ248v5uCmH5KNWakdMS1CWmflQYjm8DXW7sf9JWUv6ki9cbdt9n8jmlciHZ8sZjw96Q=
