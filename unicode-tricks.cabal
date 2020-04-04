@@ -1,7 +1,9 @@
 name:                unicode-tricks
 version:             0.1.0.0
--- synopsis:
--- description:
+synopsis: Functions to work with unicode blocks more convenient.
+description:
+  A package that makes rendering of frames, blocks, subscript and superscript
+  more convenient.
 homepage:            https://github.com/hapytex/unicode-tricks#readme
 license:             BSD3
 license-file:        LICENSE
@@ -10,7 +12,9 @@ maintainer:          hapytexeu+gh@gmail.com
 copyright:           2020 Willem Van Onsem
 category:            utils
 build-type:          Simple
-extra-source-files:  README.md
+extra-source-files:
+    README.md
+  , CHANGELOG.md
 cabal-version:       >=1.10
 
 library
