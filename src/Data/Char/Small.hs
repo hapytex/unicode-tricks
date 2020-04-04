@@ -20,9 +20,12 @@ module Data.Char.Small (
     toSub, toSup
   -- * Numbers as subscript and superscript.
   , asSub, asSup
+  -- * Ratio formatting
+  , ratioToUnicode
   ) where
 
 import Data.Char(chr, isDigit, ord)
+import Data.Ratio(Ratio, denominator, numerator)
 import Data.Text(Text, cons, snoc, singleton)
 
 -- | Convert a set of characters to their superscript counterpart, given that
@@ -80,6 +83,13 @@ _prefixSign c f v
     | v < 0 = cons c (f' (-v))
     | otherwise = f' v
     where f' = _value f
+
+-- | Format a given 'Ratio' object to a 'Text' value that formats the ratio with
+-- superscript and subscript.
+ratioToUnicode :: Integral i
+    => Ratio i -- ^ The given 'Ratio' value to format.
+    -> Text -- ^ The 'Text' block that contains a textual representation of the 'Ratio'.
+ratioToUnicode dn = asSup (numerator dn) <> cons '\x2044' (asSub (denominator dn))
 
 -- | Convert a number (positive or negative) to a 'Text' that specifies that
 -- number in superscript characters.
