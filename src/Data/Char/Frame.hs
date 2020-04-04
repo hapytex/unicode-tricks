@@ -1,16 +1,59 @@
 {-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable, PatternSynonyms #-}
 
-module Data.Char.Frame where
+{-|
+Module      : Data.Char.Frame
+Description : A module used to render frames with light and heavy lines.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+A frame is represented as a pair of horizontal and vertical lines. These can be any items, but currently only booleans and weight objects are covered to convert the item to a corresponding character.
+-}
+
+module Data.Char.Frame(
+    -- * Line weight
+    Weight(Empty, Light, Heavy)
+    -- * Datastructures to store the four directions
+  , Horizontal(Horizontal, left, right)
+  , Vertical(Vertical, up, down)
+  , Parts(Parts)
+    -- * Type aliasses and pattern synonyms for convenient 'Parts'
+  , Simple, Weighted
+  , pattern Frame
+    -- * Functions to render specific frame values
+  , simple, simple', simpleWithArc, weighted
+    -- * Convert a 'Simple' to a 'Weighted'
+  , simpleToWeighted, simpleToLight, simpleToHeavy
+  ) where
 
 import Data.Bool(bool)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
--- import Test.QuickCheck.Gen()
 
-data Horizontal a = Horizontal { left :: a, right :: a } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
-data Vertical a = Vertical { up :: a, down :: a } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+-- | A data type that determines the state of the /horizontal/ lines of
+-- the frame ('left' and 'right').
+data Horizontal a = Horizontal { 
+    left :: a -- ^ The state of the left line of the frame.
+  , right :: a -- ^ The state of the right line of the frame.
+  } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+
+-- | A data type that determines the state of the /vertical/ lines of the frame
+-- ('up' and 'down').
+data Vertical a = Vertical {
+    up :: a  -- ^ The state of the line in the up direction of the frame.
+  , down :: a -- ^ The state of the line in the down direction of the frame.
+  } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+
+-- | A data type that specifies the four lines that should (not) be drawn for
+-- the frame.
 data Parts a = Parts (Vertical a) (Horizontal a) deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
-data Weight = Empty | Light | Heavy deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+-- | The weights of the frame lines, these can be 'Empty', 'Light' or 'Heavy'.
+data Weight
+  = Empty -- ^ The frame does not contain such line.
+  | Light -- ^ The frame contains such line.
+  | Heavy -- ^ The frame contains such line, in /boldface/.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 instance Semigroup a => Semigroup (Horizontal a) where
     Horizontal a1 a2 <> Horizontal b1 b2 = Horizontal (a1 <> b1) (a2 <> b2)
@@ -54,35 +97,75 @@ instance Applicative Parts where
     pure x = Parts (pure x) (pure x)
     Parts fa fb <*> Parts xa xb = Parts (fa <*> xa) (fb <*> xb)
 
-pattern Frame :: a -> a -> a -> a -> Parts a
+-- | A pattern that makes pattern matching and expressions with 'Parts' more convenient.
+pattern Frame
+  :: a -- ^ The state of the line in the /up/ direction.
+  -> a -- ^ The state of the line in the /down/ direction.
+  -> a -- ^ The state of the line in the /left/ direction.
+  -> a -- ^ The state of the line in the /right/ direction.
+  -> Parts a -- ^ The 'Parts' pattern with the state of the given lines.
 pattern Frame u d l r = Parts (Vertical u d) (Horizontal l r)
 
+-- | A type synonym that makes it more convenient to work with a 'Parts' object
+-- that wraps 'Bool's. Usually 'True' means it should draw a line, and 'False'
+-- that there is no line in that direction.
 type Simple = Parts Bool
+
+-- | A type synonym that makes it more convenient to work with a 'Parts' object
+-- that wraps 'Weight' objects. These specify the weight .
 type Weighted = Parts Weight
 
-simpleToWeighted :: Weight -> Simple -> Weighted
+-- | Convert a 'Simple' frame to a 'Weighted' frame by converting 'True' to the
+-- given 'Weight' value.
+simpleToWeighted
+  :: Weight -- ^ The 'Weight' that is used for 'True' values.
+  -> Simple -- ^ The 'Simple' frame to convert.
+  -> Weighted -- ^ The resulting 'Weighted' frame.
 simpleToWeighted = fmap . bool Empty
 
-simpleToLight :: Simple -> Weighted
+-- | Convert a 'Simple' frame to a 'Weighted' frame by converting 'True' to
+-- 'Light'.
+simpleToLight
+  :: Simple -- ^ The 'Simple' frame to convert.
+  -> Weighted -- ^ The resulting 'Weighted' frame.
 simpleToLight = simpleToWeighted Light
 
-simpleToHeavy :: Simple -> Weighted
+-- | Convert a 'Simple' frame to a 'Weighted' frame by converting 'True' to
+-- 'Heavy'.
+simpleToHeavy
+  :: Simple -- ^ The 'Simple frame to convert.
+  -> Weighted -- ^ The resulting 'Weighted' frame.
 simpleToHeavy = simpleToWeighted Heavy
 
-simple :: Simple -> Char
+-- | Convert a 'Simple' frame to a corresponding 'Char'. Here 'True' is
+-- mapped to a 'Light' line.
+simple
+  :: Simple -- ^ The given 'Simple' frame to convert.
+  -> Char -- ^ The corresponding characer for this 'Simple' frame.
 simple = weighted . simpleToLight
 
-simple' :: Simple -> Char
+-- | Convert a 'Simple' frame to a corresponding 'Char'. Here 'True' is mapped
+-- to a 'Heavy' line.
+simple'
+  :: Simple -- ^ The given 'Simple' frame to convert.
+  -> Char -- ^ The corresponding characer for this 'Simple' frame.
 simple' = weighted . simpleToHeavy
 
-simpleWithArc :: Simple -> Char
+-- | Generate a 'Char' where turns are done with an /arc/ instead of a corner.
+-- This can only be done for 'Light' lines.
+simpleWithArc
+  :: Simple -- ^ The given 'Simple' frame to convert.
+  -> Char -- ^ The corresponding characer for this 'Simple' frame.
 simpleWithArc (Parts (Vertical False True) (Horizontal False True)) = '\x256d'
 simpleWithArc (Parts (Vertical False True) (Horizontal True False)) = '\x256e'
 simpleWithArc (Parts (Vertical True False) (Horizontal False True)) = '\x256f'
 simpleWithArc (Parts (Vertical True False) (Horizontal True False)) = '\x2570'
 simpleWithArc x = simple x
 
-weighted :: Weighted -> Char
+-- | Converts a given 'Weighted' to the char that can be used to render frames.
+weighted
+  :: Weighted -- ^ The 'Weighted' object that specifies how the lines on the four directions should look like.
+  -> Char -- ^ The character that represents these lines.
 weighted (Parts (Vertical Empty Empty) (Horizontal Empty Empty)) = ' '
 weighted (Parts (Vertical Empty Empty) (Horizontal Light Light)) = '\x2500'
 weighted (Parts (Vertical Empty Empty) (Horizontal Heavy Heavy)) = '\x2501'
