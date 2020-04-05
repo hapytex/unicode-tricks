@@ -1,5 +1,5 @@
 name:                unicode-tricks
-version:             0.2.0.0
+version:             0.3.0.0
 synopsis: Functions to work with unicode blocks more convenient.
 description:
   A package that makes rendering of frames, blocks, subscript and superscript
@@ -22,6 +22,7 @@ library
   exposed-modules:
       Data.Char.Block
     , Data.Char.Braille
+    , Data.Char.Chess
     , Data.Char.Frame
     , Data.Char.Small
   build-depends:
