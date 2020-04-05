@@ -174,7 +174,7 @@ _chessValue t c = 6 * fromEnum c + fromEnum t
 chessPiece
   :: ChessPiece -- ^ The given 'ChessPiece' to convert.
   -> Char -- ^ The unicode character that represents the given 'ChessPiece'.1
-chessPiece (Chess90 c Equihopper r) = chr (3 * (mod (fromEnum r) 2) + fromEnum c + 0x1fa48)
+chessPiece (Chess90 c Equihopper r) = chr (3 * mod (fromEnum r) 2 + fromEnum c + 0x1fa48)
 chessPiece (Chess90 Neutral t R0) = chr (0x1fa00 .|. fromEnum t)
 chessPiece (Chess90 c t R0) = chr (_chessValue t c + 0x2654)
 chessPiece (Chess90 c t r) = chr (0x15 * fromEnum r + _chessValue t c + 0x1f9f4)
