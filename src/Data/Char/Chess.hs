@@ -55,12 +55,12 @@ data ChessColor
 -- | The type of chess pieces. Unicode includes an 'Equihopper' as piece as
 -- well.
 data ChessPieceType
-  = King -- ^ The /knight/ chess piece.
-  | Queen -- ^ The /knight/ chess piece.
-  | Rook -- ^ The /knight/ chess piece.
-  | Bishop -- ^ The /knight/ chess piece.
+  = King -- ^ The /king/ chess piece.
+  | Queen -- ^ The /queen/ chess piece.
+  | Rook -- ^ The /rook/ chess piece.
+  | Bishop -- ^ The /bishop/ chess piece.
   | Knight -- ^ The /knight/ chess piece.
-  | Pawn -- ^ The /knigat/ chess piece.
+  | Pawn -- ^ The /pawn/ chess piece.
   | Equihopper -- ^ The /equihopper/ chess piece.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
@@ -93,7 +93,6 @@ data ChessHybridType
 -- /queen/, /rook/, /bishop/, /knight/, /pawn/, and /equihopper/ over 0, 90,
 -- 180, and 270 degrees; and the /knight/ over /45/, /135/, /225/, and /315/
 -- degrees in 'Black', 'White' and 'Neutral'.
--- .
 -- Furthermore one can draw a /knight-queen/, /knight-rook/, and /knight-bishop/
 -- pieces can be drawn without rotation and only in 'BBlack' or 'BWhite'.
 data ChessPiece
@@ -173,7 +172,7 @@ _chessValue t c = 6 * fromEnum c + fromEnum t
 -- | Convert the given 'ChessPiece' to the corresponding unicode character.
 chessPiece
   :: ChessPiece -- ^ The given 'ChessPiece' to convert.
-  -> Char -- ^ The unicode character that represents the given 'ChessPiece'.1
+  -> Char -- ^ The unicode character that represents the given 'ChessPiece'.
 chessPiece (Chess90 c Equihopper r) = chr (3 * mod (fromEnum r) 2 + fromEnum c + 0x1fa48)
 chessPiece (Chess90 Neutral t R0) = chr (0x1fa00 .|. fromEnum t)
 chessPiece (Chess90 c t R0) = chr (_chessValue t c + 0x2654)
