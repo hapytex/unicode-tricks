@@ -12,10 +12,13 @@ unicode characters more effective.
 Currently there are three modules:
 
  - **`Data.Char.Block`**: rendering a 2-by-2 block by a matrix of `Bool`s;
+ - **`Data.Char.Braille`**: a module to render Braille characters with six or
+   eight dot cells;
  - **`Data.Char.Frame`**: typesetting frame elements. Lines of the frames can be
    `Light` or `Heavy`, and there are additional options to use arcs for corners;
+   and
  - **`Data.Char.Small`**: making use of subscript and superscript in unicode, and
-   for example formatting `Ratio` objects;
+   for example formatting `Ratio` objects.
 
 ## `unicode-tricks` is *safe* Haskell
 
