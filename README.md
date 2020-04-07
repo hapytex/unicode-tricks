@@ -14,6 +14,7 @@ Currently there are three modules:
  - **`Data.Char.Block`**: rendering a 2-by-2 block by a matrix of `Bool`s;
  - **`Data.Char.Braille`**: a module to render Braille characters with six or
    eight dot cells;
+ - **`Data.Char.Card`**: a module to work with playing cards;
  - **`Data.Char.Chess`**: a module to render chess pieces (and some variants) in
    unicode;
  - **`Data.Char.Frame`**: typesetting frame elements. Lines of the frames can be
