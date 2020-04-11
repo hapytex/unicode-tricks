@@ -25,7 +25,7 @@ import Data.Bool(bool)
 import Data.Char(chr)
 import Data.Char.Block(Row(Row))
 
-import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary))
+import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1)
 
 -- | A datastructure to render Braille patterns with six dots cells.
 data Braille6 a = Braille6 {
@@ -58,10 +58,18 @@ toBraille
 toBraille = toBraille' False
 
 instance Arbitrary a => Arbitrary (Braille6 a) where
-    arbitrary = Braille6 <$> arbitrary <*> arbitrary <*> arbitrary
+    arbitrary = arbitrary1
+
+instance Arbitrary1 Braille6 where
+    liftArbitrary arb = Braille6 <$> arb' <*> arb' <*> arb'
+        where arb' = liftArbitrary arb
 
 instance Arbitrary a => Arbitrary (Braille a) where
-    arbitrary = Braille <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+    arbitrary = arbitrary1
+
+instance Arbitrary1 Braille where
+    liftArbitrary arb = Braille <$> arb' <*> arb' <*> arb' <*> arb'
+        where arb' = liftArbitrary arb
 
 _rowValue' :: Int -> Row Bool -> Int
 _rowValue' d (Row b0 b1) = bool 0 1 b0 .|. bool 0 d b1

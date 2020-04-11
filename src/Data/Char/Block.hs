@@ -18,8 +18,7 @@ module Data.Char.Block(
   , filled
   ) where
 
-import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary))
-
+import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1)
 
 -- | A data type that determines the state of the /row/ in a block.
 -- it determines the left and the right part of the row of the block.
@@ -43,10 +42,17 @@ instance Applicative Block where
     Block fu fl <*> Block u l = Block (fu <*> u) (fl <*> l)
 
 instance Arbitrary a => Arbitrary (Row a) where
-    arbitrary = Row <$> arbitrary <*> arbitrary
+    arbitrary = arbitrary1
+
+instance Arbitrary1 Row where
+    liftArbitrary arb = Row <$> arb <*> arb
 
 instance Arbitrary a => Arbitrary (Block a) where
-    arbitrary = Block <$> arbitrary <*> arbitrary
+    arbitrary = arbitrary1
+
+instance Arbitrary1 Block where
+    liftArbitrary arb = Block <$> arb' <*> arb'
+        where arb' = liftArbitrary arb
 
 -- | Convert the given 'Block' value to a block character in unicode.
 -- 'True' means that part is filled, and 'False' means the part is not filled.

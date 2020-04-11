@@ -28,7 +28,7 @@ module Data.Char.Frame(
 
 import Data.Bool(bool)
 
-import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
+import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
 
 -- | A data type that determines the state of the /horizontal/ lines of
 -- the frame ('left' and 'right').
@@ -77,13 +77,22 @@ instance Arbitrary Weight where
     arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary a => Arbitrary (Horizontal a) where
-    arbitrary = Horizontal <$> arbitrary <*> arbitrary
+    arbitrary = arbitrary1
+
+instance Arbitrary1 Horizontal where
+    liftArbitrary arb = Horizontal <$> arb <*> arb
 
 instance Arbitrary a => Arbitrary (Vertical a) where
-    arbitrary = Vertical <$> arbitrary <*> arbitrary
+    arbitrary = arbitrary1
+
+instance Arbitrary1 Vertical where
+    liftArbitrary arb = Vertical <$> arb <*> arb
 
 instance Arbitrary a => Arbitrary (Parts a) where
-    arbitrary = Parts <$> arbitrary <*> arbitrary
+    arbitrary = arbitrary1
+
+instance Arbitrary1 Parts where
+    liftArbitrary arb = Parts <$> liftArbitrary arb <*> liftArbitrary arb
 
 instance Applicative Horizontal where
     pure x = Horizontal x x
