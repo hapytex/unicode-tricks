@@ -23,6 +23,9 @@ library
       Data.Char.Block
     , Data.Char.Braille
     , Data.Char.Card
+    , Data.Char.Core
+    , Data.Char.Dice
+    , Data.Char.Domino
     , Data.Char.Chess
     , Data.Char.Frame
     , Data.Char.Small
