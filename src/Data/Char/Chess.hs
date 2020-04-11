@@ -20,7 +20,6 @@ module Data.Char.Chess (
   , ChessPieceType(King, Queen, Rook, Bishop, Knight, Pawn, Equihopper)
   , ChessHybridType(KnightQueen, KnightRook, KnightBishop)
   , ChessPiece(Chess90, Chess45Knight, ChessHybrid)
-  , Rotate90(R0, R90, R180, R270)
   , Rotate45(R45, R135, R225, R315)
     -- * Convert the chess piece to its unicode equivalent.
   , chessPiece
@@ -32,6 +31,9 @@ module Data.Char.Chess (
 
 import Data.Bits((.|.))
 import Data.Char(chr)
+import Data.Char.Core(
+    Rotate90(R0, R180)
+  )
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 import Test.QuickCheck.Gen(oneof)
@@ -62,15 +64,6 @@ data ChessPieceType
   | Knight -- ^ The /knight/ chess piece.
   | Pawn -- ^ The /pawn/ chess piece.
   | Equihopper -- ^ The /equihopper/ chess piece.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
-
--- | Possible rotations of the pieces. Most pieces can be rotated 0, 90, 180,
--- and 270 degrees.
-data Rotate90
-  = R0 -- ^ No rotation.
-  | R90 -- ^ Rotation over /90/ degrees.
-  | R180 -- ^ Rotation over /180/ degrees.
-  | R270 -- ^ Rotation over /270/ degrees.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | Extra rotations that can be performed for knight chess pieces.
@@ -111,9 +104,6 @@ instance Arbitrary ChessPieceType where
     arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary ChessHybridType where
-    arbitrary = arbitraryBoundedEnum
-
-instance Arbitrary Rotate90 where
     arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary Rotate45 where

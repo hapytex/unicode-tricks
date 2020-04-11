@@ -9,14 +9,17 @@ Based on the [**`unicode`** package](https://hackage.haskell.org/package/unicode
 This library aims to provide functionality to make working with certain blocks of
 unicode characters more effective.
 
-Currently there are three modules:
+Currently the package contains the following modules:
 
+ - **`Data.Char.Core`**: a module that defines common data structures;
  - **`Data.Char.Block`**: rendering a 2-by-2 block by a matrix of `Bool`s;
  - **`Data.Char.Braille`**: a module to render Braille characters with six or
    eight dot cells;
  - **`Data.Char.Card`**: a module to work with playing cards;
  - **`Data.Char.Chess`**: a module to render chess pieces (and some variants) in
    unicode;
+ - **`Data.Dice`**: a module to render die unicode characters;
+ - **`Data.Domino`**: a module to render domino unicode characters;
  - **`Data.Char.Frame`**: typesetting frame elements. Lines of the frames can be
    `Light` or `Heavy`, and there are additional options to use arcs for corners;
    and
