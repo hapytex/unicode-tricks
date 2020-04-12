@@ -26,6 +26,7 @@ library
     , Data.Char.Core
     , Data.Char.Dice
     , Data.Char.Domino
+    , Data.Char.Duodecimal
     , Data.Char.Chess
     , Data.Char.Frame
     , Data.Char.Roman
