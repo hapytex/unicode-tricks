@@ -2,6 +2,10 @@
 
 For a full list of changes, see the history on [GitHub](https://github.com/hapytex/unicode-tricks).
 
+## Version 0.5.0.0
+
+Added *dices*, *dominos*, and *Roman numerals*.
+
 ## Version 0.4.0.0
 
 Added *playing cards* character support.

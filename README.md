@@ -18,11 +18,12 @@ Currently the package contains the following modules:
  - **`Data.Char.Card`**: a module to work with playing cards;
  - **`Data.Char.Chess`**: a module to render chess pieces (and some variants) in
    unicode;
- - **`Data.Dice`**: a module to render die unicode characters;
- - **`Data.Domino`**: a module to render domino unicode characters;
+ - **`Data.Char.Dice`**: a module to render die unicode characters;
+ - **`Data.Char.Domino`**: a module to render domino unicode characters;
  - **`Data.Char.Frame`**: typesetting frame elements. Lines of the frames can be
-   `Light` or `Heavy`, and there are additional options to use arcs for corners;
-   and
+   `Light` or `Heavy`, and there are additional options to use arcs for
+   corners;
+ - **`Data.Char.Roman`**: a module to render Roman numerals; and
  - **`Data.Char.Small`**: making use of subscript and superscript in unicode, and
    for example formatting `Ratio` objects.
 

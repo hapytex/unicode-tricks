@@ -16,7 +16,11 @@ module Data.Char.Core (
   , Rotate90(R0, R90, R180, R270)
     -- * Rotated objects
   , Oriented(Oriented, oobject, orientation)
+    -- * Ligating
+  , Ligate(Ligate, NoLigate), ligate, ligateF
   ) where
+
+import Data.Default(Default(def))
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
 
@@ -43,6 +47,25 @@ data Rotate90
   | R270 -- ^ Rotation over /270/ degrees.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
+-- | Specify if one should ligate, or not. When litigation is done
+-- characters that are normally written in two (or more) characters
+-- are combined in one character. For example @Ⅲ@ instead of @ⅠⅠⅠ@.
+data Ligate
+  = Ligate -- ^ A ligate operation is performed on the characters.
+  | NoLigate -- ^ No ligate operation is performed on the charaters.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+-- | Specify if the given ligate function should be performed on the input,
+-- if 'v:Ligate' is passed, and the /identity/ function otherwise.
+ligate :: (a -> a) -> Ligate -> a -> a
+ligate f Ligate = f
+ligate _ NoLigate = id
+
+-- | Specify if the given ligate function is performed over the functor object
+-- if 'v:Ligate' is passed, and the /identity/ function otherwise.
+ligateF :: Functor f => (a -> a) -> Ligate -> f a -> f a
+ligateF = ligate . fmap
+
 instance Arbitrary Orientation where
     arbitrary = arbitraryBoundedEnum
 
@@ -54,3 +77,9 @@ instance Arbitrary1 Oriented where
 
 instance Arbitrary Rotate90 where
     arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary Ligate where
+    arbitrary = arbitraryBoundedEnum
+
+instance Default Ligate where
+    def = Ligate
