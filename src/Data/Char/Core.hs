@@ -20,8 +20,11 @@ module Data.Char.Core (
   , Ligate(Ligate, NoLigate), ligate, ligateF
     -- * Types of fonts
   , Emphasis(NoBold, Bold), ItalicType(NoItalic, Italic), FontStyle(SansSerif, Serif)
+    -- * Character range checks
+  , isAsciiAlphaNum, isAsciiAlpha
   ) where
 
+import Data.Char(isAlpha, isAlphaNum, isAscii)
 import Data.Default(Default(def))
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
@@ -88,6 +91,18 @@ ligate _ NoLigate = id
 -- if 'v:Ligate' is passed, and the /identity/ function otherwise.
 ligateF :: Functor f => (a -> a) -> Ligate -> f a -> f a
 ligateF = ligate . fmap
+
+-- | Checks if a charcter is an /alphabetic/ character in ASCII. The characters
+-- @"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"@ satisfy this
+-- predicate.
+isAsciiAlpha :: Char -> Bool
+isAsciiAlpha x = isAscii x && isAlpha x
+
+-- | Checks if a character is an /alphabetic/ or /numerical/ character in ASCII.
+-- The characters @0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@
+-- satisfy this predicate.
+isAsciiAlphaNum :: Char -> Bool
+isAsciiAlphaNum x = isAscii x && isAlphaNum x
 
 instance Arbitrary Orientation where
     arbitrary = arbitraryBoundedEnum
