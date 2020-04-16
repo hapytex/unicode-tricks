@@ -23,6 +23,8 @@ Currently the package contains the following modules:
  - **`Data.Char.Frame`**: typesetting frame elements. Lines of the frames can be
    `Light` or `Heavy`, and there are additional options to use arcs for
    corners;
+ - **`Data.Char.Math`**: a set of functions to render mathematical symbols and
+   text, for example in /Fraktur/, /Blackboard bold/, etc.
  - **`Data.Char.Roman`**: a module to render Roman numerals; and
  - **`Data.Char.Small`**: making use of subscript and superscript in unicode, and
    for example formatting `Ratio` objects.

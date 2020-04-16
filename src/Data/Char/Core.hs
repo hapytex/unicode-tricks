@@ -18,6 +18,8 @@ module Data.Char.Core (
   , Oriented(Oriented, oobject, orientation)
     -- * Ligating
   , Ligate(Ligate, NoLigate), ligate, ligateF
+    -- * Types of fonts
+  , Emphasis(NoBold, Bold), ItalicType(NoItalic, Italic), FontStyle(SansSerif, Serif)
   ) where
 
 import Data.Default(Default(def))
@@ -45,6 +47,27 @@ data Rotate90
   | R90 -- ^ Rotation over /90/ degrees.
   | R180 -- ^ Rotation over /180/ degrees.
   | R270 -- ^ Rotation over /270/ degrees.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+-- | A data type that lists the possible emphasis of a font. This can be 'Bold'
+-- or 'NoBold' the 'Default' is 'NoBold'.
+data Emphasis
+  = NoBold -- ^ The characters are not stressed with boldface.
+  | Bold -- ^ The characters are stressed in boldface.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+-- | A data type that can be used to specify if an /italic/ character is used.
+-- The 'Default' is 'NoItalic'.
+data ItalicType
+  = NoItalic -- ^ No italic characters are used.
+  | Italic -- ^ Italic characters are used.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+-- | A data type that specifies if the font is with /serifs/ or not. The
+-- 'Defaul;t' is 'Serif'.
+data FontStyle
+  = SansSerif -- ^ The character is a character rendered /without/ serifs.
+  | Serif -- ^ The character is a character rendered /with/ serifs.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | Specify if one should ligate, or not. When litigation is done
@@ -81,5 +104,23 @@ instance Arbitrary Rotate90 where
 instance Arbitrary Ligate where
     arbitrary = arbitraryBoundedEnum
 
+instance Arbitrary Emphasis where
+    arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary ItalicType where
+    arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary FontStyle where
+    arbitrary = arbitraryBoundedEnum
+
 instance Default Ligate where
     def = Ligate
+
+instance Default Emphasis where
+    def = NoBold
+
+instance Default ItalicType where
+    def = NoItalic
+
+instance Default FontStyle where
+    def = Serif
