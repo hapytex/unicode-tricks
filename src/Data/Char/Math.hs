@@ -863,7 +863,7 @@ script = _boldSplit scriptRegular scriptBold
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
 -- symbol is /not/ written in boldface. If the symbol is outside the alphabet
 -- range (@A@-@Z@, and @a-z@), the returned character is unspecified.
--- This is an alias of 'scriptRegular\''.
+-- This is an alias of 'scriptRegular''.
 calligraphyRegular'
   :: Char -- ^ The given character to convert.
   -> Char -- ^ The equivalent character that is formatted in calligraphy, not in bold.
@@ -883,7 +883,7 @@ calligraphyRegular = scriptRegular
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
 -- symbol is written in boldface. If the symbol is outside the alphabet
 -- range (@A@-@Z@, and @a-z@), the returned character is unspecified. This is an
--- alias of 'scriptBold\''.
+-- alias of 'scriptBold''.
 calligraphyBold'
   :: Char -- ^ The given character to convert.
   -> Char -- ^ The equivalent character that is formatted in calligraphy, and in bold.
@@ -903,7 +903,7 @@ calligraphyBold = scriptBold
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
 -- symbol is written in the given 'Emphasis' style. If the symbol is outside the
 -- alphabet range (@A@-@Z@, and @a-z@), the returned character is unspecified.
--- This is an alias of 'script\''.
+-- This is an alias of 'script''.
 calligraphy'
   :: Emphasis -- ^ The given 'Emphasis' style to use.
   -> Char -- ^ The given character to convert.
