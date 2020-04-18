@@ -18,8 +18,13 @@ module Data.Char.Core (
   , Oriented(Oriented, oobject, orientation)
     -- * Ligating
   , Ligate(Ligate, NoLigate), ligate, ligateF
+    -- * Types of fonts
+  , Emphasis(NoBold, Bold), ItalicType(NoItalic, Italic), FontStyle(SansSerif, Serif)
+    -- * Character range checks
+  , isAsciiAlphaNum, isAsciiAlpha
   ) where
 
+import Data.Char(isAlpha, isAlphaNum, isAscii)
 import Data.Default(Default(def))
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
@@ -47,6 +52,27 @@ data Rotate90
   | R270 -- ^ Rotation over /270/ degrees.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
+-- | A data type that lists the possible emphasis of a font. This can be 'Bold'
+-- or 'NoBold' the 'Default' is 'NoBold'.
+data Emphasis
+  = NoBold -- ^ The characters are not stressed with boldface.
+  | Bold -- ^ The characters are stressed in boldface.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+-- | A data type that can be used to specify if an /italic/ character is used.
+-- The 'Default' is 'NoItalic'.
+data ItalicType
+  = NoItalic -- ^ No italic characters are used.
+  | Italic -- ^ Italic characters are used.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+-- | A data type that specifies if the font is with /serifs/ or not. The
+-- 'Defaul;t' is 'Serif'.
+data FontStyle
+  = SansSerif -- ^ The character is a character rendered /without/ serifs.
+  | Serif -- ^ The character is a character rendered /with/ serifs.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
 -- | Specify if one should ligate, or not. When litigation is done
 -- characters that are normally written in two (or more) characters
 -- are combined in one character. For example @Ⅲ@ instead of @ⅠⅠⅠ@.
@@ -66,6 +92,18 @@ ligate _ NoLigate = id
 ligateF :: Functor f => (a -> a) -> Ligate -> f a -> f a
 ligateF = ligate . fmap
 
+-- | Checks if a charcter is an /alphabetic/ character in ASCII. The characters
+-- @"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"@ satisfy this
+-- predicate.
+isAsciiAlpha :: Char -> Bool
+isAsciiAlpha x = isAscii x && isAlpha x
+
+-- | Checks if a character is an /alphabetic/ or /numerical/ character in ASCII.
+-- The characters @0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@
+-- satisfy this predicate.
+isAsciiAlphaNum :: Char -> Bool
+isAsciiAlphaNum x = isAscii x && isAlphaNum x
+
 instance Arbitrary Orientation where
     arbitrary = arbitraryBoundedEnum
 
@@ -81,5 +119,23 @@ instance Arbitrary Rotate90 where
 instance Arbitrary Ligate where
     arbitrary = arbitraryBoundedEnum
 
+instance Arbitrary Emphasis where
+    arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary ItalicType where
+    arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary FontStyle where
+    arbitrary = arbitraryBoundedEnum
+
 instance Default Ligate where
     def = Ligate
+
+instance Default Emphasis where
+    def = NoBold
+
+instance Default ItalicType where
+    def = NoItalic
+
+instance Default FontStyle where
+    def = Serif

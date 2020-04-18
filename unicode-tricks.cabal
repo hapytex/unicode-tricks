@@ -29,6 +29,7 @@ library
     , Data.Char.Duodecimal
     , Data.Char.Chess
     , Data.Char.Frame
+    , Data.Char.Math
     , Data.Char.Roman
     , Data.Char.Small
   build-depends:
