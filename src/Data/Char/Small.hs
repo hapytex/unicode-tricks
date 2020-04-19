@@ -19,7 +19,8 @@ module Data.Char.Small (
   -- * Convert characters to their subscript and superscript counterpart
     toSub, toSup
   -- * Numbers as subscript and superscript.
-  , asSub, asSup
+  , asSub, asSubPlus
+  , asSup, asSupPlus
   -- * Ratio formatting
   , ratioToUnicode
   ) where
@@ -80,9 +81,15 @@ _value f = go
 
 _prefixSign :: Integral i => Char -> (Int -> Char) -> i -> Text
 _prefixSign c f v
-    | v < 0 = cons c (f' (-v))
-    | otherwise = f' v
-    where f' = _value f
+  | v < 0 = cons c (f' (-v))
+  | otherwise = f' v
+  where f' = _value f
+
+_prefixSignPlus :: Integral i => Char -> Char -> (Int -> Char) -> i -> Text
+_prefixSignPlus cp cn f v
+  | v < 0 = c' cn (-v)
+  | otherwise = c' cp v
+  where c' = (. _value f) . cons
 
 -- | Format a given 'Ratio' object to a 'Text' value that formats the ratio with
 -- superscript and subscript.
@@ -99,11 +106,27 @@ asSup :: Integral i
 asSup = _prefixSign '\x207b' _digitToSup
 
 -- | Convert a number (positive or negative) to a 'Text' that specifies that
+-- number in superscript characters. For positive characters, the superscript
+-- contains a plus character (@⁺@).
+asSupPlus :: Integral i
+    => i -- ^ The number to convert.
+    -> Text -- ^ A 'Text' value that contains the number as a sequence of superscript characters.
+asSupPlus = _prefixSignPlus '\x207a' '\x207b' _digitToSup
+
+-- | Convert a number (positive or negative) to a 'Text' that specifies that
 -- number in subscript characters.
 asSub :: Integral i
     => i -- ^ The number to convert.
     -> Text -- ^ A 'Text' value that contains the number as a sequence of subscript characters.
 asSub = _prefixSign '\x208b' _digitToSub
+
+-- | Convert a number (positive or negative) to a 'Text' that specifies that
+-- number in subscript characters. For positive characters, the subscript
+-- contains a plus character (@₊@).
+asSubPlus :: Integral i
+    => i -- ^ The number to convert.
+    -> Text -- ^ A 'Text' value that contains the number as a sequence of subscript characters.
+asSubPlus = _prefixSignPlus '\x208a' '\x208b' _digitToSub
 
 _digitToSub :: Int -> Char
 _digitToSub = chr . (8320+)
