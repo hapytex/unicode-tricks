@@ -580,7 +580,7 @@ digit
   -> Char -- ^ The given character to convert.
   -> Maybe Char -- ^ The corresponding symbol in serifs for the given /emphasis/ style wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
-digit = _fontSplit digitSansSerif digitSansSerif
+digit = _fontSplit digitSansSerif digitSerif
 
 
 -- | Convert the given number (@0@-@9@) to its corresponding character
