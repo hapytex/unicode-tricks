@@ -1,3 +1,4 @@
+# Haskell
 *.zip
 dist
 dist-*
@@ -31,3 +32,6 @@ samples
 samples/
 samples/*
 samples/**
+
+# IDE
+*.code-workspace
