@@ -20,13 +20,14 @@ Currently the package contains the following modules:
    unicode;
  - **`Data.Char.Dice`**: a module to render die unicode characters;
  - **`Data.Char.Domino`**: a module to render domino unicode characters;
- - **`Data.Char.Duodecimal`**: a module to work with [duodecimal numbers](https://en.wikipedia.org/wiki/Duodecimal);
  - **`Data.Char.Frame`**: typesetting frame elements. Lines of the frames can be
    `Light` or `Heavy`, and there are additional options to use arcs for
    corners;
  - **`Data.Char.Math`**: a set of functions to render mathematical symbols and
    text, for example in *Fraktur*, *Blackboard bold*, etc.
- - **`Data.Char.Roman`**: a module to render Roman numerals; and
+ - **`Data.Char.Number.Duodecimal`**: a module to work with [duodecimal numbers](https://en.wikipedia.org/wiki/Duodecimal);
+ - **`Data.Char.Number.Egyptian`**: a module to render [ancient Egyptian numerals](https://en.wikipedia.org/wiki/Egyptian_numerals); and
+ - **`Data.Char.Number.Roman`**: a module to render [Roman numerals](https://en.wikipedia.org/wiki/Roman_numerals); and
  - **`Data.Char.Small`**: making use of subscript and superscript in unicode, and
    for example formatting `Ratio` objects.
 

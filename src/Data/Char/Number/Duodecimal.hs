@@ -1,7 +1,7 @@
 {-# LANGUAGE Safe #-}
 
 {-|
-Module      : Data.Char.Duodecimal
+Module      : Data.Char.Number.Duodecimal
 Description : A module used to render duodecimal numbers.
 Maintainer  : hapytexeu+gh@gmail.com
 Stability   : experimental
@@ -13,7 +13,7 @@ In order to represent digits for 10 and 11, unicode has two codepoints: @TURNED 
 more convenient to convert an 'Integral' number to these digits, as well as converting a number to its duodecimal representation.
 -}
 
-module Data.Char.Duodecimal (
+module Data.Char.Number.Duodecimal (
     -- * Convert values to digits
     duodecimalDigit, duodecimalDigit'
     -- * Convert value to a sequence of digits

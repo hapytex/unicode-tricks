@@ -22,12 +22,24 @@ module Data.Char.Core (
   , Emphasis(NoBold, Bold), ItalicType(NoItalic, Italic), FontStyle(SansSerif, Serif)
     -- * Character range checks
   , isAsciiAlphaNum, isAsciiAlpha
+    -- * Ways to display numbers
+  , PlusStyle(WithoutPlus, WithPlus)
+    -- * Functions to implement a number system
+  , withSign
   ) where
 
 import Data.Char(isAlpha, isAlphaNum, isAscii)
 import Data.Default(Default(def))
+import Data.Text(Text, cons)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
+
+-- | Specify whether we write a positive number /with/ or /without/ a plus sign.
+-- the 'Default' is 'WithoutPlus'.
+data PlusStyle
+  = WithoutPlus -- ^ Write positive numbers /without/ using a plus sign.
+  | WithPlus -- ^ Write positive numbers /with/ a plus sign.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | The possible orientations of a unicode character, these can be
 -- /horizontal/, or /vertical/.
@@ -104,6 +116,15 @@ isAsciiAlpha x = isAscii x && isAlpha x
 isAsciiAlphaNum :: Char -> Bool
 isAsciiAlphaNum x = isAscii x && isAlphaNum x
 
+withSign :: Integral i => Char -> Char -> (i -> Text) -> PlusStyle -> i -> Text
+withSign cp cn f ps n | n <= 0 = cons cn (f (-n))
+                      | WithPlus <- ps = cons cp (f n)
+                      | otherwise = f n
+
+--positionalNumberSystem :: Integral i => Int -> (Int -> Char) -> PlusStyle -> i -> Text
+--positionalNumberSystem radix toChar = go
+--    where go Plus
+
 instance Arbitrary Orientation where
     arbitrary = arbitraryBoundedEnum
 
@@ -112,6 +133,9 @@ instance Arbitrary a => Arbitrary (Oriented a) where
 
 instance Arbitrary1 Oriented where
     liftArbitrary arb = Oriented <$> arb <*> arbitrary
+
+instance Arbitrary PlusStyle where
+    arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary Rotate90 where
     arbitrary = arbitraryBoundedEnum
@@ -127,6 +151,9 @@ instance Arbitrary ItalicType where
 
 instance Arbitrary FontStyle where
     arbitrary = arbitraryBoundedEnum
+
+instance Default PlusStyle where
+    def = WithoutPlus
 
 instance Default Ligate where
     def = Ligate

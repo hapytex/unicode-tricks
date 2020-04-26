@@ -25,12 +25,13 @@ library
     , Data.Char.Card
     , Data.Char.Core
     , Data.Char.Dice
-    , Data.Char.Duodecimal
     , Data.Char.Domino
     , Data.Char.Chess
     , Data.Char.Frame
     , Data.Char.Math
-    , Data.Char.Roman
+    , Data.Char.Number.Duodecimal
+    , Data.Char.Number.Egyptian
+    , Data.Char.Number.Roman
     , Data.Char.Small
   build-depends:
       base >= 4.7 && < 5
