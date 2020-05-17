@@ -35,3 +35,19 @@ samples/**
 
 # IDE
 *.code-workspace
+
+# LaTeX
+*.aux
+*.glg
+*.glo
+*.gls
+*.idx
+*.ilg
+*.ind
+*.ist
+*.log
+*.out
+*.pdf
+*.adx
+*.and
+*.tex

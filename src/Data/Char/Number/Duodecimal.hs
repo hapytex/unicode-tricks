@@ -17,12 +17,14 @@ module Data.Char.Number.Duodecimal (
     -- * Convert values to digits
     duodecimalDigit, duodecimalDigit'
     -- * Convert value to a sequence of digits
-  , duodecimalNumber
+  , duodecimalNumber, duodecimalNumber'
   ) where
 
 import Data.Bits((.|.))
 import Data.Char(chr)
-import Data.Text(Text, cons, singleton, snoc)
+import Data.Char.Core(PlusStyle, positionalNumberSystem)
+import Data.Default(def)
+import Data.Text(Text)
 
 _duodecimalDigit :: Int -> Char
 _duodecimalDigit n
@@ -44,14 +46,15 @@ duodecimalDigit n
     | n >= 0 && n < 12 = Just (duodecimalDigit' n)
     | otherwise = Nothing
 
+duodecimalNumber :: Integral i
+  => PlusStyle
+  -> i
+  -> Text
+duodecimalNumber = positionalNumberSystem 12 _duodecimalDigit '+' '-'
+
 -- | Convert the given 'Integral' number to a 'Text' object that contains
 -- sequence of duodecimal digits that represent that number.
-duodecimalNumber :: Integral i
+duodecimalNumber' :: Integral i
   => i -- ^ The given number to convert.
   -> Text -- ^ A string of unicode characters representing the value in duodecimal notation.
-duodecimalNumber n
-    | n < 0 = cons '-' (go (-n))
-    | otherwise = go n
-    where go k | k < 12 = singleton (duodecimalDigit' k)
-               | otherwise = snoc (go q) (duodecimalDigit' r)
-               where (q, r) = quotRem k 12
+duodecimalNumber' = duodecimalNumber def
