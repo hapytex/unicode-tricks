@@ -1,7 +1,7 @@
 {-# LANGUAGE Safe #-}
 
 {-|
-Module      : Data.Char.Duodecimal
+Module      : Data.Char.Number.Duodecimal
 Description : A module used to render duodecimal numbers.
 Maintainer  : hapytexeu+gh@gmail.com
 Stability   : experimental
@@ -13,16 +13,28 @@ In order to represent digits for 10 and 11, unicode has two codepoints: @TURNED 
 more convenient to convert an 'Integral' number to these digits, as well as converting a number to its duodecimal representation.
 -}
 
-module Data.Char.Duodecimal (
+module Data.Char.Number.Duodecimal (
+    -- * Characters used for duodecimal numbers
+    char10, char11
     -- * Convert values to digits
-    duodecimalDigit, duodecimalDigit'
+  , duodecimalDigit, duodecimalDigit'
     -- * Convert value to a sequence of digits
-  , duodecimalNumber
+  , duodecimalNumber, duodecimalNumber'
   ) where
 
 import Data.Bits((.|.))
 import Data.Char(chr)
-import Data.Text(Text, cons, singleton, snoc)
+import Data.Char.Core(PlusStyle, positionalNumberSystem)
+import Data.Default(def)
+import Data.Text(Text)
+
+-- | The character used to denote 10: @ↀ@.
+char10 :: Char -- ^ A character used in duodecimal numbers to denote 10.
+char10 = '\x2180'
+
+-- | The character used to denote 11: @ↁ@.
+char11 :: Char -- ^ A character used in duodecimal numbers to denote 11.
+char11 = '\x2181'
 
 _duodecimalDigit :: Int -> Char
 _duodecimalDigit n
@@ -45,13 +57,17 @@ duodecimalDigit n
     | otherwise = Nothing
 
 -- | Convert the given 'Integral' number to a 'Text' object that contains
--- sequence of duodecimal digits that represent that number.
+-- a sequence of duodecimal digits that represent that number. The given
+-- 'PlusStyle' specifies if the number is prefixed with @+@ if it is positive.
 duodecimalNumber :: Integral i
+  => PlusStyle -- ^ The given 'PlusStyle' to use.
+  -> i -- ^ The given number to convert.
+  -> Text -- ^ A string of unicode characters representing the value in duodecimal notation.
+duodecimalNumber = positionalNumberSystem 12 _duodecimalDigit '+' '-'
+
+-- | Convert the given 'Integral' number to a 'Text' object that contains
+-- sequence of duodecimal digits that represent that number.
+duodecimalNumber' :: Integral i
   => i -- ^ The given number to convert.
   -> Text -- ^ A string of unicode characters representing the value in duodecimal notation.
-duodecimalNumber n
-    | n < 0 = cons '-' (go (-n))
-    | otherwise = go n
-    where go k | k < 12 = singleton (duodecimalDigit' k)
-               | otherwise = snoc (go q) (duodecimalDigit' r)
-               where (q, r) = quotRem k 12
+duodecimalNumber' = duodecimalNumber def

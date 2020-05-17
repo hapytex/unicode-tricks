@@ -1,7 +1,7 @@
 {-# LANGUAGE Safe #-}
 
 {-|
-Module      : Data.Char.Roman
+Module      : Data.Char.Number.Roman
 Description : A module to print Roman numerals both in uppercase and lowercase.
 Maintainer  : hapytexeu+gh@gmail.com
 Stability   : experimental
@@ -13,7 +13,7 @@ represent Roman numerals.
 One can convert numbers to Roman numerals in uppercase and lowercase, and in 'Additive' and 'Subtractive' style.
 -}
 
-module Data.Char.Roman (
+module Data.Char.Number.Roman (
     -- * Data types to represent Roman numerals
     RomanLiteral(I, II, III, IV, V, VI, VII, VIII, IX, X, XI, XII, L, C, D, M)
   , RomanStyle(Additive, Subtractive)
