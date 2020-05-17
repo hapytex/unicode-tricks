@@ -27,7 +27,7 @@ module Data.Char.Small (
 
 import Data.Char(chr, isDigit, ord)
 import Data.Char.Core(PlusStyle(WithPlus, WithoutPlus), positionalNumberSystem10)
-import Data.Default(def)
+import Data.Default(Default(def))
 import Data.Ratio(Ratio, denominator, numerator)
 import Data.Text(Text, cons, snoc, singleton)
 
@@ -93,26 +93,31 @@ _prefixSignPlus cp cn f v
   | otherwise = c' cp v
   where c' = (. _value f) . cons
 
+-- | Convert the given 'Ratio' object to a sequence of characters with the
+-- numerator in superscript and the denominator in subscript. The given
+-- 'PlusStyle' is applied to the numerator.
 ratioToUnicode :: Integral i
-  => PlusStyle
-  -> Ratio i
-  -> Text
+  => PlusStyle -- ^ The given 'PlusStyle' to use.
+  -> Ratio i -- ^ The given 'Ratio' object to convert to a 'Text'.
+  -> Text -- ^ A 'Text' object that denotes the given 'Ratio' making use of superscript and subscript.
 ratioToUnicode ps dn = asSup ps (numerator dn) <> cons '\x2044' (asSub' (denominator dn))
 
 -- | Format a given 'Ratio' object to a 'Text' value that formats the ratio with
--- superscript and subscript.
+-- superscript and subscript using the 'Default' 'PlusStyle'.
 ratioToUnicode' :: Integral i
     => Ratio i -- ^ The given 'Ratio' value to format.
     -> Text -- ^ The 'Text' block that contains a textual representation of the 'Ratio'.
 ratioToUnicode' = ratioToUnicode def
 
+-- | Convert a number (positive or negative) to a 'Text' object that denotes
+-- that number in superscript characters.
 asSup :: Integral i
-  => PlusStyle
-  -> i
-  -> Text
+  => PlusStyle -- ^ The given 'PlusStyle' to use.
+  -> i -- ^ The given number to convert.
+  -> Text -- ^ A 'Text' value that denotes the number as a sequence of superscript characters.
 asSup = positionalNumberSystem10 _digitToSup '\x207a' '\x207b'
 
--- | Convert a number (positive or negative) to a 'Text' that specifies that
+-- | Convert a number (positive or negative) to a 'Text' object that denotes that
 -- number in superscript characters.
 asSup' :: Integral i
     => i -- ^ The number to convert.
@@ -127,10 +132,12 @@ asSupPlus :: Integral i
     -> Text -- ^ A 'Text' value that contains the number as a sequence of superscript characters.
 asSupPlus = asSup WithPlus -- _prefixSignPlus '\x207a' '\x207b' _digitToSup
 
+-- | Convert a number (positive or negative) to a 'Text' object that denotes
+-- that number in subscript characters.
 asSub :: Integral i
-  => PlusStyle
-  -> i
-  -> Text
+  => PlusStyle -- ^ The given 'PlusStyle' to use.
+  -> i -- ^ The given number to convert.
+  -> Text -- ^ A 'Text' value that denotes the number as a sequence of subscript characters.
 asSub = positionalNumberSystem10 _digitToSub '\x208a' '\x208b'
 
 -- | Convert a number (positive or negative) to a 'Text' that specifies that

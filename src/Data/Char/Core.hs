@@ -27,9 +27,9 @@ module Data.Char.Core (
     -- * Ways to display numbers
   , PlusStyle(WithoutPlus, WithPlus), splitPlusStyle
     -- * Functions to implement a number system
-  , withSign, positionalNumberSystem', positionalNumberSystem, positionalNumberSystem10
-    -- * Reexport of some functions 'Data.Char' functions
-  , chr, ord
+  , withSign, signValueSystem, positionalNumberSystem, positionalNumberSystem10
+    -- * Re-export of some functions of the 'Data.Char' module
+  , chr, isAlpha, isAlphaNum, isAscii, ord
   ) where
 
 import Data.Char(chr, isAlpha, isAlphaNum, isAscii, ord)
@@ -183,22 +183,56 @@ withSign f cp cn ps n | n < 0 = cons cn (f (-n))
                       | WithPlus <- ps = cons cp (f n)
                       | otherwise = f n
 
-positionalNumberSystem' :: Integral i => i -> (Int -> Int -> Text) -> Text -> Char -> Char -> PlusStyle -> i -> Text
-positionalNumberSystem' radix fi zero = withSign (f 0)
+-- | A function to make it more convenient to implement a /sign-value system/.
+-- This is done for a given /radix/ a function that maps the given value and the
+-- given weight to a 'Text' object, a 'Text' object for /zero/ (since in some
+-- systems that is different), and characters for /plus/ and /minus/.
+-- The function then will for a given 'PlusStyle' convert the number to a
+-- sequence of characters with respect to how the /sign-value system/ is
+-- implemented.
+signValueSystem :: Integral i
+  => i  -- ^ The given /radix/ to use.
+  -> (Int -> Int -> Text) -- ^ A function that maps the /value/ and the /weight/ to a 'Text' object.
+  -> Text -- ^ The given 'Text' used to represent /zero/.
+  -> Char -- ^ The given 'Char' used to denote /plus/.
+  -> Char -- ^ The given 'Char' used to denote /minus/.
+  -> PlusStyle -- ^ The given 'PlusStyle' to use.
+  -> i -- ^ The given number to convert.
+  -> Text -- ^ A 'Text' object that denotes the given number with the given /sign-value system/.
+signValueSystem radix fi zero = withSign (f 0)
     where f 0 0 = zero
           f i n | n < radix = fi' n i
                 | otherwise = f (i+1) q <> fi' r i
                 where (q, r) = quotRem n radix
           fi' = flip fi . fromIntegral
 
-positionalNumberSystem :: Integral i => i -> (Int -> Char) -> Char -> Char -> PlusStyle -> i -> Text
+-- | A function to make it more convenient to implement a /positional number
+-- system/. This is done for a given /radix/ a given conversion funtion that
+-- maps a value to a 'Char', and a 'Char' for /plus/ and /minus/.
+-- The function then construct a 'Text' object for a given 'PlusStyle' and a given number.
+positionalNumberSystem :: Integral i
+  => i -- ^ The given radix to use.
+  -> (Int -> Char) -- ^ A function that maps the value of a /digit/ to the corresponding 'Char'.
+  -> Char -- ^ The given character used to denote /plus/.
+  -> Char -- ^ The given character used to denote /minus/.
+  -> PlusStyle -- ^ The given 'PlusStyle' to use.
+  -> i -- ^ The given number to convert.
+  -> Text -- ^ A 'Text' object that denotes the given number with the given /positional number system/.
 positionalNumberSystem radix fi = withSign f
     where f n | n < radix = singleton (fi' n)
               | otherwise = snoc (f q) (fi' r)
               where (q, r) = quotRem n radix
           fi' = fi . fromIntegral
 
-positionalNumberSystem10 :: Integral i => (Int -> Char) -> Char -> Char -> PlusStyle -> i -> Text
+-- | A function to make it more convenient to implement a /positional number
+-- system/ with /radix/ 10.
+positionalNumberSystem10 :: Integral i
+  => (Int -> Char) -- ^ A function that maps the value of a /digit/ to the corresponding 'Char'.
+  -> Char -- ^ The given character used to denote /plus/.
+  -> Char -- ^ The given character used to denote /minus/.
+  -> PlusStyle -- ^ The given 'PlusStyle' to use.
+  -> i -- ^ The given number to convert.
+  -> Text -- ^ A 'Text' object that denotes the given number with the given /positional number system/.
 positionalNumberSystem10 = positionalNumberSystem 10
 
 instance Arbitrary Orientation where

@@ -14,8 +14,10 @@ more convenient to convert an 'Integral' number to these digits, as well as conv
 -}
 
 module Data.Char.Number.Duodecimal (
+    -- * Characters used for duodecimal numbers
+    char10, char11
     -- * Convert values to digits
-    duodecimalDigit, duodecimalDigit'
+  , duodecimalDigit, duodecimalDigit'
     -- * Convert value to a sequence of digits
   , duodecimalNumber, duodecimalNumber'
   ) where
@@ -25,6 +27,14 @@ import Data.Char(chr)
 import Data.Char.Core(PlusStyle, positionalNumberSystem)
 import Data.Default(def)
 import Data.Text(Text)
+
+-- | The character used to denote 10: @ↀ@.
+char10 :: Char -- ^ A character used in duodecimal numbers to denote 10.
+char10 = '\x2180'
+
+-- | The character used to denote 11: @ↁ@.
+char11 :: Char -- ^ A character used in duodecimal numbers to denote 11.
+char11 = '\x2181'
 
 _duodecimalDigit :: Int -> Char
 _duodecimalDigit n
@@ -46,10 +56,13 @@ duodecimalDigit n
     | n >= 0 && n < 12 = Just (duodecimalDigit' n)
     | otherwise = Nothing
 
+-- | Convert the given 'Integral' number to a 'Text' object that contains
+-- a sequence of duodecimal digits that represent that number. The given
+-- 'PlusStyle' specifies if the number is prefixed with @+@ if it is positive.
 duodecimalNumber :: Integral i
-  => PlusStyle
-  -> i
-  -> Text
+  => PlusStyle -- ^ The given 'PlusStyle' to use.
+  -> i -- ^ The given number to convert.
+  -> Text -- ^ A string of unicode characters representing the value in duodecimal notation.
 duodecimalNumber = positionalNumberSystem 12 _duodecimalDigit '+' '-'
 
 -- | Convert the given 'Integral' number to a 'Text' object that contains
