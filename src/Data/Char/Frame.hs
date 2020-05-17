@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable, PatternSynonyms, Safe #-}
+{-# LANGUAGE DeriveTraversable, PatternSynonyms, Safe #-}
 
 {-|
 Module      : Data.Char.Frame

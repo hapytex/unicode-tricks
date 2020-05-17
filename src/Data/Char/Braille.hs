@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveTraversable, Safe #-}
+{-# LANGUAGE DeriveTraversable, Safe #-}
 
 {-|
 Module      : Data.Char.Braille
