@@ -18,6 +18,7 @@ Currently the package contains the following modules:
  - **`Data.Char.Card`**: a module to work with playing cards;
  - **`Data.Char.Chess`**: a module to render chess pieces (and some variants) in
    unicode;
+ - **`Data.Char.Combining`**: combine a character with a (sequence of) *combining* characters (diacritics, geometrical shapes, etc.);
  - **`Data.Char.Dice`**: a module to render die unicode characters;
  - **`Data.Char.Domino`**: a module to render domino unicode characters;
  - **`Data.Char.Frame`**: typesetting frame elements. Lines of the frames can be
@@ -26,7 +27,7 @@ Currently the package contains the following modules:
  - **`Data.Char.Math`**: a set of functions to render mathematical symbols and
    text, for example in *Fraktur*, *Blackboard bold*, etc.
  - **`Data.Char.Number.Duodecimal`**: a module to work with [duodecimal numbers](https://en.wikipedia.org/wiki/Duodecimal);
- - **`Data.Char.Number.Egyptian`**: a module to render [ancient Egyptian numerals](https://en.wikipedia.org/wiki/Egyptian_numerals); and
+ - **`Data.Char.Number.Egyptian`**: a module to render [ancient Egyptian numerals](https://en.wikipedia.org/wiki/Egyptian_numerals);
  - **`Data.Char.Number.Roman`**: a module to render [Roman numerals](https://en.wikipedia.org/wiki/Roman_numerals); and
  - **`Data.Char.Small`**: making use of subscript and superscript in unicode, and
    for example formatting `Ratio` objects.
