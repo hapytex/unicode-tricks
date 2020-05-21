@@ -7,7 +7,10 @@ module Data.Char.Combining (
   , combiningToUnicode, combiningCharacter, combiningCharacter', isCombiningCharacter
   ) where
 
-data CombiningSequence = CombiningSequence [CombiningCharacter] deriving (Eq, Ord, Read, Show)
+import Data.Maybe(isJust)
+import Data.String(IsString(fromString))
+
+newtype CombiningSequence = CombiningSequence [CombiningCharacter] deriving (Eq, Ord, Read, Show)
 
 -- | The list of possible combining characters. In the documentation of the
 -- combining characters, the characters are demonstrated on the /bullet/ symbol (&#x2022;).
@@ -91,7 +94,6 @@ data CombiningCharacter
   | CombiningAlmostEqualToAbove  -- ^ The combining character @COMBINING ALMOST EQUAL TO ABOVE@ from the Unicode standard, defined by @'\\x034c'@ (&#x2022;&#x034c;).
   | CombiningLeftRightArrowBelow  -- ^ The combining character @COMBINING LEFT RIGHT ARROW BELOW@ from the Unicode standard, defined by @'\\x034d'@ (&#x2022;&#x034d;).
   | CombiningUpwardsArrowBelow  -- ^ The combining character @COMBINING UPWARDS ARROW BELOW@ from the Unicode standard, defined by @'\\x034e'@ (&#x2022;&#x034e;).
-  | CombiningGraphemeJoiner  -- ^ The combining character @COMBINING GRAPHEME JOINER@ from the Unicode standard, defined by @'\\x034f'@ (&#x2022;&#x034f;).
   | CombiningRightArrowheadAbove  -- ^ The combining character @COMBINING RIGHT ARROWHEAD ABOVE@ from the Unicode standard, defined by @'\\x0350'@ (&#x2022;&#x0350;).
   | CombiningLeftHalfRingAbove  -- ^ The combining character @COMBINING LEFT HALF RING ABOVE@ from the Unicode standard, defined by @'\\x0351'@ (&#x2022;&#x0351;).
   | CombiningFermata  -- ^ The combining character @COMBINING FERMATA@ from the Unicode standard, defined by @'\\x0352'@ (&#x2022;&#x0352;).
@@ -129,8 +131,137 @@ data CombiningCharacter
   | CombiningCyrillicDasiaPneumata  -- ^ The combining character @COMBINING CYRILLIC DASIA PNEUMATA@ from the Unicode standard, defined by @'\\x0485'@ (&#x2022;&#x0485;).
   | CombiningCyrillicPsiliPneumata  -- ^ The combining character @COMBINING CYRILLIC PSILI PNEUMATA@ from the Unicode standard, defined by @'\\x0486'@ (&#x2022;&#x0486;).
   | CombiningCyrillicPokrytie  -- ^ The combining character @COMBINING CYRILLIC POKRYTIE@ from the Unicode standard, defined by @'\\x0487'@ (&#x2022;&#x0487;).
-  | CombiningCyrillicHundredThousandsSign  -- ^ The combining character @COMBINING CYRILLIC HUNDRED THOUSANDS SIGN@ from the Unicode standard, defined by @'\\x0488'@ (&#x2022;&#x0488;).
-  | CombiningCyrillicMillionsSign  -- ^ The combining character @COMBINING CYRILLIC MILLIONS SIGN@ from the Unicode standard, defined by @'\\x0489'@ (&#x2022;&#x0489;).
+  | HebrewAccentEtnahta  -- ^ The combining character @HEBREW ACCENT ETNAHTA@ from the Unicode standard, defined by @'\\x0591'@ (&#x2022;&#x0591;).
+  | HebrewAccentSegol  -- ^ The combining character @HEBREW ACCENT SEGOL@ from the Unicode standard, defined by @'\\x0592'@ (&#x2022;&#x0592;).
+  | HebrewAccentShalshelet  -- ^ The combining character @HEBREW ACCENT SHALSHELET@ from the Unicode standard, defined by @'\\x0593'@ (&#x2022;&#x0593;).
+  | HebrewAccentZaqefQatan  -- ^ The combining character @HEBREW ACCENT ZAQEF QATAN@ from the Unicode standard, defined by @'\\x0594'@ (&#x2022;&#x0594;).
+  | HebrewAccentZaqefGadol  -- ^ The combining character @HEBREW ACCENT ZAQEF GADOL@ from the Unicode standard, defined by @'\\x0595'@ (&#x2022;&#x0595;).
+  | HebrewAccentTipeha  -- ^ The combining character @HEBREW ACCENT TIPEHA@ from the Unicode standard, defined by @'\\x0596'@ (&#x2022;&#x0596;).
+  | HebrewAccentRevia  -- ^ The combining character @HEBREW ACCENT REVIA@ from the Unicode standard, defined by @'\\x0597'@ (&#x2022;&#x0597;).
+  | HebrewAccentZarqa  -- ^ The combining character @HEBREW ACCENT ZARQA@ from the Unicode standard, defined by @'\\x0598'@ (&#x2022;&#x0598;).
+  | HebrewAccentPashta  -- ^ The combining character @HEBREW ACCENT PASHTA@ from the Unicode standard, defined by @'\\x0599'@ (&#x2022;&#x0599;).
+  | HebrewAccentYetiv  -- ^ The combining character @HEBREW ACCENT YETIV@ from the Unicode standard, defined by @'\\x059a'@ (&#x2022;&#x059a;).
+  | HebrewAccentTevir  -- ^ The combining character @HEBREW ACCENT TEVIR@ from the Unicode standard, defined by @'\\x059b'@ (&#x2022;&#x059b;).
+  | HebrewAccentGeresh  -- ^ The combining character @HEBREW ACCENT GERESH@ from the Unicode standard, defined by @'\\x059c'@ (&#x2022;&#x059c;).
+  | HebrewAccentGereshMuqdam  -- ^ The combining character @HEBREW ACCENT GERESH MUQDAM@ from the Unicode standard, defined by @'\\x059d'@ (&#x2022;&#x059d;).
+  | HebrewAccentGershayim  -- ^ The combining character @HEBREW ACCENT GERSHAYIM@ from the Unicode standard, defined by @'\\x059e'@ (&#x2022;&#x059e;).
+  | HebrewAccentQarneyPara  -- ^ The combining character @HEBREW ACCENT QARNEY PARA@ from the Unicode standard, defined by @'\\x059f'@ (&#x2022;&#x059f;).
+  | HebrewAccentTelishaGedola  -- ^ The combining character @HEBREW ACCENT TELISHA GEDOLA@ from the Unicode standard, defined by @'\\x05a0'@ (&#x2022;&#x05a0;).
+  | HebrewAccentPazer  -- ^ The combining character @HEBREW ACCENT PAZER@ from the Unicode standard, defined by @'\\x05a1'@ (&#x2022;&#x05a1;).
+  | HebrewAccentAtnahHafukh  -- ^ The combining character @HEBREW ACCENT ATNAH HAFUKH@ from the Unicode standard, defined by @'\\x05a2'@ (&#x2022;&#x05a2;).
+  | HebrewAccentMunah  -- ^ The combining character @HEBREW ACCENT MUNAH@ from the Unicode standard, defined by @'\\x05a3'@ (&#x2022;&#x05a3;).
+  | HebrewAccentMahapakh  -- ^ The combining character @HEBREW ACCENT MAHAPAKH@ from the Unicode standard, defined by @'\\x05a4'@ (&#x2022;&#x05a4;).
+  | HebrewAccentMerkha  -- ^ The combining character @HEBREW ACCENT MERKHA@ from the Unicode standard, defined by @'\\x05a5'@ (&#x2022;&#x05a5;).
+  | HebrewAccentMerkhaKefula  -- ^ The combining character @HEBREW ACCENT MERKHA KEFULA@ from the Unicode standard, defined by @'\\x05a6'@ (&#x2022;&#x05a6;).
+  | HebrewAccentDarga  -- ^ The combining character @HEBREW ACCENT DARGA@ from the Unicode standard, defined by @'\\x05a7'@ (&#x2022;&#x05a7;).
+  | HebrewAccentQadma  -- ^ The combining character @HEBREW ACCENT QADMA@ from the Unicode standard, defined by @'\\x05a8'@ (&#x2022;&#x05a8;).
+  | HebrewAccentTelishaQetana  -- ^ The combining character @HEBREW ACCENT TELISHA QETANA@ from the Unicode standard, defined by @'\\x05a9'@ (&#x2022;&#x05a9;).
+  | HebrewAccentYerahBenYomo  -- ^ The combining character @HEBREW ACCENT YERAH BEN YOMO@ from the Unicode standard, defined by @'\\x05aa'@ (&#x2022;&#x05aa;).
+  | HebrewAccentOle  -- ^ The combining character @HEBREW ACCENT OLE@ from the Unicode standard, defined by @'\\x05ab'@ (&#x2022;&#x05ab;).
+  | HebrewAccentIluy  -- ^ The combining character @HEBREW ACCENT ILUY@ from the Unicode standard, defined by @'\\x05ac'@ (&#x2022;&#x05ac;).
+  | HebrewAccentDehi  -- ^ The combining character @HEBREW ACCENT DEHI@ from the Unicode standard, defined by @'\\x05ad'@ (&#x2022;&#x05ad;).
+  | HebrewAccentZinor  -- ^ The combining character @HEBREW ACCENT ZINOR@ from the Unicode standard, defined by @'\\x05ae'@ (&#x2022;&#x05ae;).
+  | HebrewMarkMasoraCircle  -- ^ The combining character @HEBREW MARK MASORA CIRCLE@ from the Unicode standard, defined by @'\\x05af'@ (&#x2022;&#x05af;).
+  | HebrewPointSheva  -- ^ The combining character @HEBREW POINT SHEVA@ from the Unicode standard, defined by @'\\x05b0'@ (&#x2022;&#x05b0;).
+  | HebrewPointHatafSegol  -- ^ The combining character @HEBREW POINT HATAF SEGOL@ from the Unicode standard, defined by @'\\x05b1'@ (&#x2022;&#x05b1;).
+  | HebrewPointHatafPatah  -- ^ The combining character @HEBREW POINT HATAF PATAH@ from the Unicode standard, defined by @'\\x05b2'@ (&#x2022;&#x05b2;).
+  | HebrewPointHatafQamats  -- ^ The combining character @HEBREW POINT HATAF QAMATS@ from the Unicode standard, defined by @'\\x05b3'@ (&#x2022;&#x05b3;).
+  | HebrewPointHiriq  -- ^ The combining character @HEBREW POINT HIRIQ@ from the Unicode standard, defined by @'\\x05b4'@ (&#x2022;&#x05b4;).
+  | HebrewPointTsere  -- ^ The combining character @HEBREW POINT TSERE@ from the Unicode standard, defined by @'\\x05b5'@ (&#x2022;&#x05b5;).
+  | HebrewPointSegol  -- ^ The combining character @HEBREW POINT SEGOL@ from the Unicode standard, defined by @'\\x05b6'@ (&#x2022;&#x05b6;).
+  | HebrewPointPatah  -- ^ The combining character @HEBREW POINT PATAH@ from the Unicode standard, defined by @'\\x05b7'@ (&#x2022;&#x05b7;).
+  | HebrewPointQamats  -- ^ The combining character @HEBREW POINT QAMATS@ from the Unicode standard, defined by @'\\x05b8'@ (&#x2022;&#x05b8;).
+  | HebrewPointHolam  -- ^ The combining character @HEBREW POINT HOLAM@ from the Unicode standard, defined by @'\\x05b9'@ (&#x2022;&#x05b9;).
+  | HebrewPointHolamHaserForVav  -- ^ The combining character @HEBREW POINT HOLAM HASER FOR VAV@ from the Unicode standard, defined by @'\\x05ba'@ (&#x2022;&#x05ba;).
+  | HebrewPointQubuts  -- ^ The combining character @HEBREW POINT QUBUTS@ from the Unicode standard, defined by @'\\x05bb'@ (&#x2022;&#x05bb;).
+  | HebrewPointDageshOrMapiq  -- ^ The combining character @HEBREW POINT DAGESH OR MAPIQ@ from the Unicode standard, defined by @'\\x05bc'@ (&#x2022;&#x05bc;).
+  | HebrewPointMeteg  -- ^ The combining character @HEBREW POINT METEG@ from the Unicode standard, defined by @'\\x05bd'@ (&#x2022;&#x05bd;).
+  | HebrewPointRafe  -- ^ The combining character @HEBREW POINT RAFE@ from the Unicode standard, defined by @'\\x05bf'@ (&#x2022;&#x05bf;).
+  | HebrewPointShinDot  -- ^ The combining character @HEBREW POINT SHIN DOT@ from the Unicode standard, defined by @'\\x05c1'@ (&#x2022;&#x05c1;).
+  | HebrewPointSinDot  -- ^ The combining character @HEBREW POINT SIN DOT@ from the Unicode standard, defined by @'\\x05c2'@ (&#x2022;&#x05c2;).
+  | HebrewMarkUpperDot  -- ^ The combining character @HEBREW MARK UPPER DOT@ from the Unicode standard, defined by @'\\x05c4'@ (&#x2022;&#x05c4;).
+  | HebrewMarkLowerDot  -- ^ The combining character @HEBREW MARK LOWER DOT@ from the Unicode standard, defined by @'\\x05c5'@ (&#x2022;&#x05c5;).
+  | HebrewPointQamatsQatan  -- ^ The combining character @HEBREW POINT QAMATS QATAN@ from the Unicode standard, defined by @'\\x05c7'@ (&#x2022;&#x05c7;).
+  | ArabicSignSallallahouAlayheWassallam  -- ^ The combining character @ARABIC SIGN SALLALLAHOU ALAYHE WASSALLAM@ from the Unicode standard, defined by @'\\x0610'@ (&#x2022;&#x0610;).
+  | ArabicSignAlayheAssallam  -- ^ The combining character @ARABIC SIGN ALAYHE ASSALLAM@ from the Unicode standard, defined by @'\\x0611'@ (&#x2022;&#x0611;).
+  | ArabicSignRahmatullahAlayhe  -- ^ The combining character @ARABIC SIGN RAHMATULLAH ALAYHE@ from the Unicode standard, defined by @'\\x0612'@ (&#x2022;&#x0612;).
+  | ArabicSignRadiAllahouAnhu  -- ^ The combining character @ARABIC SIGN RADI ALLAHOU ANHU@ from the Unicode standard, defined by @'\\x0613'@ (&#x2022;&#x0613;).
+  | ArabicSignTakhallus  -- ^ The combining character @ARABIC SIGN TAKHALLUS@ from the Unicode standard, defined by @'\\x0614'@ (&#x2022;&#x0614;).
+  | ArabicSmallHighTah  -- ^ The combining character @ARABIC SMALL HIGH TAH@ from the Unicode standard, defined by @'\\x0615'@ (&#x2022;&#x0615;).
+  | ArabicSmallHighLigatureAlefWithLamWithYeh  -- ^ The combining character @ARABIC SMALL HIGH LIGATURE ALEF WITH LAM WITH YEH@ from the Unicode standard, defined by @'\\x0616'@ (&#x2022;&#x0616;).
+  | ArabicSmallHighZain  -- ^ The combining character @ARABIC SMALL HIGH ZAIN@ from the Unicode standard, defined by @'\\x0617'@ (&#x2022;&#x0617;).
+  | ArabicSmallFatha  -- ^ The combining character @ARABIC SMALL FATHA@ from the Unicode standard, defined by @'\\x0618'@ (&#x2022;&#x0618;).
+  | ArabicSmallDamma  -- ^ The combining character @ARABIC SMALL DAMMA@ from the Unicode standard, defined by @'\\x0619'@ (&#x2022;&#x0619;).
+  | ArabicSmallKasra  -- ^ The combining character @ARABIC SMALL KASRA@ from the Unicode standard, defined by @'\\x061a'@ (&#x2022;&#x061a;).
+  | ArabicFathatan  -- ^ The combining character @ARABIC FATHATAN@ from the Unicode standard, defined by @'\\x064b'@ (&#x2022;&#x064b;).
+  | ArabicDammatan  -- ^ The combining character @ARABIC DAMMATAN@ from the Unicode standard, defined by @'\\x064c'@ (&#x2022;&#x064c;).
+  | ArabicKasratan  -- ^ The combining character @ARABIC KASRATAN@ from the Unicode standard, defined by @'\\x064d'@ (&#x2022;&#x064d;).
+  | ArabicFatha  -- ^ The combining character @ARABIC FATHA@ from the Unicode standard, defined by @'\\x064e'@ (&#x2022;&#x064e;).
+  | ArabicDamma  -- ^ The combining character @ARABIC DAMMA@ from the Unicode standard, defined by @'\\x064f'@ (&#x2022;&#x064f;).
+  | ArabicKasra  -- ^ The combining character @ARABIC KASRA@ from the Unicode standard, defined by @'\\x0650'@ (&#x2022;&#x0650;).
+  | ArabicShadda  -- ^ The combining character @ARABIC SHADDA@ from the Unicode standard, defined by @'\\x0651'@ (&#x2022;&#x0651;).
+  | ArabicSukun  -- ^ The combining character @ARABIC SUKUN@ from the Unicode standard, defined by @'\\x0652'@ (&#x2022;&#x0652;).
+  | ArabicMaddahAbove  -- ^ The combining character @ARABIC MADDAH ABOVE@ from the Unicode standard, defined by @'\\x0653'@ (&#x2022;&#x0653;).
+  | ArabicHamzaAbove  -- ^ The combining character @ARABIC HAMZA ABOVE@ from the Unicode standard, defined by @'\\x0654'@ (&#x2022;&#x0654;).
+  | ArabicHamzaBelow  -- ^ The combining character @ARABIC HAMZA BELOW@ from the Unicode standard, defined by @'\\x0655'@ (&#x2022;&#x0655;).
+  | ArabicSubscriptAlef  -- ^ The combining character @ARABIC SUBSCRIPT ALEF@ from the Unicode standard, defined by @'\\x0656'@ (&#x2022;&#x0656;).
+  | ArabicInvertedDamma  -- ^ The combining character @ARABIC INVERTED DAMMA@ from the Unicode standard, defined by @'\\x0657'@ (&#x2022;&#x0657;).
+  | ArabicMarkNoonGhunna  -- ^ The combining character @ARABIC MARK NOON GHUNNA@ from the Unicode standard, defined by @'\\x0658'@ (&#x2022;&#x0658;).
+  | ArabicZwarakay  -- ^ The combining character @ARABIC ZWARAKAY@ from the Unicode standard, defined by @'\\x0659'@ (&#x2022;&#x0659;).
+  | ArabicVowelSignSmallVAbove  -- ^ The combining character @ARABIC VOWEL SIGN SMALL V ABOVE@ from the Unicode standard, defined by @'\\x065a'@ (&#x2022;&#x065a;).
+  | ArabicVowelSignInvertedSmallVAbove  -- ^ The combining character @ARABIC VOWEL SIGN INVERTED SMALL V ABOVE@ from the Unicode standard, defined by @'\\x065b'@ (&#x2022;&#x065b;).
+  | ArabicVowelSignDotBelow  -- ^ The combining character @ARABIC VOWEL SIGN DOT BELOW@ from the Unicode standard, defined by @'\\x065c'@ (&#x2022;&#x065c;).
+  | ArabicReversedDamma  -- ^ The combining character @ARABIC REVERSED DAMMA@ from the Unicode standard, defined by @'\\x065d'@ (&#x2022;&#x065d;).
+  | ArabicFathaWithTwoDots  -- ^ The combining character @ARABIC FATHA WITH TWO DOTS@ from the Unicode standard, defined by @'\\x065e'@ (&#x2022;&#x065e;).
+  | ArabicWavyHamzaBelow  -- ^ The combining character @ARABIC WAVY HAMZA BELOW@ from the Unicode standard, defined by @'\\x065f'@ (&#x2022;&#x065f;).
+  | ArabicLetterSuperscriptAlef  -- ^ The combining character @ARABIC LETTER SUPERSCRIPT ALEF@ from the Unicode standard, defined by @'\\x0670'@ (&#x2022;&#x0670;).
+  | ArabicSmallHighLigatureSadWithLamWithAlefMaksura  -- ^ The combining character @ARABIC SMALL HIGH LIGATURE SAD WITH LAM WITH ALEF MAKSURA@ from the Unicode standard, defined by @'\\x06d6'@ (&#x2022;&#x06d6;).
+  | ArabicSmallHighLigatureQafWithLamWithAlefMaksura  -- ^ The combining character @ARABIC SMALL HIGH LIGATURE QAF WITH LAM WITH ALEF MAKSURA@ from the Unicode standard, defined by @'\\x06d7'@ (&#x2022;&#x06d7;).
+  | ArabicSmallHighMeemInitialForm  -- ^ The combining character @ARABIC SMALL HIGH MEEM INITIAL FORM@ from the Unicode standard, defined by @'\\x06d8'@ (&#x2022;&#x06d8;).
+  | ArabicSmallHighLamAlef  -- ^ The combining character @ARABIC SMALL HIGH LAM ALEF@ from the Unicode standard, defined by @'\\x06d9'@ (&#x2022;&#x06d9;).
+  | ArabicSmallHighJeem  -- ^ The combining character @ARABIC SMALL HIGH JEEM@ from the Unicode standard, defined by @'\\x06da'@ (&#x2022;&#x06da;).
+  | ArabicSmallHighThreeDots  -- ^ The combining character @ARABIC SMALL HIGH THREE DOTS@ from the Unicode standard, defined by @'\\x06db'@ (&#x2022;&#x06db;).
+  | ArabicSmallHighSeen  -- ^ The combining character @ARABIC SMALL HIGH SEEN@ from the Unicode standard, defined by @'\\x06dc'@ (&#x2022;&#x06dc;).
+  | ArabicSmallHighRoundedZero  -- ^ The combining character @ARABIC SMALL HIGH ROUNDED ZERO@ from the Unicode standard, defined by @'\\x06df'@ (&#x2022;&#x06df;).
+  | ArabicSmallHighUprightRectangularZero  -- ^ The combining character @ARABIC SMALL HIGH UPRIGHT RECTANGULAR ZERO@ from the Unicode standard, defined by @'\\x06e0'@ (&#x2022;&#x06e0;).
+  | ArabicSmallHighDotlessHeadOfKhah  -- ^ The combining character @ARABIC SMALL HIGH DOTLESS HEAD OF KHAH@ from the Unicode standard, defined by @'\\x06e1'@ (&#x2022;&#x06e1;).
+  | ArabicSmallHighMeemIsolatedForm  -- ^ The combining character @ARABIC SMALL HIGH MEEM ISOLATED FORM@ from the Unicode standard, defined by @'\\x06e2'@ (&#x2022;&#x06e2;).
+  | ArabicSmallLowSeen  -- ^ The combining character @ARABIC SMALL LOW SEEN@ from the Unicode standard, defined by @'\\x06e3'@ (&#x2022;&#x06e3;).
+  | ArabicSmallHighMadda  -- ^ The combining character @ARABIC SMALL HIGH MADDA@ from the Unicode standard, defined by @'\\x06e4'@ (&#x2022;&#x06e4;).
+  | ArabicSmallHighYeh  -- ^ The combining character @ARABIC SMALL HIGH YEH@ from the Unicode standard, defined by @'\\x06e7'@ (&#x2022;&#x06e7;).
+  | ArabicSmallHighNoon  -- ^ The combining character @ARABIC SMALL HIGH NOON@ from the Unicode standard, defined by @'\\x06e8'@ (&#x2022;&#x06e8;).
+  | ArabicEmptyCentreLowStop  -- ^ The combining character @ARABIC EMPTY CENTRE LOW STOP@ from the Unicode standard, defined by @'\\x06ea'@ (&#x2022;&#x06ea;).
+  | ArabicEmptyCentreHighStop  -- ^ The combining character @ARABIC EMPTY CENTRE HIGH STOP@ from the Unicode standard, defined by @'\\x06eb'@ (&#x2022;&#x06eb;).
+  | ArabicRoundedHighStopWithFilledCentre  -- ^ The combining character @ARABIC ROUNDED HIGH STOP WITH FILLED CENTRE@ from the Unicode standard, defined by @'\\x06ec'@ (&#x2022;&#x06ec;).
+  | ArabicSmallLowMeem  -- ^ The combining character @ARABIC SMALL LOW MEEM@ from the Unicode standard, defined by @'\\x06ed'@ (&#x2022;&#x06ed;).
+  | SyriacLetterSuperscriptAlaph  -- ^ The combining character @SYRIAC LETTER SUPERSCRIPT ALAPH@ from the Unicode standard, defined by @'\\x0711'@ (&#x2022;&#x0711;).
+  | SyriacPthahaAbove  -- ^ The combining character @SYRIAC PTHAHA ABOVE@ from the Unicode standard, defined by @'\\x0730'@ (&#x2022;&#x0730;).
+  | SyriacPthahaBelow  -- ^ The combining character @SYRIAC PTHAHA BELOW@ from the Unicode standard, defined by @'\\x0731'@ (&#x2022;&#x0731;).
+  | SyriacPthahaDotted  -- ^ The combining character @SYRIAC PTHAHA DOTTED@ from the Unicode standard, defined by @'\\x0732'@ (&#x2022;&#x0732;).
+  | SyriacZqaphaAbove  -- ^ The combining character @SYRIAC ZQAPHA ABOVE@ from the Unicode standard, defined by @'\\x0733'@ (&#x2022;&#x0733;).
+  | SyriacZqaphaBelow  -- ^ The combining character @SYRIAC ZQAPHA BELOW@ from the Unicode standard, defined by @'\\x0734'@ (&#x2022;&#x0734;).
+  | SyriacZqaphaDotted  -- ^ The combining character @SYRIAC ZQAPHA DOTTED@ from the Unicode standard, defined by @'\\x0735'@ (&#x2022;&#x0735;).
+  | SyriacRbasaAbove  -- ^ The combining character @SYRIAC RBASA ABOVE@ from the Unicode standard, defined by @'\\x0736'@ (&#x2022;&#x0736;).
+  | SyriacRbasaBelow  -- ^ The combining character @SYRIAC RBASA BELOW@ from the Unicode standard, defined by @'\\x0737'@ (&#x2022;&#x0737;).
+  | SyriacDottedZlamaHorizontal  -- ^ The combining character @SYRIAC DOTTED ZLAMA HORIZONTAL@ from the Unicode standard, defined by @'\\x0738'@ (&#x2022;&#x0738;).
+  | SyriacDottedZlamaAngular  -- ^ The combining character @SYRIAC DOTTED ZLAMA ANGULAR@ from the Unicode standard, defined by @'\\x0739'@ (&#x2022;&#x0739;).
+  | SyriacHbasaAbove  -- ^ The combining character @SYRIAC HBASA ABOVE@ from the Unicode standard, defined by @'\\x073a'@ (&#x2022;&#x073a;).
+  | SyriacHbasaBelow  -- ^ The combining character @SYRIAC HBASA BELOW@ from the Unicode standard, defined by @'\\x073b'@ (&#x2022;&#x073b;).
+  | SyriacHbasaEsasaDotted  -- ^ The combining character @SYRIAC HBASA-ESASA DOTTED@ from the Unicode standard, defined by @'\\x073c'@ (&#x2022;&#x073c;).
+  | SyriacEsasaAbove  -- ^ The combining character @SYRIAC ESASA ABOVE@ from the Unicode standard, defined by @'\\x073d'@ (&#x2022;&#x073d;).
+  | SyriacEsasaBelow  -- ^ The combining character @SYRIAC ESASA BELOW@ from the Unicode standard, defined by @'\\x073e'@ (&#x2022;&#x073e;).
+  | SyriacRwaha  -- ^ The combining character @SYRIAC RWAHA@ from the Unicode standard, defined by @'\\x073f'@ (&#x2022;&#x073f;).
+  | SyriacFeminineDot  -- ^ The combining character @SYRIAC FEMININE DOT@ from the Unicode standard, defined by @'\\x0740'@ (&#x2022;&#x0740;).
+  | SyriacQushshaya  -- ^ The combining character @SYRIAC QUSHSHAYA@ from the Unicode standard, defined by @'\\x0741'@ (&#x2022;&#x0741;).
+  | SyriacRukkakha  -- ^ The combining character @SYRIAC RUKKAKHA@ from the Unicode standard, defined by @'\\x0742'@ (&#x2022;&#x0742;).
+  | SyriacTwoVerticalDotsAbove  -- ^ The combining character @SYRIAC TWO VERTICAL DOTS ABOVE@ from the Unicode standard, defined by @'\\x0743'@ (&#x2022;&#x0743;).
+  | SyriacTwoVerticalDotsBelow  -- ^ The combining character @SYRIAC TWO VERTICAL DOTS BELOW@ from the Unicode standard, defined by @'\\x0744'@ (&#x2022;&#x0744;).
+  | SyriacThreeDotsAbove  -- ^ The combining character @SYRIAC THREE DOTS ABOVE@ from the Unicode standard, defined by @'\\x0745'@ (&#x2022;&#x0745;).
+  | SyriacThreeDotsBelow  -- ^ The combining character @SYRIAC THREE DOTS BELOW@ from the Unicode standard, defined by @'\\x0746'@ (&#x2022;&#x0746;).
+  | SyriacObliqueLineAbove  -- ^ The combining character @SYRIAC OBLIQUE LINE ABOVE@ from the Unicode standard, defined by @'\\x0747'@ (&#x2022;&#x0747;).
+  | SyriacObliqueLineBelow  -- ^ The combining character @SYRIAC OBLIQUE LINE BELOW@ from the Unicode standard, defined by @'\\x0748'@ (&#x2022;&#x0748;).
+  | SyriacMusic  -- ^ The combining character @SYRIAC MUSIC@ from the Unicode standard, defined by @'\\x0749'@ (&#x2022;&#x0749;).
+  | SyriacBarrekh  -- ^ The combining character @SYRIAC BARREKH@ from the Unicode standard, defined by @'\\x074a'@ (&#x2022;&#x074a;).
   | NkoCombiningShortHighTone  -- ^ The combining character @NKO COMBINING SHORT HIGH TONE@ from the Unicode standard, defined by @'\\x07eb'@ (&#x2022;&#x07eb;).
   | NkoCombiningShortLowTone  -- ^ The combining character @NKO COMBINING SHORT LOW TONE@ from the Unicode standard, defined by @'\\x07ec'@ (&#x2022;&#x07ec;).
   | NkoCombiningShortRisingTone  -- ^ The combining character @NKO COMBINING SHORT RISING TONE@ from the Unicode standard, defined by @'\\x07ed'@ (&#x2022;&#x07ed;).
@@ -140,12 +271,153 @@ data CombiningCharacter
   | NkoCombiningLongRisingTone  -- ^ The combining character @NKO COMBINING LONG RISING TONE@ from the Unicode standard, defined by @'\\x07f1'@ (&#x2022;&#x07f1;).
   | NkoCombiningNasalizationMark  -- ^ The combining character @NKO COMBINING NASALIZATION MARK@ from the Unicode standard, defined by @'\\x07f2'@ (&#x2022;&#x07f2;).
   | NkoCombiningDoubleDotAbove  -- ^ The combining character @NKO COMBINING DOUBLE DOT ABOVE@ from the Unicode standard, defined by @'\\x07f3'@ (&#x2022;&#x07f3;).
-  | TeluguSignCombiningCandrabinduAbove  -- ^ The combining character @TELUGU SIGN COMBINING CANDRABINDU ABOVE@ from the Unicode standard, defined by @'\\x0c00'@ (&#x2022;&#x0c00;).
-  | TeluguSignCombiningAnusvaraAbove  -- ^ The combining character @TELUGU SIGN COMBINING ANUSVARA ABOVE@ from the Unicode standard, defined by @'\\x0c04'@ (&#x2022;&#x0c04;).
-  | MalayalamSignCombiningAnusvaraAbove  -- ^ The combining character @MALAYALAM SIGN COMBINING ANUSVARA ABOVE@ from the Unicode standard, defined by @'\\x0d00'@ (&#x2022;&#x0d00;).
+  | SamaritanMarkIn  -- ^ The combining character @SAMARITAN MARK IN@ from the Unicode standard, defined by @'\\x0816'@ (&#x2022;&#x0816;).
+  | SamaritanMarkInAlaf  -- ^ The combining character @SAMARITAN MARK IN-ALAF@ from the Unicode standard, defined by @'\\x0817'@ (&#x2022;&#x0817;).
+  | SamaritanMarkOcclusion  -- ^ The combining character @SAMARITAN MARK OCCLUSION@ from the Unicode standard, defined by @'\\x0818'@ (&#x2022;&#x0818;).
+  | SamaritanMarkDagesh  -- ^ The combining character @SAMARITAN MARK DAGESH@ from the Unicode standard, defined by @'\\x0819'@ (&#x2022;&#x0819;).
+  | SamaritanMarkEpentheticYut  -- ^ The combining character @SAMARITAN MARK EPENTHETIC YUT@ from the Unicode standard, defined by @'\\x081b'@ (&#x2022;&#x081b;).
+  | SamaritanVowelSignLongE  -- ^ The combining character @SAMARITAN VOWEL SIGN LONG E@ from the Unicode standard, defined by @'\\x081c'@ (&#x2022;&#x081c;).
+  | SamaritanVowelSignE  -- ^ The combining character @SAMARITAN VOWEL SIGN E@ from the Unicode standard, defined by @'\\x081d'@ (&#x2022;&#x081d;).
+  | SamaritanVowelSignOverlongAa  -- ^ The combining character @SAMARITAN VOWEL SIGN OVERLONG AA@ from the Unicode standard, defined by @'\\x081e'@ (&#x2022;&#x081e;).
+  | SamaritanVowelSignLongAa  -- ^ The combining character @SAMARITAN VOWEL SIGN LONG AA@ from the Unicode standard, defined by @'\\x081f'@ (&#x2022;&#x081f;).
+  | SamaritanVowelSignAa  -- ^ The combining character @SAMARITAN VOWEL SIGN AA@ from the Unicode standard, defined by @'\\x0820'@ (&#x2022;&#x0820;).
+  | SamaritanVowelSignOverlongA  -- ^ The combining character @SAMARITAN VOWEL SIGN OVERLONG A@ from the Unicode standard, defined by @'\\x0821'@ (&#x2022;&#x0821;).
+  | SamaritanVowelSignLongA  -- ^ The combining character @SAMARITAN VOWEL SIGN LONG A@ from the Unicode standard, defined by @'\\x0822'@ (&#x2022;&#x0822;).
+  | SamaritanVowelSignA  -- ^ The combining character @SAMARITAN VOWEL SIGN A@ from the Unicode standard, defined by @'\\x0823'@ (&#x2022;&#x0823;).
+  | SamaritanVowelSignShortA  -- ^ The combining character @SAMARITAN VOWEL SIGN SHORT A@ from the Unicode standard, defined by @'\\x0825'@ (&#x2022;&#x0825;).
+  | SamaritanVowelSignLongU  -- ^ The combining character @SAMARITAN VOWEL SIGN LONG U@ from the Unicode standard, defined by @'\\x0826'@ (&#x2022;&#x0826;).
+  | SamaritanVowelSignU  -- ^ The combining character @SAMARITAN VOWEL SIGN U@ from the Unicode standard, defined by @'\\x0827'@ (&#x2022;&#x0827;).
+  | SamaritanVowelSignLongI  -- ^ The combining character @SAMARITAN VOWEL SIGN LONG I@ from the Unicode standard, defined by @'\\x0829'@ (&#x2022;&#x0829;).
+  | SamaritanVowelSignI  -- ^ The combining character @SAMARITAN VOWEL SIGN I@ from the Unicode standard, defined by @'\\x082a'@ (&#x2022;&#x082a;).
+  | SamaritanVowelSignO  -- ^ The combining character @SAMARITAN VOWEL SIGN O@ from the Unicode standard, defined by @'\\x082b'@ (&#x2022;&#x082b;).
+  | SamaritanVowelSignSukun  -- ^ The combining character @SAMARITAN VOWEL SIGN SUKUN@ from the Unicode standard, defined by @'\\x082c'@ (&#x2022;&#x082c;).
+  | SamaritanMarkNequdaa  -- ^ The combining character @SAMARITAN MARK NEQUDAA@ from the Unicode standard, defined by @'\\x082d'@ (&#x2022;&#x082d;).
+  | MandaicAffricationMark  -- ^ The combining character @MANDAIC AFFRICATION MARK@ from the Unicode standard, defined by @'\\x0859'@ (&#x2022;&#x0859;).
+  | MandaicVocalizationMark  -- ^ The combining character @MANDAIC VOCALIZATION MARK@ from the Unicode standard, defined by @'\\x085a'@ (&#x2022;&#x085a;).
+  | MandaicGeminationMark  -- ^ The combining character @MANDAIC GEMINATION MARK@ from the Unicode standard, defined by @'\\x085b'@ (&#x2022;&#x085b;).
+  | ArabicSmallHighWordArRub  -- ^ The combining character @ARABIC SMALL HIGH WORD AR-RUB@ from the Unicode standard, defined by @'\\x08d4'@ (&#x2022;&#x08d4;).
+  | ArabicSmallHighSad  -- ^ The combining character @ARABIC SMALL HIGH SAD@ from the Unicode standard, defined by @'\\x08d5'@ (&#x2022;&#x08d5;).
+  | ArabicSmallHighAin  -- ^ The combining character @ARABIC SMALL HIGH AIN@ from the Unicode standard, defined by @'\\x08d6'@ (&#x2022;&#x08d6;).
+  | ArabicSmallHighQaf  -- ^ The combining character @ARABIC SMALL HIGH QAF@ from the Unicode standard, defined by @'\\x08d7'@ (&#x2022;&#x08d7;).
+  | ArabicSmallHighNoonWithKasra  -- ^ The combining character @ARABIC SMALL HIGH NOON WITH KASRA@ from the Unicode standard, defined by @'\\x08d8'@ (&#x2022;&#x08d8;).
+  | ArabicSmallLowNoonWithKasra  -- ^ The combining character @ARABIC SMALL LOW NOON WITH KASRA@ from the Unicode standard, defined by @'\\x08d9'@ (&#x2022;&#x08d9;).
+  | ArabicSmallHighWordAthThalatha  -- ^ The combining character @ARABIC SMALL HIGH WORD ATH-THALATHA@ from the Unicode standard, defined by @'\\x08da'@ (&#x2022;&#x08da;).
+  | ArabicSmallHighWordAsSajda  -- ^ The combining character @ARABIC SMALL HIGH WORD AS-SAJDA@ from the Unicode standard, defined by @'\\x08db'@ (&#x2022;&#x08db;).
+  | ArabicSmallHighWordAnNisf  -- ^ The combining character @ARABIC SMALL HIGH WORD AN-NISF@ from the Unicode standard, defined by @'\\x08dc'@ (&#x2022;&#x08dc;).
+  | ArabicSmallHighWordSakta  -- ^ The combining character @ARABIC SMALL HIGH WORD SAKTA@ from the Unicode standard, defined by @'\\x08dd'@ (&#x2022;&#x08dd;).
+  | ArabicSmallHighWordQif  -- ^ The combining character @ARABIC SMALL HIGH WORD QIF@ from the Unicode standard, defined by @'\\x08de'@ (&#x2022;&#x08de;).
+  | ArabicSmallHighWordWaqfa  -- ^ The combining character @ARABIC SMALL HIGH WORD WAQFA@ from the Unicode standard, defined by @'\\x08df'@ (&#x2022;&#x08df;).
+  | ArabicSmallHighFootnoteMarker  -- ^ The combining character @ARABIC SMALL HIGH FOOTNOTE MARKER@ from the Unicode standard, defined by @'\\x08e0'@ (&#x2022;&#x08e0;).
+  | ArabicSmallHighSignSafha  -- ^ The combining character @ARABIC SMALL HIGH SIGN SAFHA@ from the Unicode standard, defined by @'\\x08e1'@ (&#x2022;&#x08e1;).
+  | ArabicTurnedDammaBelow  -- ^ The combining character @ARABIC TURNED DAMMA BELOW@ from the Unicode standard, defined by @'\\x08e3'@ (&#x2022;&#x08e3;).
+  | ArabicCurlyFatha  -- ^ The combining character @ARABIC CURLY FATHA@ from the Unicode standard, defined by @'\\x08e4'@ (&#x2022;&#x08e4;).
+  | ArabicCurlyDamma  -- ^ The combining character @ARABIC CURLY DAMMA@ from the Unicode standard, defined by @'\\x08e5'@ (&#x2022;&#x08e5;).
+  | ArabicCurlyKasra  -- ^ The combining character @ARABIC CURLY KASRA@ from the Unicode standard, defined by @'\\x08e6'@ (&#x2022;&#x08e6;).
+  | ArabicCurlyFathatan  -- ^ The combining character @ARABIC CURLY FATHATAN@ from the Unicode standard, defined by @'\\x08e7'@ (&#x2022;&#x08e7;).
+  | ArabicCurlyDammatan  -- ^ The combining character @ARABIC CURLY DAMMATAN@ from the Unicode standard, defined by @'\\x08e8'@ (&#x2022;&#x08e8;).
+  | ArabicCurlyKasratan  -- ^ The combining character @ARABIC CURLY KASRATAN@ from the Unicode standard, defined by @'\\x08e9'@ (&#x2022;&#x08e9;).
+  | ArabicToneOneDotAbove  -- ^ The combining character @ARABIC TONE ONE DOT ABOVE@ from the Unicode standard, defined by @'\\x08ea'@ (&#x2022;&#x08ea;).
+  | ArabicToneTwoDotsAbove  -- ^ The combining character @ARABIC TONE TWO DOTS ABOVE@ from the Unicode standard, defined by @'\\x08eb'@ (&#x2022;&#x08eb;).
+  | ArabicToneLoopAbove  -- ^ The combining character @ARABIC TONE LOOP ABOVE@ from the Unicode standard, defined by @'\\x08ec'@ (&#x2022;&#x08ec;).
+  | ArabicToneOneDotBelow  -- ^ The combining character @ARABIC TONE ONE DOT BELOW@ from the Unicode standard, defined by @'\\x08ed'@ (&#x2022;&#x08ed;).
+  | ArabicToneTwoDotsBelow  -- ^ The combining character @ARABIC TONE TWO DOTS BELOW@ from the Unicode standard, defined by @'\\x08ee'@ (&#x2022;&#x08ee;).
+  | ArabicToneLoopBelow  -- ^ The combining character @ARABIC TONE LOOP BELOW@ from the Unicode standard, defined by @'\\x08ef'@ (&#x2022;&#x08ef;).
+  | ArabicOpenFathatan  -- ^ The combining character @ARABIC OPEN FATHATAN@ from the Unicode standard, defined by @'\\x08f0'@ (&#x2022;&#x08f0;).
+  | ArabicOpenDammatan  -- ^ The combining character @ARABIC OPEN DAMMATAN@ from the Unicode standard, defined by @'\\x08f1'@ (&#x2022;&#x08f1;).
+  | ArabicOpenKasratan  -- ^ The combining character @ARABIC OPEN KASRATAN@ from the Unicode standard, defined by @'\\x08f2'@ (&#x2022;&#x08f2;).
+  | ArabicSmallHighWaw  -- ^ The combining character @ARABIC SMALL HIGH WAW@ from the Unicode standard, defined by @'\\x08f3'@ (&#x2022;&#x08f3;).
+  | ArabicFathaWithRing  -- ^ The combining character @ARABIC FATHA WITH RING@ from the Unicode standard, defined by @'\\x08f4'@ (&#x2022;&#x08f4;).
+  | ArabicFathaWithDotAbove  -- ^ The combining character @ARABIC FATHA WITH DOT ABOVE@ from the Unicode standard, defined by @'\\x08f5'@ (&#x2022;&#x08f5;).
+  | ArabicKasraWithDotBelow  -- ^ The combining character @ARABIC KASRA WITH DOT BELOW@ from the Unicode standard, defined by @'\\x08f6'@ (&#x2022;&#x08f6;).
+  | ArabicLeftArrowheadAbove  -- ^ The combining character @ARABIC LEFT ARROWHEAD ABOVE@ from the Unicode standard, defined by @'\\x08f7'@ (&#x2022;&#x08f7;).
+  | ArabicRightArrowheadAbove  -- ^ The combining character @ARABIC RIGHT ARROWHEAD ABOVE@ from the Unicode standard, defined by @'\\x08f8'@ (&#x2022;&#x08f8;).
+  | ArabicLeftArrowheadBelow  -- ^ The combining character @ARABIC LEFT ARROWHEAD BELOW@ from the Unicode standard, defined by @'\\x08f9'@ (&#x2022;&#x08f9;).
+  | ArabicRightArrowheadBelow  -- ^ The combining character @ARABIC RIGHT ARROWHEAD BELOW@ from the Unicode standard, defined by @'\\x08fa'@ (&#x2022;&#x08fa;).
+  | ArabicDoubleRightArrowheadAbove  -- ^ The combining character @ARABIC DOUBLE RIGHT ARROWHEAD ABOVE@ from the Unicode standard, defined by @'\\x08fb'@ (&#x2022;&#x08fb;).
+  | ArabicDoubleRightArrowheadAboveWithDot  -- ^ The combining character @ARABIC DOUBLE RIGHT ARROWHEAD ABOVE WITH DOT@ from the Unicode standard, defined by @'\\x08fc'@ (&#x2022;&#x08fc;).
+  | ArabicRightArrowheadAboveWithDot  -- ^ The combining character @ARABIC RIGHT ARROWHEAD ABOVE WITH DOT@ from the Unicode standard, defined by @'\\x08fd'@ (&#x2022;&#x08fd;).
+  | ArabicDammaWithDot  -- ^ The combining character @ARABIC DAMMA WITH DOT@ from the Unicode standard, defined by @'\\x08fe'@ (&#x2022;&#x08fe;).
+  | ArabicMarkSidewaysNoonGhunna  -- ^ The combining character @ARABIC MARK SIDEWAYS NOON GHUNNA@ from the Unicode standard, defined by @'\\x08ff'@ (&#x2022;&#x08ff;).
+  | DevanagariSignNukta  -- ^ The combining character @DEVANAGARI SIGN NUKTA@ from the Unicode standard, defined by @'\\x093c'@ (&#x2022;&#x093c;).
+  | DevanagariSignVirama  -- ^ The combining character @DEVANAGARI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x094d'@ (&#x2022;&#x094d;).
+  | DevanagariStressSignUdatta  -- ^ The combining character @DEVANAGARI STRESS SIGN UDATTA@ from the Unicode standard, defined by @'\\x0951'@ (&#x2022;&#x0951;).
+  | DevanagariStressSignAnudatta  -- ^ The combining character @DEVANAGARI STRESS SIGN ANUDATTA@ from the Unicode standard, defined by @'\\x0952'@ (&#x2022;&#x0952;).
+  | DevanagariGraveAccent  -- ^ The combining character @DEVANAGARI GRAVE ACCENT@ from the Unicode standard, defined by @'\\x0953'@ (&#x2022;&#x0953;).
+  | DevanagariAcuteAccent  -- ^ The combining character @DEVANAGARI ACUTE ACCENT@ from the Unicode standard, defined by @'\\x0954'@ (&#x2022;&#x0954;).
+  | BengaliSignNukta  -- ^ The combining character @BENGALI SIGN NUKTA@ from the Unicode standard, defined by @'\\x09bc'@ (&#x2022;&#x09bc;).
+  | BengaliSignVirama  -- ^ The combining character @BENGALI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x09cd'@ (&#x2022;&#x09cd;).
+  | GurmukhiSignNukta  -- ^ The combining character @GURMUKHI SIGN NUKTA@ from the Unicode standard, defined by @'\\x0a3c'@ (&#x2022;&#x0a3c;).
+  | GurmukhiSignVirama  -- ^ The combining character @GURMUKHI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x0a4d'@ (&#x2022;&#x0a4d;).
+  | GujaratiSignNukta  -- ^ The combining character @GUJARATI SIGN NUKTA@ from the Unicode standard, defined by @'\\x0abc'@ (&#x2022;&#x0abc;).
+  | GujaratiSignVirama  -- ^ The combining character @GUJARATI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x0acd'@ (&#x2022;&#x0acd;).
+  | OriyaSignNukta  -- ^ The combining character @ORIYA SIGN NUKTA@ from the Unicode standard, defined by @'\\x0b3c'@ (&#x2022;&#x0b3c;).
+  | OriyaSignVirama  -- ^ The combining character @ORIYA SIGN VIRAMA@ from the Unicode standard, defined by @'\\x0b4d'@ (&#x2022;&#x0b4d;).
+  | TamilSignVirama  -- ^ The combining character @TAMIL SIGN VIRAMA@ from the Unicode standard, defined by @'\\x0bcd'@ (&#x2022;&#x0bcd;).
+  | TeluguSignVirama  -- ^ The combining character @TELUGU SIGN VIRAMA@ from the Unicode standard, defined by @'\\x0c4d'@ (&#x2022;&#x0c4d;).
+  | TeluguLengthMark  -- ^ The combining character @TELUGU LENGTH MARK@ from the Unicode standard, defined by @'\\x0c55'@ (&#x2022;&#x0c55;).
+  | TeluguAiLengthMark  -- ^ The combining character @TELUGU AI LENGTH MARK@ from the Unicode standard, defined by @'\\x0c56'@ (&#x2022;&#x0c56;).
+  | KannadaSignNukta  -- ^ The combining character @KANNADA SIGN NUKTA@ from the Unicode standard, defined by @'\\x0cbc'@ (&#x2022;&#x0cbc;).
+  | KannadaSignVirama  -- ^ The combining character @KANNADA SIGN VIRAMA@ from the Unicode standard, defined by @'\\x0ccd'@ (&#x2022;&#x0ccd;).
+  | MalayalamSignVirama  -- ^ The combining character @MALAYALAM SIGN VIRAMA@ from the Unicode standard, defined by @'\\x0d4d'@ (&#x2022;&#x0d4d;).
+  | SinhalaSignAlLakuna  -- ^ The combining character @SINHALA SIGN AL-LAKUNA@ from the Unicode standard, defined by @'\\x0dca'@ (&#x2022;&#x0dca;).
+  | ThaiCharacterSaraU  -- ^ The combining character @THAI CHARACTER SARA U@ from the Unicode standard, defined by @'\\x0e38'@ (&#x2022;&#x0e38;).
+  | ThaiCharacterSaraUu  -- ^ The combining character @THAI CHARACTER SARA UU@ from the Unicode standard, defined by @'\\x0e39'@ (&#x2022;&#x0e39;).
+  | ThaiCharacterPhinthu  -- ^ The combining character @THAI CHARACTER PHINTHU@ from the Unicode standard, defined by @'\\x0e3a'@ (&#x2022;&#x0e3a;).
+  | ThaiCharacterMaiEk  -- ^ The combining character @THAI CHARACTER MAI EK@ from the Unicode standard, defined by @'\\x0e48'@ (&#x2022;&#x0e48;).
+  | ThaiCharacterMaiTho  -- ^ The combining character @THAI CHARACTER MAI THO@ from the Unicode standard, defined by @'\\x0e49'@ (&#x2022;&#x0e49;).
+  | ThaiCharacterMaiTri  -- ^ The combining character @THAI CHARACTER MAI TRI@ from the Unicode standard, defined by @'\\x0e4a'@ (&#x2022;&#x0e4a;).
+  | ThaiCharacterMaiChattawa  -- ^ The combining character @THAI CHARACTER MAI CHATTAWA@ from the Unicode standard, defined by @'\\x0e4b'@ (&#x2022;&#x0e4b;).
+  | LaoVowelSignU  -- ^ The combining character @LAO VOWEL SIGN U@ from the Unicode standard, defined by @'\\x0eb8'@ (&#x2022;&#x0eb8;).
+  | LaoVowelSignUu  -- ^ The combining character @LAO VOWEL SIGN UU@ from the Unicode standard, defined by @'\\x0eb9'@ (&#x2022;&#x0eb9;).
+  | LaoToneMaiEk  -- ^ The combining character @LAO TONE MAI EK@ from the Unicode standard, defined by @'\\x0ec8'@ (&#x2022;&#x0ec8;).
+  | LaoToneMaiTho  -- ^ The combining character @LAO TONE MAI THO@ from the Unicode standard, defined by @'\\x0ec9'@ (&#x2022;&#x0ec9;).
+  | LaoToneMaiTi  -- ^ The combining character @LAO TONE MAI TI@ from the Unicode standard, defined by @'\\x0eca'@ (&#x2022;&#x0eca;).
+  | LaoToneMaiCatawa  -- ^ The combining character @LAO TONE MAI CATAWA@ from the Unicode standard, defined by @'\\x0ecb'@ (&#x2022;&#x0ecb;).
+  | TibetanAstrologicalSignKhyudPa  -- ^ The combining character @TIBETAN ASTROLOGICAL SIGN -KHYUD PA@ from the Unicode standard, defined by @'\\x0f18'@ (&#x2022;&#x0f18;).
+  | TibetanAstrologicalSignSdongTshugs  -- ^ The combining character @TIBETAN ASTROLOGICAL SIGN SDONG TSHUGS@ from the Unicode standard, defined by @'\\x0f19'@ (&#x2022;&#x0f19;).
+  | TibetanMarkNgasBzungNyiZla  -- ^ The combining character @TIBETAN MARK NGAS BZUNG NYI ZLA@ from the Unicode standard, defined by @'\\x0f35'@ (&#x2022;&#x0f35;).
+  | TibetanMarkNgasBzungSgorRtags  -- ^ The combining character @TIBETAN MARK NGAS BZUNG SGOR RTAGS@ from the Unicode standard, defined by @'\\x0f37'@ (&#x2022;&#x0f37;).
+  | TibetanMarkTsaPhru  -- ^ The combining character @TIBETAN MARK TSA -PHRU@ from the Unicode standard, defined by @'\\x0f39'@ (&#x2022;&#x0f39;).
+  | TibetanVowelSignAa  -- ^ The combining character @TIBETAN VOWEL SIGN AA@ from the Unicode standard, defined by @'\\x0f71'@ (&#x2022;&#x0f71;).
+  | TibetanVowelSignI  -- ^ The combining character @TIBETAN VOWEL SIGN I@ from the Unicode standard, defined by @'\\x0f72'@ (&#x2022;&#x0f72;).
+  | TibetanVowelSignU  -- ^ The combining character @TIBETAN VOWEL SIGN U@ from the Unicode standard, defined by @'\\x0f74'@ (&#x2022;&#x0f74;).
+  | TibetanVowelSignE  -- ^ The combining character @TIBETAN VOWEL SIGN E@ from the Unicode standard, defined by @'\\x0f7a'@ (&#x2022;&#x0f7a;).
+  | TibetanVowelSignEe  -- ^ The combining character @TIBETAN VOWEL SIGN EE@ from the Unicode standard, defined by @'\\x0f7b'@ (&#x2022;&#x0f7b;).
+  | TibetanVowelSignO  -- ^ The combining character @TIBETAN VOWEL SIGN O@ from the Unicode standard, defined by @'\\x0f7c'@ (&#x2022;&#x0f7c;).
+  | TibetanVowelSignOo  -- ^ The combining character @TIBETAN VOWEL SIGN OO@ from the Unicode standard, defined by @'\\x0f7d'@ (&#x2022;&#x0f7d;).
+  | TibetanVowelSignReversedI  -- ^ The combining character @TIBETAN VOWEL SIGN REVERSED I@ from the Unicode standard, defined by @'\\x0f80'@ (&#x2022;&#x0f80;).
+  | TibetanSignNyiZlaNaaDa  -- ^ The combining character @TIBETAN SIGN NYI ZLA NAA DA@ from the Unicode standard, defined by @'\\x0f82'@ (&#x2022;&#x0f82;).
+  | TibetanSignSnaLdan  -- ^ The combining character @TIBETAN SIGN SNA LDAN@ from the Unicode standard, defined by @'\\x0f83'@ (&#x2022;&#x0f83;).
+  | TibetanMarkHalanta  -- ^ The combining character @TIBETAN MARK HALANTA@ from the Unicode standard, defined by @'\\x0f84'@ (&#x2022;&#x0f84;).
+  | TibetanSignLciRtags  -- ^ The combining character @TIBETAN SIGN LCI RTAGS@ from the Unicode standard, defined by @'\\x0f86'@ (&#x2022;&#x0f86;).
+  | TibetanSignYangRtags  -- ^ The combining character @TIBETAN SIGN YANG RTAGS@ from the Unicode standard, defined by @'\\x0f87'@ (&#x2022;&#x0f87;).
+  | TibetanSymbolPadmaGdan  -- ^ The combining character @TIBETAN SYMBOL PADMA GDAN@ from the Unicode standard, defined by @'\\x0fc6'@ (&#x2022;&#x0fc6;).
+  | MyanmarSignDotBelow  -- ^ The combining character @MYANMAR SIGN DOT BELOW@ from the Unicode standard, defined by @'\\x1037'@ (&#x2022;&#x1037;).
+  | MyanmarSignVirama  -- ^ The combining character @MYANMAR SIGN VIRAMA@ from the Unicode standard, defined by @'\\x1039'@ (&#x2022;&#x1039;).
+  | MyanmarSignAsat  -- ^ The combining character @MYANMAR SIGN ASAT@ from the Unicode standard, defined by @'\\x103a'@ (&#x2022;&#x103a;).
+  | MyanmarSignShanCouncilEmphaticTone  -- ^ The combining character @MYANMAR SIGN SHAN COUNCIL EMPHATIC TONE@ from the Unicode standard, defined by @'\\x108d'@ (&#x2022;&#x108d;).
   | EthiopicCombiningGeminationAndVowelLengthMark  -- ^ The combining character @ETHIOPIC COMBINING GEMINATION AND VOWEL LENGTH MARK@ from the Unicode standard, defined by @'\\x135d'@ (&#x2022;&#x135d;).
   | EthiopicCombiningVowelLengthMark  -- ^ The combining character @ETHIOPIC COMBINING VOWEL LENGTH MARK@ from the Unicode standard, defined by @'\\x135e'@ (&#x2022;&#x135e;).
   | EthiopicCombiningGeminationMark  -- ^ The combining character @ETHIOPIC COMBINING GEMINATION MARK@ from the Unicode standard, defined by @'\\x135f'@ (&#x2022;&#x135f;).
+  | TagalogSignVirama  -- ^ The combining character @TAGALOG SIGN VIRAMA@ from the Unicode standard, defined by @'\\x1714'@ (&#x2022;&#x1714;).
+  | HanunooSignPamudpod  -- ^ The combining character @HANUNOO SIGN PAMUDPOD@ from the Unicode standard, defined by @'\\x1734'@ (&#x2022;&#x1734;).
+  | KhmerSignCoeng  -- ^ The combining character @KHMER SIGN COENG@ from the Unicode standard, defined by @'\\x17d2'@ (&#x2022;&#x17d2;).
+  | KhmerSignAtthacan  -- ^ The combining character @KHMER SIGN ATTHACAN@ from the Unicode standard, defined by @'\\x17dd'@ (&#x2022;&#x17dd;).
+  | MongolianLetterAliGaliDagalga  -- ^ The combining character @MONGOLIAN LETTER ALI GALI DAGALGA@ from the Unicode standard, defined by @'\\x18a9'@ (&#x2022;&#x18a9;).
+  | LimbuSignMukphreng  -- ^ The combining character @LIMBU SIGN MUKPHRENG@ from the Unicode standard, defined by @'\\x1939'@ (&#x2022;&#x1939;).
+  | LimbuSignKemphreng  -- ^ The combining character @LIMBU SIGN KEMPHRENG@ from the Unicode standard, defined by @'\\x193a'@ (&#x2022;&#x193a;).
+  | LimbuSignSaI  -- ^ The combining character @LIMBU SIGN SA-I@ from the Unicode standard, defined by @'\\x193b'@ (&#x2022;&#x193b;).
+  | BugineseVowelSignI  -- ^ The combining character @BUGINESE VOWEL SIGN I@ from the Unicode standard, defined by @'\\x1a17'@ (&#x2022;&#x1a17;).
+  | BugineseVowelSignU  -- ^ The combining character @BUGINESE VOWEL SIGN U@ from the Unicode standard, defined by @'\\x1a18'@ (&#x2022;&#x1a18;).
+  | TaiThamSignSakot  -- ^ The combining character @TAI THAM SIGN SAKOT@ from the Unicode standard, defined by @'\\x1a60'@ (&#x2022;&#x1a60;).
+  | TaiThamSignTone1  -- ^ The combining character @TAI THAM SIGN TONE1@ from the Unicode standard, defined by @'\\x1a75'@ (&#x2022;&#x1a75;).
+  | TaiThamSignTone2  -- ^ The combining character @TAI THAM SIGN TONE2@ from the Unicode standard, defined by @'\\x1a76'@ (&#x2022;&#x1a76;).
+  | TaiThamSignKhuenTone3  -- ^ The combining character @TAI THAM SIGN KHUEN TONE3@ from the Unicode standard, defined by @'\\x1a77'@ (&#x2022;&#x1a77;).
+  | TaiThamSignKhuenTone4  -- ^ The combining character @TAI THAM SIGN KHUEN TONE4@ from the Unicode standard, defined by @'\\x1a78'@ (&#x2022;&#x1a78;).
+  | TaiThamSignKhuenTone5  -- ^ The combining character @TAI THAM SIGN KHUEN TONE5@ from the Unicode standard, defined by @'\\x1a79'@ (&#x2022;&#x1a79;).
+  | TaiThamSignRaHaam  -- ^ The combining character @TAI THAM SIGN RA HAAM@ from the Unicode standard, defined by @'\\x1a7a'@ (&#x2022;&#x1a7a;).
+  | TaiThamSignMaiSam  -- ^ The combining character @TAI THAM SIGN MAI SAM@ from the Unicode standard, defined by @'\\x1a7b'@ (&#x2022;&#x1a7b;).
+  | TaiThamSignKhuenLueKaran  -- ^ The combining character @TAI THAM SIGN KHUEN-LUE KARAN@ from the Unicode standard, defined by @'\\x1a7c'@ (&#x2022;&#x1a7c;).
   | TaiThamCombiningCryptogrammicDot  -- ^ The combining character @TAI THAM COMBINING CRYPTOGRAMMIC DOT@ from the Unicode standard, defined by @'\\x1a7f'@ (&#x2022;&#x1a7f;).
   | CombiningDoubledCircumflexAccent  -- ^ The combining character @COMBINING DOUBLED CIRCUMFLEX ACCENT@ from the Unicode standard, defined by @'\\x1ab0'@ (&#x2022;&#x1ab0;).
   | CombiningDiaeresisRing  -- ^ The combining character @COMBINING DIAERESIS-RING@ from the Unicode standard, defined by @'\\x1ab1'@ (&#x2022;&#x1ab1;).
@@ -161,9 +433,8 @@ data CombiningCharacter
   | CombiningParenthesesAbove  -- ^ The combining character @COMBINING PARENTHESES ABOVE@ from the Unicode standard, defined by @'\\x1abb'@ (&#x2022;&#x1abb;).
   | CombiningDoubleParenthesesAbove  -- ^ The combining character @COMBINING DOUBLE PARENTHESES ABOVE@ from the Unicode standard, defined by @'\\x1abc'@ (&#x2022;&#x1abc;).
   | CombiningParenthesesBelow  -- ^ The combining character @COMBINING PARENTHESES BELOW@ from the Unicode standard, defined by @'\\x1abd'@ (&#x2022;&#x1abd;).
-  | CombiningParenthesesOverlay  -- ^ The combining character @COMBINING PARENTHESES OVERLAY@ from the Unicode standard, defined by @'\\x1abe'@ (&#x2022;&#x1abe;).
-  | CombiningLatinSmallLetterWBelow  -- ^ The combining character @COMBINING LATIN SMALL LETTER W BELOW@ from the Unicode standard, defined by @'\\x1abf'@ (&#x2022;&#x1abf;).
-  | CombiningLatinSmallLetterTurnedWBelow  -- ^ The combining character @COMBINING LATIN SMALL LETTER TURNED W BELOW@ from the Unicode standard, defined by @'\\x1ac0'@ (&#x2022;&#x1ac0;).
+  | BalineseSignRerekan  -- ^ The combining character @BALINESE SIGN REREKAN@ from the Unicode standard, defined by @'\\x1b34'@ (&#x2022;&#x1b34;).
+  | BalineseAdegAdeg  -- ^ The combining character @BALINESE ADEG ADEG@ from the Unicode standard, defined by @'\\x1b44'@ (&#x2022;&#x1b44;).
   | BalineseMusicalSymbolCombiningTegeh  -- ^ The combining character @BALINESE MUSICAL SYMBOL COMBINING TEGEH@ from the Unicode standard, defined by @'\\x1b6b'@ (&#x2022;&#x1b6b;).
   | BalineseMusicalSymbolCombiningEndep  -- ^ The combining character @BALINESE MUSICAL SYMBOL COMBINING ENDEP@ from the Unicode standard, defined by @'\\x1b6c'@ (&#x2022;&#x1b6c;).
   | BalineseMusicalSymbolCombiningKempul  -- ^ The combining character @BALINESE MUSICAL SYMBOL COMBINING KEMPUL@ from the Unicode standard, defined by @'\\x1b6d'@ (&#x2022;&#x1b6d;).
@@ -173,6 +444,39 @@ data CombiningCharacter
   | BalineseMusicalSymbolCombiningKempliWithJegogan  -- ^ The combining character @BALINESE MUSICAL SYMBOL COMBINING KEMPLI WITH JEGOGAN@ from the Unicode standard, defined by @'\\x1b71'@ (&#x2022;&#x1b71;).
   | BalineseMusicalSymbolCombiningBende  -- ^ The combining character @BALINESE MUSICAL SYMBOL COMBINING BENDE@ from the Unicode standard, defined by @'\\x1b72'@ (&#x2022;&#x1b72;).
   | BalineseMusicalSymbolCombiningGong  -- ^ The combining character @BALINESE MUSICAL SYMBOL COMBINING GONG@ from the Unicode standard, defined by @'\\x1b73'@ (&#x2022;&#x1b73;).
+  | SundaneseSignPamaaeh  -- ^ The combining character @SUNDANESE SIGN PAMAAEH@ from the Unicode standard, defined by @'\\x1baa'@ (&#x2022;&#x1baa;).
+  | SundaneseSignVirama  -- ^ The combining character @SUNDANESE SIGN VIRAMA@ from the Unicode standard, defined by @'\\x1bab'@ (&#x2022;&#x1bab;).
+  | BatakSignTompi  -- ^ The combining character @BATAK SIGN TOMPI@ from the Unicode standard, defined by @'\\x1be6'@ (&#x2022;&#x1be6;).
+  | BatakPangolat  -- ^ The combining character @BATAK PANGOLAT@ from the Unicode standard, defined by @'\\x1bf2'@ (&#x2022;&#x1bf2;).
+  | BatakPanongonan  -- ^ The combining character @BATAK PANONGONAN@ from the Unicode standard, defined by @'\\x1bf3'@ (&#x2022;&#x1bf3;).
+  | LepchaSignNukta  -- ^ The combining character @LEPCHA SIGN NUKTA@ from the Unicode standard, defined by @'\\x1c37'@ (&#x2022;&#x1c37;).
+  | VedicToneKarshana  -- ^ The combining character @VEDIC TONE KARSHANA@ from the Unicode standard, defined by @'\\x1cd0'@ (&#x2022;&#x1cd0;).
+  | VedicToneShara  -- ^ The combining character @VEDIC TONE SHARA@ from the Unicode standard, defined by @'\\x1cd1'@ (&#x2022;&#x1cd1;).
+  | VedicTonePrenkha  -- ^ The combining character @VEDIC TONE PRENKHA@ from the Unicode standard, defined by @'\\x1cd2'@ (&#x2022;&#x1cd2;).
+  | VedicSignYajurvedicMidlineSvarita  -- ^ The combining character @VEDIC SIGN YAJURVEDIC MIDLINE SVARITA@ from the Unicode standard, defined by @'\\x1cd4'@ (&#x2022;&#x1cd4;).
+  | VedicToneYajurvedicAggravatedIndependentSvarita  -- ^ The combining character @VEDIC TONE YAJURVEDIC AGGRAVATED INDEPENDENT SVARITA@ from the Unicode standard, defined by @'\\x1cd5'@ (&#x2022;&#x1cd5;).
+  | VedicToneYajurvedicIndependentSvarita  -- ^ The combining character @VEDIC TONE YAJURVEDIC INDEPENDENT SVARITA@ from the Unicode standard, defined by @'\\x1cd6'@ (&#x2022;&#x1cd6;).
+  | VedicToneYajurvedicKathakaIndependentSvarita  -- ^ The combining character @VEDIC TONE YAJURVEDIC KATHAKA INDEPENDENT SVARITA@ from the Unicode standard, defined by @'\\x1cd7'@ (&#x2022;&#x1cd7;).
+  | VedicToneCandraBelow  -- ^ The combining character @VEDIC TONE CANDRA BELOW@ from the Unicode standard, defined by @'\\x1cd8'@ (&#x2022;&#x1cd8;).
+  | VedicToneYajurvedicKathakaIndependentSvaritaSchroeder  -- ^ The combining character @VEDIC TONE YAJURVEDIC KATHAKA INDEPENDENT SVARITA SCHROEDER@ from the Unicode standard, defined by @'\\x1cd9'@ (&#x2022;&#x1cd9;).
+  | VedicToneDoubleSvarita  -- ^ The combining character @VEDIC TONE DOUBLE SVARITA@ from the Unicode standard, defined by @'\\x1cda'@ (&#x2022;&#x1cda;).
+  | VedicToneTripleSvarita  -- ^ The combining character @VEDIC TONE TRIPLE SVARITA@ from the Unicode standard, defined by @'\\x1cdb'@ (&#x2022;&#x1cdb;).
+  | VedicToneKathakaAnudatta  -- ^ The combining character @VEDIC TONE KATHAKA ANUDATTA@ from the Unicode standard, defined by @'\\x1cdc'@ (&#x2022;&#x1cdc;).
+  | VedicToneDotBelow  -- ^ The combining character @VEDIC TONE DOT BELOW@ from the Unicode standard, defined by @'\\x1cdd'@ (&#x2022;&#x1cdd;).
+  | VedicToneTwoDotsBelow  -- ^ The combining character @VEDIC TONE TWO DOTS BELOW@ from the Unicode standard, defined by @'\\x1cde'@ (&#x2022;&#x1cde;).
+  | VedicToneThreeDotsBelow  -- ^ The combining character @VEDIC TONE THREE DOTS BELOW@ from the Unicode standard, defined by @'\\x1cdf'@ (&#x2022;&#x1cdf;).
+  | VedicToneRigvedicKashmiriIndependentSvarita  -- ^ The combining character @VEDIC TONE RIGVEDIC KASHMIRI INDEPENDENT SVARITA@ from the Unicode standard, defined by @'\\x1ce0'@ (&#x2022;&#x1ce0;).
+  | VedicSignVisargaSvarita  -- ^ The combining character @VEDIC SIGN VISARGA SVARITA@ from the Unicode standard, defined by @'\\x1ce2'@ (&#x2022;&#x1ce2;).
+  | VedicSignVisargaUdatta  -- ^ The combining character @VEDIC SIGN VISARGA UDATTA@ from the Unicode standard, defined by @'\\x1ce3'@ (&#x2022;&#x1ce3;).
+  | VedicSignReversedVisargaUdatta  -- ^ The combining character @VEDIC SIGN REVERSED VISARGA UDATTA@ from the Unicode standard, defined by @'\\x1ce4'@ (&#x2022;&#x1ce4;).
+  | VedicSignVisargaAnudatta  -- ^ The combining character @VEDIC SIGN VISARGA ANUDATTA@ from the Unicode standard, defined by @'\\x1ce5'@ (&#x2022;&#x1ce5;).
+  | VedicSignReversedVisargaAnudatta  -- ^ The combining character @VEDIC SIGN REVERSED VISARGA ANUDATTA@ from the Unicode standard, defined by @'\\x1ce6'@ (&#x2022;&#x1ce6;).
+  | VedicSignVisargaUdattaWithTail  -- ^ The combining character @VEDIC SIGN VISARGA UDATTA WITH TAIL@ from the Unicode standard, defined by @'\\x1ce7'@ (&#x2022;&#x1ce7;).
+  | VedicSignVisargaAnudattaWithTail  -- ^ The combining character @VEDIC SIGN VISARGA ANUDATTA WITH TAIL@ from the Unicode standard, defined by @'\\x1ce8'@ (&#x2022;&#x1ce8;).
+  | VedicSignTiryak  -- ^ The combining character @VEDIC SIGN TIRYAK@ from the Unicode standard, defined by @'\\x1ced'@ (&#x2022;&#x1ced;).
+  | VedicToneCandraAbove  -- ^ The combining character @VEDIC TONE CANDRA ABOVE@ from the Unicode standard, defined by @'\\x1cf4'@ (&#x2022;&#x1cf4;).
+  | VedicToneRingAbove  -- ^ The combining character @VEDIC TONE RING ABOVE@ from the Unicode standard, defined by @'\\x1cf8'@ (&#x2022;&#x1cf8;).
+  | VedicToneDoubleRingAbove  -- ^ The combining character @VEDIC TONE DOUBLE RING ABOVE@ from the Unicode standard, defined by @'\\x1cf9'@ (&#x2022;&#x1cf9;).
   | CombiningDottedGraveAccent  -- ^ The combining character @COMBINING DOTTED GRAVE ACCENT@ from the Unicode standard, defined by @'\\x1dc0'@ (&#x2022;&#x1dc0;).
   | CombiningDottedAcuteAccent  -- ^ The combining character @COMBINING DOTTED ACUTE ACCENT@ from the Unicode standard, defined by @'\\x1dc1'@ (&#x2022;&#x1dc1;).
   | CombiningSnakeBelow  -- ^ The combining character @COMBINING SNAKE BELOW@ from the Unicode standard, defined by @'\\x1dc2'@ (&#x2022;&#x1dc2;).
@@ -227,10 +531,6 @@ data CombiningCharacter
   | CombiningLatinSmallLetterOWithDiaeresis  -- ^ The combining character @COMBINING LATIN SMALL LETTER O WITH DIAERESIS@ from the Unicode standard, defined by @'\\x1df3'@ (&#x2022;&#x1df3;).
   | CombiningLatinSmallLetterUWithDiaeresis  -- ^ The combining character @COMBINING LATIN SMALL LETTER U WITH DIAERESIS@ from the Unicode standard, defined by @'\\x1df4'@ (&#x2022;&#x1df4;).
   | CombiningUpTackAbove  -- ^ The combining character @COMBINING UP TACK ABOVE@ from the Unicode standard, defined by @'\\x1df5'@ (&#x2022;&#x1df5;).
-  | CombiningKavykaAboveRight  -- ^ The combining character @COMBINING KAVYKA ABOVE RIGHT@ from the Unicode standard, defined by @'\\x1df6'@ (&#x2022;&#x1df6;).
-  | CombiningKavykaAboveLeft  -- ^ The combining character @COMBINING KAVYKA ABOVE LEFT@ from the Unicode standard, defined by @'\\x1df7'@ (&#x2022;&#x1df7;).
-  | CombiningDotAboveLeft  -- ^ The combining character @COMBINING DOT ABOVE LEFT@ from the Unicode standard, defined by @'\\x1df8'@ (&#x2022;&#x1df8;).
-  | CombiningWideInvertedBridgeBelow  -- ^ The combining character @COMBINING WIDE INVERTED BRIDGE BELOW@ from the Unicode standard, defined by @'\\x1df9'@ (&#x2022;&#x1df9;).
   | CombiningDeletionMark  -- ^ The combining character @COMBINING DELETION MARK@ from the Unicode standard, defined by @'\\x1dfb'@ (&#x2022;&#x1dfb;).
   | CombiningDoubleInvertedBreveBelow  -- ^ The combining character @COMBINING DOUBLE INVERTED BREVE BELOW@ from the Unicode standard, defined by @'\\x1dfc'@ (&#x2022;&#x1dfc;).
   | CombiningAlmostEqualToBelow  -- ^ The combining character @COMBINING ALMOST EQUAL TO BELOW@ from the Unicode standard, defined by @'\\x1dfd'@ (&#x2022;&#x1dfd;).
@@ -249,14 +549,7 @@ data CombiningCharacter
   | CombiningAnticlockwiseRingOverlay  -- ^ The combining character @COMBINING ANTICLOCKWISE RING OVERLAY@ from the Unicode standard, defined by @'\\x20da'@ (&#x2022;&#x20da;).
   | CombiningThreeDotsAbove  -- ^ The combining character @COMBINING THREE DOTS ABOVE@ from the Unicode standard, defined by @'\\x20db'@ (&#x2022;&#x20db;).
   | CombiningFourDotsAbove  -- ^ The combining character @COMBINING FOUR DOTS ABOVE@ from the Unicode standard, defined by @'\\x20dc'@ (&#x2022;&#x20dc;).
-  | CombiningEnclosingCircle  -- ^ The combining character @COMBINING ENCLOSING CIRCLE@ from the Unicode standard, defined by @'\\x20dd'@ (&#x2022;&#x20dd;).
-  | CombiningEnclosingSquare  -- ^ The combining character @COMBINING ENCLOSING SQUARE@ from the Unicode standard, defined by @'\\x20de'@ (&#x2022;&#x20de;).
-  | CombiningEnclosingDiamond  -- ^ The combining character @COMBINING ENCLOSING DIAMOND@ from the Unicode standard, defined by @'\\x20df'@ (&#x2022;&#x20df;).
-  | CombiningEnclosingCircleBackslash  -- ^ The combining character @COMBINING ENCLOSING CIRCLE BACKSLASH@ from the Unicode standard, defined by @'\\x20e0'@ (&#x2022;&#x20e0;).
   | CombiningLeftRightArrowAbove  -- ^ The combining character @COMBINING LEFT RIGHT ARROW ABOVE@ from the Unicode standard, defined by @'\\x20e1'@ (&#x2022;&#x20e1;).
-  | CombiningEnclosingScreen  -- ^ The combining character @COMBINING ENCLOSING SCREEN@ from the Unicode standard, defined by @'\\x20e2'@ (&#x2022;&#x20e2;).
-  | CombiningEnclosingKeycap  -- ^ The combining character @COMBINING ENCLOSING KEYCAP@ from the Unicode standard, defined by @'\\x20e3'@ (&#x2022;&#x20e3;).
-  | CombiningEnclosingUpwardPointingTriangle  -- ^ The combining character @COMBINING ENCLOSING UPWARD POINTING TRIANGLE@ from the Unicode standard, defined by @'\\x20e4'@ (&#x2022;&#x20e4;).
   | CombiningReverseSolidusOverlay  -- ^ The combining character @COMBINING REVERSE SOLIDUS OVERLAY@ from the Unicode standard, defined by @'\\x20e5'@ (&#x2022;&#x20e5;).
   | CombiningDoubleVerticalStrokeOverlay  -- ^ The combining character @COMBINING DOUBLE VERTICAL STROKE OVERLAY@ from the Unicode standard, defined by @'\\x20e6'@ (&#x2022;&#x20e6;).
   | CombiningAnnuitySymbol  -- ^ The combining character @COMBINING ANNUITY SYMBOL@ from the Unicode standard, defined by @'\\x20e7'@ (&#x2022;&#x20e7;).
@@ -272,6 +565,7 @@ data CombiningCharacter
   | CopticCombiningNiAbove  -- ^ The combining character @COPTIC COMBINING NI ABOVE@ from the Unicode standard, defined by @'\\x2cef'@ (&#x2022;&#x2cef;).
   | CopticCombiningSpiritusAsper  -- ^ The combining character @COPTIC COMBINING SPIRITUS ASPER@ from the Unicode standard, defined by @'\\x2cf0'@ (&#x2022;&#x2cf0;).
   | CopticCombiningSpiritusLenis  -- ^ The combining character @COPTIC COMBINING SPIRITUS LENIS@ from the Unicode standard, defined by @'\\x2cf1'@ (&#x2022;&#x2cf1;).
+  | TifinaghConsonantJoiner  -- ^ The combining character @TIFINAGH CONSONANT JOINER@ from the Unicode standard, defined by @'\\x2d7f'@ (&#x2022;&#x2d7f;).
   | CombiningCyrillicLetterBe  -- ^ The combining character @COMBINING CYRILLIC LETTER BE@ from the Unicode standard, defined by @'\\x2de0'@ (&#x2022;&#x2de0;).
   | CombiningCyrillicLetterVe  -- ^ The combining character @COMBINING CYRILLIC LETTER VE@ from the Unicode standard, defined by @'\\x2de1'@ (&#x2022;&#x2de1;).
   | CombiningCyrillicLetterGhe  -- ^ The combining character @COMBINING CYRILLIC LETTER GHE@ from the Unicode standard, defined by @'\\x2de2'@ (&#x2022;&#x2de2;).
@@ -304,12 +598,15 @@ data CombiningCharacter
   | CombiningCyrillicLetterLittleYus  -- ^ The combining character @COMBINING CYRILLIC LETTER LITTLE YUS@ from the Unicode standard, defined by @'\\x2dfd'@ (&#x2022;&#x2dfd;).
   | CombiningCyrillicLetterBigYus  -- ^ The combining character @COMBINING CYRILLIC LETTER BIG YUS@ from the Unicode standard, defined by @'\\x2dfe'@ (&#x2022;&#x2dfe;).
   | CombiningCyrillicLetterIotifiedBigYus  -- ^ The combining character @COMBINING CYRILLIC LETTER IOTIFIED BIG YUS@ from the Unicode standard, defined by @'\\x2dff'@ (&#x2022;&#x2dff;).
+  | IdeographicLevelToneMark  -- ^ The combining character @IDEOGRAPHIC LEVEL TONE MARK@ from the Unicode standard, defined by @'\\x302a'@ (&#x2022;&#x302a;).
+  | IdeographicRisingToneMark  -- ^ The combining character @IDEOGRAPHIC RISING TONE MARK@ from the Unicode standard, defined by @'\\x302b'@ (&#x2022;&#x302b;).
+  | IdeographicDepartingToneMark  -- ^ The combining character @IDEOGRAPHIC DEPARTING TONE MARK@ from the Unicode standard, defined by @'\\x302c'@ (&#x2022;&#x302c;).
+  | IdeographicEnteringToneMark  -- ^ The combining character @IDEOGRAPHIC ENTERING TONE MARK@ from the Unicode standard, defined by @'\\x302d'@ (&#x2022;&#x302d;).
+  | HangulSingleDotToneMark  -- ^ The combining character @HANGUL SINGLE DOT TONE MARK@ from the Unicode standard, defined by @'\\x302e'@ (&#x2022;&#x302e;).
+  | HangulDoubleDotToneMark  -- ^ The combining character @HANGUL DOUBLE DOT TONE MARK@ from the Unicode standard, defined by @'\\x302f'@ (&#x2022;&#x302f;).
   | CombiningKatakanaHiraganaVoicedSoundMark  -- ^ The combining character @COMBINING KATAKANA-HIRAGANA VOICED SOUND MARK@ from the Unicode standard, defined by @'\\x3099'@ (&#x2022;&#x3099;).
   | CombiningKatakanaHiraganaSemiVoicedSoundMark  -- ^ The combining character @COMBINING KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK@ from the Unicode standard, defined by @'\\x309a'@ (&#x2022;&#x309a;).
   | CombiningCyrillicVzmet  -- ^ The combining character @COMBINING CYRILLIC VZMET@ from the Unicode standard, defined by @'\\xa66f'@ (&#x2022;&#xa66f;).
-  | CombiningCyrillicTenMillionsSign  -- ^ The combining character @COMBINING CYRILLIC TEN MILLIONS SIGN@ from the Unicode standard, defined by @'\\xa670'@ (&#x2022;&#xa670;).
-  | CombiningCyrillicHundredMillionsSign  -- ^ The combining character @COMBINING CYRILLIC HUNDRED MILLIONS SIGN@ from the Unicode standard, defined by @'\\xa671'@ (&#x2022;&#xa671;).
-  | CombiningCyrillicThousandMillionsSign  -- ^ The combining character @COMBINING CYRILLIC THOUSAND MILLIONS SIGN@ from the Unicode standard, defined by @'\\xa672'@ (&#x2022;&#xa672;).
   | CombiningCyrillicLetterUkrainianIe  -- ^ The combining character @COMBINING CYRILLIC LETTER UKRAINIAN IE@ from the Unicode standard, defined by @'\\xa674'@ (&#x2022;&#xa674;).
   | CombiningCyrillicLetterI  -- ^ The combining character @COMBINING CYRILLIC LETTER I@ from the Unicode standard, defined by @'\\xa675'@ (&#x2022;&#xa675;).
   | CombiningCyrillicLetterYi  -- ^ The combining character @COMBINING CYRILLIC LETTER YI@ from the Unicode standard, defined by @'\\xa676'@ (&#x2022;&#xa676;).
@@ -324,6 +621,8 @@ data CombiningCharacter
   | CombiningCyrillicLetterIotifiedE  -- ^ The combining character @COMBINING CYRILLIC LETTER IOTIFIED E@ from the Unicode standard, defined by @'\\xa69f'@ (&#x2022;&#xa69f;).
   | BamumCombiningMarkKoqndon  -- ^ The combining character @BAMUM COMBINING MARK KOQNDON@ from the Unicode standard, defined by @'\\xa6f0'@ (&#x2022;&#xa6f0;).
   | BamumCombiningMarkTukwentis  -- ^ The combining character @BAMUM COMBINING MARK TUKWENTIS@ from the Unicode standard, defined by @'\\xa6f1'@ (&#x2022;&#xa6f1;).
+  | SylotiNagriSignHasanta  -- ^ The combining character @SYLOTI NAGRI SIGN HASANTA@ from the Unicode standard, defined by @'\\xa806'@ (&#x2022;&#xa806;).
+  | SaurashtraSignVirama  -- ^ The combining character @SAURASHTRA SIGN VIRAMA@ from the Unicode standard, defined by @'\\xa8c4'@ (&#x2022;&#xa8c4;).
   | CombiningDevanagariDigitZero  -- ^ The combining character @COMBINING DEVANAGARI DIGIT ZERO@ from the Unicode standard, defined by @'\\xa8e0'@ (&#x2022;&#xa8e0;).
   | CombiningDevanagariDigitOne  -- ^ The combining character @COMBINING DEVANAGARI DIGIT ONE@ from the Unicode standard, defined by @'\\xa8e1'@ (&#x2022;&#xa8e1;).
   | CombiningDevanagariDigitTwo  -- ^ The combining character @COMBINING DEVANAGARI DIGIT TWO@ from the Unicode standard, defined by @'\\xa8e2'@ (&#x2022;&#xa8e2;).
@@ -342,6 +641,24 @@ data CombiningCharacter
   | CombiningDevanagariLetterRa  -- ^ The combining character @COMBINING DEVANAGARI LETTER RA@ from the Unicode standard, defined by @'\\xa8ef'@ (&#x2022;&#xa8ef;).
   | CombiningDevanagariLetterVi  -- ^ The combining character @COMBINING DEVANAGARI LETTER VI@ from the Unicode standard, defined by @'\\xa8f0'@ (&#x2022;&#xa8f0;).
   | CombiningDevanagariSignAvagraha  -- ^ The combining character @COMBINING DEVANAGARI SIGN AVAGRAHA@ from the Unicode standard, defined by @'\\xa8f1'@ (&#x2022;&#xa8f1;).
+  | KayahLiTonePlophu  -- ^ The combining character @KAYAH LI TONE PLOPHU@ from the Unicode standard, defined by @'\\xa92b'@ (&#x2022;&#xa92b;).
+  | KayahLiToneCalya  -- ^ The combining character @KAYAH LI TONE CALYA@ from the Unicode standard, defined by @'\\xa92c'@ (&#x2022;&#xa92c;).
+  | KayahLiToneCalyaPlophu  -- ^ The combining character @KAYAH LI TONE CALYA PLOPHU@ from the Unicode standard, defined by @'\\xa92d'@ (&#x2022;&#xa92d;).
+  | RejangVirama  -- ^ The combining character @REJANG VIRAMA@ from the Unicode standard, defined by @'\\xa953'@ (&#x2022;&#xa953;).
+  | JavaneseSignCecakTelu  -- ^ The combining character @JAVANESE SIGN CECAK TELU@ from the Unicode standard, defined by @'\\xa9b3'@ (&#x2022;&#xa9b3;).
+  | JavanesePangkon  -- ^ The combining character @JAVANESE PANGKON@ from the Unicode standard, defined by @'\\xa9c0'@ (&#x2022;&#xa9c0;).
+  | TaiVietMaiKang  -- ^ The combining character @TAI VIET MAI KANG@ from the Unicode standard, defined by @'\\xaab0'@ (&#x2022;&#xaab0;).
+  | TaiVietVowelI  -- ^ The combining character @TAI VIET VOWEL I@ from the Unicode standard, defined by @'\\xaab2'@ (&#x2022;&#xaab2;).
+  | TaiVietVowelUe  -- ^ The combining character @TAI VIET VOWEL UE@ from the Unicode standard, defined by @'\\xaab3'@ (&#x2022;&#xaab3;).
+  | TaiVietVowelU  -- ^ The combining character @TAI VIET VOWEL U@ from the Unicode standard, defined by @'\\xaab4'@ (&#x2022;&#xaab4;).
+  | TaiVietMaiKhit  -- ^ The combining character @TAI VIET MAI KHIT@ from the Unicode standard, defined by @'\\xaab7'@ (&#x2022;&#xaab7;).
+  | TaiVietVowelIa  -- ^ The combining character @TAI VIET VOWEL IA@ from the Unicode standard, defined by @'\\xaab8'@ (&#x2022;&#xaab8;).
+  | TaiVietVowelAm  -- ^ The combining character @TAI VIET VOWEL AM@ from the Unicode standard, defined by @'\\xaabe'@ (&#x2022;&#xaabe;).
+  | TaiVietToneMaiEk  -- ^ The combining character @TAI VIET TONE MAI EK@ from the Unicode standard, defined by @'\\xaabf'@ (&#x2022;&#xaabf;).
+  | TaiVietToneMaiTho  -- ^ The combining character @TAI VIET TONE MAI THO@ from the Unicode standard, defined by @'\\xaac1'@ (&#x2022;&#xaac1;).
+  | MeeteiMayekVirama  -- ^ The combining character @MEETEI MAYEK VIRAMA@ from the Unicode standard, defined by @'\\xaaf6'@ (&#x2022;&#xaaf6;).
+  | MeeteiMayekApunIyek  -- ^ The combining character @MEETEI MAYEK APUN IYEK@ from the Unicode standard, defined by @'\\xabed'@ (&#x2022;&#xabed;).
+  | HebrewPointJudeoSpanishVarika  -- ^ The combining character @HEBREW POINT JUDEO-SPANISH VARIKA@ from the Unicode standard, defined by @'\\xfb1e'@ (&#x2022;&#xfb1e;).
   | CombiningLigatureLeftHalf  -- ^ The combining character @COMBINING LIGATURE LEFT HALF@ from the Unicode standard, defined by @'\\xfe20'@ (&#x2022;&#xfe20;).
   | CombiningLigatureRightHalf  -- ^ The combining character @COMBINING LIGATURE RIGHT HALF@ from the Unicode standard, defined by @'\\xfe21'@ (&#x2022;&#xfe21;).
   | CombiningDoubleTildeLeftHalf  -- ^ The combining character @COMBINING DOUBLE TILDE LEFT HALF@ from the Unicode standard, defined by @'\\xfe22'@ (&#x2022;&#xfe22;).
@@ -359,26 +676,38 @@ data CombiningCharacter
   | CombiningCyrillicTitloLeftHalf  -- ^ The combining character @COMBINING CYRILLIC TITLO LEFT HALF@ from the Unicode standard, defined by @'\\xfe2e'@ (&#x2022;&#xfe2e;).
   | CombiningCyrillicTitloRightHalf  -- ^ The combining character @COMBINING CYRILLIC TITLO RIGHT HALF@ from the Unicode standard, defined by @'\\xfe2f'@ (&#x2022;&#xfe2f;).
   | PhaistosDiscSignCombiningObliqueStroke  -- ^ The combining character @PHAISTOS DISC SIGN COMBINING OBLIQUE STROKE@ from the Unicode standard, defined by @'\\x101fd'@ (&#x2022;&#x101fd;).
+  | CopticEpactThousandsMark  -- ^ The combining character @COPTIC EPACT THOUSANDS MARK@ from the Unicode standard, defined by @'\\x102e0'@ (&#x2022;&#x102e0;).
   | CombiningOldPermicLetterAn  -- ^ The combining character @COMBINING OLD PERMIC LETTER AN@ from the Unicode standard, defined by @'\\x10376'@ (&#x2022;&#x10376;).
   | CombiningOldPermicLetterDoi  -- ^ The combining character @COMBINING OLD PERMIC LETTER DOI@ from the Unicode standard, defined by @'\\x10377'@ (&#x2022;&#x10377;).
   | CombiningOldPermicLetterZata  -- ^ The combining character @COMBINING OLD PERMIC LETTER ZATA@ from the Unicode standard, defined by @'\\x10378'@ (&#x2022;&#x10378;).
   | CombiningOldPermicLetterNenoe  -- ^ The combining character @COMBINING OLD PERMIC LETTER NENOE@ from the Unicode standard, defined by @'\\x10379'@ (&#x2022;&#x10379;).
   | CombiningOldPermicLetterSii  -- ^ The combining character @COMBINING OLD PERMIC LETTER SII@ from the Unicode standard, defined by @'\\x1037a'@ (&#x2022;&#x1037a;).
-  | YezidiCombiningHamzaMark  -- ^ The combining character @YEZIDI COMBINING HAMZA MARK@ from the Unicode standard, defined by @'\\x10eab'@ (&#x2022;&#x10eab;).
-  | YezidiCombiningMaddaMark  -- ^ The combining character @YEZIDI COMBINING MADDA MARK@ from the Unicode standard, defined by @'\\x10eac'@ (&#x2022;&#x10eac;).
-  | SogdianCombiningDotBelow  -- ^ The combining character @SOGDIAN COMBINING DOT BELOW@ from the Unicode standard, defined by @'\\x10f46'@ (&#x2022;&#x10f46;).
-  | SogdianCombiningTwoDotsBelow  -- ^ The combining character @SOGDIAN COMBINING TWO DOTS BELOW@ from the Unicode standard, defined by @'\\x10f47'@ (&#x2022;&#x10f47;).
-  | SogdianCombiningDotAbove  -- ^ The combining character @SOGDIAN COMBINING DOT ABOVE@ from the Unicode standard, defined by @'\\x10f48'@ (&#x2022;&#x10f48;).
-  | SogdianCombiningTwoDotsAbove  -- ^ The combining character @SOGDIAN COMBINING TWO DOTS ABOVE@ from the Unicode standard, defined by @'\\x10f49'@ (&#x2022;&#x10f49;).
-  | SogdianCombiningCurveAbove  -- ^ The combining character @SOGDIAN COMBINING CURVE ABOVE@ from the Unicode standard, defined by @'\\x10f4a'@ (&#x2022;&#x10f4a;).
-  | SogdianCombiningCurveBelow  -- ^ The combining character @SOGDIAN COMBINING CURVE BELOW@ from the Unicode standard, defined by @'\\x10f4b'@ (&#x2022;&#x10f4b;).
-  | SogdianCombiningHookAbove  -- ^ The combining character @SOGDIAN COMBINING HOOK ABOVE@ from the Unicode standard, defined by @'\\x10f4c'@ (&#x2022;&#x10f4c;).
-  | SogdianCombiningHookBelow  -- ^ The combining character @SOGDIAN COMBINING HOOK BELOW@ from the Unicode standard, defined by @'\\x10f4d'@ (&#x2022;&#x10f4d;).
-  | SogdianCombiningLongHookBelow  -- ^ The combining character @SOGDIAN COMBINING LONG HOOK BELOW@ from the Unicode standard, defined by @'\\x10f4e'@ (&#x2022;&#x10f4e;).
-  | SogdianCombiningReshBelow  -- ^ The combining character @SOGDIAN COMBINING RESH BELOW@ from the Unicode standard, defined by @'\\x10f4f'@ (&#x2022;&#x10f4f;).
-  | SogdianCombiningStrokeBelow  -- ^ The combining character @SOGDIAN COMBINING STROKE BELOW@ from the Unicode standard, defined by @'\\x10f50'@ (&#x2022;&#x10f50;).
-  | GranthaSignCombiningAnusvaraAbove  -- ^ The combining character @GRANTHA SIGN COMBINING ANUSVARA ABOVE@ from the Unicode standard, defined by @'\\x11300'@ (&#x2022;&#x11300;).
-  | CombiningBinduBelow  -- ^ The combining character @COMBINING BINDU BELOW@ from the Unicode standard, defined by @'\\x1133b'@ (&#x2022;&#x1133b;).
+  | KharoshthiSignDoubleRingBelow  -- ^ The combining character @KHAROSHTHI SIGN DOUBLE RING BELOW@ from the Unicode standard, defined by @'\\x10a0d'@ (&#x2022;&#x10a0d;).
+  | KharoshthiSignVisarga  -- ^ The combining character @KHAROSHTHI SIGN VISARGA@ from the Unicode standard, defined by @'\\x10a0f'@ (&#x2022;&#x10a0f;).
+  | KharoshthiSignBarAbove  -- ^ The combining character @KHAROSHTHI SIGN BAR ABOVE@ from the Unicode standard, defined by @'\\x10a38'@ (&#x2022;&#x10a38;).
+  | KharoshthiSignCauda  -- ^ The combining character @KHAROSHTHI SIGN CAUDA@ from the Unicode standard, defined by @'\\x10a39'@ (&#x2022;&#x10a39;).
+  | KharoshthiSignDotBelow  -- ^ The combining character @KHAROSHTHI SIGN DOT BELOW@ from the Unicode standard, defined by @'\\x10a3a'@ (&#x2022;&#x10a3a;).
+  | KharoshthiVirama  -- ^ The combining character @KHAROSHTHI VIRAMA@ from the Unicode standard, defined by @'\\x10a3f'@ (&#x2022;&#x10a3f;).
+  | ManichaeanAbbreviationMarkAbove  -- ^ The combining character @MANICHAEAN ABBREVIATION MARK ABOVE@ from the Unicode standard, defined by @'\\x10ae5'@ (&#x2022;&#x10ae5;).
+  | ManichaeanAbbreviationMarkBelow  -- ^ The combining character @MANICHAEAN ABBREVIATION MARK BELOW@ from the Unicode standard, defined by @'\\x10ae6'@ (&#x2022;&#x10ae6;).
+  | BrahmiVirama  -- ^ The combining character @BRAHMI VIRAMA@ from the Unicode standard, defined by @'\\x11046'@ (&#x2022;&#x11046;).
+  | BrahmiNumberJoiner  -- ^ The combining character @BRAHMI NUMBER JOINER@ from the Unicode standard, defined by @'\\x1107f'@ (&#x2022;&#x1107f;).
+  | KaithiSignVirama  -- ^ The combining character @KAITHI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x110b9'@ (&#x2022;&#x110b9;).
+  | KaithiSignNukta  -- ^ The combining character @KAITHI SIGN NUKTA@ from the Unicode standard, defined by @'\\x110ba'@ (&#x2022;&#x110ba;).
+  | ChakmaSignCandrabindu  -- ^ The combining character @CHAKMA SIGN CANDRABINDU@ from the Unicode standard, defined by @'\\x11100'@ (&#x2022;&#x11100;).
+  | ChakmaSignAnusvara  -- ^ The combining character @CHAKMA SIGN ANUSVARA@ from the Unicode standard, defined by @'\\x11101'@ (&#x2022;&#x11101;).
+  | ChakmaSignVisarga  -- ^ The combining character @CHAKMA SIGN VISARGA@ from the Unicode standard, defined by @'\\x11102'@ (&#x2022;&#x11102;).
+  | ChakmaVirama  -- ^ The combining character @CHAKMA VIRAMA@ from the Unicode standard, defined by @'\\x11133'@ (&#x2022;&#x11133;).
+  | ChakmaMaayyaa  -- ^ The combining character @CHAKMA MAAYYAA@ from the Unicode standard, defined by @'\\x11134'@ (&#x2022;&#x11134;).
+  | MahajaniSignNukta  -- ^ The combining character @MAHAJANI SIGN NUKTA@ from the Unicode standard, defined by @'\\x11173'@ (&#x2022;&#x11173;).
+  | SharadaSignVirama  -- ^ The combining character @SHARADA SIGN VIRAMA@ from the Unicode standard, defined by @'\\x111c0'@ (&#x2022;&#x111c0;).
+  | SharadaSignNukta  -- ^ The combining character @SHARADA SIGN NUKTA@ from the Unicode standard, defined by @'\\x111ca'@ (&#x2022;&#x111ca;).
+  | KhojkiSignVirama  -- ^ The combining character @KHOJKI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x11235'@ (&#x2022;&#x11235;).
+  | KhojkiSignNukta  -- ^ The combining character @KHOJKI SIGN NUKTA@ from the Unicode standard, defined by @'\\x11236'@ (&#x2022;&#x11236;).
+  | KhudawadiSignNukta  -- ^ The combining character @KHUDAWADI SIGN NUKTA@ from the Unicode standard, defined by @'\\x112e9'@ (&#x2022;&#x112e9;).
+  | KhudawadiSignVirama  -- ^ The combining character @KHUDAWADI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x112ea'@ (&#x2022;&#x112ea;).
+  | GranthaSignNukta  -- ^ The combining character @GRANTHA SIGN NUKTA@ from the Unicode standard, defined by @'\\x1133c'@ (&#x2022;&#x1133c;).
+  | GranthaSignVirama  -- ^ The combining character @GRANTHA SIGN VIRAMA@ from the Unicode standard, defined by @'\\x1134d'@ (&#x2022;&#x1134d;).
   | CombiningGranthaDigitZero  -- ^ The combining character @COMBINING GRANTHA DIGIT ZERO@ from the Unicode standard, defined by @'\\x11366'@ (&#x2022;&#x11366;).
   | CombiningGranthaDigitOne  -- ^ The combining character @COMBINING GRANTHA DIGIT ONE@ from the Unicode standard, defined by @'\\x11367'@ (&#x2022;&#x11367;).
   | CombiningGranthaDigitTwo  -- ^ The combining character @COMBINING GRANTHA DIGIT TWO@ from the Unicode standard, defined by @'\\x11368'@ (&#x2022;&#x11368;).
@@ -391,22 +720,41 @@ data CombiningCharacter
   | CombiningGranthaLetterNa  -- ^ The combining character @COMBINING GRANTHA LETTER NA@ from the Unicode standard, defined by @'\\x11372'@ (&#x2022;&#x11372;).
   | CombiningGranthaLetterVi  -- ^ The combining character @COMBINING GRANTHA LETTER VI@ from the Unicode standard, defined by @'\\x11373'@ (&#x2022;&#x11373;).
   | CombiningGranthaLetterPa  -- ^ The combining character @COMBINING GRANTHA LETTER PA@ from the Unicode standard, defined by @'\\x11374'@ (&#x2022;&#x11374;).
+  | NewaSignVirama  -- ^ The combining character @NEWA SIGN VIRAMA@ from the Unicode standard, defined by @'\\x11442'@ (&#x2022;&#x11442;).
+  | NewaSignNukta  -- ^ The combining character @NEWA SIGN NUKTA@ from the Unicode standard, defined by @'\\x11446'@ (&#x2022;&#x11446;).
+  | TirhutaSignVirama  -- ^ The combining character @TIRHUTA SIGN VIRAMA@ from the Unicode standard, defined by @'\\x114c2'@ (&#x2022;&#x114c2;).
+  | TirhutaSignNukta  -- ^ The combining character @TIRHUTA SIGN NUKTA@ from the Unicode standard, defined by @'\\x114c3'@ (&#x2022;&#x114c3;).
+  | SiddhamSignVirama  -- ^ The combining character @SIDDHAM SIGN VIRAMA@ from the Unicode standard, defined by @'\\x115bf'@ (&#x2022;&#x115bf;).
+  | SiddhamSignNukta  -- ^ The combining character @SIDDHAM SIGN NUKTA@ from the Unicode standard, defined by @'\\x115c0'@ (&#x2022;&#x115c0;).
+  | ModiSignVirama  -- ^ The combining character @MODI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x1163f'@ (&#x2022;&#x1163f;).
+  | TakriSignVirama  -- ^ The combining character @TAKRI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x116b6'@ (&#x2022;&#x116b6;).
+  | TakriSignNukta  -- ^ The combining character @TAKRI SIGN NUKTA@ from the Unicode standard, defined by @'\\x116b7'@ (&#x2022;&#x116b7;).
+  | AhomSignKiller  -- ^ The combining character @AHOM SIGN KILLER@ from the Unicode standard, defined by @'\\x1172b'@ (&#x2022;&#x1172b;).
+  | BhaiksukiSignVirama  -- ^ The combining character @BHAIKSUKI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x11c3f'@ (&#x2022;&#x11c3f;).
   | BassaVahCombiningHighTone  -- ^ The combining character @BASSA VAH COMBINING HIGH TONE@ from the Unicode standard, defined by @'\\x16af0'@ (&#x2022;&#x16af0;).
   | BassaVahCombiningLowTone  -- ^ The combining character @BASSA VAH COMBINING LOW TONE@ from the Unicode standard, defined by @'\\x16af1'@ (&#x2022;&#x16af1;).
   | BassaVahCombiningMidTone  -- ^ The combining character @BASSA VAH COMBINING MID TONE@ from the Unicode standard, defined by @'\\x16af2'@ (&#x2022;&#x16af2;).
   | BassaVahCombiningLowMidTone  -- ^ The combining character @BASSA VAH COMBINING LOW-MID TONE@ from the Unicode standard, defined by @'\\x16af3'@ (&#x2022;&#x16af3;).
   | BassaVahCombiningHighLowTone  -- ^ The combining character @BASSA VAH COMBINING HIGH-LOW TONE@ from the Unicode standard, defined by @'\\x16af4'@ (&#x2022;&#x16af4;).
+  | PahawhHmongMarkCimTub  -- ^ The combining character @PAHAWH HMONG MARK CIM TUB@ from the Unicode standard, defined by @'\\x16b30'@ (&#x2022;&#x16b30;).
+  | PahawhHmongMarkCimSo  -- ^ The combining character @PAHAWH HMONG MARK CIM SO@ from the Unicode standard, defined by @'\\x16b31'@ (&#x2022;&#x16b31;).
+  | PahawhHmongMarkCimKes  -- ^ The combining character @PAHAWH HMONG MARK CIM KES@ from the Unicode standard, defined by @'\\x16b32'@ (&#x2022;&#x16b32;).
+  | PahawhHmongMarkCimKhav  -- ^ The combining character @PAHAWH HMONG MARK CIM KHAV@ from the Unicode standard, defined by @'\\x16b33'@ (&#x2022;&#x16b33;).
+  | PahawhHmongMarkCimSuam  -- ^ The combining character @PAHAWH HMONG MARK CIM SUAM@ from the Unicode standard, defined by @'\\x16b34'@ (&#x2022;&#x16b34;).
+  | PahawhHmongMarkCimHom  -- ^ The combining character @PAHAWH HMONG MARK CIM HOM@ from the Unicode standard, defined by @'\\x16b35'@ (&#x2022;&#x16b35;).
+  | PahawhHmongMarkCimTaum  -- ^ The combining character @PAHAWH HMONG MARK CIM TAUM@ from the Unicode standard, defined by @'\\x16b36'@ (&#x2022;&#x16b36;).
+  | DuployanDoubleMark  -- ^ The combining character @DUPLOYAN DOUBLE MARK@ from the Unicode standard, defined by @'\\x1bc9e'@ (&#x2022;&#x1bc9e;).
   | MusicalSymbolCombiningStem  -- ^ The combining character @MUSICAL SYMBOL COMBINING STEM@ from the Unicode standard, defined by @'\\x1d165'@ (&#x2022;&#x1d165;).
   | MusicalSymbolCombiningSprechgesangStem  -- ^ The combining character @MUSICAL SYMBOL COMBINING SPRECHGESANG STEM@ from the Unicode standard, defined by @'\\x1d166'@ (&#x2022;&#x1d166;).
-  | MusicalSymbolCombiningTremolo1  -- ^ The combining character @MUSICAL SYMBOL COMBINING TREMOLO-1@ from the Unicode standard, defined by @'\\x1d167'@ (&#x2022;&#x1d167;).
-  | MusicalSymbolCombiningTremolo2  -- ^ The combining character @MUSICAL SYMBOL COMBINING TREMOLO-2@ from the Unicode standard, defined by @'\\x1d168'@ (&#x2022;&#x1d168;).
-  | MusicalSymbolCombiningTremolo3  -- ^ The combining character @MUSICAL SYMBOL COMBINING TREMOLO-3@ from the Unicode standard, defined by @'\\x1d169'@ (&#x2022;&#x1d169;).
+  | MusicalSymbolCombiningTremolo1  -- ^ The combining character @MUSICAL SYMBOL COMBINING TREMOLO1@ from the Unicode standard, defined by @'\\x1d167'@ (&#x2022;&#x1d167;).
+  | MusicalSymbolCombiningTremolo2  -- ^ The combining character @MUSICAL SYMBOL COMBINING TREMOLO2@ from the Unicode standard, defined by @'\\x1d168'@ (&#x2022;&#x1d168;).
+  | MusicalSymbolCombiningTremolo3  -- ^ The combining character @MUSICAL SYMBOL COMBINING TREMOLO3@ from the Unicode standard, defined by @'\\x1d169'@ (&#x2022;&#x1d169;).
   | MusicalSymbolCombiningAugmentationDot  -- ^ The combining character @MUSICAL SYMBOL COMBINING AUGMENTATION DOT@ from the Unicode standard, defined by @'\\x1d16d'@ (&#x2022;&#x1d16d;).
-  | MusicalSymbolCombiningFlag1  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG-1@ from the Unicode standard, defined by @'\\x1d16e'@ (&#x2022;&#x1d16e;).
-  | MusicalSymbolCombiningFlag2  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG-2@ from the Unicode standard, defined by @'\\x1d16f'@ (&#x2022;&#x1d16f;).
-  | MusicalSymbolCombiningFlag3  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG-3@ from the Unicode standard, defined by @'\\x1d170'@ (&#x2022;&#x1d170;).
-  | MusicalSymbolCombiningFlag4  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG-4@ from the Unicode standard, defined by @'\\x1d171'@ (&#x2022;&#x1d171;).
-  | MusicalSymbolCombiningFlag5  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG-5@ from the Unicode standard, defined by @'\\x1d172'@ (&#x2022;&#x1d172;).
+  | MusicalSymbolCombiningFlag1  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG1@ from the Unicode standard, defined by @'\\x1d16e'@ (&#x2022;&#x1d16e;).
+  | MusicalSymbolCombiningFlag2  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG2@ from the Unicode standard, defined by @'\\x1d16f'@ (&#x2022;&#x1d16f;).
+  | MusicalSymbolCombiningFlag3  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG3@ from the Unicode standard, defined by @'\\x1d170'@ (&#x2022;&#x1d170;).
+  | MusicalSymbolCombiningFlag4  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG4@ from the Unicode standard, defined by @'\\x1d171'@ (&#x2022;&#x1d171;).
+  | MusicalSymbolCombiningFlag5  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG5@ from the Unicode standard, defined by @'\\x1d172'@ (&#x2022;&#x1d172;).
   | MusicalSymbolCombiningAccent  -- ^ The combining character @MUSICAL SYMBOL COMBINING ACCENT@ from the Unicode standard, defined by @'\\x1d17b'@ (&#x2022;&#x1d17b;).
   | MusicalSymbolCombiningStaccato  -- ^ The combining character @MUSICAL SYMBOL COMBINING STACCATO@ from the Unicode standard, defined by @'\\x1d17c'@ (&#x2022;&#x1d17c;).
   | MusicalSymbolCombiningTenuto  -- ^ The combining character @MUSICAL SYMBOL COMBINING TENUTO@ from the Unicode standard, defined by @'\\x1d17d'@ (&#x2022;&#x1d17d;).
@@ -474,12 +822,20 @@ data CombiningCharacter
   | MendeKikakuiCombiningNumberTenThousands  -- ^ The combining character @MENDE KIKAKUI COMBINING NUMBER TEN THOUSANDS@ from the Unicode standard, defined by @'\\x1e8d4'@ (&#x2022;&#x1e8d4;).
   | MendeKikakuiCombiningNumberHundredThousands  -- ^ The combining character @MENDE KIKAKUI COMBINING NUMBER HUNDRED THOUSANDS@ from the Unicode standard, defined by @'\\x1e8d5'@ (&#x2022;&#x1e8d5;).
   | MendeKikakuiCombiningNumberMillions  -- ^ The combining character @MENDE KIKAKUI COMBINING NUMBER MILLIONS@ from the Unicode standard, defined by @'\\x1e8d6'@ (&#x2022;&#x1e8d6;).
+  | AdlamAlifLengthener  -- ^ The combining character @ADLAM ALIF LENGTHENER@ from the Unicode standard, defined by @'\\x1e944'@ (&#x2022;&#x1e944;).
+  | AdlamVowelLengthener  -- ^ The combining character @ADLAM VOWEL LENGTHENER@ from the Unicode standard, defined by @'\\x1e945'@ (&#x2022;&#x1e945;).
+  | AdlamGeminationMark  -- ^ The combining character @ADLAM GEMINATION MARK@ from the Unicode standard, defined by @'\\x1e946'@ (&#x2022;&#x1e946;).
+  | AdlamHamza  -- ^ The combining character @ADLAM HAMZA@ from the Unicode standard, defined by @'\\x1e947'@ (&#x2022;&#x1e947;).
+  | AdlamConsonantModifier  -- ^ The combining character @ADLAM CONSONANT MODIFIER@ from the Unicode standard, defined by @'\\x1e948'@ (&#x2022;&#x1e948;).
+  | AdlamGeminateConsonantModifier  -- ^ The combining character @ADLAM GEMINATE CONSONANT MODIFIER@ from the Unicode standard, defined by @'\\x1e949'@ (&#x2022;&#x1e949;).
+  | AdlamNukta  -- ^ The combining character @ADLAM NUKTA@ from the Unicode standard, defined by @'\\x1e94a'@ (&#x2022;&#x1e94a;).
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
--- | Obtain the Unicode codepoint for the given CombiningCharacter.
-combiningToUnicode
-  :: CombiningCharacter -- ^ The given 'CombiningCharacter' to obtain the Unicode codepoint 'Char' from.
-  -> Char -- ^ The equivalent Unicode codepoint 'Char'.
+instance IsString CombiningCharacter where
+    fromString [x] = combiningCharacter' x
+    fromString _ = error "The given string should contain exactly one codepoint"
+
+combiningToUnicode :: CombiningCharacter -> Char
 combiningToUnicode CombiningGraveAccent = '\x0300'
 combiningToUnicode CombiningAcuteAccent = '\x0301'
 combiningToUnicode CombiningCircumflexAccent = '\x0302'
@@ -559,7 +915,6 @@ combiningToUnicode CombiningHomotheticAbove = '\x034b'
 combiningToUnicode CombiningAlmostEqualToAbove = '\x034c'
 combiningToUnicode CombiningLeftRightArrowBelow = '\x034d'
 combiningToUnicode CombiningUpwardsArrowBelow = '\x034e'
-combiningToUnicode CombiningGraphemeJoiner = '\x034f'
 combiningToUnicode CombiningRightArrowheadAbove = '\x0350'
 combiningToUnicode CombiningLeftHalfRingAbove = '\x0351'
 combiningToUnicode CombiningFermata = '\x0352'
@@ -597,8 +952,137 @@ combiningToUnicode CombiningCyrillicPalatalization = '\x0484'
 combiningToUnicode CombiningCyrillicDasiaPneumata = '\x0485'
 combiningToUnicode CombiningCyrillicPsiliPneumata = '\x0486'
 combiningToUnicode CombiningCyrillicPokrytie = '\x0487'
-combiningToUnicode CombiningCyrillicHundredThousandsSign = '\x0488'
-combiningToUnicode CombiningCyrillicMillionsSign = '\x0489'
+combiningToUnicode HebrewAccentEtnahta = '\x0591'
+combiningToUnicode HebrewAccentSegol = '\x0592'
+combiningToUnicode HebrewAccentShalshelet = '\x0593'
+combiningToUnicode HebrewAccentZaqefQatan = '\x0594'
+combiningToUnicode HebrewAccentZaqefGadol = '\x0595'
+combiningToUnicode HebrewAccentTipeha = '\x0596'
+combiningToUnicode HebrewAccentRevia = '\x0597'
+combiningToUnicode HebrewAccentZarqa = '\x0598'
+combiningToUnicode HebrewAccentPashta = '\x0599'
+combiningToUnicode HebrewAccentYetiv = '\x059a'
+combiningToUnicode HebrewAccentTevir = '\x059b'
+combiningToUnicode HebrewAccentGeresh = '\x059c'
+combiningToUnicode HebrewAccentGereshMuqdam = '\x059d'
+combiningToUnicode HebrewAccentGershayim = '\x059e'
+combiningToUnicode HebrewAccentQarneyPara = '\x059f'
+combiningToUnicode HebrewAccentTelishaGedola = '\x05a0'
+combiningToUnicode HebrewAccentPazer = '\x05a1'
+combiningToUnicode HebrewAccentAtnahHafukh = '\x05a2'
+combiningToUnicode HebrewAccentMunah = '\x05a3'
+combiningToUnicode HebrewAccentMahapakh = '\x05a4'
+combiningToUnicode HebrewAccentMerkha = '\x05a5'
+combiningToUnicode HebrewAccentMerkhaKefula = '\x05a6'
+combiningToUnicode HebrewAccentDarga = '\x05a7'
+combiningToUnicode HebrewAccentQadma = '\x05a8'
+combiningToUnicode HebrewAccentTelishaQetana = '\x05a9'
+combiningToUnicode HebrewAccentYerahBenYomo = '\x05aa'
+combiningToUnicode HebrewAccentOle = '\x05ab'
+combiningToUnicode HebrewAccentIluy = '\x05ac'
+combiningToUnicode HebrewAccentDehi = '\x05ad'
+combiningToUnicode HebrewAccentZinor = '\x05ae'
+combiningToUnicode HebrewMarkMasoraCircle = '\x05af'
+combiningToUnicode HebrewPointSheva = '\x05b0'
+combiningToUnicode HebrewPointHatafSegol = '\x05b1'
+combiningToUnicode HebrewPointHatafPatah = '\x05b2'
+combiningToUnicode HebrewPointHatafQamats = '\x05b3'
+combiningToUnicode HebrewPointHiriq = '\x05b4'
+combiningToUnicode HebrewPointTsere = '\x05b5'
+combiningToUnicode HebrewPointSegol = '\x05b6'
+combiningToUnicode HebrewPointPatah = '\x05b7'
+combiningToUnicode HebrewPointQamats = '\x05b8'
+combiningToUnicode HebrewPointHolam = '\x05b9'
+combiningToUnicode HebrewPointHolamHaserForVav = '\x05ba'
+combiningToUnicode HebrewPointQubuts = '\x05bb'
+combiningToUnicode HebrewPointDageshOrMapiq = '\x05bc'
+combiningToUnicode HebrewPointMeteg = '\x05bd'
+combiningToUnicode HebrewPointRafe = '\x05bf'
+combiningToUnicode HebrewPointShinDot = '\x05c1'
+combiningToUnicode HebrewPointSinDot = '\x05c2'
+combiningToUnicode HebrewMarkUpperDot = '\x05c4'
+combiningToUnicode HebrewMarkLowerDot = '\x05c5'
+combiningToUnicode HebrewPointQamatsQatan = '\x05c7'
+combiningToUnicode ArabicSignSallallahouAlayheWassallam = '\x0610'
+combiningToUnicode ArabicSignAlayheAssallam = '\x0611'
+combiningToUnicode ArabicSignRahmatullahAlayhe = '\x0612'
+combiningToUnicode ArabicSignRadiAllahouAnhu = '\x0613'
+combiningToUnicode ArabicSignTakhallus = '\x0614'
+combiningToUnicode ArabicSmallHighTah = '\x0615'
+combiningToUnicode ArabicSmallHighLigatureAlefWithLamWithYeh = '\x0616'
+combiningToUnicode ArabicSmallHighZain = '\x0617'
+combiningToUnicode ArabicSmallFatha = '\x0618'
+combiningToUnicode ArabicSmallDamma = '\x0619'
+combiningToUnicode ArabicSmallKasra = '\x061a'
+combiningToUnicode ArabicFathatan = '\x064b'
+combiningToUnicode ArabicDammatan = '\x064c'
+combiningToUnicode ArabicKasratan = '\x064d'
+combiningToUnicode ArabicFatha = '\x064e'
+combiningToUnicode ArabicDamma = '\x064f'
+combiningToUnicode ArabicKasra = '\x0650'
+combiningToUnicode ArabicShadda = '\x0651'
+combiningToUnicode ArabicSukun = '\x0652'
+combiningToUnicode ArabicMaddahAbove = '\x0653'
+combiningToUnicode ArabicHamzaAbove = '\x0654'
+combiningToUnicode ArabicHamzaBelow = '\x0655'
+combiningToUnicode ArabicSubscriptAlef = '\x0656'
+combiningToUnicode ArabicInvertedDamma = '\x0657'
+combiningToUnicode ArabicMarkNoonGhunna = '\x0658'
+combiningToUnicode ArabicZwarakay = '\x0659'
+combiningToUnicode ArabicVowelSignSmallVAbove = '\x065a'
+combiningToUnicode ArabicVowelSignInvertedSmallVAbove = '\x065b'
+combiningToUnicode ArabicVowelSignDotBelow = '\x065c'
+combiningToUnicode ArabicReversedDamma = '\x065d'
+combiningToUnicode ArabicFathaWithTwoDots = '\x065e'
+combiningToUnicode ArabicWavyHamzaBelow = '\x065f'
+combiningToUnicode ArabicLetterSuperscriptAlef = '\x0670'
+combiningToUnicode ArabicSmallHighLigatureSadWithLamWithAlefMaksura = '\x06d6'
+combiningToUnicode ArabicSmallHighLigatureQafWithLamWithAlefMaksura = '\x06d7'
+combiningToUnicode ArabicSmallHighMeemInitialForm = '\x06d8'
+combiningToUnicode ArabicSmallHighLamAlef = '\x06d9'
+combiningToUnicode ArabicSmallHighJeem = '\x06da'
+combiningToUnicode ArabicSmallHighThreeDots = '\x06db'
+combiningToUnicode ArabicSmallHighSeen = '\x06dc'
+combiningToUnicode ArabicSmallHighRoundedZero = '\x06df'
+combiningToUnicode ArabicSmallHighUprightRectangularZero = '\x06e0'
+combiningToUnicode ArabicSmallHighDotlessHeadOfKhah = '\x06e1'
+combiningToUnicode ArabicSmallHighMeemIsolatedForm = '\x06e2'
+combiningToUnicode ArabicSmallLowSeen = '\x06e3'
+combiningToUnicode ArabicSmallHighMadda = '\x06e4'
+combiningToUnicode ArabicSmallHighYeh = '\x06e7'
+combiningToUnicode ArabicSmallHighNoon = '\x06e8'
+combiningToUnicode ArabicEmptyCentreLowStop = '\x06ea'
+combiningToUnicode ArabicEmptyCentreHighStop = '\x06eb'
+combiningToUnicode ArabicRoundedHighStopWithFilledCentre = '\x06ec'
+combiningToUnicode ArabicSmallLowMeem = '\x06ed'
+combiningToUnicode SyriacLetterSuperscriptAlaph = '\x0711'
+combiningToUnicode SyriacPthahaAbove = '\x0730'
+combiningToUnicode SyriacPthahaBelow = '\x0731'
+combiningToUnicode SyriacPthahaDotted = '\x0732'
+combiningToUnicode SyriacZqaphaAbove = '\x0733'
+combiningToUnicode SyriacZqaphaBelow = '\x0734'
+combiningToUnicode SyriacZqaphaDotted = '\x0735'
+combiningToUnicode SyriacRbasaAbove = '\x0736'
+combiningToUnicode SyriacRbasaBelow = '\x0737'
+combiningToUnicode SyriacDottedZlamaHorizontal = '\x0738'
+combiningToUnicode SyriacDottedZlamaAngular = '\x0739'
+combiningToUnicode SyriacHbasaAbove = '\x073a'
+combiningToUnicode SyriacHbasaBelow = '\x073b'
+combiningToUnicode SyriacHbasaEsasaDotted = '\x073c'
+combiningToUnicode SyriacEsasaAbove = '\x073d'
+combiningToUnicode SyriacEsasaBelow = '\x073e'
+combiningToUnicode SyriacRwaha = '\x073f'
+combiningToUnicode SyriacFeminineDot = '\x0740'
+combiningToUnicode SyriacQushshaya = '\x0741'
+combiningToUnicode SyriacRukkakha = '\x0742'
+combiningToUnicode SyriacTwoVerticalDotsAbove = '\x0743'
+combiningToUnicode SyriacTwoVerticalDotsBelow = '\x0744'
+combiningToUnicode SyriacThreeDotsAbove = '\x0745'
+combiningToUnicode SyriacThreeDotsBelow = '\x0746'
+combiningToUnicode SyriacObliqueLineAbove = '\x0747'
+combiningToUnicode SyriacObliqueLineBelow = '\x0748'
+combiningToUnicode SyriacMusic = '\x0749'
+combiningToUnicode SyriacBarrekh = '\x074a'
 combiningToUnicode NkoCombiningShortHighTone = '\x07eb'
 combiningToUnicode NkoCombiningShortLowTone = '\x07ec'
 combiningToUnicode NkoCombiningShortRisingTone = '\x07ed'
@@ -608,12 +1092,153 @@ combiningToUnicode NkoCombiningLongLowTone = '\x07f0'
 combiningToUnicode NkoCombiningLongRisingTone = '\x07f1'
 combiningToUnicode NkoCombiningNasalizationMark = '\x07f2'
 combiningToUnicode NkoCombiningDoubleDotAbove = '\x07f3'
-combiningToUnicode TeluguSignCombiningCandrabinduAbove = '\x0c00'
-combiningToUnicode TeluguSignCombiningAnusvaraAbove = '\x0c04'
-combiningToUnicode MalayalamSignCombiningAnusvaraAbove = '\x0d00'
+combiningToUnicode SamaritanMarkIn = '\x0816'
+combiningToUnicode SamaritanMarkInAlaf = '\x0817'
+combiningToUnicode SamaritanMarkOcclusion = '\x0818'
+combiningToUnicode SamaritanMarkDagesh = '\x0819'
+combiningToUnicode SamaritanMarkEpentheticYut = '\x081b'
+combiningToUnicode SamaritanVowelSignLongE = '\x081c'
+combiningToUnicode SamaritanVowelSignE = '\x081d'
+combiningToUnicode SamaritanVowelSignOverlongAa = '\x081e'
+combiningToUnicode SamaritanVowelSignLongAa = '\x081f'
+combiningToUnicode SamaritanVowelSignAa = '\x0820'
+combiningToUnicode SamaritanVowelSignOverlongA = '\x0821'
+combiningToUnicode SamaritanVowelSignLongA = '\x0822'
+combiningToUnicode SamaritanVowelSignA = '\x0823'
+combiningToUnicode SamaritanVowelSignShortA = '\x0825'
+combiningToUnicode SamaritanVowelSignLongU = '\x0826'
+combiningToUnicode SamaritanVowelSignU = '\x0827'
+combiningToUnicode SamaritanVowelSignLongI = '\x0829'
+combiningToUnicode SamaritanVowelSignI = '\x082a'
+combiningToUnicode SamaritanVowelSignO = '\x082b'
+combiningToUnicode SamaritanVowelSignSukun = '\x082c'
+combiningToUnicode SamaritanMarkNequdaa = '\x082d'
+combiningToUnicode MandaicAffricationMark = '\x0859'
+combiningToUnicode MandaicVocalizationMark = '\x085a'
+combiningToUnicode MandaicGeminationMark = '\x085b'
+combiningToUnicode ArabicSmallHighWordArRub = '\x08d4'
+combiningToUnicode ArabicSmallHighSad = '\x08d5'
+combiningToUnicode ArabicSmallHighAin = '\x08d6'
+combiningToUnicode ArabicSmallHighQaf = '\x08d7'
+combiningToUnicode ArabicSmallHighNoonWithKasra = '\x08d8'
+combiningToUnicode ArabicSmallLowNoonWithKasra = '\x08d9'
+combiningToUnicode ArabicSmallHighWordAthThalatha = '\x08da'
+combiningToUnicode ArabicSmallHighWordAsSajda = '\x08db'
+combiningToUnicode ArabicSmallHighWordAnNisf = '\x08dc'
+combiningToUnicode ArabicSmallHighWordSakta = '\x08dd'
+combiningToUnicode ArabicSmallHighWordQif = '\x08de'
+combiningToUnicode ArabicSmallHighWordWaqfa = '\x08df'
+combiningToUnicode ArabicSmallHighFootnoteMarker = '\x08e0'
+combiningToUnicode ArabicSmallHighSignSafha = '\x08e1'
+combiningToUnicode ArabicTurnedDammaBelow = '\x08e3'
+combiningToUnicode ArabicCurlyFatha = '\x08e4'
+combiningToUnicode ArabicCurlyDamma = '\x08e5'
+combiningToUnicode ArabicCurlyKasra = '\x08e6'
+combiningToUnicode ArabicCurlyFathatan = '\x08e7'
+combiningToUnicode ArabicCurlyDammatan = '\x08e8'
+combiningToUnicode ArabicCurlyKasratan = '\x08e9'
+combiningToUnicode ArabicToneOneDotAbove = '\x08ea'
+combiningToUnicode ArabicToneTwoDotsAbove = '\x08eb'
+combiningToUnicode ArabicToneLoopAbove = '\x08ec'
+combiningToUnicode ArabicToneOneDotBelow = '\x08ed'
+combiningToUnicode ArabicToneTwoDotsBelow = '\x08ee'
+combiningToUnicode ArabicToneLoopBelow = '\x08ef'
+combiningToUnicode ArabicOpenFathatan = '\x08f0'
+combiningToUnicode ArabicOpenDammatan = '\x08f1'
+combiningToUnicode ArabicOpenKasratan = '\x08f2'
+combiningToUnicode ArabicSmallHighWaw = '\x08f3'
+combiningToUnicode ArabicFathaWithRing = '\x08f4'
+combiningToUnicode ArabicFathaWithDotAbove = '\x08f5'
+combiningToUnicode ArabicKasraWithDotBelow = '\x08f6'
+combiningToUnicode ArabicLeftArrowheadAbove = '\x08f7'
+combiningToUnicode ArabicRightArrowheadAbove = '\x08f8'
+combiningToUnicode ArabicLeftArrowheadBelow = '\x08f9'
+combiningToUnicode ArabicRightArrowheadBelow = '\x08fa'
+combiningToUnicode ArabicDoubleRightArrowheadAbove = '\x08fb'
+combiningToUnicode ArabicDoubleRightArrowheadAboveWithDot = '\x08fc'
+combiningToUnicode ArabicRightArrowheadAboveWithDot = '\x08fd'
+combiningToUnicode ArabicDammaWithDot = '\x08fe'
+combiningToUnicode ArabicMarkSidewaysNoonGhunna = '\x08ff'
+combiningToUnicode DevanagariSignNukta = '\x093c'
+combiningToUnicode DevanagariSignVirama = '\x094d'
+combiningToUnicode DevanagariStressSignUdatta = '\x0951'
+combiningToUnicode DevanagariStressSignAnudatta = '\x0952'
+combiningToUnicode DevanagariGraveAccent = '\x0953'
+combiningToUnicode DevanagariAcuteAccent = '\x0954'
+combiningToUnicode BengaliSignNukta = '\x09bc'
+combiningToUnicode BengaliSignVirama = '\x09cd'
+combiningToUnicode GurmukhiSignNukta = '\x0a3c'
+combiningToUnicode GurmukhiSignVirama = '\x0a4d'
+combiningToUnicode GujaratiSignNukta = '\x0abc'
+combiningToUnicode GujaratiSignVirama = '\x0acd'
+combiningToUnicode OriyaSignNukta = '\x0b3c'
+combiningToUnicode OriyaSignVirama = '\x0b4d'
+combiningToUnicode TamilSignVirama = '\x0bcd'
+combiningToUnicode TeluguSignVirama = '\x0c4d'
+combiningToUnicode TeluguLengthMark = '\x0c55'
+combiningToUnicode TeluguAiLengthMark = '\x0c56'
+combiningToUnicode KannadaSignNukta = '\x0cbc'
+combiningToUnicode KannadaSignVirama = '\x0ccd'
+combiningToUnicode MalayalamSignVirama = '\x0d4d'
+combiningToUnicode SinhalaSignAlLakuna = '\x0dca'
+combiningToUnicode ThaiCharacterSaraU = '\x0e38'
+combiningToUnicode ThaiCharacterSaraUu = '\x0e39'
+combiningToUnicode ThaiCharacterPhinthu = '\x0e3a'
+combiningToUnicode ThaiCharacterMaiEk = '\x0e48'
+combiningToUnicode ThaiCharacterMaiTho = '\x0e49'
+combiningToUnicode ThaiCharacterMaiTri = '\x0e4a'
+combiningToUnicode ThaiCharacterMaiChattawa = '\x0e4b'
+combiningToUnicode LaoVowelSignU = '\x0eb8'
+combiningToUnicode LaoVowelSignUu = '\x0eb9'
+combiningToUnicode LaoToneMaiEk = '\x0ec8'
+combiningToUnicode LaoToneMaiTho = '\x0ec9'
+combiningToUnicode LaoToneMaiTi = '\x0eca'
+combiningToUnicode LaoToneMaiCatawa = '\x0ecb'
+combiningToUnicode TibetanAstrologicalSignKhyudPa = '\x0f18'
+combiningToUnicode TibetanAstrologicalSignSdongTshugs = '\x0f19'
+combiningToUnicode TibetanMarkNgasBzungNyiZla = '\x0f35'
+combiningToUnicode TibetanMarkNgasBzungSgorRtags = '\x0f37'
+combiningToUnicode TibetanMarkTsaPhru = '\x0f39'
+combiningToUnicode TibetanVowelSignAa = '\x0f71'
+combiningToUnicode TibetanVowelSignI = '\x0f72'
+combiningToUnicode TibetanVowelSignU = '\x0f74'
+combiningToUnicode TibetanVowelSignE = '\x0f7a'
+combiningToUnicode TibetanVowelSignEe = '\x0f7b'
+combiningToUnicode TibetanVowelSignO = '\x0f7c'
+combiningToUnicode TibetanVowelSignOo = '\x0f7d'
+combiningToUnicode TibetanVowelSignReversedI = '\x0f80'
+combiningToUnicode TibetanSignNyiZlaNaaDa = '\x0f82'
+combiningToUnicode TibetanSignSnaLdan = '\x0f83'
+combiningToUnicode TibetanMarkHalanta = '\x0f84'
+combiningToUnicode TibetanSignLciRtags = '\x0f86'
+combiningToUnicode TibetanSignYangRtags = '\x0f87'
+combiningToUnicode TibetanSymbolPadmaGdan = '\x0fc6'
+combiningToUnicode MyanmarSignDotBelow = '\x1037'
+combiningToUnicode MyanmarSignVirama = '\x1039'
+combiningToUnicode MyanmarSignAsat = '\x103a'
+combiningToUnicode MyanmarSignShanCouncilEmphaticTone = '\x108d'
 combiningToUnicode EthiopicCombiningGeminationAndVowelLengthMark = '\x135d'
 combiningToUnicode EthiopicCombiningVowelLengthMark = '\x135e'
 combiningToUnicode EthiopicCombiningGeminationMark = '\x135f'
+combiningToUnicode TagalogSignVirama = '\x1714'
+combiningToUnicode HanunooSignPamudpod = '\x1734'
+combiningToUnicode KhmerSignCoeng = '\x17d2'
+combiningToUnicode KhmerSignAtthacan = '\x17dd'
+combiningToUnicode MongolianLetterAliGaliDagalga = '\x18a9'
+combiningToUnicode LimbuSignMukphreng = '\x1939'
+combiningToUnicode LimbuSignKemphreng = '\x193a'
+combiningToUnicode LimbuSignSaI = '\x193b'
+combiningToUnicode BugineseVowelSignI = '\x1a17'
+combiningToUnicode BugineseVowelSignU = '\x1a18'
+combiningToUnicode TaiThamSignSakot = '\x1a60'
+combiningToUnicode TaiThamSignTone1 = '\x1a75'
+combiningToUnicode TaiThamSignTone2 = '\x1a76'
+combiningToUnicode TaiThamSignKhuenTone3 = '\x1a77'
+combiningToUnicode TaiThamSignKhuenTone4 = '\x1a78'
+combiningToUnicode TaiThamSignKhuenTone5 = '\x1a79'
+combiningToUnicode TaiThamSignRaHaam = '\x1a7a'
+combiningToUnicode TaiThamSignMaiSam = '\x1a7b'
+combiningToUnicode TaiThamSignKhuenLueKaran = '\x1a7c'
 combiningToUnicode TaiThamCombiningCryptogrammicDot = '\x1a7f'
 combiningToUnicode CombiningDoubledCircumflexAccent = '\x1ab0'
 combiningToUnicode CombiningDiaeresisRing = '\x1ab1'
@@ -629,9 +1254,8 @@ combiningToUnicode CombiningStrongCentralizationStrokeBelow = '\x1aba'
 combiningToUnicode CombiningParenthesesAbove = '\x1abb'
 combiningToUnicode CombiningDoubleParenthesesAbove = '\x1abc'
 combiningToUnicode CombiningParenthesesBelow = '\x1abd'
-combiningToUnicode CombiningParenthesesOverlay = '\x1abe'
-combiningToUnicode CombiningLatinSmallLetterWBelow = '\x1abf'
-combiningToUnicode CombiningLatinSmallLetterTurnedWBelow = '\x1ac0'
+combiningToUnicode BalineseSignRerekan = '\x1b34'
+combiningToUnicode BalineseAdegAdeg = '\x1b44'
 combiningToUnicode BalineseMusicalSymbolCombiningTegeh = '\x1b6b'
 combiningToUnicode BalineseMusicalSymbolCombiningEndep = '\x1b6c'
 combiningToUnicode BalineseMusicalSymbolCombiningKempul = '\x1b6d'
@@ -641,6 +1265,39 @@ combiningToUnicode BalineseMusicalSymbolCombiningKempulWithJegogan = '\x1b70'
 combiningToUnicode BalineseMusicalSymbolCombiningKempliWithJegogan = '\x1b71'
 combiningToUnicode BalineseMusicalSymbolCombiningBende = '\x1b72'
 combiningToUnicode BalineseMusicalSymbolCombiningGong = '\x1b73'
+combiningToUnicode SundaneseSignPamaaeh = '\x1baa'
+combiningToUnicode SundaneseSignVirama = '\x1bab'
+combiningToUnicode BatakSignTompi = '\x1be6'
+combiningToUnicode BatakPangolat = '\x1bf2'
+combiningToUnicode BatakPanongonan = '\x1bf3'
+combiningToUnicode LepchaSignNukta = '\x1c37'
+combiningToUnicode VedicToneKarshana = '\x1cd0'
+combiningToUnicode VedicToneShara = '\x1cd1'
+combiningToUnicode VedicTonePrenkha = '\x1cd2'
+combiningToUnicode VedicSignYajurvedicMidlineSvarita = '\x1cd4'
+combiningToUnicode VedicToneYajurvedicAggravatedIndependentSvarita = '\x1cd5'
+combiningToUnicode VedicToneYajurvedicIndependentSvarita = '\x1cd6'
+combiningToUnicode VedicToneYajurvedicKathakaIndependentSvarita = '\x1cd7'
+combiningToUnicode VedicToneCandraBelow = '\x1cd8'
+combiningToUnicode VedicToneYajurvedicKathakaIndependentSvaritaSchroeder = '\x1cd9'
+combiningToUnicode VedicToneDoubleSvarita = '\x1cda'
+combiningToUnicode VedicToneTripleSvarita = '\x1cdb'
+combiningToUnicode VedicToneKathakaAnudatta = '\x1cdc'
+combiningToUnicode VedicToneDotBelow = '\x1cdd'
+combiningToUnicode VedicToneTwoDotsBelow = '\x1cde'
+combiningToUnicode VedicToneThreeDotsBelow = '\x1cdf'
+combiningToUnicode VedicToneRigvedicKashmiriIndependentSvarita = '\x1ce0'
+combiningToUnicode VedicSignVisargaSvarita = '\x1ce2'
+combiningToUnicode VedicSignVisargaUdatta = '\x1ce3'
+combiningToUnicode VedicSignReversedVisargaUdatta = '\x1ce4'
+combiningToUnicode VedicSignVisargaAnudatta = '\x1ce5'
+combiningToUnicode VedicSignReversedVisargaAnudatta = '\x1ce6'
+combiningToUnicode VedicSignVisargaUdattaWithTail = '\x1ce7'
+combiningToUnicode VedicSignVisargaAnudattaWithTail = '\x1ce8'
+combiningToUnicode VedicSignTiryak = '\x1ced'
+combiningToUnicode VedicToneCandraAbove = '\x1cf4'
+combiningToUnicode VedicToneRingAbove = '\x1cf8'
+combiningToUnicode VedicToneDoubleRingAbove = '\x1cf9'
 combiningToUnicode CombiningDottedGraveAccent = '\x1dc0'
 combiningToUnicode CombiningDottedAcuteAccent = '\x1dc1'
 combiningToUnicode CombiningSnakeBelow = '\x1dc2'
@@ -695,10 +1352,6 @@ combiningToUnicode CombiningLatinSmallLetterAWithDiaeresis = '\x1df2'
 combiningToUnicode CombiningLatinSmallLetterOWithDiaeresis = '\x1df3'
 combiningToUnicode CombiningLatinSmallLetterUWithDiaeresis = '\x1df4'
 combiningToUnicode CombiningUpTackAbove = '\x1df5'
-combiningToUnicode CombiningKavykaAboveRight = '\x1df6'
-combiningToUnicode CombiningKavykaAboveLeft = '\x1df7'
-combiningToUnicode CombiningDotAboveLeft = '\x1df8'
-combiningToUnicode CombiningWideInvertedBridgeBelow = '\x1df9'
 combiningToUnicode CombiningDeletionMark = '\x1dfb'
 combiningToUnicode CombiningDoubleInvertedBreveBelow = '\x1dfc'
 combiningToUnicode CombiningAlmostEqualToBelow = '\x1dfd'
@@ -717,14 +1370,7 @@ combiningToUnicode CombiningClockwiseRingOverlay = '\x20d9'
 combiningToUnicode CombiningAnticlockwiseRingOverlay = '\x20da'
 combiningToUnicode CombiningThreeDotsAbove = '\x20db'
 combiningToUnicode CombiningFourDotsAbove = '\x20dc'
-combiningToUnicode CombiningEnclosingCircle = '\x20dd'
-combiningToUnicode CombiningEnclosingSquare = '\x20de'
-combiningToUnicode CombiningEnclosingDiamond = '\x20df'
-combiningToUnicode CombiningEnclosingCircleBackslash = '\x20e0'
 combiningToUnicode CombiningLeftRightArrowAbove = '\x20e1'
-combiningToUnicode CombiningEnclosingScreen = '\x20e2'
-combiningToUnicode CombiningEnclosingKeycap = '\x20e3'
-combiningToUnicode CombiningEnclosingUpwardPointingTriangle = '\x20e4'
 combiningToUnicode CombiningReverseSolidusOverlay = '\x20e5'
 combiningToUnicode CombiningDoubleVerticalStrokeOverlay = '\x20e6'
 combiningToUnicode CombiningAnnuitySymbol = '\x20e7'
@@ -740,6 +1386,7 @@ combiningToUnicode CombiningAsteriskAbove = '\x20f0'
 combiningToUnicode CopticCombiningNiAbove = '\x2cef'
 combiningToUnicode CopticCombiningSpiritusAsper = '\x2cf0'
 combiningToUnicode CopticCombiningSpiritusLenis = '\x2cf1'
+combiningToUnicode TifinaghConsonantJoiner = '\x2d7f'
 combiningToUnicode CombiningCyrillicLetterBe = '\x2de0'
 combiningToUnicode CombiningCyrillicLetterVe = '\x2de1'
 combiningToUnicode CombiningCyrillicLetterGhe = '\x2de2'
@@ -772,12 +1419,15 @@ combiningToUnicode CombiningCyrillicLetterIotifiedA = '\x2dfc'
 combiningToUnicode CombiningCyrillicLetterLittleYus = '\x2dfd'
 combiningToUnicode CombiningCyrillicLetterBigYus = '\x2dfe'
 combiningToUnicode CombiningCyrillicLetterIotifiedBigYus = '\x2dff'
+combiningToUnicode IdeographicLevelToneMark = '\x302a'
+combiningToUnicode IdeographicRisingToneMark = '\x302b'
+combiningToUnicode IdeographicDepartingToneMark = '\x302c'
+combiningToUnicode IdeographicEnteringToneMark = '\x302d'
+combiningToUnicode HangulSingleDotToneMark = '\x302e'
+combiningToUnicode HangulDoubleDotToneMark = '\x302f'
 combiningToUnicode CombiningKatakanaHiraganaVoicedSoundMark = '\x3099'
 combiningToUnicode CombiningKatakanaHiraganaSemiVoicedSoundMark = '\x309a'
 combiningToUnicode CombiningCyrillicVzmet = '\xa66f'
-combiningToUnicode CombiningCyrillicTenMillionsSign = '\xa670'
-combiningToUnicode CombiningCyrillicHundredMillionsSign = '\xa671'
-combiningToUnicode CombiningCyrillicThousandMillionsSign = '\xa672'
 combiningToUnicode CombiningCyrillicLetterUkrainianIe = '\xa674'
 combiningToUnicode CombiningCyrillicLetterI = '\xa675'
 combiningToUnicode CombiningCyrillicLetterYi = '\xa676'
@@ -792,6 +1442,8 @@ combiningToUnicode CombiningCyrillicLetterEf = '\xa69e'
 combiningToUnicode CombiningCyrillicLetterIotifiedE = '\xa69f'
 combiningToUnicode BamumCombiningMarkKoqndon = '\xa6f0'
 combiningToUnicode BamumCombiningMarkTukwentis = '\xa6f1'
+combiningToUnicode SylotiNagriSignHasanta = '\xa806'
+combiningToUnicode SaurashtraSignVirama = '\xa8c4'
 combiningToUnicode CombiningDevanagariDigitZero = '\xa8e0'
 combiningToUnicode CombiningDevanagariDigitOne = '\xa8e1'
 combiningToUnicode CombiningDevanagariDigitTwo = '\xa8e2'
@@ -810,6 +1462,24 @@ combiningToUnicode CombiningDevanagariLetterPa = '\xa8ee'
 combiningToUnicode CombiningDevanagariLetterRa = '\xa8ef'
 combiningToUnicode CombiningDevanagariLetterVi = '\xa8f0'
 combiningToUnicode CombiningDevanagariSignAvagraha = '\xa8f1'
+combiningToUnicode KayahLiTonePlophu = '\xa92b'
+combiningToUnicode KayahLiToneCalya = '\xa92c'
+combiningToUnicode KayahLiToneCalyaPlophu = '\xa92d'
+combiningToUnicode RejangVirama = '\xa953'
+combiningToUnicode JavaneseSignCecakTelu = '\xa9b3'
+combiningToUnicode JavanesePangkon = '\xa9c0'
+combiningToUnicode TaiVietMaiKang = '\xaab0'
+combiningToUnicode TaiVietVowelI = '\xaab2'
+combiningToUnicode TaiVietVowelUe = '\xaab3'
+combiningToUnicode TaiVietVowelU = '\xaab4'
+combiningToUnicode TaiVietMaiKhit = '\xaab7'
+combiningToUnicode TaiVietVowelIa = '\xaab8'
+combiningToUnicode TaiVietVowelAm = '\xaabe'
+combiningToUnicode TaiVietToneMaiEk = '\xaabf'
+combiningToUnicode TaiVietToneMaiTho = '\xaac1'
+combiningToUnicode MeeteiMayekVirama = '\xaaf6'
+combiningToUnicode MeeteiMayekApunIyek = '\xabed'
+combiningToUnicode HebrewPointJudeoSpanishVarika = '\xfb1e'
 combiningToUnicode CombiningLigatureLeftHalf = '\xfe20'
 combiningToUnicode CombiningLigatureRightHalf = '\xfe21'
 combiningToUnicode CombiningDoubleTildeLeftHalf = '\xfe22'
@@ -827,26 +1497,38 @@ combiningToUnicode CombiningConjoiningMacronBelow = '\xfe2d'
 combiningToUnicode CombiningCyrillicTitloLeftHalf = '\xfe2e'
 combiningToUnicode CombiningCyrillicTitloRightHalf = '\xfe2f'
 combiningToUnicode PhaistosDiscSignCombiningObliqueStroke = '\x101fd'
+combiningToUnicode CopticEpactThousandsMark = '\x102e0'
 combiningToUnicode CombiningOldPermicLetterAn = '\x10376'
 combiningToUnicode CombiningOldPermicLetterDoi = '\x10377'
 combiningToUnicode CombiningOldPermicLetterZata = '\x10378'
 combiningToUnicode CombiningOldPermicLetterNenoe = '\x10379'
 combiningToUnicode CombiningOldPermicLetterSii = '\x1037a'
-combiningToUnicode YezidiCombiningHamzaMark = '\x10eab'
-combiningToUnicode YezidiCombiningMaddaMark = '\x10eac'
-combiningToUnicode SogdianCombiningDotBelow = '\x10f46'
-combiningToUnicode SogdianCombiningTwoDotsBelow = '\x10f47'
-combiningToUnicode SogdianCombiningDotAbove = '\x10f48'
-combiningToUnicode SogdianCombiningTwoDotsAbove = '\x10f49'
-combiningToUnicode SogdianCombiningCurveAbove = '\x10f4a'
-combiningToUnicode SogdianCombiningCurveBelow = '\x10f4b'
-combiningToUnicode SogdianCombiningHookAbove = '\x10f4c'
-combiningToUnicode SogdianCombiningHookBelow = '\x10f4d'
-combiningToUnicode SogdianCombiningLongHookBelow = '\x10f4e'
-combiningToUnicode SogdianCombiningReshBelow = '\x10f4f'
-combiningToUnicode SogdianCombiningStrokeBelow = '\x10f50'
-combiningToUnicode GranthaSignCombiningAnusvaraAbove = '\x11300'
-combiningToUnicode CombiningBinduBelow = '\x1133b'
+combiningToUnicode KharoshthiSignDoubleRingBelow = '\x10a0d'
+combiningToUnicode KharoshthiSignVisarga = '\x10a0f'
+combiningToUnicode KharoshthiSignBarAbove = '\x10a38'
+combiningToUnicode KharoshthiSignCauda = '\x10a39'
+combiningToUnicode KharoshthiSignDotBelow = '\x10a3a'
+combiningToUnicode KharoshthiVirama = '\x10a3f'
+combiningToUnicode ManichaeanAbbreviationMarkAbove = '\x10ae5'
+combiningToUnicode ManichaeanAbbreviationMarkBelow = '\x10ae6'
+combiningToUnicode BrahmiVirama = '\x11046'
+combiningToUnicode BrahmiNumberJoiner = '\x1107f'
+combiningToUnicode KaithiSignVirama = '\x110b9'
+combiningToUnicode KaithiSignNukta = '\x110ba'
+combiningToUnicode ChakmaSignCandrabindu = '\x11100'
+combiningToUnicode ChakmaSignAnusvara = '\x11101'
+combiningToUnicode ChakmaSignVisarga = '\x11102'
+combiningToUnicode ChakmaVirama = '\x11133'
+combiningToUnicode ChakmaMaayyaa = '\x11134'
+combiningToUnicode MahajaniSignNukta = '\x11173'
+combiningToUnicode SharadaSignVirama = '\x111c0'
+combiningToUnicode SharadaSignNukta = '\x111ca'
+combiningToUnicode KhojkiSignVirama = '\x11235'
+combiningToUnicode KhojkiSignNukta = '\x11236'
+combiningToUnicode KhudawadiSignNukta = '\x112e9'
+combiningToUnicode KhudawadiSignVirama = '\x112ea'
+combiningToUnicode GranthaSignNukta = '\x1133c'
+combiningToUnicode GranthaSignVirama = '\x1134d'
 combiningToUnicode CombiningGranthaDigitZero = '\x11366'
 combiningToUnicode CombiningGranthaDigitOne = '\x11367'
 combiningToUnicode CombiningGranthaDigitTwo = '\x11368'
@@ -859,11 +1541,30 @@ combiningToUnicode CombiningGranthaLetterKa = '\x11371'
 combiningToUnicode CombiningGranthaLetterNa = '\x11372'
 combiningToUnicode CombiningGranthaLetterVi = '\x11373'
 combiningToUnicode CombiningGranthaLetterPa = '\x11374'
+combiningToUnicode NewaSignVirama = '\x11442'
+combiningToUnicode NewaSignNukta = '\x11446'
+combiningToUnicode TirhutaSignVirama = '\x114c2'
+combiningToUnicode TirhutaSignNukta = '\x114c3'
+combiningToUnicode SiddhamSignVirama = '\x115bf'
+combiningToUnicode SiddhamSignNukta = '\x115c0'
+combiningToUnicode ModiSignVirama = '\x1163f'
+combiningToUnicode TakriSignVirama = '\x116b6'
+combiningToUnicode TakriSignNukta = '\x116b7'
+combiningToUnicode AhomSignKiller = '\x1172b'
+combiningToUnicode BhaiksukiSignVirama = '\x11c3f'
 combiningToUnicode BassaVahCombiningHighTone = '\x16af0'
 combiningToUnicode BassaVahCombiningLowTone = '\x16af1'
 combiningToUnicode BassaVahCombiningMidTone = '\x16af2'
 combiningToUnicode BassaVahCombiningLowMidTone = '\x16af3'
 combiningToUnicode BassaVahCombiningHighLowTone = '\x16af4'
+combiningToUnicode PahawhHmongMarkCimTub = '\x16b30'
+combiningToUnicode PahawhHmongMarkCimSo = '\x16b31'
+combiningToUnicode PahawhHmongMarkCimKes = '\x16b32'
+combiningToUnicode PahawhHmongMarkCimKhav = '\x16b33'
+combiningToUnicode PahawhHmongMarkCimSuam = '\x16b34'
+combiningToUnicode PahawhHmongMarkCimHom = '\x16b35'
+combiningToUnicode PahawhHmongMarkCimTaum = '\x16b36'
+combiningToUnicode DuployanDoubleMark = '\x1bc9e'
 combiningToUnicode MusicalSymbolCombiningStem = '\x1d165'
 combiningToUnicode MusicalSymbolCombiningSprechgesangStem = '\x1d166'
 combiningToUnicode MusicalSymbolCombiningTremolo1 = '\x1d167'
@@ -942,11 +1643,21 @@ combiningToUnicode MendeKikakuiCombiningNumberThousands = '\x1e8d3'
 combiningToUnicode MendeKikakuiCombiningNumberTenThousands = '\x1e8d4'
 combiningToUnicode MendeKikakuiCombiningNumberHundredThousands = '\x1e8d5'
 combiningToUnicode MendeKikakuiCombiningNumberMillions = '\x1e8d6'
+combiningToUnicode AdlamAlifLengthener = '\x1e944'
+combiningToUnicode AdlamVowelLengthener = '\x1e945'
+combiningToUnicode AdlamGeminationMark = '\x1e946'
+combiningToUnicode AdlamHamza = '\x1e947'
+combiningToUnicode AdlamConsonantModifier = '\x1e948'
+combiningToUnicode AdlamGeminateConsonantModifier = '\x1e949'
+combiningToUnicode AdlamNukta = '\x1e94a'
+
+isCombiningCharacter :: Char -> Bool
+isCombiningCharacter = isJust . combiningCharacter
 
 combiningCharacter' :: Char -> CombiningCharacter
 combiningCharacter' c
     | Just y <- combiningCharacter c = y
-    | otherwise = error "The given character is not a CombiningCharacter."
+    | otherwise = error "The given character is a not a CombiningCharacter"
 
 combiningCharacter :: Char -> Maybe CombiningCharacter
 combiningCharacter '\x0300' = Just CombiningGraveAccent
@@ -1028,7 +1739,6 @@ combiningCharacter '\x034b' = Just CombiningHomotheticAbove
 combiningCharacter '\x034c' = Just CombiningAlmostEqualToAbove
 combiningCharacter '\x034d' = Just CombiningLeftRightArrowBelow
 combiningCharacter '\x034e' = Just CombiningUpwardsArrowBelow
-combiningCharacter '\x034f' = Just CombiningGraphemeJoiner
 combiningCharacter '\x0350' = Just CombiningRightArrowheadAbove
 combiningCharacter '\x0351' = Just CombiningLeftHalfRingAbove
 combiningCharacter '\x0352' = Just CombiningFermata
@@ -1066,8 +1776,137 @@ combiningCharacter '\x0484' = Just CombiningCyrillicPalatalization
 combiningCharacter '\x0485' = Just CombiningCyrillicDasiaPneumata
 combiningCharacter '\x0486' = Just CombiningCyrillicPsiliPneumata
 combiningCharacter '\x0487' = Just CombiningCyrillicPokrytie
-combiningCharacter '\x0488' = Just CombiningCyrillicHundredThousandsSign
-combiningCharacter '\x0489' = Just CombiningCyrillicMillionsSign
+combiningCharacter '\x0591' = Just HebrewAccentEtnahta
+combiningCharacter '\x0592' = Just HebrewAccentSegol
+combiningCharacter '\x0593' = Just HebrewAccentShalshelet
+combiningCharacter '\x0594' = Just HebrewAccentZaqefQatan
+combiningCharacter '\x0595' = Just HebrewAccentZaqefGadol
+combiningCharacter '\x0596' = Just HebrewAccentTipeha
+combiningCharacter '\x0597' = Just HebrewAccentRevia
+combiningCharacter '\x0598' = Just HebrewAccentZarqa
+combiningCharacter '\x0599' = Just HebrewAccentPashta
+combiningCharacter '\x059a' = Just HebrewAccentYetiv
+combiningCharacter '\x059b' = Just HebrewAccentTevir
+combiningCharacter '\x059c' = Just HebrewAccentGeresh
+combiningCharacter '\x059d' = Just HebrewAccentGereshMuqdam
+combiningCharacter '\x059e' = Just HebrewAccentGershayim
+combiningCharacter '\x059f' = Just HebrewAccentQarneyPara
+combiningCharacter '\x05a0' = Just HebrewAccentTelishaGedola
+combiningCharacter '\x05a1' = Just HebrewAccentPazer
+combiningCharacter '\x05a2' = Just HebrewAccentAtnahHafukh
+combiningCharacter '\x05a3' = Just HebrewAccentMunah
+combiningCharacter '\x05a4' = Just HebrewAccentMahapakh
+combiningCharacter '\x05a5' = Just HebrewAccentMerkha
+combiningCharacter '\x05a6' = Just HebrewAccentMerkhaKefula
+combiningCharacter '\x05a7' = Just HebrewAccentDarga
+combiningCharacter '\x05a8' = Just HebrewAccentQadma
+combiningCharacter '\x05a9' = Just HebrewAccentTelishaQetana
+combiningCharacter '\x05aa' = Just HebrewAccentYerahBenYomo
+combiningCharacter '\x05ab' = Just HebrewAccentOle
+combiningCharacter '\x05ac' = Just HebrewAccentIluy
+combiningCharacter '\x05ad' = Just HebrewAccentDehi
+combiningCharacter '\x05ae' = Just HebrewAccentZinor
+combiningCharacter '\x05af' = Just HebrewMarkMasoraCircle
+combiningCharacter '\x05b0' = Just HebrewPointSheva
+combiningCharacter '\x05b1' = Just HebrewPointHatafSegol
+combiningCharacter '\x05b2' = Just HebrewPointHatafPatah
+combiningCharacter '\x05b3' = Just HebrewPointHatafQamats
+combiningCharacter '\x05b4' = Just HebrewPointHiriq
+combiningCharacter '\x05b5' = Just HebrewPointTsere
+combiningCharacter '\x05b6' = Just HebrewPointSegol
+combiningCharacter '\x05b7' = Just HebrewPointPatah
+combiningCharacter '\x05b8' = Just HebrewPointQamats
+combiningCharacter '\x05b9' = Just HebrewPointHolam
+combiningCharacter '\x05ba' = Just HebrewPointHolamHaserForVav
+combiningCharacter '\x05bb' = Just HebrewPointQubuts
+combiningCharacter '\x05bc' = Just HebrewPointDageshOrMapiq
+combiningCharacter '\x05bd' = Just HebrewPointMeteg
+combiningCharacter '\x05bf' = Just HebrewPointRafe
+combiningCharacter '\x05c1' = Just HebrewPointShinDot
+combiningCharacter '\x05c2' = Just HebrewPointSinDot
+combiningCharacter '\x05c4' = Just HebrewMarkUpperDot
+combiningCharacter '\x05c5' = Just HebrewMarkLowerDot
+combiningCharacter '\x05c7' = Just HebrewPointQamatsQatan
+combiningCharacter '\x0610' = Just ArabicSignSallallahouAlayheWassallam
+combiningCharacter '\x0611' = Just ArabicSignAlayheAssallam
+combiningCharacter '\x0612' = Just ArabicSignRahmatullahAlayhe
+combiningCharacter '\x0613' = Just ArabicSignRadiAllahouAnhu
+combiningCharacter '\x0614' = Just ArabicSignTakhallus
+combiningCharacter '\x0615' = Just ArabicSmallHighTah
+combiningCharacter '\x0616' = Just ArabicSmallHighLigatureAlefWithLamWithYeh
+combiningCharacter '\x0617' = Just ArabicSmallHighZain
+combiningCharacter '\x0618' = Just ArabicSmallFatha
+combiningCharacter '\x0619' = Just ArabicSmallDamma
+combiningCharacter '\x061a' = Just ArabicSmallKasra
+combiningCharacter '\x064b' = Just ArabicFathatan
+combiningCharacter '\x064c' = Just ArabicDammatan
+combiningCharacter '\x064d' = Just ArabicKasratan
+combiningCharacter '\x064e' = Just ArabicFatha
+combiningCharacter '\x064f' = Just ArabicDamma
+combiningCharacter '\x0650' = Just ArabicKasra
+combiningCharacter '\x0651' = Just ArabicShadda
+combiningCharacter '\x0652' = Just ArabicSukun
+combiningCharacter '\x0653' = Just ArabicMaddahAbove
+combiningCharacter '\x0654' = Just ArabicHamzaAbove
+combiningCharacter '\x0655' = Just ArabicHamzaBelow
+combiningCharacter '\x0656' = Just ArabicSubscriptAlef
+combiningCharacter '\x0657' = Just ArabicInvertedDamma
+combiningCharacter '\x0658' = Just ArabicMarkNoonGhunna
+combiningCharacter '\x0659' = Just ArabicZwarakay
+combiningCharacter '\x065a' = Just ArabicVowelSignSmallVAbove
+combiningCharacter '\x065b' = Just ArabicVowelSignInvertedSmallVAbove
+combiningCharacter '\x065c' = Just ArabicVowelSignDotBelow
+combiningCharacter '\x065d' = Just ArabicReversedDamma
+combiningCharacter '\x065e' = Just ArabicFathaWithTwoDots
+combiningCharacter '\x065f' = Just ArabicWavyHamzaBelow
+combiningCharacter '\x0670' = Just ArabicLetterSuperscriptAlef
+combiningCharacter '\x06d6' = Just ArabicSmallHighLigatureSadWithLamWithAlefMaksura
+combiningCharacter '\x06d7' = Just ArabicSmallHighLigatureQafWithLamWithAlefMaksura
+combiningCharacter '\x06d8' = Just ArabicSmallHighMeemInitialForm
+combiningCharacter '\x06d9' = Just ArabicSmallHighLamAlef
+combiningCharacter '\x06da' = Just ArabicSmallHighJeem
+combiningCharacter '\x06db' = Just ArabicSmallHighThreeDots
+combiningCharacter '\x06dc' = Just ArabicSmallHighSeen
+combiningCharacter '\x06df' = Just ArabicSmallHighRoundedZero
+combiningCharacter '\x06e0' = Just ArabicSmallHighUprightRectangularZero
+combiningCharacter '\x06e1' = Just ArabicSmallHighDotlessHeadOfKhah
+combiningCharacter '\x06e2' = Just ArabicSmallHighMeemIsolatedForm
+combiningCharacter '\x06e3' = Just ArabicSmallLowSeen
+combiningCharacter '\x06e4' = Just ArabicSmallHighMadda
+combiningCharacter '\x06e7' = Just ArabicSmallHighYeh
+combiningCharacter '\x06e8' = Just ArabicSmallHighNoon
+combiningCharacter '\x06ea' = Just ArabicEmptyCentreLowStop
+combiningCharacter '\x06eb' = Just ArabicEmptyCentreHighStop
+combiningCharacter '\x06ec' = Just ArabicRoundedHighStopWithFilledCentre
+combiningCharacter '\x06ed' = Just ArabicSmallLowMeem
+combiningCharacter '\x0711' = Just SyriacLetterSuperscriptAlaph
+combiningCharacter '\x0730' = Just SyriacPthahaAbove
+combiningCharacter '\x0731' = Just SyriacPthahaBelow
+combiningCharacter '\x0732' = Just SyriacPthahaDotted
+combiningCharacter '\x0733' = Just SyriacZqaphaAbove
+combiningCharacter '\x0734' = Just SyriacZqaphaBelow
+combiningCharacter '\x0735' = Just SyriacZqaphaDotted
+combiningCharacter '\x0736' = Just SyriacRbasaAbove
+combiningCharacter '\x0737' = Just SyriacRbasaBelow
+combiningCharacter '\x0738' = Just SyriacDottedZlamaHorizontal
+combiningCharacter '\x0739' = Just SyriacDottedZlamaAngular
+combiningCharacter '\x073a' = Just SyriacHbasaAbove
+combiningCharacter '\x073b' = Just SyriacHbasaBelow
+combiningCharacter '\x073c' = Just SyriacHbasaEsasaDotted
+combiningCharacter '\x073d' = Just SyriacEsasaAbove
+combiningCharacter '\x073e' = Just SyriacEsasaBelow
+combiningCharacter '\x073f' = Just SyriacRwaha
+combiningCharacter '\x0740' = Just SyriacFeminineDot
+combiningCharacter '\x0741' = Just SyriacQushshaya
+combiningCharacter '\x0742' = Just SyriacRukkakha
+combiningCharacter '\x0743' = Just SyriacTwoVerticalDotsAbove
+combiningCharacter '\x0744' = Just SyriacTwoVerticalDotsBelow
+combiningCharacter '\x0745' = Just SyriacThreeDotsAbove
+combiningCharacter '\x0746' = Just SyriacThreeDotsBelow
+combiningCharacter '\x0747' = Just SyriacObliqueLineAbove
+combiningCharacter '\x0748' = Just SyriacObliqueLineBelow
+combiningCharacter '\x0749' = Just SyriacMusic
+combiningCharacter '\x074a' = Just SyriacBarrekh
 combiningCharacter '\x07eb' = Just NkoCombiningShortHighTone
 combiningCharacter '\x07ec' = Just NkoCombiningShortLowTone
 combiningCharacter '\x07ed' = Just NkoCombiningShortRisingTone
@@ -1077,12 +1916,153 @@ combiningCharacter '\x07f0' = Just NkoCombiningLongLowTone
 combiningCharacter '\x07f1' = Just NkoCombiningLongRisingTone
 combiningCharacter '\x07f2' = Just NkoCombiningNasalizationMark
 combiningCharacter '\x07f3' = Just NkoCombiningDoubleDotAbove
-combiningCharacter '\x0c00' = Just TeluguSignCombiningCandrabinduAbove
-combiningCharacter '\x0c04' = Just TeluguSignCombiningAnusvaraAbove
-combiningCharacter '\x0d00' = Just MalayalamSignCombiningAnusvaraAbove
+combiningCharacter '\x0816' = Just SamaritanMarkIn
+combiningCharacter '\x0817' = Just SamaritanMarkInAlaf
+combiningCharacter '\x0818' = Just SamaritanMarkOcclusion
+combiningCharacter '\x0819' = Just SamaritanMarkDagesh
+combiningCharacter '\x081b' = Just SamaritanMarkEpentheticYut
+combiningCharacter '\x081c' = Just SamaritanVowelSignLongE
+combiningCharacter '\x081d' = Just SamaritanVowelSignE
+combiningCharacter '\x081e' = Just SamaritanVowelSignOverlongAa
+combiningCharacter '\x081f' = Just SamaritanVowelSignLongAa
+combiningCharacter '\x0820' = Just SamaritanVowelSignAa
+combiningCharacter '\x0821' = Just SamaritanVowelSignOverlongA
+combiningCharacter '\x0822' = Just SamaritanVowelSignLongA
+combiningCharacter '\x0823' = Just SamaritanVowelSignA
+combiningCharacter '\x0825' = Just SamaritanVowelSignShortA
+combiningCharacter '\x0826' = Just SamaritanVowelSignLongU
+combiningCharacter '\x0827' = Just SamaritanVowelSignU
+combiningCharacter '\x0829' = Just SamaritanVowelSignLongI
+combiningCharacter '\x082a' = Just SamaritanVowelSignI
+combiningCharacter '\x082b' = Just SamaritanVowelSignO
+combiningCharacter '\x082c' = Just SamaritanVowelSignSukun
+combiningCharacter '\x082d' = Just SamaritanMarkNequdaa
+combiningCharacter '\x0859' = Just MandaicAffricationMark
+combiningCharacter '\x085a' = Just MandaicVocalizationMark
+combiningCharacter '\x085b' = Just MandaicGeminationMark
+combiningCharacter '\x08d4' = Just ArabicSmallHighWordArRub
+combiningCharacter '\x08d5' = Just ArabicSmallHighSad
+combiningCharacter '\x08d6' = Just ArabicSmallHighAin
+combiningCharacter '\x08d7' = Just ArabicSmallHighQaf
+combiningCharacter '\x08d8' = Just ArabicSmallHighNoonWithKasra
+combiningCharacter '\x08d9' = Just ArabicSmallLowNoonWithKasra
+combiningCharacter '\x08da' = Just ArabicSmallHighWordAthThalatha
+combiningCharacter '\x08db' = Just ArabicSmallHighWordAsSajda
+combiningCharacter '\x08dc' = Just ArabicSmallHighWordAnNisf
+combiningCharacter '\x08dd' = Just ArabicSmallHighWordSakta
+combiningCharacter '\x08de' = Just ArabicSmallHighWordQif
+combiningCharacter '\x08df' = Just ArabicSmallHighWordWaqfa
+combiningCharacter '\x08e0' = Just ArabicSmallHighFootnoteMarker
+combiningCharacter '\x08e1' = Just ArabicSmallHighSignSafha
+combiningCharacter '\x08e3' = Just ArabicTurnedDammaBelow
+combiningCharacter '\x08e4' = Just ArabicCurlyFatha
+combiningCharacter '\x08e5' = Just ArabicCurlyDamma
+combiningCharacter '\x08e6' = Just ArabicCurlyKasra
+combiningCharacter '\x08e7' = Just ArabicCurlyFathatan
+combiningCharacter '\x08e8' = Just ArabicCurlyDammatan
+combiningCharacter '\x08e9' = Just ArabicCurlyKasratan
+combiningCharacter '\x08ea' = Just ArabicToneOneDotAbove
+combiningCharacter '\x08eb' = Just ArabicToneTwoDotsAbove
+combiningCharacter '\x08ec' = Just ArabicToneLoopAbove
+combiningCharacter '\x08ed' = Just ArabicToneOneDotBelow
+combiningCharacter '\x08ee' = Just ArabicToneTwoDotsBelow
+combiningCharacter '\x08ef' = Just ArabicToneLoopBelow
+combiningCharacter '\x08f0' = Just ArabicOpenFathatan
+combiningCharacter '\x08f1' = Just ArabicOpenDammatan
+combiningCharacter '\x08f2' = Just ArabicOpenKasratan
+combiningCharacter '\x08f3' = Just ArabicSmallHighWaw
+combiningCharacter '\x08f4' = Just ArabicFathaWithRing
+combiningCharacter '\x08f5' = Just ArabicFathaWithDotAbove
+combiningCharacter '\x08f6' = Just ArabicKasraWithDotBelow
+combiningCharacter '\x08f7' = Just ArabicLeftArrowheadAbove
+combiningCharacter '\x08f8' = Just ArabicRightArrowheadAbove
+combiningCharacter '\x08f9' = Just ArabicLeftArrowheadBelow
+combiningCharacter '\x08fa' = Just ArabicRightArrowheadBelow
+combiningCharacter '\x08fb' = Just ArabicDoubleRightArrowheadAbove
+combiningCharacter '\x08fc' = Just ArabicDoubleRightArrowheadAboveWithDot
+combiningCharacter '\x08fd' = Just ArabicRightArrowheadAboveWithDot
+combiningCharacter '\x08fe' = Just ArabicDammaWithDot
+combiningCharacter '\x08ff' = Just ArabicMarkSidewaysNoonGhunna
+combiningCharacter '\x093c' = Just DevanagariSignNukta
+combiningCharacter '\x094d' = Just DevanagariSignVirama
+combiningCharacter '\x0951' = Just DevanagariStressSignUdatta
+combiningCharacter '\x0952' = Just DevanagariStressSignAnudatta
+combiningCharacter '\x0953' = Just DevanagariGraveAccent
+combiningCharacter '\x0954' = Just DevanagariAcuteAccent
+combiningCharacter '\x09bc' = Just BengaliSignNukta
+combiningCharacter '\x09cd' = Just BengaliSignVirama
+combiningCharacter '\x0a3c' = Just GurmukhiSignNukta
+combiningCharacter '\x0a4d' = Just GurmukhiSignVirama
+combiningCharacter '\x0abc' = Just GujaratiSignNukta
+combiningCharacter '\x0acd' = Just GujaratiSignVirama
+combiningCharacter '\x0b3c' = Just OriyaSignNukta
+combiningCharacter '\x0b4d' = Just OriyaSignVirama
+combiningCharacter '\x0bcd' = Just TamilSignVirama
+combiningCharacter '\x0c4d' = Just TeluguSignVirama
+combiningCharacter '\x0c55' = Just TeluguLengthMark
+combiningCharacter '\x0c56' = Just TeluguAiLengthMark
+combiningCharacter '\x0cbc' = Just KannadaSignNukta
+combiningCharacter '\x0ccd' = Just KannadaSignVirama
+combiningCharacter '\x0d4d' = Just MalayalamSignVirama
+combiningCharacter '\x0dca' = Just SinhalaSignAlLakuna
+combiningCharacter '\x0e38' = Just ThaiCharacterSaraU
+combiningCharacter '\x0e39' = Just ThaiCharacterSaraUu
+combiningCharacter '\x0e3a' = Just ThaiCharacterPhinthu
+combiningCharacter '\x0e48' = Just ThaiCharacterMaiEk
+combiningCharacter '\x0e49' = Just ThaiCharacterMaiTho
+combiningCharacter '\x0e4a' = Just ThaiCharacterMaiTri
+combiningCharacter '\x0e4b' = Just ThaiCharacterMaiChattawa
+combiningCharacter '\x0eb8' = Just LaoVowelSignU
+combiningCharacter '\x0eb9' = Just LaoVowelSignUu
+combiningCharacter '\x0ec8' = Just LaoToneMaiEk
+combiningCharacter '\x0ec9' = Just LaoToneMaiTho
+combiningCharacter '\x0eca' = Just LaoToneMaiTi
+combiningCharacter '\x0ecb' = Just LaoToneMaiCatawa
+combiningCharacter '\x0f18' = Just TibetanAstrologicalSignKhyudPa
+combiningCharacter '\x0f19' = Just TibetanAstrologicalSignSdongTshugs
+combiningCharacter '\x0f35' = Just TibetanMarkNgasBzungNyiZla
+combiningCharacter '\x0f37' = Just TibetanMarkNgasBzungSgorRtags
+combiningCharacter '\x0f39' = Just TibetanMarkTsaPhru
+combiningCharacter '\x0f71' = Just TibetanVowelSignAa
+combiningCharacter '\x0f72' = Just TibetanVowelSignI
+combiningCharacter '\x0f74' = Just TibetanVowelSignU
+combiningCharacter '\x0f7a' = Just TibetanVowelSignE
+combiningCharacter '\x0f7b' = Just TibetanVowelSignEe
+combiningCharacter '\x0f7c' = Just TibetanVowelSignO
+combiningCharacter '\x0f7d' = Just TibetanVowelSignOo
+combiningCharacter '\x0f80' = Just TibetanVowelSignReversedI
+combiningCharacter '\x0f82' = Just TibetanSignNyiZlaNaaDa
+combiningCharacter '\x0f83' = Just TibetanSignSnaLdan
+combiningCharacter '\x0f84' = Just TibetanMarkHalanta
+combiningCharacter '\x0f86' = Just TibetanSignLciRtags
+combiningCharacter '\x0f87' = Just TibetanSignYangRtags
+combiningCharacter '\x0fc6' = Just TibetanSymbolPadmaGdan
+combiningCharacter '\x1037' = Just MyanmarSignDotBelow
+combiningCharacter '\x1039' = Just MyanmarSignVirama
+combiningCharacter '\x103a' = Just MyanmarSignAsat
+combiningCharacter '\x108d' = Just MyanmarSignShanCouncilEmphaticTone
 combiningCharacter '\x135d' = Just EthiopicCombiningGeminationAndVowelLengthMark
 combiningCharacter '\x135e' = Just EthiopicCombiningVowelLengthMark
 combiningCharacter '\x135f' = Just EthiopicCombiningGeminationMark
+combiningCharacter '\x1714' = Just TagalogSignVirama
+combiningCharacter '\x1734' = Just HanunooSignPamudpod
+combiningCharacter '\x17d2' = Just KhmerSignCoeng
+combiningCharacter '\x17dd' = Just KhmerSignAtthacan
+combiningCharacter '\x18a9' = Just MongolianLetterAliGaliDagalga
+combiningCharacter '\x1939' = Just LimbuSignMukphreng
+combiningCharacter '\x193a' = Just LimbuSignKemphreng
+combiningCharacter '\x193b' = Just LimbuSignSaI
+combiningCharacter '\x1a17' = Just BugineseVowelSignI
+combiningCharacter '\x1a18' = Just BugineseVowelSignU
+combiningCharacter '\x1a60' = Just TaiThamSignSakot
+combiningCharacter '\x1a75' = Just TaiThamSignTone1
+combiningCharacter '\x1a76' = Just TaiThamSignTone2
+combiningCharacter '\x1a77' = Just TaiThamSignKhuenTone3
+combiningCharacter '\x1a78' = Just TaiThamSignKhuenTone4
+combiningCharacter '\x1a79' = Just TaiThamSignKhuenTone5
+combiningCharacter '\x1a7a' = Just TaiThamSignRaHaam
+combiningCharacter '\x1a7b' = Just TaiThamSignMaiSam
+combiningCharacter '\x1a7c' = Just TaiThamSignKhuenLueKaran
 combiningCharacter '\x1a7f' = Just TaiThamCombiningCryptogrammicDot
 combiningCharacter '\x1ab0' = Just CombiningDoubledCircumflexAccent
 combiningCharacter '\x1ab1' = Just CombiningDiaeresisRing
@@ -1098,9 +2078,8 @@ combiningCharacter '\x1aba' = Just CombiningStrongCentralizationStrokeBelow
 combiningCharacter '\x1abb' = Just CombiningParenthesesAbove
 combiningCharacter '\x1abc' = Just CombiningDoubleParenthesesAbove
 combiningCharacter '\x1abd' = Just CombiningParenthesesBelow
-combiningCharacter '\x1abe' = Just CombiningParenthesesOverlay
-combiningCharacter '\x1abf' = Just CombiningLatinSmallLetterWBelow
-combiningCharacter '\x1ac0' = Just CombiningLatinSmallLetterTurnedWBelow
+combiningCharacter '\x1b34' = Just BalineseSignRerekan
+combiningCharacter '\x1b44' = Just BalineseAdegAdeg
 combiningCharacter '\x1b6b' = Just BalineseMusicalSymbolCombiningTegeh
 combiningCharacter '\x1b6c' = Just BalineseMusicalSymbolCombiningEndep
 combiningCharacter '\x1b6d' = Just BalineseMusicalSymbolCombiningKempul
@@ -1110,6 +2089,39 @@ combiningCharacter '\x1b70' = Just BalineseMusicalSymbolCombiningKempulWithJegog
 combiningCharacter '\x1b71' = Just BalineseMusicalSymbolCombiningKempliWithJegogan
 combiningCharacter '\x1b72' = Just BalineseMusicalSymbolCombiningBende
 combiningCharacter '\x1b73' = Just BalineseMusicalSymbolCombiningGong
+combiningCharacter '\x1baa' = Just SundaneseSignPamaaeh
+combiningCharacter '\x1bab' = Just SundaneseSignVirama
+combiningCharacter '\x1be6' = Just BatakSignTompi
+combiningCharacter '\x1bf2' = Just BatakPangolat
+combiningCharacter '\x1bf3' = Just BatakPanongonan
+combiningCharacter '\x1c37' = Just LepchaSignNukta
+combiningCharacter '\x1cd0' = Just VedicToneKarshana
+combiningCharacter '\x1cd1' = Just VedicToneShara
+combiningCharacter '\x1cd2' = Just VedicTonePrenkha
+combiningCharacter '\x1cd4' = Just VedicSignYajurvedicMidlineSvarita
+combiningCharacter '\x1cd5' = Just VedicToneYajurvedicAggravatedIndependentSvarita
+combiningCharacter '\x1cd6' = Just VedicToneYajurvedicIndependentSvarita
+combiningCharacter '\x1cd7' = Just VedicToneYajurvedicKathakaIndependentSvarita
+combiningCharacter '\x1cd8' = Just VedicToneCandraBelow
+combiningCharacter '\x1cd9' = Just VedicToneYajurvedicKathakaIndependentSvaritaSchroeder
+combiningCharacter '\x1cda' = Just VedicToneDoubleSvarita
+combiningCharacter '\x1cdb' = Just VedicToneTripleSvarita
+combiningCharacter '\x1cdc' = Just VedicToneKathakaAnudatta
+combiningCharacter '\x1cdd' = Just VedicToneDotBelow
+combiningCharacter '\x1cde' = Just VedicToneTwoDotsBelow
+combiningCharacter '\x1cdf' = Just VedicToneThreeDotsBelow
+combiningCharacter '\x1ce0' = Just VedicToneRigvedicKashmiriIndependentSvarita
+combiningCharacter '\x1ce2' = Just VedicSignVisargaSvarita
+combiningCharacter '\x1ce3' = Just VedicSignVisargaUdatta
+combiningCharacter '\x1ce4' = Just VedicSignReversedVisargaUdatta
+combiningCharacter '\x1ce5' = Just VedicSignVisargaAnudatta
+combiningCharacter '\x1ce6' = Just VedicSignReversedVisargaAnudatta
+combiningCharacter '\x1ce7' = Just VedicSignVisargaUdattaWithTail
+combiningCharacter '\x1ce8' = Just VedicSignVisargaAnudattaWithTail
+combiningCharacter '\x1ced' = Just VedicSignTiryak
+combiningCharacter '\x1cf4' = Just VedicToneCandraAbove
+combiningCharacter '\x1cf8' = Just VedicToneRingAbove
+combiningCharacter '\x1cf9' = Just VedicToneDoubleRingAbove
 combiningCharacter '\x1dc0' = Just CombiningDottedGraveAccent
 combiningCharacter '\x1dc1' = Just CombiningDottedAcuteAccent
 combiningCharacter '\x1dc2' = Just CombiningSnakeBelow
@@ -1164,10 +2176,6 @@ combiningCharacter '\x1df2' = Just CombiningLatinSmallLetterAWithDiaeresis
 combiningCharacter '\x1df3' = Just CombiningLatinSmallLetterOWithDiaeresis
 combiningCharacter '\x1df4' = Just CombiningLatinSmallLetterUWithDiaeresis
 combiningCharacter '\x1df5' = Just CombiningUpTackAbove
-combiningCharacter '\x1df6' = Just CombiningKavykaAboveRight
-combiningCharacter '\x1df7' = Just CombiningKavykaAboveLeft
-combiningCharacter '\x1df8' = Just CombiningDotAboveLeft
-combiningCharacter '\x1df9' = Just CombiningWideInvertedBridgeBelow
 combiningCharacter '\x1dfb' = Just CombiningDeletionMark
 combiningCharacter '\x1dfc' = Just CombiningDoubleInvertedBreveBelow
 combiningCharacter '\x1dfd' = Just CombiningAlmostEqualToBelow
@@ -1186,14 +2194,7 @@ combiningCharacter '\x20d9' = Just CombiningClockwiseRingOverlay
 combiningCharacter '\x20da' = Just CombiningAnticlockwiseRingOverlay
 combiningCharacter '\x20db' = Just CombiningThreeDotsAbove
 combiningCharacter '\x20dc' = Just CombiningFourDotsAbove
-combiningCharacter '\x20dd' = Just CombiningEnclosingCircle
-combiningCharacter '\x20de' = Just CombiningEnclosingSquare
-combiningCharacter '\x20df' = Just CombiningEnclosingDiamond
-combiningCharacter '\x20e0' = Just CombiningEnclosingCircleBackslash
 combiningCharacter '\x20e1' = Just CombiningLeftRightArrowAbove
-combiningCharacter '\x20e2' = Just CombiningEnclosingScreen
-combiningCharacter '\x20e3' = Just CombiningEnclosingKeycap
-combiningCharacter '\x20e4' = Just CombiningEnclosingUpwardPointingTriangle
 combiningCharacter '\x20e5' = Just CombiningReverseSolidusOverlay
 combiningCharacter '\x20e6' = Just CombiningDoubleVerticalStrokeOverlay
 combiningCharacter '\x20e7' = Just CombiningAnnuitySymbol
@@ -1209,6 +2210,7 @@ combiningCharacter '\x20f0' = Just CombiningAsteriskAbove
 combiningCharacter '\x2cef' = Just CopticCombiningNiAbove
 combiningCharacter '\x2cf0' = Just CopticCombiningSpiritusAsper
 combiningCharacter '\x2cf1' = Just CopticCombiningSpiritusLenis
+combiningCharacter '\x2d7f' = Just TifinaghConsonantJoiner
 combiningCharacter '\x2de0' = Just CombiningCyrillicLetterBe
 combiningCharacter '\x2de1' = Just CombiningCyrillicLetterVe
 combiningCharacter '\x2de2' = Just CombiningCyrillicLetterGhe
@@ -1241,12 +2243,15 @@ combiningCharacter '\x2dfc' = Just CombiningCyrillicLetterIotifiedA
 combiningCharacter '\x2dfd' = Just CombiningCyrillicLetterLittleYus
 combiningCharacter '\x2dfe' = Just CombiningCyrillicLetterBigYus
 combiningCharacter '\x2dff' = Just CombiningCyrillicLetterIotifiedBigYus
+combiningCharacter '\x302a' = Just IdeographicLevelToneMark
+combiningCharacter '\x302b' = Just IdeographicRisingToneMark
+combiningCharacter '\x302c' = Just IdeographicDepartingToneMark
+combiningCharacter '\x302d' = Just IdeographicEnteringToneMark
+combiningCharacter '\x302e' = Just HangulSingleDotToneMark
+combiningCharacter '\x302f' = Just HangulDoubleDotToneMark
 combiningCharacter '\x3099' = Just CombiningKatakanaHiraganaVoicedSoundMark
 combiningCharacter '\x309a' = Just CombiningKatakanaHiraganaSemiVoicedSoundMark
 combiningCharacter '\xa66f' = Just CombiningCyrillicVzmet
-combiningCharacter '\xa670' = Just CombiningCyrillicTenMillionsSign
-combiningCharacter '\xa671' = Just CombiningCyrillicHundredMillionsSign
-combiningCharacter '\xa672' = Just CombiningCyrillicThousandMillionsSign
 combiningCharacter '\xa674' = Just CombiningCyrillicLetterUkrainianIe
 combiningCharacter '\xa675' = Just CombiningCyrillicLetterI
 combiningCharacter '\xa676' = Just CombiningCyrillicLetterYi
@@ -1261,6 +2266,8 @@ combiningCharacter '\xa69e' = Just CombiningCyrillicLetterEf
 combiningCharacter '\xa69f' = Just CombiningCyrillicLetterIotifiedE
 combiningCharacter '\xa6f0' = Just BamumCombiningMarkKoqndon
 combiningCharacter '\xa6f1' = Just BamumCombiningMarkTukwentis
+combiningCharacter '\xa806' = Just SylotiNagriSignHasanta
+combiningCharacter '\xa8c4' = Just SaurashtraSignVirama
 combiningCharacter '\xa8e0' = Just CombiningDevanagariDigitZero
 combiningCharacter '\xa8e1' = Just CombiningDevanagariDigitOne
 combiningCharacter '\xa8e2' = Just CombiningDevanagariDigitTwo
@@ -1279,6 +2286,24 @@ combiningCharacter '\xa8ee' = Just CombiningDevanagariLetterPa
 combiningCharacter '\xa8ef' = Just CombiningDevanagariLetterRa
 combiningCharacter '\xa8f0' = Just CombiningDevanagariLetterVi
 combiningCharacter '\xa8f1' = Just CombiningDevanagariSignAvagraha
+combiningCharacter '\xa92b' = Just KayahLiTonePlophu
+combiningCharacter '\xa92c' = Just KayahLiToneCalya
+combiningCharacter '\xa92d' = Just KayahLiToneCalyaPlophu
+combiningCharacter '\xa953' = Just RejangVirama
+combiningCharacter '\xa9b3' = Just JavaneseSignCecakTelu
+combiningCharacter '\xa9c0' = Just JavanesePangkon
+combiningCharacter '\xaab0' = Just TaiVietMaiKang
+combiningCharacter '\xaab2' = Just TaiVietVowelI
+combiningCharacter '\xaab3' = Just TaiVietVowelUe
+combiningCharacter '\xaab4' = Just TaiVietVowelU
+combiningCharacter '\xaab7' = Just TaiVietMaiKhit
+combiningCharacter '\xaab8' = Just TaiVietVowelIa
+combiningCharacter '\xaabe' = Just TaiVietVowelAm
+combiningCharacter '\xaabf' = Just TaiVietToneMaiEk
+combiningCharacter '\xaac1' = Just TaiVietToneMaiTho
+combiningCharacter '\xaaf6' = Just MeeteiMayekVirama
+combiningCharacter '\xabed' = Just MeeteiMayekApunIyek
+combiningCharacter '\xfb1e' = Just HebrewPointJudeoSpanishVarika
 combiningCharacter '\xfe20' = Just CombiningLigatureLeftHalf
 combiningCharacter '\xfe21' = Just CombiningLigatureRightHalf
 combiningCharacter '\xfe22' = Just CombiningDoubleTildeLeftHalf
@@ -1296,26 +2321,38 @@ combiningCharacter '\xfe2d' = Just CombiningConjoiningMacronBelow
 combiningCharacter '\xfe2e' = Just CombiningCyrillicTitloLeftHalf
 combiningCharacter '\xfe2f' = Just CombiningCyrillicTitloRightHalf
 combiningCharacter '\x101fd' = Just PhaistosDiscSignCombiningObliqueStroke
+combiningCharacter '\x102e0' = Just CopticEpactThousandsMark
 combiningCharacter '\x10376' = Just CombiningOldPermicLetterAn
 combiningCharacter '\x10377' = Just CombiningOldPermicLetterDoi
 combiningCharacter '\x10378' = Just CombiningOldPermicLetterZata
 combiningCharacter '\x10379' = Just CombiningOldPermicLetterNenoe
 combiningCharacter '\x1037a' = Just CombiningOldPermicLetterSii
-combiningCharacter '\x10eab' = Just YezidiCombiningHamzaMark
-combiningCharacter '\x10eac' = Just YezidiCombiningMaddaMark
-combiningCharacter '\x10f46' = Just SogdianCombiningDotBelow
-combiningCharacter '\x10f47' = Just SogdianCombiningTwoDotsBelow
-combiningCharacter '\x10f48' = Just SogdianCombiningDotAbove
-combiningCharacter '\x10f49' = Just SogdianCombiningTwoDotsAbove
-combiningCharacter '\x10f4a' = Just SogdianCombiningCurveAbove
-combiningCharacter '\x10f4b' = Just SogdianCombiningCurveBelow
-combiningCharacter '\x10f4c' = Just SogdianCombiningHookAbove
-combiningCharacter '\x10f4d' = Just SogdianCombiningHookBelow
-combiningCharacter '\x10f4e' = Just SogdianCombiningLongHookBelow
-combiningCharacter '\x10f4f' = Just SogdianCombiningReshBelow
-combiningCharacter '\x10f50' = Just SogdianCombiningStrokeBelow
-combiningCharacter '\x11300' = Just GranthaSignCombiningAnusvaraAbove
-combiningCharacter '\x1133b' = Just CombiningBinduBelow
+combiningCharacter '\x10a0d' = Just KharoshthiSignDoubleRingBelow
+combiningCharacter '\x10a0f' = Just KharoshthiSignVisarga
+combiningCharacter '\x10a38' = Just KharoshthiSignBarAbove
+combiningCharacter '\x10a39' = Just KharoshthiSignCauda
+combiningCharacter '\x10a3a' = Just KharoshthiSignDotBelow
+combiningCharacter '\x10a3f' = Just KharoshthiVirama
+combiningCharacter '\x10ae5' = Just ManichaeanAbbreviationMarkAbove
+combiningCharacter '\x10ae6' = Just ManichaeanAbbreviationMarkBelow
+combiningCharacter '\x11046' = Just BrahmiVirama
+combiningCharacter '\x1107f' = Just BrahmiNumberJoiner
+combiningCharacter '\x110b9' = Just KaithiSignVirama
+combiningCharacter '\x110ba' = Just KaithiSignNukta
+combiningCharacter '\x11100' = Just ChakmaSignCandrabindu
+combiningCharacter '\x11101' = Just ChakmaSignAnusvara
+combiningCharacter '\x11102' = Just ChakmaSignVisarga
+combiningCharacter '\x11133' = Just ChakmaVirama
+combiningCharacter '\x11134' = Just ChakmaMaayyaa
+combiningCharacter '\x11173' = Just MahajaniSignNukta
+combiningCharacter '\x111c0' = Just SharadaSignVirama
+combiningCharacter '\x111ca' = Just SharadaSignNukta
+combiningCharacter '\x11235' = Just KhojkiSignVirama
+combiningCharacter '\x11236' = Just KhojkiSignNukta
+combiningCharacter '\x112e9' = Just KhudawadiSignNukta
+combiningCharacter '\x112ea' = Just KhudawadiSignVirama
+combiningCharacter '\x1133c' = Just GranthaSignNukta
+combiningCharacter '\x1134d' = Just GranthaSignVirama
 combiningCharacter '\x11366' = Just CombiningGranthaDigitZero
 combiningCharacter '\x11367' = Just CombiningGranthaDigitOne
 combiningCharacter '\x11368' = Just CombiningGranthaDigitTwo
@@ -1328,11 +2365,30 @@ combiningCharacter '\x11371' = Just CombiningGranthaLetterKa
 combiningCharacter '\x11372' = Just CombiningGranthaLetterNa
 combiningCharacter '\x11373' = Just CombiningGranthaLetterVi
 combiningCharacter '\x11374' = Just CombiningGranthaLetterPa
+combiningCharacter '\x11442' = Just NewaSignVirama
+combiningCharacter '\x11446' = Just NewaSignNukta
+combiningCharacter '\x114c2' = Just TirhutaSignVirama
+combiningCharacter '\x114c3' = Just TirhutaSignNukta
+combiningCharacter '\x115bf' = Just SiddhamSignVirama
+combiningCharacter '\x115c0' = Just SiddhamSignNukta
+combiningCharacter '\x1163f' = Just ModiSignVirama
+combiningCharacter '\x116b6' = Just TakriSignVirama
+combiningCharacter '\x116b7' = Just TakriSignNukta
+combiningCharacter '\x1172b' = Just AhomSignKiller
+combiningCharacter '\x11c3f' = Just BhaiksukiSignVirama
 combiningCharacter '\x16af0' = Just BassaVahCombiningHighTone
 combiningCharacter '\x16af1' = Just BassaVahCombiningLowTone
 combiningCharacter '\x16af2' = Just BassaVahCombiningMidTone
 combiningCharacter '\x16af3' = Just BassaVahCombiningLowMidTone
 combiningCharacter '\x16af4' = Just BassaVahCombiningHighLowTone
+combiningCharacter '\x16b30' = Just PahawhHmongMarkCimTub
+combiningCharacter '\x16b31' = Just PahawhHmongMarkCimSo
+combiningCharacter '\x16b32' = Just PahawhHmongMarkCimKes
+combiningCharacter '\x16b33' = Just PahawhHmongMarkCimKhav
+combiningCharacter '\x16b34' = Just PahawhHmongMarkCimSuam
+combiningCharacter '\x16b35' = Just PahawhHmongMarkCimHom
+combiningCharacter '\x16b36' = Just PahawhHmongMarkCimTaum
+combiningCharacter '\x1bc9e' = Just DuployanDoubleMark
 combiningCharacter '\x1d165' = Just MusicalSymbolCombiningStem
 combiningCharacter '\x1d166' = Just MusicalSymbolCombiningSprechgesangStem
 combiningCharacter '\x1d167' = Just MusicalSymbolCombiningTremolo1
@@ -1411,4 +2467,11 @@ combiningCharacter '\x1e8d3' = Just MendeKikakuiCombiningNumberThousands
 combiningCharacter '\x1e8d4' = Just MendeKikakuiCombiningNumberTenThousands
 combiningCharacter '\x1e8d5' = Just MendeKikakuiCombiningNumberHundredThousands
 combiningCharacter '\x1e8d6' = Just MendeKikakuiCombiningNumberMillions
+combiningCharacter '\x1e944' = Just AdlamAlifLengthener
+combiningCharacter '\x1e945' = Just AdlamVowelLengthener
+combiningCharacter '\x1e946' = Just AdlamGeminationMark
+combiningCharacter '\x1e947' = Just AdlamHamza
+combiningCharacter '\x1e948' = Just AdlamConsonantModifier
+combiningCharacter '\x1e949' = Just AdlamGeminateConsonantModifier
+combiningCharacter '\x1e94a' = Just AdlamNukta
 combiningCharacter _ = Nothing

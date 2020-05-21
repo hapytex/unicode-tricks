@@ -36,6 +36,12 @@ samples/**
 # IDE
 *.code-workspace
 
+# Python
+__pycache__
+__pycache__/
+__pycache__/*
+__pycache__/**
+
 # LaTeX
 *.aux
 *.glg
