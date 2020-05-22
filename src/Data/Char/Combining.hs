@@ -1,5 +1,22 @@
 {-# LANGUAGE FunctionalDependencies, PatternSynonyms, Safe #-}
 
+{-|
+Module      : Data.Char.Combining
+Description : A module to work with combining characters in Unicode.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+In Unicode a total of 814 codepoints are defined as /combining/ characters. These characters are put after another character, to manipulate the previous one. For example by putting a /grave accent/ on an @a@.
+
+This module aims to make it more convenient to work with combining characters. It provides functions to map the 'CombiningCharacter's to 'Char's and vice versa. It furthermore defines an operator '(*^)' that can
+be used to apply one, or multiple 'CombiningCharacter's to a given character. We use a typeclass for this to allow working with different types. This allows "stacking" combining characters like:
+
+> 'a' *^ CombiningGraveAccent *^ CombiningPlusSignBelow
+
+This will first combine 'CombiningGraveAccent' on the @'a'@ character and then 'CombiningPlusSignBelow', the result is a string @"a\\768\\799"@.
+-}
+
 module Data.Char.Combining (
     -- * Combining characters
     CombiningCharacter(..)
@@ -8,111 +25,111 @@ module Data.Char.Combining (
     -- * Applying a 'CombiningCharacter' to a 'Char'
   , ApplyCombine((*^))
     -- * Pattern synonyms for the combining characters
-  ,  pattern GraveAccent                                   , pattern AcuteAccent                                   , pattern CircumflexAccent                              , pattern Tilde                                         
-  ,  pattern Macron                                        , pattern Overline                                      , pattern Breve                                         , pattern DotAbove                                      
-  ,  pattern Diaeresis                                     , pattern HookAbove                                     , pattern RingAbove                                     , pattern DoubleAcuteAccent                             
-  ,  pattern Caron                                         , pattern VerticalLineAbove                             , pattern DoubleVerticalLineAbove                       , pattern DoubleGraveAccent                             
-  ,  pattern Candrabindu                                   , pattern InvertedBreve                                 , pattern TurnedCommaAbove                              , pattern CommaAbove                                    
-  ,  pattern ReversedCommaAbove                            , pattern CommaAboveRight                               , pattern GraveAccentBelow                              , pattern AcuteAccentBelow                              
-  ,  pattern LeftTackBelow                                 , pattern RightTackBelow                                , pattern LeftAngleAbove                                , pattern Horn                                          
-  ,  pattern LeftHalfRingBelow                             , pattern UpTackBelow                                   , pattern DownTackBelow                                 , pattern PlusSignBelow                                 
-  ,  pattern MinusSignBelow                                , pattern PalatalizedHookBelow                          , pattern RetroflexHookBelow                            , pattern DotBelow                                      
-  ,  pattern DiaeresisBelow                                , pattern RingBelow                                     , pattern CommaBelow                                    , pattern Cedilla                                       
-  ,  pattern Ogonek                                        , pattern VerticalLineBelow                             , pattern BridgeBelow                                   , pattern InvertedDoubleArchBelow                       
-  ,  pattern CaronBelow                                    , pattern CircumflexAccentBelow                         , pattern BreveBelow                                    , pattern InvertedBreveBelow                            
-  ,  pattern TildeBelow                                    , pattern MacronBelow                                   , pattern LowLine                                       , pattern DoubleLowLine                                 
-  ,  pattern TildeOverlay                                  , pattern ShortStrokeOverlay                            , pattern LongStrokeOverlay                             , pattern ShortSolidusOverlay                           
-  ,  pattern LongSolidusOverlay                            , pattern RightHalfRingBelow                            , pattern InvertedBridgeBelow                           , pattern SquareBelow                                   
-  ,  pattern SeagullBelow                                  , pattern XAbove                                        , pattern VerticalTilde                                 , pattern DoubleOverline                                
-  ,  pattern GraveToneMark                                 , pattern AcuteToneMark                                 , pattern GreekPerispomeni                              , pattern GreekKoronis                                  
-  ,  pattern GreekDialytikaTonos                           , pattern GreekYpogegrammeni                            , pattern BridgeAbove                                   , pattern EqualsSignBelow                               
-  ,  pattern DoubleVerticalLineBelow                       , pattern LeftAngleBelow                                , pattern NotTildeAbove                                 , pattern HomotheticAbove                               
-  ,  pattern AlmostEqualToAbove                            , pattern LeftRightArrowBelow                           , pattern UpwardsArrowBelow                             , pattern RightArrowheadAbove                           
-  ,  pattern LeftHalfRingAbove                             , pattern Fermata                                       , pattern XBelow                                        , pattern LeftArrowheadBelow                            
-  ,  pattern RightArrowheadBelow                           , pattern RightArrowheadAndUpArrowheadBelow             , pattern RightHalfRingAbove                            , pattern DotAboveRight                                 
-  ,  pattern AsteriskBelow                                 , pattern DoubleRingBelow                               , pattern ZigzagAbove                                   , pattern DoubleBreveBelow                              
-  ,  pattern DoubleBreve                                   , pattern DoubleMacron                                  , pattern DoubleMacronBelow                             , pattern DoubleTilde                                   
-  ,  pattern DoubleInvertedBreve                           , pattern DoubleRightwardsArrowBelow                    , pattern LatinSmallLetterA                             , pattern LatinSmallLetterE                             
-  ,  pattern LatinSmallLetterI                             , pattern LatinSmallLetterO                             , pattern LatinSmallLetterU                             , pattern LatinSmallLetterC                             
-  ,  pattern LatinSmallLetterD                             , pattern LatinSmallLetterH                             , pattern LatinSmallLetterM                             , pattern LatinSmallLetterR                             
-  ,  pattern LatinSmallLetterT                             , pattern LatinSmallLetterV                             , pattern LatinSmallLetterX                             , pattern CyrillicTitlo                                 
-  ,  pattern CyrillicPalatalization                        , pattern CyrillicDasiaPneumata                         , pattern CyrillicPsiliPneumata                         , pattern CyrillicPokrytie                              
-  ,  pattern NkoShortHighTone                              , pattern NkoShortLowTone                               , pattern NkoShortRisingTone                            , pattern NkoLongDescendingTone                         
-  ,  pattern NkoLongHighTone                               , pattern NkoLongLowTone                                , pattern NkoLongRisingTone                             , pattern NkoNasalizationMark                           
-  ,  pattern NkoDoubleDotAbove                             , pattern EthiopicGeminationAndVowelLengthMark          , pattern EthiopicVowelLengthMark                       , pattern EthiopicGeminationMark                        
-  ,  pattern TaiThamCryptogrammicDot                       , pattern DoubledCircumflexAccent                       , pattern DiaeresisRing                                 , pattern Infinity                                      
-  ,  pattern DownwardsArrow                                , pattern TripleDot                                     , pattern XXBelow                                       , pattern WigglyLineBelow                               
-  ,  pattern OpenMarkBelow                                 , pattern DoubleOpenMarkBelow                           , pattern LightCentralizationStrokeBelow                , pattern StrongCentralizationStrokeBelow               
-  ,  pattern ParenthesesAbove                              , pattern DoubleParenthesesAbove                        , pattern ParenthesesBelow                              , pattern BalineseMusicalSymbolTegeh                    
-  ,  pattern BalineseMusicalSymbolEndep                    , pattern BalineseMusicalSymbolKempul                   , pattern BalineseMusicalSymbolKempli                   , pattern BalineseMusicalSymbolJegogan                  
-  ,  pattern BalineseMusicalSymbolKempulWithJegogan        , pattern BalineseMusicalSymbolKempliWithJegogan        , pattern BalineseMusicalSymbolBende                    , pattern BalineseMusicalSymbolGong                     
-  ,  pattern DottedGraveAccent                             , pattern DottedAcuteAccent                             , pattern SnakeBelow                                    , pattern SuspensionMark                                
-  ,  pattern MacronAcute                                   , pattern GraveMacron                                   , pattern MacronGrave                                   , pattern AcuteMacron                                   
-  ,  pattern GraveAcuteGrave                               , pattern AcuteGraveAcute                               , pattern LatinSmallLetterRBelow                        , pattern BreveMacron                                   
-  ,  pattern MacronBreve                                   , pattern DoubleCircumflexAbove                         , pattern OgonekAbove                                   , pattern ZigzagBelow                                   
-  ,  pattern IsBelow                                       , pattern UrAbove                                       , pattern UsAbove                                       , pattern LatinSmallLetterFlattenedOpenAAbove           
-  ,  pattern LatinSmallLetterAe                            , pattern LatinSmallLetterAo                            , pattern LatinSmallLetterAv                            , pattern LatinSmallLetterCCedilla                      
-  ,  pattern LatinSmallLetterInsularD                      , pattern LatinSmallLetterEth                           , pattern LatinSmallLetterG                             , pattern LatinLetterSmallCapitalG                      
-  ,  pattern LatinSmallLetterK                             , pattern LatinSmallLetterL                             , pattern LatinLetterSmallCapitalL                      , pattern LatinLetterSmallCapitalM                      
-  ,  pattern LatinSmallLetterN                             , pattern LatinLetterSmallCapitalN                      , pattern LatinLetterSmallCapitalR                      , pattern LatinSmallLetterRRotunda                      
-  ,  pattern LatinSmallLetterS                             , pattern LatinSmallLetterLongS                         , pattern LatinSmallLetterZ                             , pattern LatinSmallLetterAlpha                         
-  ,  pattern LatinSmallLetterB                             , pattern LatinSmallLetterBeta                          , pattern LatinSmallLetterSchwa                         , pattern LatinSmallLetterF                             
-  ,  pattern LatinSmallLetterLWithDoubleMiddleTilde        , pattern LatinSmallLetterOWithLightCentralizationStroke, pattern LatinSmallLetterP                             , pattern LatinSmallLetterEsh                           
-  ,  pattern LatinSmallLetterUWithLightCentralizationStroke, pattern LatinSmallLetterW                             , pattern LatinSmallLetterAWithDiaeresis                , pattern LatinSmallLetterOWithDiaeresis                
-  ,  pattern LatinSmallLetterUWithDiaeresis                , pattern UpTackAbove                                   , pattern DeletionMark                                  , pattern DoubleInvertedBreveBelow                      
-  ,  pattern AlmostEqualToBelow                            , pattern LeftArrowheadAbove                            , pattern RightArrowheadAndDownArrowheadBelow           , pattern LeftHarpoonAbove                              
-  ,  pattern RightHarpoonAbove                             , pattern LongVerticalLineOverlay                       , pattern ShortVerticalLineOverlay                      , pattern AnticlockwiseArrowAbove                       
-  ,  pattern ClockwiseArrowAbove                           , pattern LeftArrowAbove                                , pattern RightArrowAbove                               , pattern RingOverlay                                   
-  ,  pattern ClockwiseRingOverlay                          , pattern AnticlockwiseRingOverlay                      , pattern ThreeDotsAbove                                , pattern FourDotsAbove                                 
-  ,  pattern LeftRightArrowAbove                           , pattern ReverseSolidusOverlay                         , pattern DoubleVerticalStrokeOverlay                   , pattern AnnuitySymbol                                 
-  ,  pattern TripleUnderdot                                , pattern WideBridgeAbove                               , pattern LeftwardsArrowOverlay                         , pattern LongDoubleSolidusOverlay                      
-  ,  pattern RightwardsHarpoonWithBarbDownwards            , pattern LeftwardsHarpoonWithBarbDownwards             , pattern LeftArrowBelow                                , pattern RightArrowBelow                               
-  ,  pattern AsteriskAbove                                 , pattern CopticNiAbove                                 , pattern CopticSpiritusAsper                           , pattern CopticSpiritusLenis                           
-  ,  pattern CyrillicLetterBe                              , pattern CyrillicLetterVe                              , pattern CyrillicLetterGhe                             , pattern CyrillicLetterDe                              
-  ,  pattern CyrillicLetterZhe                             , pattern CyrillicLetterZe                              , pattern CyrillicLetterKa                              , pattern CyrillicLetterEl                              
-  ,  pattern CyrillicLetterEm                              , pattern CyrillicLetterEn                              , pattern CyrillicLetterO                               , pattern CyrillicLetterPe                              
-  ,  pattern CyrillicLetterEr                              , pattern CyrillicLetterEs                              , pattern CyrillicLetterTe                              , pattern CyrillicLetterHa                              
-  ,  pattern CyrillicLetterTse                             , pattern CyrillicLetterChe                             , pattern CyrillicLetterSha                             , pattern CyrillicLetterShcha                           
-  ,  pattern CyrillicLetterFita                            , pattern CyrillicLetterEsTe                            , pattern CyrillicLetterA                               , pattern CyrillicLetterIe                              
-  ,  pattern CyrillicLetterDjerv                           , pattern CyrillicLetterMonographUk                     , pattern CyrillicLetterYat                             , pattern CyrillicLetterYu                              
-  ,  pattern CyrillicLetterIotifiedA                       , pattern CyrillicLetterLittleYus                       , pattern CyrillicLetterBigYus                          , pattern CyrillicLetterIotifiedBigYus                  
-  ,  pattern KatakanaHiraganaVoicedSoundMark               , pattern KatakanaHiraganaSemiVoicedSoundMark           , pattern CyrillicVzmet                                 , pattern CyrillicLetterUkrainianIe                     
-  ,  pattern CyrillicLetterI                               , pattern CyrillicLetterYi                              , pattern CyrillicLetterU                               , pattern CyrillicLetterHardSign                        
-  ,  pattern CyrillicLetterYeru                            , pattern CyrillicLetterSoftSign                        , pattern CyrillicLetterOmega                           , pattern CyrillicKavyka                                
-  ,  pattern CyrillicPayerok                               , pattern CyrillicLetterEf                              , pattern CyrillicLetterIotifiedE                       , pattern BamumMarkKoqndon                              
-  ,  pattern BamumMarkTukwentis                            , pattern DevanagariDigitZero                           , pattern DevanagariDigitOne                            , pattern DevanagariDigitTwo                            
-  ,  pattern DevanagariDigitThree                          , pattern DevanagariDigitFour                           , pattern DevanagariDigitFive                           , pattern DevanagariDigitSix                            
-  ,  pattern DevanagariDigitSeven                          , pattern DevanagariDigitEight                          , pattern DevanagariDigitNine                           , pattern DevanagariLetterA                             
-  ,  pattern DevanagariLetterU                             , pattern DevanagariLetterKa                            , pattern DevanagariLetterNa                            , pattern DevanagariLetterPa                            
-  ,  pattern DevanagariLetterRa                            , pattern DevanagariLetterVi                            , pattern DevanagariSignAvagraha                        , pattern LigatureLeftHalf                              
-  ,  pattern LigatureRightHalf                             , pattern DoubleTildeLeftHalf                           , pattern DoubleTildeRightHalf                          , pattern MacronLeftHalf                                
-  ,  pattern MacronRightHalf                               , pattern ConjoiningMacron                              , pattern LigatureLeftHalfBelow                         , pattern LigatureRightHalfBelow                        
-  ,  pattern TildeLeftHalfBelow                            , pattern TildeRightHalfBelow                           , pattern MacronLeftHalfBelow                           , pattern MacronRightHalfBelow                          
-  ,  pattern ConjoiningMacronBelow                         , pattern CyrillicTitloLeftHalf                         , pattern CyrillicTitloRightHalf                        , pattern PhaistosDiscSignObliqueStroke                 
-  ,  pattern OldPermicLetterAn                             , pattern OldPermicLetterDoi                            , pattern OldPermicLetterZata                           , pattern OldPermicLetterNenoe                          
-  ,  pattern OldPermicLetterSii                            , pattern GranthaDigitZero                              , pattern GranthaDigitOne                               , pattern GranthaDigitTwo                               
-  ,  pattern GranthaDigitThree                             , pattern GranthaDigitFour                              , pattern GranthaDigitFive                              , pattern GranthaDigitSix                               
-  ,  pattern GranthaLetterA                                , pattern GranthaLetterKa                               , pattern GranthaLetterNa                               , pattern GranthaLetterVi                               
-  ,  pattern GranthaLetterPa                               , pattern BassaVahHighTone                              , pattern BassaVahLowTone                               , pattern BassaVahMidTone                               
-  ,  pattern BassaVahLowMidTone                            , pattern BassaVahHighLowTone                           , pattern MusicalSymbolStem                             , pattern MusicalSymbolSprechgesangStem                 
-  ,  pattern MusicalSymbolTremolo1                         , pattern MusicalSymbolTremolo2                         , pattern MusicalSymbolTremolo3                         , pattern MusicalSymbolAugmentationDot                  
-  ,  pattern MusicalSymbolFlag1                            , pattern MusicalSymbolFlag2                            , pattern MusicalSymbolFlag3                            , pattern MusicalSymbolFlag4                            
-  ,  pattern MusicalSymbolFlag5                            , pattern MusicalSymbolAccent                           , pattern MusicalSymbolStaccato                         , pattern MusicalSymbolTenuto                           
-  ,  pattern MusicalSymbolStaccatissimo                    , pattern MusicalSymbolMarcato                          , pattern MusicalSymbolMarcatoStaccato                  , pattern MusicalSymbolAccentStaccato                   
-  ,  pattern MusicalSymbolLoure                            , pattern MusicalSymbolDoit                             , pattern MusicalSymbolRip                              , pattern MusicalSymbolFlip                             
-  ,  pattern MusicalSymbolSmear                            , pattern MusicalSymbolBend                             , pattern MusicalSymbolDoubleTongue                     , pattern MusicalSymbolTripleTongue                     
-  ,  pattern MusicalSymbolDownBow                          , pattern MusicalSymbolUpBow                            , pattern MusicalSymbolHarmonic                         , pattern MusicalSymbolSnapPizzicato                    
-  ,  pattern GreekMusicalTriseme                           , pattern GreekMusicalTetraseme                         , pattern GreekMusicalPentaseme                         , pattern GlagoliticLetterAzu                           
-  ,  pattern GlagoliticLetterBuky                          , pattern GlagoliticLetterVede                          , pattern GlagoliticLetterGlagoli                       , pattern GlagoliticLetterDobro                         
-  ,  pattern GlagoliticLetterYestu                         , pattern GlagoliticLetterZhivete                       , pattern GlagoliticLetterZemlja                        , pattern GlagoliticLetterIzhe                          
-  ,  pattern GlagoliticLetterInitialIzhe                   , pattern GlagoliticLetterI                             , pattern GlagoliticLetterDjervi                        , pattern GlagoliticLetterKako                          
-  ,  pattern GlagoliticLetterLjudije                       , pattern GlagoliticLetterMyslite                       , pattern GlagoliticLetterNashi                         , pattern GlagoliticLetterOnu                           
-  ,  pattern GlagoliticLetterPokoji                        , pattern GlagoliticLetterRitsi                         , pattern GlagoliticLetterSlovo                         , pattern GlagoliticLetterTvrido                        
-  ,  pattern GlagoliticLetterUku                           , pattern GlagoliticLetterFritu                         , pattern GlagoliticLetterHeru                          , pattern GlagoliticLetterShta                          
-  ,  pattern GlagoliticLetterTsi                           , pattern GlagoliticLetterChrivi                        , pattern GlagoliticLetterSha                           , pattern GlagoliticLetterYeru                          
-  ,  pattern GlagoliticLetterYeri                          , pattern GlagoliticLetterYati                          , pattern GlagoliticLetterYu                            , pattern GlagoliticLetterSmallYus                      
-  ,  pattern GlagoliticLetterYo                            , pattern GlagoliticLetterIotatedSmallYus               , pattern GlagoliticLetterBigYus                        , pattern GlagoliticLetterIotatedBigYus                 
-  ,  pattern GlagoliticLetterFita                          , pattern MendeKikakuiNumberTeens                       , pattern MendeKikakuiNumberTens                        , pattern MendeKikakuiNumberHundreds                    
+  ,  pattern GraveAccent                                   , pattern AcuteAccent                                   , pattern CircumflexAccent                              , pattern Tilde
+  ,  pattern Macron                                        , pattern Overline                                      , pattern Breve                                         , pattern DotAbove
+  ,  pattern Diaeresis                                     , pattern HookAbove                                     , pattern RingAbove                                     , pattern DoubleAcuteAccent
+  ,  pattern Caron                                         , pattern VerticalLineAbove                             , pattern DoubleVerticalLineAbove                       , pattern DoubleGraveAccent
+  ,  pattern Candrabindu                                   , pattern InvertedBreve                                 , pattern TurnedCommaAbove                              , pattern CommaAbove
+  ,  pattern ReversedCommaAbove                            , pattern CommaAboveRight                               , pattern GraveAccentBelow                              , pattern AcuteAccentBelow
+  ,  pattern LeftTackBelow                                 , pattern RightTackBelow                                , pattern LeftAngleAbove                                , pattern Horn
+  ,  pattern LeftHalfRingBelow                             , pattern UpTackBelow                                   , pattern DownTackBelow                                 , pattern PlusSignBelow
+  ,  pattern MinusSignBelow                                , pattern PalatalizedHookBelow                          , pattern RetroflexHookBelow                            , pattern DotBelow
+  ,  pattern DiaeresisBelow                                , pattern RingBelow                                     , pattern CommaBelow                                    , pattern Cedilla
+  ,  pattern Ogonek                                        , pattern VerticalLineBelow                             , pattern BridgeBelow                                   , pattern InvertedDoubleArchBelow
+  ,  pattern CaronBelow                                    , pattern CircumflexAccentBelow                         , pattern BreveBelow                                    , pattern InvertedBreveBelow
+  ,  pattern TildeBelow                                    , pattern MacronBelow                                   , pattern LowLine                                       , pattern DoubleLowLine
+  ,  pattern TildeOverlay                                  , pattern ShortStrokeOverlay                            , pattern LongStrokeOverlay                             , pattern ShortSolidusOverlay
+  ,  pattern LongSolidusOverlay                            , pattern RightHalfRingBelow                            , pattern InvertedBridgeBelow                           , pattern SquareBelow
+  ,  pattern SeagullBelow                                  , pattern XAbove                                        , pattern VerticalTilde                                 , pattern DoubleOverline
+  ,  pattern GraveToneMark                                 , pattern AcuteToneMark                                 , pattern GreekPerispomeni                              , pattern GreekKoronis
+  ,  pattern GreekDialytikaTonos                           , pattern GreekYpogegrammeni                            , pattern BridgeAbove                                   , pattern EqualsSignBelow
+  ,  pattern DoubleVerticalLineBelow                       , pattern LeftAngleBelow                                , pattern NotTildeAbove                                 , pattern HomotheticAbove
+  ,  pattern AlmostEqualToAbove                            , pattern LeftRightArrowBelow                           , pattern UpwardsArrowBelow                             , pattern RightArrowheadAbove
+  ,  pattern LeftHalfRingAbove                             , pattern Fermata                                       , pattern XBelow                                        , pattern LeftArrowheadBelow
+  ,  pattern RightArrowheadBelow                           , pattern RightArrowheadAndUpArrowheadBelow             , pattern RightHalfRingAbove                            , pattern DotAboveRight
+  ,  pattern AsteriskBelow                                 , pattern DoubleRingBelow                               , pattern ZigzagAbove                                   , pattern DoubleBreveBelow
+  ,  pattern DoubleBreve                                   , pattern DoubleMacron                                  , pattern DoubleMacronBelow                             , pattern DoubleTilde
+  ,  pattern DoubleInvertedBreve                           , pattern DoubleRightwardsArrowBelow                    , pattern LatinSmallLetterA                             , pattern LatinSmallLetterE
+  ,  pattern LatinSmallLetterI                             , pattern LatinSmallLetterO                             , pattern LatinSmallLetterU                             , pattern LatinSmallLetterC
+  ,  pattern LatinSmallLetterD                             , pattern LatinSmallLetterH                             , pattern LatinSmallLetterM                             , pattern LatinSmallLetterR
+  ,  pattern LatinSmallLetterT                             , pattern LatinSmallLetterV                             , pattern LatinSmallLetterX                             , pattern CyrillicTitlo
+  ,  pattern CyrillicPalatalization                        , pattern CyrillicDasiaPneumata                         , pattern CyrillicPsiliPneumata                         , pattern CyrillicPokrytie
+  ,  pattern NkoShortHighTone                              , pattern NkoShortLowTone                               , pattern NkoShortRisingTone                            , pattern NkoLongDescendingTone
+  ,  pattern NkoLongHighTone                               , pattern NkoLongLowTone                                , pattern NkoLongRisingTone                             , pattern NkoNasalizationMark
+  ,  pattern NkoDoubleDotAbove                             , pattern EthiopicGeminationAndVowelLengthMark          , pattern EthiopicVowelLengthMark                       , pattern EthiopicGeminationMark
+  ,  pattern TaiThamCryptogrammicDot                       , pattern DoubledCircumflexAccent                       , pattern DiaeresisRing                                 , pattern Infinity
+  ,  pattern DownwardsArrow                                , pattern TripleDot                                     , pattern XXBelow                                       , pattern WigglyLineBelow
+  ,  pattern OpenMarkBelow                                 , pattern DoubleOpenMarkBelow                           , pattern LightCentralizationStrokeBelow                , pattern StrongCentralizationStrokeBelow
+  ,  pattern ParenthesesAbove                              , pattern DoubleParenthesesAbove                        , pattern ParenthesesBelow                              , pattern BalineseMusicalSymbolTegeh
+  ,  pattern BalineseMusicalSymbolEndep                    , pattern BalineseMusicalSymbolKempul                   , pattern BalineseMusicalSymbolKempli                   , pattern BalineseMusicalSymbolJegogan
+  ,  pattern BalineseMusicalSymbolKempulWithJegogan        , pattern BalineseMusicalSymbolKempliWithJegogan        , pattern BalineseMusicalSymbolBende                    , pattern BalineseMusicalSymbolGong
+  ,  pattern DottedGraveAccent                             , pattern DottedAcuteAccent                             , pattern SnakeBelow                                    , pattern SuspensionMark
+  ,  pattern MacronAcute                                   , pattern GraveMacron                                   , pattern MacronGrave                                   , pattern AcuteMacron
+  ,  pattern GraveAcuteGrave                               , pattern AcuteGraveAcute                               , pattern LatinSmallLetterRBelow                        , pattern BreveMacron
+  ,  pattern MacronBreve                                   , pattern DoubleCircumflexAbove                         , pattern OgonekAbove                                   , pattern ZigzagBelow
+  ,  pattern IsBelow                                       , pattern UrAbove                                       , pattern UsAbove                                       , pattern LatinSmallLetterFlattenedOpenAAbove
+  ,  pattern LatinSmallLetterAe                            , pattern LatinSmallLetterAo                            , pattern LatinSmallLetterAv                            , pattern LatinSmallLetterCCedilla
+  ,  pattern LatinSmallLetterInsularD                      , pattern LatinSmallLetterEth                           , pattern LatinSmallLetterG                             , pattern LatinLetterSmallCapitalG
+  ,  pattern LatinSmallLetterK                             , pattern LatinSmallLetterL                             , pattern LatinLetterSmallCapitalL                      , pattern LatinLetterSmallCapitalM
+  ,  pattern LatinSmallLetterN                             , pattern LatinLetterSmallCapitalN                      , pattern LatinLetterSmallCapitalR                      , pattern LatinSmallLetterRRotunda
+  ,  pattern LatinSmallLetterS                             , pattern LatinSmallLetterLongS                         , pattern LatinSmallLetterZ                             , pattern LatinSmallLetterAlpha
+  ,  pattern LatinSmallLetterB                             , pattern LatinSmallLetterBeta                          , pattern LatinSmallLetterSchwa                         , pattern LatinSmallLetterF
+  ,  pattern LatinSmallLetterLWithDoubleMiddleTilde        , pattern LatinSmallLetterOWithLightCentralizationStroke, pattern LatinSmallLetterP                             , pattern LatinSmallLetterEsh
+  ,  pattern LatinSmallLetterUWithLightCentralizationStroke, pattern LatinSmallLetterW                             , pattern LatinSmallLetterAWithDiaeresis                , pattern LatinSmallLetterOWithDiaeresis
+  ,  pattern LatinSmallLetterUWithDiaeresis                , pattern UpTackAbove                                   , pattern DeletionMark                                  , pattern DoubleInvertedBreveBelow
+  ,  pattern AlmostEqualToBelow                            , pattern LeftArrowheadAbove                            , pattern RightArrowheadAndDownArrowheadBelow           , pattern LeftHarpoonAbove
+  ,  pattern RightHarpoonAbove                             , pattern LongVerticalLineOverlay                       , pattern ShortVerticalLineOverlay                      , pattern AnticlockwiseArrowAbove
+  ,  pattern ClockwiseArrowAbove                           , pattern LeftArrowAbove                                , pattern RightArrowAbove                               , pattern RingOverlay
+  ,  pattern ClockwiseRingOverlay                          , pattern AnticlockwiseRingOverlay                      , pattern ThreeDotsAbove                                , pattern FourDotsAbove
+  ,  pattern LeftRightArrowAbove                           , pattern ReverseSolidusOverlay                         , pattern DoubleVerticalStrokeOverlay                   , pattern AnnuitySymbol
+  ,  pattern TripleUnderdot                                , pattern WideBridgeAbove                               , pattern LeftwardsArrowOverlay                         , pattern LongDoubleSolidusOverlay
+  ,  pattern RightwardsHarpoonWithBarbDownwards            , pattern LeftwardsHarpoonWithBarbDownwards             , pattern LeftArrowBelow                                , pattern RightArrowBelow
+  ,  pattern AsteriskAbove                                 , pattern CopticNiAbove                                 , pattern CopticSpiritusAsper                           , pattern CopticSpiritusLenis
+  ,  pattern CyrillicLetterBe                              , pattern CyrillicLetterVe                              , pattern CyrillicLetterGhe                             , pattern CyrillicLetterDe
+  ,  pattern CyrillicLetterZhe                             , pattern CyrillicLetterZe                              , pattern CyrillicLetterKa                              , pattern CyrillicLetterEl
+  ,  pattern CyrillicLetterEm                              , pattern CyrillicLetterEn                              , pattern CyrillicLetterO                               , pattern CyrillicLetterPe
+  ,  pattern CyrillicLetterEr                              , pattern CyrillicLetterEs                              , pattern CyrillicLetterTe                              , pattern CyrillicLetterHa
+  ,  pattern CyrillicLetterTse                             , pattern CyrillicLetterChe                             , pattern CyrillicLetterSha                             , pattern CyrillicLetterShcha
+  ,  pattern CyrillicLetterFita                            , pattern CyrillicLetterEsTe                            , pattern CyrillicLetterA                               , pattern CyrillicLetterIe
+  ,  pattern CyrillicLetterDjerv                           , pattern CyrillicLetterMonographUk                     , pattern CyrillicLetterYat                             , pattern CyrillicLetterYu
+  ,  pattern CyrillicLetterIotifiedA                       , pattern CyrillicLetterLittleYus                       , pattern CyrillicLetterBigYus                          , pattern CyrillicLetterIotifiedBigYus
+  ,  pattern KatakanaHiraganaVoicedSoundMark               , pattern KatakanaHiraganaSemiVoicedSoundMark           , pattern CyrillicVzmet                                 , pattern CyrillicLetterUkrainianIe
+  ,  pattern CyrillicLetterI                               , pattern CyrillicLetterYi                              , pattern CyrillicLetterU                               , pattern CyrillicLetterHardSign
+  ,  pattern CyrillicLetterYeru                            , pattern CyrillicLetterSoftSign                        , pattern CyrillicLetterOmega                           , pattern CyrillicKavyka
+  ,  pattern CyrillicPayerok                               , pattern CyrillicLetterEf                              , pattern CyrillicLetterIotifiedE                       , pattern BamumMarkKoqndon
+  ,  pattern BamumMarkTukwentis                            , pattern DevanagariDigitZero                           , pattern DevanagariDigitOne                            , pattern DevanagariDigitTwo
+  ,  pattern DevanagariDigitThree                          , pattern DevanagariDigitFour                           , pattern DevanagariDigitFive                           , pattern DevanagariDigitSix
+  ,  pattern DevanagariDigitSeven                          , pattern DevanagariDigitEight                          , pattern DevanagariDigitNine                           , pattern DevanagariLetterA
+  ,  pattern DevanagariLetterU                             , pattern DevanagariLetterKa                            , pattern DevanagariLetterNa                            , pattern DevanagariLetterPa
+  ,  pattern DevanagariLetterRa                            , pattern DevanagariLetterVi                            , pattern DevanagariSignAvagraha                        , pattern LigatureLeftHalf
+  ,  pattern LigatureRightHalf                             , pattern DoubleTildeLeftHalf                           , pattern DoubleTildeRightHalf                          , pattern MacronLeftHalf
+  ,  pattern MacronRightHalf                               , pattern ConjoiningMacron                              , pattern LigatureLeftHalfBelow                         , pattern LigatureRightHalfBelow
+  ,  pattern TildeLeftHalfBelow                            , pattern TildeRightHalfBelow                           , pattern MacronLeftHalfBelow                           , pattern MacronRightHalfBelow
+  ,  pattern ConjoiningMacronBelow                         , pattern CyrillicTitloLeftHalf                         , pattern CyrillicTitloRightHalf                        , pattern PhaistosDiscSignObliqueStroke
+  ,  pattern OldPermicLetterAn                             , pattern OldPermicLetterDoi                            , pattern OldPermicLetterZata                           , pattern OldPermicLetterNenoe
+  ,  pattern OldPermicLetterSii                            , pattern GranthaDigitZero                              , pattern GranthaDigitOne                               , pattern GranthaDigitTwo
+  ,  pattern GranthaDigitThree                             , pattern GranthaDigitFour                              , pattern GranthaDigitFive                              , pattern GranthaDigitSix
+  ,  pattern GranthaLetterA                                , pattern GranthaLetterKa                               , pattern GranthaLetterNa                               , pattern GranthaLetterVi
+  ,  pattern GranthaLetterPa                               , pattern BassaVahHighTone                              , pattern BassaVahLowTone                               , pattern BassaVahMidTone
+  ,  pattern BassaVahLowMidTone                            , pattern BassaVahHighLowTone                           , pattern MusicalSymbolStem                             , pattern MusicalSymbolSprechgesangStem
+  ,  pattern MusicalSymbolTremolo1                         , pattern MusicalSymbolTremolo2                         , pattern MusicalSymbolTremolo3                         , pattern MusicalSymbolAugmentationDot
+  ,  pattern MusicalSymbolFlag1                            , pattern MusicalSymbolFlag2                            , pattern MusicalSymbolFlag3                            , pattern MusicalSymbolFlag4
+  ,  pattern MusicalSymbolFlag5                            , pattern MusicalSymbolAccent                           , pattern MusicalSymbolStaccato                         , pattern MusicalSymbolTenuto
+  ,  pattern MusicalSymbolStaccatissimo                    , pattern MusicalSymbolMarcato                          , pattern MusicalSymbolMarcatoStaccato                  , pattern MusicalSymbolAccentStaccato
+  ,  pattern MusicalSymbolLoure                            , pattern MusicalSymbolDoit                             , pattern MusicalSymbolRip                              , pattern MusicalSymbolFlip
+  ,  pattern MusicalSymbolSmear                            , pattern MusicalSymbolBend                             , pattern MusicalSymbolDoubleTongue                     , pattern MusicalSymbolTripleTongue
+  ,  pattern MusicalSymbolDownBow                          , pattern MusicalSymbolUpBow                            , pattern MusicalSymbolHarmonic                         , pattern MusicalSymbolSnapPizzicato
+  ,  pattern GreekMusicalTriseme                           , pattern GreekMusicalTetraseme                         , pattern GreekMusicalPentaseme                         , pattern GlagoliticLetterAzu
+  ,  pattern GlagoliticLetterBuky                          , pattern GlagoliticLetterVede                          , pattern GlagoliticLetterGlagoli                       , pattern GlagoliticLetterDobro
+  ,  pattern GlagoliticLetterYestu                         , pattern GlagoliticLetterZhivete                       , pattern GlagoliticLetterZemlja                        , pattern GlagoliticLetterIzhe
+  ,  pattern GlagoliticLetterInitialIzhe                   , pattern GlagoliticLetterI                             , pattern GlagoliticLetterDjervi                        , pattern GlagoliticLetterKako
+  ,  pattern GlagoliticLetterLjudije                       , pattern GlagoliticLetterMyslite                       , pattern GlagoliticLetterNashi                         , pattern GlagoliticLetterOnu
+  ,  pattern GlagoliticLetterPokoji                        , pattern GlagoliticLetterRitsi                         , pattern GlagoliticLetterSlovo                         , pattern GlagoliticLetterTvrido
+  ,  pattern GlagoliticLetterUku                           , pattern GlagoliticLetterFritu                         , pattern GlagoliticLetterHeru                          , pattern GlagoliticLetterShta
+  ,  pattern GlagoliticLetterTsi                           , pattern GlagoliticLetterChrivi                        , pattern GlagoliticLetterSha                           , pattern GlagoliticLetterYeru
+  ,  pattern GlagoliticLetterYeri                          , pattern GlagoliticLetterYati                          , pattern GlagoliticLetterYu                            , pattern GlagoliticLetterSmallYus
+  ,  pattern GlagoliticLetterYo                            , pattern GlagoliticLetterIotatedSmallYus               , pattern GlagoliticLetterBigYus                        , pattern GlagoliticLetterIotatedBigYus
+  ,  pattern GlagoliticLetterFita                          , pattern MendeKikakuiNumberTeens                       , pattern MendeKikakuiNumberTens                        , pattern MendeKikakuiNumberHundreds
   ,  pattern MendeKikakuiNumberThousands                   , pattern MendeKikakuiNumberTenThousands                , pattern MendeKikakuiNumberHundredThousands            , pattern MendeKikakuiNumberMillions
   ) where
 
@@ -979,7 +996,7 @@ instance ApplyCombine Char CombiningSequence Text where
 -- codepoints need a preceding codepoint to be applied to.
 combiningToUnicode
   :: CombiningCharacter -- ^ The given 'CombiningCharacter' to convert to a Unicode codepoint.
-  -> Char -- ^ A Unicode 'Char'acter that is the codepoint of the given 'CombiningCharacter'. The 
+  -> Char -- ^ A Unicode 'Char'acter that is the codepoint of the given 'CombiningCharacter'. The
 combiningToUnicode CombiningGraveAccent = '\x0300'
 combiningToUnicode CombiningAcuteAccent = '\x0301'
 combiningToUnicode CombiningCircumflexAccent = '\x0302'
@@ -1963,12 +1980,21 @@ isCombiningCharacter c
   || ('\x116b6' <= c && c <= '\x116b7')
   || ('\x1e023' <= c && c <= '\x1e024')
 
-combiningCharacter' :: Char -> CombiningCharacter
+-- | Convert the given 'Char' to its corresponding 'CombiningCharacter'. If the
+-- given 'Char' is not a /combining/ character, an error is produced.
+combiningCharacter'
+  :: Char  -- ^ The given 'Char' to convert.
+  -> CombiningCharacter -- ^ The corresponding 'CombiningCharacter' if such character exists.
 combiningCharacter' c
     | Just y <- combiningCharacter c = y
     | otherwise = error ("The given character " ++ show c ++ "is a not a CombiningCharacter.")
 
-combiningCharacter :: Char -> Maybe CombiningCharacter
+-- | Convert the given 'Char' to its corresponding 'CombiningCharacter' wrapped
+-- in a 'Just' data constructor. If the given 'Char' is not a /combining/ character,
+-- 'Nothing' is returned.
+combiningCharacter
+  :: Char  -- ^ The given 'Char' to convert to a 'CombiningCharacter'.
+  -> Maybe CombiningCharacter  -- ^ The equivalent 'CombiningCharacter' for the given 'Char' wrapped in a 'Just'; if the 'Char' is not a combining character, 'Nothing'.
 combiningCharacter '\x0300' = Just CombiningGraveAccent
 combiningCharacter '\x0301' = Just CombiningAcuteAccent
 combiningCharacter '\x0302' = Just CombiningCircumflexAccent
