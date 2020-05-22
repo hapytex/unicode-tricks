@@ -1,16 +1,35 @@
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE FunctionalDependencies, Safe #-}
 
 module Data.Char.Combining (
     -- * Combining characters
     CombiningCharacter(..)
     -- * Conversions from and to 'CombiningCharacter'
   , combiningToUnicode, combiningCharacter, combiningCharacter', isCombiningCharacter
+  , ApplyCombine((*^))
   ) where
 
-import Data.Maybe(isJust)
+import Data.List.NonEmpty(NonEmpty((:|)), (<|), toList)
 import Data.String(IsString(fromString))
+import Data.Text(Text, cons, pack, singleton)
 
-newtype CombiningSequence = CombiningSequence [CombiningCharacter] deriving (Eq, Ord, Read, Show)
+infixr 8 *^
+
+newtype CombiningSequence = CombiningSequence (NonEmpty CombiningCharacter) deriving (Eq, Ord, Read, Show)
+
+class ApplyCombine a b c | a b -> c where
+    (*^) :: a -> b -> c
+
+instance ApplyCombine CombiningCharacter CombiningCharacter CombiningSequence where
+    (*^) c c2 = CombiningSequence (c :| [c2])
+
+instance ApplyCombine CombiningCharacter CombiningSequence CombiningSequence where
+    (*^) c (CombiningSequence cs) = CombiningSequence (c <| cs)
+
+instance ApplyCombine Char CombiningCharacter Text where
+    (*^) c c2 = cons c (singleton (combiningToUnicode c2))
+
+instance ApplyCombine Char CombiningSequence Text where
+    (*^) c (CombiningSequence cs) = cons c (pack (map combiningToUnicode (toList cs)))
 
 -- | The list of possible combining characters. In the documentation of the
 -- combining characters, the characters are demonstrated on the /bullet/ symbol (&#x2022;).
@@ -1652,7 +1671,169 @@ combiningToUnicode AdlamGeminateConsonantModifier = '\x1e949'
 combiningToUnicode AdlamNukta = '\x1e94a'
 
 isCombiningCharacter :: Char -> Bool
-isCombiningCharacter = isJust . combiningCharacter
+isCombiningCharacter '\x5bf' = True
+isCombiningCharacter '\x5c7' = True
+isCombiningCharacter '\x670' = True
+isCombiningCharacter '\x711' = True
+isCombiningCharacter '\x93c' = True
+isCombiningCharacter '\x94d' = True
+isCombiningCharacter '\x9bc' = True
+isCombiningCharacter '\x9cd' = True
+isCombiningCharacter '\xa3c' = True
+isCombiningCharacter '\xa4d' = True
+isCombiningCharacter '\xabc' = True
+isCombiningCharacter '\xacd' = True
+isCombiningCharacter '\xb3c' = True
+isCombiningCharacter '\xb4d' = True
+isCombiningCharacter '\xbcd' = True
+isCombiningCharacter '\xc4d' = True
+isCombiningCharacter '\xcbc' = True
+isCombiningCharacter '\xccd' = True
+isCombiningCharacter '\xd4d' = True
+isCombiningCharacter '\xdca' = True
+isCombiningCharacter '\xf35' = True
+isCombiningCharacter '\xf37' = True
+isCombiningCharacter '\xf39' = True
+isCombiningCharacter '\xf74' = True
+isCombiningCharacter '\xf80' = True
+isCombiningCharacter '\xfc6' = True
+isCombiningCharacter '\x1037' = True
+isCombiningCharacter '\x108d' = True
+isCombiningCharacter '\x1714' = True
+isCombiningCharacter '\x1734' = True
+isCombiningCharacter '\x17d2' = True
+isCombiningCharacter '\x17dd' = True
+isCombiningCharacter '\x18a9' = True
+isCombiningCharacter '\x1a60' = True
+isCombiningCharacter '\x1a7f' = True
+isCombiningCharacter '\x1b34' = True
+isCombiningCharacter '\x1b44' = True
+isCombiningCharacter '\x1be6' = True
+isCombiningCharacter '\x1c37' = True
+isCombiningCharacter '\x1ced' = True
+isCombiningCharacter '\x1cf4' = True
+isCombiningCharacter '\x20e1' = True
+isCombiningCharacter '\x2d7f' = True
+isCombiningCharacter '\xa66f' = True
+isCombiningCharacter '\xa806' = True
+isCombiningCharacter '\xa8c4' = True
+isCombiningCharacter '\xa953' = True
+isCombiningCharacter '\xa9b3' = True
+isCombiningCharacter '\xa9c0' = True
+isCombiningCharacter '\xaab0' = True
+isCombiningCharacter '\xaac1' = True
+isCombiningCharacter '\xaaf6' = True
+isCombiningCharacter '\xabed' = True
+isCombiningCharacter '\xfb1e' = True
+isCombiningCharacter '\x101fd' = True
+isCombiningCharacter '\x102e0' = True
+isCombiningCharacter '\x10a0d' = True
+isCombiningCharacter '\x10a0f' = True
+isCombiningCharacter '\x10a3f' = True
+isCombiningCharacter '\x11046' = True
+isCombiningCharacter '\x1107f' = True
+isCombiningCharacter '\x11173' = True
+isCombiningCharacter '\x111c0' = True
+isCombiningCharacter '\x111ca' = True
+isCombiningCharacter '\x1133c' = True
+isCombiningCharacter '\x1134d' = True
+isCombiningCharacter '\x11442' = True
+isCombiningCharacter '\x11446' = True
+isCombiningCharacter '\x1163f' = True
+isCombiningCharacter '\x1172b' = True
+isCombiningCharacter '\x11c3f' = True
+isCombiningCharacter '\x1bc9e' = True
+isCombiningCharacter c
+  =  ('\x300' <= c && c <= '\x34e')
+  || ('\x1dc0' <= c && c <= '\x1df5')
+  || ('\x591' <= c && c <= '\x5bd')
+  || ('\x350' <= c && c <= '\x36f')
+  || ('\x2de0' <= c && c <= '\x2dff')
+  || ('\x8e3' <= c && c <= '\x8ff')
+  || ('\x730' <= c && c <= '\x74a')
+  || ('\x64b' <= c && c <= '\x65f')
+  || ('\xa8e0' <= c && c <= '\xa8f1')
+  || ('\x1e008' <= c && c <= '\x1e018')
+  || ('\xfe20' <= c && c <= '\xfe2f')
+  || ('\x8d4' <= c && c <= '\x8e1')
+  || ('\x1ab0' <= c && c <= '\x1abd')
+  || ('\x1cd4' <= c && c <= '\x1ce0')
+  || ('\x20d0' <= c && c <= '\x20dc')
+  || ('\x20e5' <= c && c <= '\x20f0')
+  || ('\x610' <= c && c <= '\x61a')
+  || ('\xa674' <= c && c <= '\xa67d')
+  || ('\x7eb' <= c && c <= '\x7f3')
+  || ('\x81b' <= c && c <= '\x823')
+  || ('\x1b6b' <= c && c <= '\x1b73')
+  || ('\x1a75' <= c && c <= '\x1a7c')
+  || ('\x1d17b' <= c && c <= '\x1d182')
+  || ('\x6d6' <= c && c <= '\x6dc')
+  || ('\x1ce2' <= c && c <= '\x1ce8')
+  || ('\x11366' <= c && c <= '\x1136c')
+  || ('\x16b30' <= c && c <= '\x16b36')
+  || ('\x1d185' <= c && c <= '\x1d18b')
+  || ('\x1e000' <= c && c <= '\x1e006')
+  || ('\x1e01b' <= c && c <= '\x1e021')
+  || ('\x1e8d0' <= c && c <= '\x1e8d6')
+  || ('\x1e944' <= c && c <= '\x1e94a')
+  || ('\x6df' <= c && c <= '\x6e4')
+  || ('\x302a' <= c && c <= '\x302f')
+  || ('\x1d16d' <= c && c <= '\x1d172')
+  || ('\x483' <= c && c <= '\x487')
+  || ('\x829' <= c && c <= '\x82d')
+  || ('\x1dfb' <= c && c <= '\x1dff')
+  || ('\x10376' <= c && c <= '\x1037a')
+  || ('\x11370' <= c && c <= '\x11374')
+  || ('\x16af0' <= c && c <= '\x16af4')
+  || ('\x1d165' <= c && c <= '\x1d169')
+  || ('\x1e026' <= c && c <= '\x1e02a')
+  || ('\x6ea' <= c && c <= '\x6ed')
+  || ('\x816' <= c && c <= '\x819')
+  || ('\x951' <= c && c <= '\x954')
+  || ('\xe48' <= c && c <= '\xe4b')
+  || ('\xec8' <= c && c <= '\xecb')
+  || ('\xf7a' <= c && c <= '\xf7d')
+  || ('\x1d1aa' <= c && c <= '\x1d1ad')
+  || ('\x825' <= c && c <= '\x827')
+  || ('\x859' <= c && c <= '\x85b')
+  || ('\xe38' <= c && c <= '\xe3a')
+  || ('\xf82' <= c && c <= '\xf84')
+  || ('\x135d' <= c && c <= '\x135f')
+  || ('\x1939' <= c && c <= '\x193b')
+  || ('\x1cd0' <= c && c <= '\x1cd2')
+  || ('\x2cef' <= c && c <= '\x2cf1')
+  || ('\xa92b' <= c && c <= '\xa92d')
+  || ('\xaab2' <= c && c <= '\xaab4')
+  || ('\x10a38' <= c && c <= '\x10a3a')
+  || ('\x11100' <= c && c <= '\x11102')
+  || ('\x1d242' <= c && c <= '\x1d244')
+  || ('\x5c1' <= c && c <= '\x5c2')
+  || ('\x5c4' <= c && c <= '\x5c5')
+  || ('\x6e7' <= c && c <= '\x6e8')
+  || ('\xc55' <= c && c <= '\xc56')
+  || ('\xeb8' <= c && c <= '\xeb9')
+  || ('\xf18' <= c && c <= '\xf19')
+  || ('\xf71' <= c && c <= '\xf72')
+  || ('\xf86' <= c && c <= '\xf87')
+  || ('\x1039' <= c && c <= '\x103a')
+  || ('\x1a17' <= c && c <= '\x1a18')
+  || ('\x1baa' <= c && c <= '\x1bab')
+  || ('\x1bf2' <= c && c <= '\x1bf3')
+  || ('\x1cf8' <= c && c <= '\x1cf9')
+  || ('\x3099' <= c && c <= '\x309a')
+  || ('\xa69e' <= c && c <= '\xa69f')
+  || ('\xa6f0' <= c && c <= '\xa6f1')
+  || ('\xaab7' <= c && c <= '\xaab8')
+  || ('\xaabe' <= c && c <= '\xaabf')
+  || ('\x10ae5' <= c && c <= '\x10ae6')
+  || ('\x110b9' <= c && c <= '\x110ba')
+  || ('\x11133' <= c && c <= '\x11134')
+  || ('\x11235' <= c && c <= '\x11236')
+  || ('\x112e9' <= c && c <= '\x112ea')
+  || ('\x114c2' <= c && c <= '\x114c3')
+  || ('\x115bf' <= c && c <= '\x115c0')
+  || ('\x116b6' <= c && c <= '\x116b7')
+  || ('\x1e023' <= c && c <= '\x1e024')
 
 combiningCharacter' :: Char -> CombiningCharacter
 combiningCharacter' c
