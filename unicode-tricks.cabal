@@ -23,10 +23,11 @@ library
       Data.Char.Block
     , Data.Char.Braille
     , Data.Char.Card
+    , Data.Char.Chess
     , Data.Char.Core
+    , Data.Char.Combining
     , Data.Char.Dice
     , Data.Char.Domino
-    , Data.Char.Chess
     , Data.Char.Frame
     , Data.Char.Math
     , Data.Char.Number.Duodecimal

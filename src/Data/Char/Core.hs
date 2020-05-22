@@ -16,6 +16,8 @@ module Data.Char.Core (
   , Rotate90(R0, R90, R180, R270)
     -- * Rotated objects
   , Oriented(Oriented, oobject, orientation)
+    -- * Letter case
+  , LetterCase(UpperCase, LowerCase), splitLetterCase
     -- * Ligating
   , Ligate(Ligate, NoLigate), splitLigate, ligate, ligateF
     -- * Types of fonts
@@ -37,6 +39,24 @@ import Data.Default(Default(def))
 import Data.Text(Text, cons, singleton, snoc)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
+
+-- | Specify whether we write a value in 'UpperCase' or 'LowerCase'. The
+-- 'Default' is 'UpperCase', since for example often Roman numerals are written
+-- in /upper case/.
+data LetterCase
+  = UpperCase  -- ^ The /upper case/ formatting.
+  | LowerCase  -- ^ The /lower case/ formatting.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+-- | Pick one of the two values based on the 'LetterCase' value.
+splitLetterCase
+  :: a -- ^ The value to return in case of 'UpperCase'.
+  -> a -- ^ The value to return in case of 'LowerCase'.
+  -> LetterCase -- ^ The given /letter case/.
+  -> a -- ^ One of the two given values, depending on the 'LetterCase' value.
+splitLetterCase x y = go
+    where go UpperCase = x
+          go LowerCase = y
 
 -- | Specify whether we write a positive number /with/ or /without/ a plus sign.
 -- the 'Default' is 'WithoutPlus'.
@@ -235,6 +255,9 @@ positionalNumberSystem10 :: Integral i
   -> Text -- ^ A 'Text' object that denotes the given number with the given /positional number system/.
 positionalNumberSystem10 = positionalNumberSystem 10
 
+instance Arbitrary LetterCase where
+    arbitrary = arbitraryBoundedEnum
+
 instance Arbitrary Orientation where
     arbitrary = arbitraryBoundedEnum
 
@@ -261,6 +284,9 @@ instance Arbitrary ItalicType where
 
 instance Arbitrary FontStyle where
     arbitrary = arbitraryBoundedEnum
+
+instance Default LetterCase where
+    def = UpperCase
 
 instance Default PlusStyle where
     def = WithoutPlus

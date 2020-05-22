@@ -21,13 +21,13 @@ module Data.Char.Number.Roman (
   , toLiterals
   , romanLiteral, romanLiteral'
     -- * Convert a number to text
-  , romanNumeral, romanNumeral'
-  , romanNumber,  romanNumber'
+  , romanNumeral, romanNumeral', romanNumeralCase
+  , romanNumber,  romanNumber',  romanNumberCase
   ) where
 
 import Data.Bits((.|.))
 import Data.Char(chr)
-import Data.Char.Core(Ligate, ligateF)
+import Data.Char.Core(LetterCase, Ligate, ligateF, splitLetterCase)
 import Data.Default(Default(def))
 import Data.Text(Text, cons, empty)
 
@@ -148,27 +148,36 @@ _romanNumeral = (`foldr` empty) . (cons .)
 
 -- | Convert a sequence of 'RomanLiteral' objects to a 'Text' object that
 -- contains a sequence of corresponding Unicode characters which are Roman
--- numberals in /uppercase/.
+-- numberals in /upper case/.
 romanNumeral
   :: [RomanLiteral] -- ^ The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.
   -> Text -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.
 romanNumeral = _romanNumeral romanLiteral
 
+
 -- | Convert a sequence of 'RomanLiteral' objects to a 'Text' object that
 -- contains a sequence of corresponding Unicode characters which are Roman
--- numberals in /lowercase/.
+-- numberals in /lower case/.
 romanNumeral'
   :: [RomanLiteral] -- ^ The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.
   -> Text -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.
 romanNumeral' = _romanNumeral romanLiteral'
 
+-- | Convert a sequence of 'RomanLiteral' objects to a 'Text' object that
+-- contains a sequence of corresponding Unicode characters which are Roman
+-- numberals in /upper case/ or /lower case/ depending on the 'LetterCase' value.
+romanNumeralCase
+  :: LetterCase -- ^ The given 'LetterCase' to apply.
+  -> [RomanLiteral] -- ^ The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.
+  -> Text -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.
+romanNumeralCase = splitLetterCase romanNumeral romanNumeral'
+
 _romanNumber :: Integral i => ([RomanLiteral] -> a) -> RomanStyle -> Ligate -> i -> Maybe a
 _romanNumber f r c = fmap f . toLiterals r c
 
 -- | Convert a given number to a 'Text' wrapped in a 'Just' data constructor,
--- given the number can be converted to a Roman numeral, given it can be
--- represented. 'Nothing' in case it can not be represented. The number is
--- written in Roman numerals in /uppercase/.
+-- given the number, given it can be represented. 'Nothing' in case it can not
+-- be represented. The number is written in Roman numerals in /upper case/.
 romanNumber :: Integral i
   => RomanStyle -- ^ Specifies if the Numeral is 'Additive' or 'Subtractive' style.
   -> Ligate -- ^ Specifies if characters like @ⅠⅤ@ are joined to @Ⅳ@.
@@ -178,9 +187,8 @@ romanNumber :: Integral i
 romanNumber = _romanNumber romanNumeral
 
 -- | Convert a given number to a 'Text' wrapped in a 'Just' data constructor,
--- given the number can be converted to a Roman numeral, given it can be
--- represented. 'Nothing' in case it can not be represented. The number is
--- written in Roman numerals in /lowercase/.
+-- given the number, given it can be represented. 'Nothing' in case it can not
+-- be represented. The number is written in Roman numerals in /lower case/.
 romanNumber' :: Integral i
   => RomanStyle -- ^ Specifies if the Numeral is 'Additive' or 'Subtractive' style.
   -> Ligate -- ^ Specifies if characters like @ⅠⅤ@ are joined to @Ⅳ@.
@@ -188,3 +196,15 @@ romanNumber' :: Integral i
   -> Maybe Text -- ^ A 'Text' if the given number can be specified with Roman
                 -- numerals wrapped in a 'Just', 'Nothing' otherwise.
 romanNumber' = _romanNumber romanNumeral'
+
+-- | Convert a given number to a 'Text' wrapped in a 'Just' data constructor,
+-- given the number, given it can be represented. 'Nothing' in case it can not
+-- be represented. The number is written in Roman numerals in /upper case/ or
+-- /lower case/ depending on the 'LetterCase' value.
+romanNumberCase :: Integral i
+  => LetterCase
+  -> RomanStyle
+  -> Ligate
+  -> i
+  -> Maybe Text
+romanNumberCase = splitLetterCase romanNumber romanNumber'
