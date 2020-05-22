@@ -14,12 +14,16 @@ be used to apply one, or multiple 'CombiningCharacter's to a given character. We
 
 > 'a' *^ CombiningGraveAccent *^ CombiningPlusSignBelow
 
-This will first combine 'CombiningGraveAccent' on the @'a'@ character and then 'CombiningPlusSignBelow', the result is a string @"a\\768\\799"@.
+This will first combine 'CombiningGraveAccent' on the @a@ character and then 'CombiningPlusSignBelow', the result is a string @"a\\768\\799"@.
+
+The module contains a set of pattern synonyms to make working with the 'CombiningCharacter's less verbose.
 -}
 
 module Data.Char.Combining (
     -- * Combining characters
     CombiningCharacter(..)
+    -- * A set of combining characters
+  , CombiningSequence(..)
     -- * Conversions from and to 'CombiningCharacter'
   , combiningToUnicode, combiningCharacter, combiningCharacter', isCombiningCharacter
     -- * Applying a 'CombiningCharacter' to a 'Char'
@@ -962,6 +966,10 @@ instance IsString CombiningCharacter where
     fromString [x] = combiningCharacter' x
     fromString _ = error "The given string should contain exactly one codepoint"
 
+-- | A set of 'CombiningCharacter's that can then all be applied to the same
+-- character. The '(*^)' is used both to "stack" characters in a
+-- 'CombiningSequence', and to apply a 'CombiningCharacter' or a
+-- 'CombiningSequence' to a 'Char'.
 newtype CombiningSequence = CombiningSequence (NonEmpty CombiningCharacter) deriving (Eq, Ord, Read, Show)
 
 instance IsString CombiningSequence where
