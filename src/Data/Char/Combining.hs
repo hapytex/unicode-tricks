@@ -1,11 +1,119 @@
-{-# LANGUAGE FunctionalDependencies, Safe #-}
+{-# LANGUAGE FunctionalDependencies, PatternSynonyms, Safe #-}
 
 module Data.Char.Combining (
     -- * Combining characters
     CombiningCharacter(..)
     -- * Conversions from and to 'CombiningCharacter'
   , combiningToUnicode, combiningCharacter, combiningCharacter', isCombiningCharacter
+    -- * Applying a 'CombiningCharacter' to a 'Char'
   , ApplyCombine((*^))
+    -- * Pattern synonyms for the combining characters
+  ,  pattern GraveAccent                                   , pattern AcuteAccent                                   , pattern CircumflexAccent                              , pattern Tilde                                         
+  ,  pattern Macron                                        , pattern Overline                                      , pattern Breve                                         , pattern DotAbove                                      
+  ,  pattern Diaeresis                                     , pattern HookAbove                                     , pattern RingAbove                                     , pattern DoubleAcuteAccent                             
+  ,  pattern Caron                                         , pattern VerticalLineAbove                             , pattern DoubleVerticalLineAbove                       , pattern DoubleGraveAccent                             
+  ,  pattern Candrabindu                                   , pattern InvertedBreve                                 , pattern TurnedCommaAbove                              , pattern CommaAbove                                    
+  ,  pattern ReversedCommaAbove                            , pattern CommaAboveRight                               , pattern GraveAccentBelow                              , pattern AcuteAccentBelow                              
+  ,  pattern LeftTackBelow                                 , pattern RightTackBelow                                , pattern LeftAngleAbove                                , pattern Horn                                          
+  ,  pattern LeftHalfRingBelow                             , pattern UpTackBelow                                   , pattern DownTackBelow                                 , pattern PlusSignBelow                                 
+  ,  pattern MinusSignBelow                                , pattern PalatalizedHookBelow                          , pattern RetroflexHookBelow                            , pattern DotBelow                                      
+  ,  pattern DiaeresisBelow                                , pattern RingBelow                                     , pattern CommaBelow                                    , pattern Cedilla                                       
+  ,  pattern Ogonek                                        , pattern VerticalLineBelow                             , pattern BridgeBelow                                   , pattern InvertedDoubleArchBelow                       
+  ,  pattern CaronBelow                                    , pattern CircumflexAccentBelow                         , pattern BreveBelow                                    , pattern InvertedBreveBelow                            
+  ,  pattern TildeBelow                                    , pattern MacronBelow                                   , pattern LowLine                                       , pattern DoubleLowLine                                 
+  ,  pattern TildeOverlay                                  , pattern ShortStrokeOverlay                            , pattern LongStrokeOverlay                             , pattern ShortSolidusOverlay                           
+  ,  pattern LongSolidusOverlay                            , pattern RightHalfRingBelow                            , pattern InvertedBridgeBelow                           , pattern SquareBelow                                   
+  ,  pattern SeagullBelow                                  , pattern XAbove                                        , pattern VerticalTilde                                 , pattern DoubleOverline                                
+  ,  pattern GraveToneMark                                 , pattern AcuteToneMark                                 , pattern GreekPerispomeni                              , pattern GreekKoronis                                  
+  ,  pattern GreekDialytikaTonos                           , pattern GreekYpogegrammeni                            , pattern BridgeAbove                                   , pattern EqualsSignBelow                               
+  ,  pattern DoubleVerticalLineBelow                       , pattern LeftAngleBelow                                , pattern NotTildeAbove                                 , pattern HomotheticAbove                               
+  ,  pattern AlmostEqualToAbove                            , pattern LeftRightArrowBelow                           , pattern UpwardsArrowBelow                             , pattern RightArrowheadAbove                           
+  ,  pattern LeftHalfRingAbove                             , pattern Fermata                                       , pattern XBelow                                        , pattern LeftArrowheadBelow                            
+  ,  pattern RightArrowheadBelow                           , pattern RightArrowheadAndUpArrowheadBelow             , pattern RightHalfRingAbove                            , pattern DotAboveRight                                 
+  ,  pattern AsteriskBelow                                 , pattern DoubleRingBelow                               , pattern ZigzagAbove                                   , pattern DoubleBreveBelow                              
+  ,  pattern DoubleBreve                                   , pattern DoubleMacron                                  , pattern DoubleMacronBelow                             , pattern DoubleTilde                                   
+  ,  pattern DoubleInvertedBreve                           , pattern DoubleRightwardsArrowBelow                    , pattern LatinSmallLetterA                             , pattern LatinSmallLetterE                             
+  ,  pattern LatinSmallLetterI                             , pattern LatinSmallLetterO                             , pattern LatinSmallLetterU                             , pattern LatinSmallLetterC                             
+  ,  pattern LatinSmallLetterD                             , pattern LatinSmallLetterH                             , pattern LatinSmallLetterM                             , pattern LatinSmallLetterR                             
+  ,  pattern LatinSmallLetterT                             , pattern LatinSmallLetterV                             , pattern LatinSmallLetterX                             , pattern CyrillicTitlo                                 
+  ,  pattern CyrillicPalatalization                        , pattern CyrillicDasiaPneumata                         , pattern CyrillicPsiliPneumata                         , pattern CyrillicPokrytie                              
+  ,  pattern NkoShortHighTone                              , pattern NkoShortLowTone                               , pattern NkoShortRisingTone                            , pattern NkoLongDescendingTone                         
+  ,  pattern NkoLongHighTone                               , pattern NkoLongLowTone                                , pattern NkoLongRisingTone                             , pattern NkoNasalizationMark                           
+  ,  pattern NkoDoubleDotAbove                             , pattern EthiopicGeminationAndVowelLengthMark          , pattern EthiopicVowelLengthMark                       , pattern EthiopicGeminationMark                        
+  ,  pattern TaiThamCryptogrammicDot                       , pattern DoubledCircumflexAccent                       , pattern DiaeresisRing                                 , pattern Infinity                                      
+  ,  pattern DownwardsArrow                                , pattern TripleDot                                     , pattern XXBelow                                       , pattern WigglyLineBelow                               
+  ,  pattern OpenMarkBelow                                 , pattern DoubleOpenMarkBelow                           , pattern LightCentralizationStrokeBelow                , pattern StrongCentralizationStrokeBelow               
+  ,  pattern ParenthesesAbove                              , pattern DoubleParenthesesAbove                        , pattern ParenthesesBelow                              , pattern BalineseMusicalSymbolTegeh                    
+  ,  pattern BalineseMusicalSymbolEndep                    , pattern BalineseMusicalSymbolKempul                   , pattern BalineseMusicalSymbolKempli                   , pattern BalineseMusicalSymbolJegogan                  
+  ,  pattern BalineseMusicalSymbolKempulWithJegogan        , pattern BalineseMusicalSymbolKempliWithJegogan        , pattern BalineseMusicalSymbolBende                    , pattern BalineseMusicalSymbolGong                     
+  ,  pattern DottedGraveAccent                             , pattern DottedAcuteAccent                             , pattern SnakeBelow                                    , pattern SuspensionMark                                
+  ,  pattern MacronAcute                                   , pattern GraveMacron                                   , pattern MacronGrave                                   , pattern AcuteMacron                                   
+  ,  pattern GraveAcuteGrave                               , pattern AcuteGraveAcute                               , pattern LatinSmallLetterRBelow                        , pattern BreveMacron                                   
+  ,  pattern MacronBreve                                   , pattern DoubleCircumflexAbove                         , pattern OgonekAbove                                   , pattern ZigzagBelow                                   
+  ,  pattern IsBelow                                       , pattern UrAbove                                       , pattern UsAbove                                       , pattern LatinSmallLetterFlattenedOpenAAbove           
+  ,  pattern LatinSmallLetterAe                            , pattern LatinSmallLetterAo                            , pattern LatinSmallLetterAv                            , pattern LatinSmallLetterCCedilla                      
+  ,  pattern LatinSmallLetterInsularD                      , pattern LatinSmallLetterEth                           , pattern LatinSmallLetterG                             , pattern LatinLetterSmallCapitalG                      
+  ,  pattern LatinSmallLetterK                             , pattern LatinSmallLetterL                             , pattern LatinLetterSmallCapitalL                      , pattern LatinLetterSmallCapitalM                      
+  ,  pattern LatinSmallLetterN                             , pattern LatinLetterSmallCapitalN                      , pattern LatinLetterSmallCapitalR                      , pattern LatinSmallLetterRRotunda                      
+  ,  pattern LatinSmallLetterS                             , pattern LatinSmallLetterLongS                         , pattern LatinSmallLetterZ                             , pattern LatinSmallLetterAlpha                         
+  ,  pattern LatinSmallLetterB                             , pattern LatinSmallLetterBeta                          , pattern LatinSmallLetterSchwa                         , pattern LatinSmallLetterF                             
+  ,  pattern LatinSmallLetterLWithDoubleMiddleTilde        , pattern LatinSmallLetterOWithLightCentralizationStroke, pattern LatinSmallLetterP                             , pattern LatinSmallLetterEsh                           
+  ,  pattern LatinSmallLetterUWithLightCentralizationStroke, pattern LatinSmallLetterW                             , pattern LatinSmallLetterAWithDiaeresis                , pattern LatinSmallLetterOWithDiaeresis                
+  ,  pattern LatinSmallLetterUWithDiaeresis                , pattern UpTackAbove                                   , pattern DeletionMark                                  , pattern DoubleInvertedBreveBelow                      
+  ,  pattern AlmostEqualToBelow                            , pattern LeftArrowheadAbove                            , pattern RightArrowheadAndDownArrowheadBelow           , pattern LeftHarpoonAbove                              
+  ,  pattern RightHarpoonAbove                             , pattern LongVerticalLineOverlay                       , pattern ShortVerticalLineOverlay                      , pattern AnticlockwiseArrowAbove                       
+  ,  pattern ClockwiseArrowAbove                           , pattern LeftArrowAbove                                , pattern RightArrowAbove                               , pattern RingOverlay                                   
+  ,  pattern ClockwiseRingOverlay                          , pattern AnticlockwiseRingOverlay                      , pattern ThreeDotsAbove                                , pattern FourDotsAbove                                 
+  ,  pattern LeftRightArrowAbove                           , pattern ReverseSolidusOverlay                         , pattern DoubleVerticalStrokeOverlay                   , pattern AnnuitySymbol                                 
+  ,  pattern TripleUnderdot                                , pattern WideBridgeAbove                               , pattern LeftwardsArrowOverlay                         , pattern LongDoubleSolidusOverlay                      
+  ,  pattern RightwardsHarpoonWithBarbDownwards            , pattern LeftwardsHarpoonWithBarbDownwards             , pattern LeftArrowBelow                                , pattern RightArrowBelow                               
+  ,  pattern AsteriskAbove                                 , pattern CopticNiAbove                                 , pattern CopticSpiritusAsper                           , pattern CopticSpiritusLenis                           
+  ,  pattern CyrillicLetterBe                              , pattern CyrillicLetterVe                              , pattern CyrillicLetterGhe                             , pattern CyrillicLetterDe                              
+  ,  pattern CyrillicLetterZhe                             , pattern CyrillicLetterZe                              , pattern CyrillicLetterKa                              , pattern CyrillicLetterEl                              
+  ,  pattern CyrillicLetterEm                              , pattern CyrillicLetterEn                              , pattern CyrillicLetterO                               , pattern CyrillicLetterPe                              
+  ,  pattern CyrillicLetterEr                              , pattern CyrillicLetterEs                              , pattern CyrillicLetterTe                              , pattern CyrillicLetterHa                              
+  ,  pattern CyrillicLetterTse                             , pattern CyrillicLetterChe                             , pattern CyrillicLetterSha                             , pattern CyrillicLetterShcha                           
+  ,  pattern CyrillicLetterFita                            , pattern CyrillicLetterEsTe                            , pattern CyrillicLetterA                               , pattern CyrillicLetterIe                              
+  ,  pattern CyrillicLetterDjerv                           , pattern CyrillicLetterMonographUk                     , pattern CyrillicLetterYat                             , pattern CyrillicLetterYu                              
+  ,  pattern CyrillicLetterIotifiedA                       , pattern CyrillicLetterLittleYus                       , pattern CyrillicLetterBigYus                          , pattern CyrillicLetterIotifiedBigYus                  
+  ,  pattern KatakanaHiraganaVoicedSoundMark               , pattern KatakanaHiraganaSemiVoicedSoundMark           , pattern CyrillicVzmet                                 , pattern CyrillicLetterUkrainianIe                     
+  ,  pattern CyrillicLetterI                               , pattern CyrillicLetterYi                              , pattern CyrillicLetterU                               , pattern CyrillicLetterHardSign                        
+  ,  pattern CyrillicLetterYeru                            , pattern CyrillicLetterSoftSign                        , pattern CyrillicLetterOmega                           , pattern CyrillicKavyka                                
+  ,  pattern CyrillicPayerok                               , pattern CyrillicLetterEf                              , pattern CyrillicLetterIotifiedE                       , pattern BamumMarkKoqndon                              
+  ,  pattern BamumMarkTukwentis                            , pattern DevanagariDigitZero                           , pattern DevanagariDigitOne                            , pattern DevanagariDigitTwo                            
+  ,  pattern DevanagariDigitThree                          , pattern DevanagariDigitFour                           , pattern DevanagariDigitFive                           , pattern DevanagariDigitSix                            
+  ,  pattern DevanagariDigitSeven                          , pattern DevanagariDigitEight                          , pattern DevanagariDigitNine                           , pattern DevanagariLetterA                             
+  ,  pattern DevanagariLetterU                             , pattern DevanagariLetterKa                            , pattern DevanagariLetterNa                            , pattern DevanagariLetterPa                            
+  ,  pattern DevanagariLetterRa                            , pattern DevanagariLetterVi                            , pattern DevanagariSignAvagraha                        , pattern LigatureLeftHalf                              
+  ,  pattern LigatureRightHalf                             , pattern DoubleTildeLeftHalf                           , pattern DoubleTildeRightHalf                          , pattern MacronLeftHalf                                
+  ,  pattern MacronRightHalf                               , pattern ConjoiningMacron                              , pattern LigatureLeftHalfBelow                         , pattern LigatureRightHalfBelow                        
+  ,  pattern TildeLeftHalfBelow                            , pattern TildeRightHalfBelow                           , pattern MacronLeftHalfBelow                           , pattern MacronRightHalfBelow                          
+  ,  pattern ConjoiningMacronBelow                         , pattern CyrillicTitloLeftHalf                         , pattern CyrillicTitloRightHalf                        , pattern PhaistosDiscSignObliqueStroke                 
+  ,  pattern OldPermicLetterAn                             , pattern OldPermicLetterDoi                            , pattern OldPermicLetterZata                           , pattern OldPermicLetterNenoe                          
+  ,  pattern OldPermicLetterSii                            , pattern GranthaDigitZero                              , pattern GranthaDigitOne                               , pattern GranthaDigitTwo                               
+  ,  pattern GranthaDigitThree                             , pattern GranthaDigitFour                              , pattern GranthaDigitFive                              , pattern GranthaDigitSix                               
+  ,  pattern GranthaLetterA                                , pattern GranthaLetterKa                               , pattern GranthaLetterNa                               , pattern GranthaLetterVi                               
+  ,  pattern GranthaLetterPa                               , pattern BassaVahHighTone                              , pattern BassaVahLowTone                               , pattern BassaVahMidTone                               
+  ,  pattern BassaVahLowMidTone                            , pattern BassaVahHighLowTone                           , pattern MusicalSymbolStem                             , pattern MusicalSymbolSprechgesangStem                 
+  ,  pattern MusicalSymbolTremolo1                         , pattern MusicalSymbolTremolo2                         , pattern MusicalSymbolTremolo3                         , pattern MusicalSymbolAugmentationDot                  
+  ,  pattern MusicalSymbolFlag1                            , pattern MusicalSymbolFlag2                            , pattern MusicalSymbolFlag3                            , pattern MusicalSymbolFlag4                            
+  ,  pattern MusicalSymbolFlag5                            , pattern MusicalSymbolAccent                           , pattern MusicalSymbolStaccato                         , pattern MusicalSymbolTenuto                           
+  ,  pattern MusicalSymbolStaccatissimo                    , pattern MusicalSymbolMarcato                          , pattern MusicalSymbolMarcatoStaccato                  , pattern MusicalSymbolAccentStaccato                   
+  ,  pattern MusicalSymbolLoure                            , pattern MusicalSymbolDoit                             , pattern MusicalSymbolRip                              , pattern MusicalSymbolFlip                             
+  ,  pattern MusicalSymbolSmear                            , pattern MusicalSymbolBend                             , pattern MusicalSymbolDoubleTongue                     , pattern MusicalSymbolTripleTongue                     
+  ,  pattern MusicalSymbolDownBow                          , pattern MusicalSymbolUpBow                            , pattern MusicalSymbolHarmonic                         , pattern MusicalSymbolSnapPizzicato                    
+  ,  pattern GreekMusicalTriseme                           , pattern GreekMusicalTetraseme                         , pattern GreekMusicalPentaseme                         , pattern GlagoliticLetterAzu                           
+  ,  pattern GlagoliticLetterBuky                          , pattern GlagoliticLetterVede                          , pattern GlagoliticLetterGlagoli                       , pattern GlagoliticLetterDobro                         
+  ,  pattern GlagoliticLetterYestu                         , pattern GlagoliticLetterZhivete                       , pattern GlagoliticLetterZemlja                        , pattern GlagoliticLetterIzhe                          
+  ,  pattern GlagoliticLetterInitialIzhe                   , pattern GlagoliticLetterI                             , pattern GlagoliticLetterDjervi                        , pattern GlagoliticLetterKako                          
+  ,  pattern GlagoliticLetterLjudije                       , pattern GlagoliticLetterMyslite                       , pattern GlagoliticLetterNashi                         , pattern GlagoliticLetterOnu                           
+  ,  pattern GlagoliticLetterPokoji                        , pattern GlagoliticLetterRitsi                         , pattern GlagoliticLetterSlovo                         , pattern GlagoliticLetterTvrido                        
+  ,  pattern GlagoliticLetterUku                           , pattern GlagoliticLetterFritu                         , pattern GlagoliticLetterHeru                          , pattern GlagoliticLetterShta                          
+  ,  pattern GlagoliticLetterTsi                           , pattern GlagoliticLetterChrivi                        , pattern GlagoliticLetterSha                           , pattern GlagoliticLetterYeru                          
+  ,  pattern GlagoliticLetterYeri                          , pattern GlagoliticLetterYati                          , pattern GlagoliticLetterYu                            , pattern GlagoliticLetterSmallYus                      
+  ,  pattern GlagoliticLetterYo                            , pattern GlagoliticLetterIotatedSmallYus               , pattern GlagoliticLetterBigYus                        , pattern GlagoliticLetterIotatedBigYus                 
+  ,  pattern GlagoliticLetterFita                          , pattern MendeKikakuiNumberTeens                       , pattern MendeKikakuiNumberTens                        , pattern MendeKikakuiNumberHundreds                    
+  ,  pattern MendeKikakuiNumberThousands                   , pattern MendeKikakuiNumberTenThousands                , pattern MendeKikakuiNumberHundredThousands            , pattern MendeKikakuiNumberMillions
   ) where
 
 import Data.List.NonEmpty(NonEmpty((:|)), (<|), toList)
@@ -13,23 +121,6 @@ import Data.String(IsString(fromString))
 import Data.Text(Text, cons, pack, singleton)
 
 infixr 8 *^
-
-newtype CombiningSequence = CombiningSequence (NonEmpty CombiningCharacter) deriving (Eq, Ord, Read, Show)
-
-class ApplyCombine a b c | a b -> c where
-    (*^) :: a -> b -> c
-
-instance ApplyCombine CombiningCharacter CombiningCharacter CombiningSequence where
-    (*^) c c2 = CombiningSequence (c :| [c2])
-
-instance ApplyCombine CombiningCharacter CombiningSequence CombiningSequence where
-    (*^) c (CombiningSequence cs) = CombiningSequence (c <| cs)
-
-instance ApplyCombine Char CombiningCharacter Text where
-    (*^) c c2 = cons c (singleton (combiningToUnicode c2))
-
-instance ApplyCombine Char CombiningSequence Text where
-    (*^) c (CombiningSequence cs) = cons c (pack (map combiningToUnicode (toList cs)))
 
 -- | The list of possible combining characters. In the documentation of the
 -- combining characters, the characters are demonstrated on the /bullet/ symbol (&#x2022;).
@@ -854,7 +945,41 @@ instance IsString CombiningCharacter where
     fromString [x] = combiningCharacter' x
     fromString _ = error "The given string should contain exactly one codepoint"
 
-combiningToUnicode :: CombiningCharacter -> Char
+newtype CombiningSequence = CombiningSequence (NonEmpty CombiningCharacter) deriving (Eq, Ord, Read, Show)
+
+instance IsString CombiningSequence where
+    fromString (c:cs)
+        | Just y <- traverse combiningCharacter (c :| cs) = CombiningSequence y
+    fromString _ = error "The given string should contain at least one character, and all should be combining codepoints."
+
+-- | A typeclass used to apply a 'CombiningCharacter' or a 'CombiningSequence'
+-- to a 'Char', and return a 'Text' object.
+class ApplyCombine a b c | a b -> c where
+    -- | Applies the given 'CombiningCharacter' or 'CombiningSequence' to the
+    -- given character. The operator is right-to-left, to allow "stacking" of
+    -- 'CombiningCharacter's for example:
+    --
+    --  > 'a' *^ CombiningGraveAccent *^ CombiningPlusSignBelow
+    (*^) :: a -> b -> c
+
+instance ApplyCombine CombiningCharacter CombiningCharacter CombiningSequence where
+    (*^) c c2 = CombiningSequence (c :| [c2])
+
+instance ApplyCombine CombiningCharacter CombiningSequence CombiningSequence where
+    (*^) c (CombiningSequence cs) = CombiningSequence (c <| cs)
+
+instance ApplyCombine Char CombiningCharacter Text where
+    (*^) c c2 = cons c (singleton (combiningToUnicode c2))
+
+instance ApplyCombine Char CombiningSequence Text where
+    (*^) c (CombiningSequence cs) = cons c (pack (map combiningToUnicode (toList cs)))
+
+
+-- | Convert the given 'CombiningCharacter' to a 'Char' in Unicode, this
+-- codepoints need a preceding codepoint to be applied to.
+combiningToUnicode
+  :: CombiningCharacter -- ^ The given 'CombiningCharacter' to convert to a Unicode codepoint.
+  -> Char -- ^ A Unicode 'Char'acter that is the codepoint of the given 'CombiningCharacter'. The 
 combiningToUnicode CombiningGraveAccent = '\x0300'
 combiningToUnicode CombiningAcuteAccent = '\x0301'
 combiningToUnicode CombiningCircumflexAccent = '\x0302'
@@ -1670,7 +1795,10 @@ combiningToUnicode AdlamConsonantModifier = '\x1e948'
 combiningToUnicode AdlamGeminateConsonantModifier = '\x1e949'
 combiningToUnicode AdlamNukta = '\x1e94a'
 
-isCombiningCharacter :: Char -> Bool
+-- | Checks if the given 'Char' is a combining character.
+isCombiningCharacter
+  :: Char -- ^ The given 'Char'acter to check.
+  -> Bool -- ^ 'True' if the given 'Char'acter is a combining character; 'False' otherwise.
 isCombiningCharacter '\x5bf' = True
 isCombiningCharacter '\x5c7' = True
 isCombiningCharacter '\x670' = True
@@ -1838,7 +1966,7 @@ isCombiningCharacter c
 combiningCharacter' :: Char -> CombiningCharacter
 combiningCharacter' c
     | Just y <- combiningCharacter c = y
-    | otherwise = error "The given character is a not a CombiningCharacter"
+    | otherwise = error ("The given character " ++ show c ++ "is a not a CombiningCharacter.")
 
 combiningCharacter :: Char -> Maybe CombiningCharacter
 combiningCharacter '\x0300' = Just CombiningGraveAccent
@@ -2656,3 +2784,1699 @@ combiningCharacter '\x1e948' = Just AdlamConsonantModifier
 combiningCharacter '\x1e949' = Just AdlamGeminateConsonantModifier
 combiningCharacter '\x1e94a' = Just AdlamNukta
 combiningCharacter _ = Nothing
+
+-- | A pattern synonym for 'CombiningGraveAccent', the name without the @Combining@ part.
+pattern GraveAccent :: CombiningCharacter
+pattern GraveAccent = CombiningGraveAccent
+
+-- | A pattern synonym for 'CombiningAcuteAccent', the name without the @Combining@ part.
+pattern AcuteAccent :: CombiningCharacter
+pattern AcuteAccent = CombiningAcuteAccent
+
+-- | A pattern synonym for 'CombiningCircumflexAccent', the name without the @Combining@ part.
+pattern CircumflexAccent :: CombiningCharacter
+pattern CircumflexAccent = CombiningCircumflexAccent
+
+-- | A pattern synonym for 'CombiningTilde', the name without the @Combining@ part.
+pattern Tilde :: CombiningCharacter
+pattern Tilde = CombiningTilde
+
+-- | A pattern synonym for 'CombiningMacron', the name without the @Combining@ part.
+pattern Macron :: CombiningCharacter
+pattern Macron = CombiningMacron
+
+-- | A pattern synonym for 'CombiningOverline', the name without the @Combining@ part.
+pattern Overline :: CombiningCharacter
+pattern Overline = CombiningOverline
+
+-- | A pattern synonym for 'CombiningBreve', the name without the @Combining@ part.
+pattern Breve :: CombiningCharacter
+pattern Breve = CombiningBreve
+
+-- | A pattern synonym for 'CombiningDotAbove', the name without the @Combining@ part.
+pattern DotAbove :: CombiningCharacter
+pattern DotAbove = CombiningDotAbove
+
+-- | A pattern synonym for 'CombiningDiaeresis', the name without the @Combining@ part.
+pattern Diaeresis :: CombiningCharacter
+pattern Diaeresis = CombiningDiaeresis
+
+-- | A pattern synonym for 'CombiningHookAbove', the name without the @Combining@ part.
+pattern HookAbove :: CombiningCharacter
+pattern HookAbove = CombiningHookAbove
+
+-- | A pattern synonym for 'CombiningRingAbove', the name without the @Combining@ part.
+pattern RingAbove :: CombiningCharacter
+pattern RingAbove = CombiningRingAbove
+
+-- | A pattern synonym for 'CombiningDoubleAcuteAccent', the name without the @Combining@ part.
+pattern DoubleAcuteAccent :: CombiningCharacter
+pattern DoubleAcuteAccent = CombiningDoubleAcuteAccent
+
+-- | A pattern synonym for 'CombiningCaron', the name without the @Combining@ part.
+pattern Caron :: CombiningCharacter
+pattern Caron = CombiningCaron
+
+-- | A pattern synonym for 'CombiningVerticalLineAbove', the name without the @Combining@ part.
+pattern VerticalLineAbove :: CombiningCharacter
+pattern VerticalLineAbove = CombiningVerticalLineAbove
+
+-- | A pattern synonym for 'CombiningDoubleVerticalLineAbove', the name without the @Combining@ part.
+pattern DoubleVerticalLineAbove :: CombiningCharacter
+pattern DoubleVerticalLineAbove = CombiningDoubleVerticalLineAbove
+
+-- | A pattern synonym for 'CombiningDoubleGraveAccent', the name without the @Combining@ part.
+pattern DoubleGraveAccent :: CombiningCharacter
+pattern DoubleGraveAccent = CombiningDoubleGraveAccent
+
+-- | A pattern synonym for 'CombiningCandrabindu', the name without the @Combining@ part.
+pattern Candrabindu :: CombiningCharacter
+pattern Candrabindu = CombiningCandrabindu
+
+-- | A pattern synonym for 'CombiningInvertedBreve', the name without the @Combining@ part.
+pattern InvertedBreve :: CombiningCharacter
+pattern InvertedBreve = CombiningInvertedBreve
+
+-- | A pattern synonym for 'CombiningTurnedCommaAbove', the name without the @Combining@ part.
+pattern TurnedCommaAbove :: CombiningCharacter
+pattern TurnedCommaAbove = CombiningTurnedCommaAbove
+
+-- | A pattern synonym for 'CombiningCommaAbove', the name without the @Combining@ part.
+pattern CommaAbove :: CombiningCharacter
+pattern CommaAbove = CombiningCommaAbove
+
+-- | A pattern synonym for 'CombiningReversedCommaAbove', the name without the @Combining@ part.
+pattern ReversedCommaAbove :: CombiningCharacter
+pattern ReversedCommaAbove = CombiningReversedCommaAbove
+
+-- | A pattern synonym for 'CombiningCommaAboveRight', the name without the @Combining@ part.
+pattern CommaAboveRight :: CombiningCharacter
+pattern CommaAboveRight = CombiningCommaAboveRight
+
+-- | A pattern synonym for 'CombiningGraveAccentBelow', the name without the @Combining@ part.
+pattern GraveAccentBelow :: CombiningCharacter
+pattern GraveAccentBelow = CombiningGraveAccentBelow
+
+-- | A pattern synonym for 'CombiningAcuteAccentBelow', the name without the @Combining@ part.
+pattern AcuteAccentBelow :: CombiningCharacter
+pattern AcuteAccentBelow = CombiningAcuteAccentBelow
+
+-- | A pattern synonym for 'CombiningLeftTackBelow', the name without the @Combining@ part.
+pattern LeftTackBelow :: CombiningCharacter
+pattern LeftTackBelow = CombiningLeftTackBelow
+
+-- | A pattern synonym for 'CombiningRightTackBelow', the name without the @Combining@ part.
+pattern RightTackBelow :: CombiningCharacter
+pattern RightTackBelow = CombiningRightTackBelow
+
+-- | A pattern synonym for 'CombiningLeftAngleAbove', the name without the @Combining@ part.
+pattern LeftAngleAbove :: CombiningCharacter
+pattern LeftAngleAbove = CombiningLeftAngleAbove
+
+-- | A pattern synonym for 'CombiningHorn', the name without the @Combining@ part.
+pattern Horn :: CombiningCharacter
+pattern Horn = CombiningHorn
+
+-- | A pattern synonym for 'CombiningLeftHalfRingBelow', the name without the @Combining@ part.
+pattern LeftHalfRingBelow :: CombiningCharacter
+pattern LeftHalfRingBelow = CombiningLeftHalfRingBelow
+
+-- | A pattern synonym for 'CombiningUpTackBelow', the name without the @Combining@ part.
+pattern UpTackBelow :: CombiningCharacter
+pattern UpTackBelow = CombiningUpTackBelow
+
+-- | A pattern synonym for 'CombiningDownTackBelow', the name without the @Combining@ part.
+pattern DownTackBelow :: CombiningCharacter
+pattern DownTackBelow = CombiningDownTackBelow
+
+-- | A pattern synonym for 'CombiningPlusSignBelow', the name without the @Combining@ part.
+pattern PlusSignBelow :: CombiningCharacter
+pattern PlusSignBelow = CombiningPlusSignBelow
+
+-- | A pattern synonym for 'CombiningMinusSignBelow', the name without the @Combining@ part.
+pattern MinusSignBelow :: CombiningCharacter
+pattern MinusSignBelow = CombiningMinusSignBelow
+
+-- | A pattern synonym for 'CombiningPalatalizedHookBelow', the name without the @Combining@ part.
+pattern PalatalizedHookBelow :: CombiningCharacter
+pattern PalatalizedHookBelow = CombiningPalatalizedHookBelow
+
+-- | A pattern synonym for 'CombiningRetroflexHookBelow', the name without the @Combining@ part.
+pattern RetroflexHookBelow :: CombiningCharacter
+pattern RetroflexHookBelow = CombiningRetroflexHookBelow
+
+-- | A pattern synonym for 'CombiningDotBelow', the name without the @Combining@ part.
+pattern DotBelow :: CombiningCharacter
+pattern DotBelow = CombiningDotBelow
+
+-- | A pattern synonym for 'CombiningDiaeresisBelow', the name without the @Combining@ part.
+pattern DiaeresisBelow :: CombiningCharacter
+pattern DiaeresisBelow = CombiningDiaeresisBelow
+
+-- | A pattern synonym for 'CombiningRingBelow', the name without the @Combining@ part.
+pattern RingBelow :: CombiningCharacter
+pattern RingBelow = CombiningRingBelow
+
+-- | A pattern synonym for 'CombiningCommaBelow', the name without the @Combining@ part.
+pattern CommaBelow :: CombiningCharacter
+pattern CommaBelow = CombiningCommaBelow
+
+-- | A pattern synonym for 'CombiningCedilla', the name without the @Combining@ part.
+pattern Cedilla :: CombiningCharacter
+pattern Cedilla = CombiningCedilla
+
+-- | A pattern synonym for 'CombiningOgonek', the name without the @Combining@ part.
+pattern Ogonek :: CombiningCharacter
+pattern Ogonek = CombiningOgonek
+
+-- | A pattern synonym for 'CombiningVerticalLineBelow', the name without the @Combining@ part.
+pattern VerticalLineBelow :: CombiningCharacter
+pattern VerticalLineBelow = CombiningVerticalLineBelow
+
+-- | A pattern synonym for 'CombiningBridgeBelow', the name without the @Combining@ part.
+pattern BridgeBelow :: CombiningCharacter
+pattern BridgeBelow = CombiningBridgeBelow
+
+-- | A pattern synonym for 'CombiningInvertedDoubleArchBelow', the name without the @Combining@ part.
+pattern InvertedDoubleArchBelow :: CombiningCharacter
+pattern InvertedDoubleArchBelow = CombiningInvertedDoubleArchBelow
+
+-- | A pattern synonym for 'CombiningCaronBelow', the name without the @Combining@ part.
+pattern CaronBelow :: CombiningCharacter
+pattern CaronBelow = CombiningCaronBelow
+
+-- | A pattern synonym for 'CombiningCircumflexAccentBelow', the name without the @Combining@ part.
+pattern CircumflexAccentBelow :: CombiningCharacter
+pattern CircumflexAccentBelow = CombiningCircumflexAccentBelow
+
+-- | A pattern synonym for 'CombiningBreveBelow', the name without the @Combining@ part.
+pattern BreveBelow :: CombiningCharacter
+pattern BreveBelow = CombiningBreveBelow
+
+-- | A pattern synonym for 'CombiningInvertedBreveBelow', the name without the @Combining@ part.
+pattern InvertedBreveBelow :: CombiningCharacter
+pattern InvertedBreveBelow = CombiningInvertedBreveBelow
+
+-- | A pattern synonym for 'CombiningTildeBelow', the name without the @Combining@ part.
+pattern TildeBelow :: CombiningCharacter
+pattern TildeBelow = CombiningTildeBelow
+
+-- | A pattern synonym for 'CombiningMacronBelow', the name without the @Combining@ part.
+pattern MacronBelow :: CombiningCharacter
+pattern MacronBelow = CombiningMacronBelow
+
+-- | A pattern synonym for 'CombiningLowLine', the name without the @Combining@ part.
+pattern LowLine :: CombiningCharacter
+pattern LowLine = CombiningLowLine
+
+-- | A pattern synonym for 'CombiningDoubleLowLine', the name without the @Combining@ part.
+pattern DoubleLowLine :: CombiningCharacter
+pattern DoubleLowLine = CombiningDoubleLowLine
+
+-- | A pattern synonym for 'CombiningTildeOverlay', the name without the @Combining@ part.
+pattern TildeOverlay :: CombiningCharacter
+pattern TildeOverlay = CombiningTildeOverlay
+
+-- | A pattern synonym for 'CombiningShortStrokeOverlay', the name without the @Combining@ part.
+pattern ShortStrokeOverlay :: CombiningCharacter
+pattern ShortStrokeOverlay = CombiningShortStrokeOverlay
+
+-- | A pattern synonym for 'CombiningLongStrokeOverlay', the name without the @Combining@ part.
+pattern LongStrokeOverlay :: CombiningCharacter
+pattern LongStrokeOverlay = CombiningLongStrokeOverlay
+
+-- | A pattern synonym for 'CombiningShortSolidusOverlay', the name without the @Combining@ part.
+pattern ShortSolidusOverlay :: CombiningCharacter
+pattern ShortSolidusOverlay = CombiningShortSolidusOverlay
+
+-- | A pattern synonym for 'CombiningLongSolidusOverlay', the name without the @Combining@ part.
+pattern LongSolidusOverlay :: CombiningCharacter
+pattern LongSolidusOverlay = CombiningLongSolidusOverlay
+
+-- | A pattern synonym for 'CombiningRightHalfRingBelow', the name without the @Combining@ part.
+pattern RightHalfRingBelow :: CombiningCharacter
+pattern RightHalfRingBelow = CombiningRightHalfRingBelow
+
+-- | A pattern synonym for 'CombiningInvertedBridgeBelow', the name without the @Combining@ part.
+pattern InvertedBridgeBelow :: CombiningCharacter
+pattern InvertedBridgeBelow = CombiningInvertedBridgeBelow
+
+-- | A pattern synonym for 'CombiningSquareBelow', the name without the @Combining@ part.
+pattern SquareBelow :: CombiningCharacter
+pattern SquareBelow = CombiningSquareBelow
+
+-- | A pattern synonym for 'CombiningSeagullBelow', the name without the @Combining@ part.
+pattern SeagullBelow :: CombiningCharacter
+pattern SeagullBelow = CombiningSeagullBelow
+
+-- | A pattern synonym for 'CombiningXAbove', the name without the @Combining@ part.
+pattern XAbove :: CombiningCharacter
+pattern XAbove = CombiningXAbove
+
+-- | A pattern synonym for 'CombiningVerticalTilde', the name without the @Combining@ part.
+pattern VerticalTilde :: CombiningCharacter
+pattern VerticalTilde = CombiningVerticalTilde
+
+-- | A pattern synonym for 'CombiningDoubleOverline', the name without the @Combining@ part.
+pattern DoubleOverline :: CombiningCharacter
+pattern DoubleOverline = CombiningDoubleOverline
+
+-- | A pattern synonym for 'CombiningGraveToneMark', the name without the @Combining@ part.
+pattern GraveToneMark :: CombiningCharacter
+pattern GraveToneMark = CombiningGraveToneMark
+
+-- | A pattern synonym for 'CombiningAcuteToneMark', the name without the @Combining@ part.
+pattern AcuteToneMark :: CombiningCharacter
+pattern AcuteToneMark = CombiningAcuteToneMark
+
+-- | A pattern synonym for 'CombiningGreekPerispomeni', the name without the @Combining@ part.
+pattern GreekPerispomeni :: CombiningCharacter
+pattern GreekPerispomeni = CombiningGreekPerispomeni
+
+-- | A pattern synonym for 'CombiningGreekKoronis', the name without the @Combining@ part.
+pattern GreekKoronis :: CombiningCharacter
+pattern GreekKoronis = CombiningGreekKoronis
+
+-- | A pattern synonym for 'CombiningGreekDialytikaTonos', the name without the @Combining@ part.
+pattern GreekDialytikaTonos :: CombiningCharacter
+pattern GreekDialytikaTonos = CombiningGreekDialytikaTonos
+
+-- | A pattern synonym for 'CombiningGreekYpogegrammeni', the name without the @Combining@ part.
+pattern GreekYpogegrammeni :: CombiningCharacter
+pattern GreekYpogegrammeni = CombiningGreekYpogegrammeni
+
+-- | A pattern synonym for 'CombiningBridgeAbove', the name without the @Combining@ part.
+pattern BridgeAbove :: CombiningCharacter
+pattern BridgeAbove = CombiningBridgeAbove
+
+-- | A pattern synonym for 'CombiningEqualsSignBelow', the name without the @Combining@ part.
+pattern EqualsSignBelow :: CombiningCharacter
+pattern EqualsSignBelow = CombiningEqualsSignBelow
+
+-- | A pattern synonym for 'CombiningDoubleVerticalLineBelow', the name without the @Combining@ part.
+pattern DoubleVerticalLineBelow :: CombiningCharacter
+pattern DoubleVerticalLineBelow = CombiningDoubleVerticalLineBelow
+
+-- | A pattern synonym for 'CombiningLeftAngleBelow', the name without the @Combining@ part.
+pattern LeftAngleBelow :: CombiningCharacter
+pattern LeftAngleBelow = CombiningLeftAngleBelow
+
+-- | A pattern synonym for 'CombiningNotTildeAbove', the name without the @Combining@ part.
+pattern NotTildeAbove :: CombiningCharacter
+pattern NotTildeAbove = CombiningNotTildeAbove
+
+-- | A pattern synonym for 'CombiningHomotheticAbove', the name without the @Combining@ part.
+pattern HomotheticAbove :: CombiningCharacter
+pattern HomotheticAbove = CombiningHomotheticAbove
+
+-- | A pattern synonym for 'CombiningAlmostEqualToAbove', the name without the @Combining@ part.
+pattern AlmostEqualToAbove :: CombiningCharacter
+pattern AlmostEqualToAbove = CombiningAlmostEqualToAbove
+
+-- | A pattern synonym for 'CombiningLeftRightArrowBelow', the name without the @Combining@ part.
+pattern LeftRightArrowBelow :: CombiningCharacter
+pattern LeftRightArrowBelow = CombiningLeftRightArrowBelow
+
+-- | A pattern synonym for 'CombiningUpwardsArrowBelow', the name without the @Combining@ part.
+pattern UpwardsArrowBelow :: CombiningCharacter
+pattern UpwardsArrowBelow = CombiningUpwardsArrowBelow
+
+-- | A pattern synonym for 'CombiningRightArrowheadAbove', the name without the @Combining@ part.
+pattern RightArrowheadAbove :: CombiningCharacter
+pattern RightArrowheadAbove = CombiningRightArrowheadAbove
+
+-- | A pattern synonym for 'CombiningLeftHalfRingAbove', the name without the @Combining@ part.
+pattern LeftHalfRingAbove :: CombiningCharacter
+pattern LeftHalfRingAbove = CombiningLeftHalfRingAbove
+
+-- | A pattern synonym for 'CombiningFermata', the name without the @Combining@ part.
+pattern Fermata :: CombiningCharacter
+pattern Fermata = CombiningFermata
+
+-- | A pattern synonym for 'CombiningXBelow', the name without the @Combining@ part.
+pattern XBelow :: CombiningCharacter
+pattern XBelow = CombiningXBelow
+
+-- | A pattern synonym for 'CombiningLeftArrowheadBelow', the name without the @Combining@ part.
+pattern LeftArrowheadBelow :: CombiningCharacter
+pattern LeftArrowheadBelow = CombiningLeftArrowheadBelow
+
+-- | A pattern synonym for 'CombiningRightArrowheadBelow', the name without the @Combining@ part.
+pattern RightArrowheadBelow :: CombiningCharacter
+pattern RightArrowheadBelow = CombiningRightArrowheadBelow
+
+-- | A pattern synonym for 'CombiningRightArrowheadAndUpArrowheadBelow', the name without the @Combining@ part.
+pattern RightArrowheadAndUpArrowheadBelow :: CombiningCharacter
+pattern RightArrowheadAndUpArrowheadBelow = CombiningRightArrowheadAndUpArrowheadBelow
+
+-- | A pattern synonym for 'CombiningRightHalfRingAbove', the name without the @Combining@ part.
+pattern RightHalfRingAbove :: CombiningCharacter
+pattern RightHalfRingAbove = CombiningRightHalfRingAbove
+
+-- | A pattern synonym for 'CombiningDotAboveRight', the name without the @Combining@ part.
+pattern DotAboveRight :: CombiningCharacter
+pattern DotAboveRight = CombiningDotAboveRight
+
+-- | A pattern synonym for 'CombiningAsteriskBelow', the name without the @Combining@ part.
+pattern AsteriskBelow :: CombiningCharacter
+pattern AsteriskBelow = CombiningAsteriskBelow
+
+-- | A pattern synonym for 'CombiningDoubleRingBelow', the name without the @Combining@ part.
+pattern DoubleRingBelow :: CombiningCharacter
+pattern DoubleRingBelow = CombiningDoubleRingBelow
+
+-- | A pattern synonym for 'CombiningZigzagAbove', the name without the @Combining@ part.
+pattern ZigzagAbove :: CombiningCharacter
+pattern ZigzagAbove = CombiningZigzagAbove
+
+-- | A pattern synonym for 'CombiningDoubleBreveBelow', the name without the @Combining@ part.
+pattern DoubleBreveBelow :: CombiningCharacter
+pattern DoubleBreveBelow = CombiningDoubleBreveBelow
+
+-- | A pattern synonym for 'CombiningDoubleBreve', the name without the @Combining@ part.
+pattern DoubleBreve :: CombiningCharacter
+pattern DoubleBreve = CombiningDoubleBreve
+
+-- | A pattern synonym for 'CombiningDoubleMacron', the name without the @Combining@ part.
+pattern DoubleMacron :: CombiningCharacter
+pattern DoubleMacron = CombiningDoubleMacron
+
+-- | A pattern synonym for 'CombiningDoubleMacronBelow', the name without the @Combining@ part.
+pattern DoubleMacronBelow :: CombiningCharacter
+pattern DoubleMacronBelow = CombiningDoubleMacronBelow
+
+-- | A pattern synonym for 'CombiningDoubleTilde', the name without the @Combining@ part.
+pattern DoubleTilde :: CombiningCharacter
+pattern DoubleTilde = CombiningDoubleTilde
+
+-- | A pattern synonym for 'CombiningDoubleInvertedBreve', the name without the @Combining@ part.
+pattern DoubleInvertedBreve :: CombiningCharacter
+pattern DoubleInvertedBreve = CombiningDoubleInvertedBreve
+
+-- | A pattern synonym for 'CombiningDoubleRightwardsArrowBelow', the name without the @Combining@ part.
+pattern DoubleRightwardsArrowBelow :: CombiningCharacter
+pattern DoubleRightwardsArrowBelow = CombiningDoubleRightwardsArrowBelow
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterA', the name without the @Combining@ part.
+pattern LatinSmallLetterA :: CombiningCharacter
+pattern LatinSmallLetterA = CombiningLatinSmallLetterA
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterE', the name without the @Combining@ part.
+pattern LatinSmallLetterE :: CombiningCharacter
+pattern LatinSmallLetterE = CombiningLatinSmallLetterE
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterI', the name without the @Combining@ part.
+pattern LatinSmallLetterI :: CombiningCharacter
+pattern LatinSmallLetterI = CombiningLatinSmallLetterI
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterO', the name without the @Combining@ part.
+pattern LatinSmallLetterO :: CombiningCharacter
+pattern LatinSmallLetterO = CombiningLatinSmallLetterO
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterU', the name without the @Combining@ part.
+pattern LatinSmallLetterU :: CombiningCharacter
+pattern LatinSmallLetterU = CombiningLatinSmallLetterU
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterC', the name without the @Combining@ part.
+pattern LatinSmallLetterC :: CombiningCharacter
+pattern LatinSmallLetterC = CombiningLatinSmallLetterC
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterD', the name without the @Combining@ part.
+pattern LatinSmallLetterD :: CombiningCharacter
+pattern LatinSmallLetterD = CombiningLatinSmallLetterD
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterH', the name without the @Combining@ part.
+pattern LatinSmallLetterH :: CombiningCharacter
+pattern LatinSmallLetterH = CombiningLatinSmallLetterH
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterM', the name without the @Combining@ part.
+pattern LatinSmallLetterM :: CombiningCharacter
+pattern LatinSmallLetterM = CombiningLatinSmallLetterM
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterR', the name without the @Combining@ part.
+pattern LatinSmallLetterR :: CombiningCharacter
+pattern LatinSmallLetterR = CombiningLatinSmallLetterR
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterT', the name without the @Combining@ part.
+pattern LatinSmallLetterT :: CombiningCharacter
+pattern LatinSmallLetterT = CombiningLatinSmallLetterT
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterV', the name without the @Combining@ part.
+pattern LatinSmallLetterV :: CombiningCharacter
+pattern LatinSmallLetterV = CombiningLatinSmallLetterV
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterX', the name without the @Combining@ part.
+pattern LatinSmallLetterX :: CombiningCharacter
+pattern LatinSmallLetterX = CombiningLatinSmallLetterX
+
+-- | A pattern synonym for 'CombiningCyrillicTitlo', the name without the @Combining@ part.
+pattern CyrillicTitlo :: CombiningCharacter
+pattern CyrillicTitlo = CombiningCyrillicTitlo
+
+-- | A pattern synonym for 'CombiningCyrillicPalatalization', the name without the @Combining@ part.
+pattern CyrillicPalatalization :: CombiningCharacter
+pattern CyrillicPalatalization = CombiningCyrillicPalatalization
+
+-- | A pattern synonym for 'CombiningCyrillicDasiaPneumata', the name without the @Combining@ part.
+pattern CyrillicDasiaPneumata :: CombiningCharacter
+pattern CyrillicDasiaPneumata = CombiningCyrillicDasiaPneumata
+
+-- | A pattern synonym for 'CombiningCyrillicPsiliPneumata', the name without the @Combining@ part.
+pattern CyrillicPsiliPneumata :: CombiningCharacter
+pattern CyrillicPsiliPneumata = CombiningCyrillicPsiliPneumata
+
+-- | A pattern synonym for 'CombiningCyrillicPokrytie', the name without the @Combining@ part.
+pattern CyrillicPokrytie :: CombiningCharacter
+pattern CyrillicPokrytie = CombiningCyrillicPokrytie
+
+-- | A pattern synonym for 'NkoCombiningShortHighTone', the name without the @Combining@ part.
+pattern NkoShortHighTone :: CombiningCharacter
+pattern NkoShortHighTone = NkoCombiningShortHighTone
+
+-- | A pattern synonym for 'NkoCombiningShortLowTone', the name without the @Combining@ part.
+pattern NkoShortLowTone :: CombiningCharacter
+pattern NkoShortLowTone = NkoCombiningShortLowTone
+
+-- | A pattern synonym for 'NkoCombiningShortRisingTone', the name without the @Combining@ part.
+pattern NkoShortRisingTone :: CombiningCharacter
+pattern NkoShortRisingTone = NkoCombiningShortRisingTone
+
+-- | A pattern synonym for 'NkoCombiningLongDescendingTone', the name without the @Combining@ part.
+pattern NkoLongDescendingTone :: CombiningCharacter
+pattern NkoLongDescendingTone = NkoCombiningLongDescendingTone
+
+-- | A pattern synonym for 'NkoCombiningLongHighTone', the name without the @Combining@ part.
+pattern NkoLongHighTone :: CombiningCharacter
+pattern NkoLongHighTone = NkoCombiningLongHighTone
+
+-- | A pattern synonym for 'NkoCombiningLongLowTone', the name without the @Combining@ part.
+pattern NkoLongLowTone :: CombiningCharacter
+pattern NkoLongLowTone = NkoCombiningLongLowTone
+
+-- | A pattern synonym for 'NkoCombiningLongRisingTone', the name without the @Combining@ part.
+pattern NkoLongRisingTone :: CombiningCharacter
+pattern NkoLongRisingTone = NkoCombiningLongRisingTone
+
+-- | A pattern synonym for 'NkoCombiningNasalizationMark', the name without the @Combining@ part.
+pattern NkoNasalizationMark :: CombiningCharacter
+pattern NkoNasalizationMark = NkoCombiningNasalizationMark
+
+-- | A pattern synonym for 'NkoCombiningDoubleDotAbove', the name without the @Combining@ part.
+pattern NkoDoubleDotAbove :: CombiningCharacter
+pattern NkoDoubleDotAbove = NkoCombiningDoubleDotAbove
+
+-- | A pattern synonym for 'EthiopicCombiningGeminationAndVowelLengthMark', the name without the @Combining@ part.
+pattern EthiopicGeminationAndVowelLengthMark :: CombiningCharacter
+pattern EthiopicGeminationAndVowelLengthMark = EthiopicCombiningGeminationAndVowelLengthMark
+
+-- | A pattern synonym for 'EthiopicCombiningVowelLengthMark', the name without the @Combining@ part.
+pattern EthiopicVowelLengthMark :: CombiningCharacter
+pattern EthiopicVowelLengthMark = EthiopicCombiningVowelLengthMark
+
+-- | A pattern synonym for 'EthiopicCombiningGeminationMark', the name without the @Combining@ part.
+pattern EthiopicGeminationMark :: CombiningCharacter
+pattern EthiopicGeminationMark = EthiopicCombiningGeminationMark
+
+-- | A pattern synonym for 'TaiThamCombiningCryptogrammicDot', the name without the @Combining@ part.
+pattern TaiThamCryptogrammicDot :: CombiningCharacter
+pattern TaiThamCryptogrammicDot = TaiThamCombiningCryptogrammicDot
+
+-- | A pattern synonym for 'CombiningDoubledCircumflexAccent', the name without the @Combining@ part.
+pattern DoubledCircumflexAccent :: CombiningCharacter
+pattern DoubledCircumflexAccent = CombiningDoubledCircumflexAccent
+
+-- | A pattern synonym for 'CombiningDiaeresisRing', the name without the @Combining@ part.
+pattern DiaeresisRing :: CombiningCharacter
+pattern DiaeresisRing = CombiningDiaeresisRing
+
+-- | A pattern synonym for 'CombiningInfinity', the name without the @Combining@ part.
+pattern Infinity :: CombiningCharacter
+pattern Infinity = CombiningInfinity
+
+-- | A pattern synonym for 'CombiningDownwardsArrow', the name without the @Combining@ part.
+pattern DownwardsArrow :: CombiningCharacter
+pattern DownwardsArrow = CombiningDownwardsArrow
+
+-- | A pattern synonym for 'CombiningTripleDot', the name without the @Combining@ part.
+pattern TripleDot :: CombiningCharacter
+pattern TripleDot = CombiningTripleDot
+
+-- | A pattern synonym for 'CombiningXXBelow', the name without the @Combining@ part.
+pattern XXBelow :: CombiningCharacter
+pattern XXBelow = CombiningXXBelow
+
+-- | A pattern synonym for 'CombiningWigglyLineBelow', the name without the @Combining@ part.
+pattern WigglyLineBelow :: CombiningCharacter
+pattern WigglyLineBelow = CombiningWigglyLineBelow
+
+-- | A pattern synonym for 'CombiningOpenMarkBelow', the name without the @Combining@ part.
+pattern OpenMarkBelow :: CombiningCharacter
+pattern OpenMarkBelow = CombiningOpenMarkBelow
+
+-- | A pattern synonym for 'CombiningDoubleOpenMarkBelow', the name without the @Combining@ part.
+pattern DoubleOpenMarkBelow :: CombiningCharacter
+pattern DoubleOpenMarkBelow = CombiningDoubleOpenMarkBelow
+
+-- | A pattern synonym for 'CombiningLightCentralizationStrokeBelow', the name without the @Combining@ part.
+pattern LightCentralizationStrokeBelow :: CombiningCharacter
+pattern LightCentralizationStrokeBelow = CombiningLightCentralizationStrokeBelow
+
+-- | A pattern synonym for 'CombiningStrongCentralizationStrokeBelow', the name without the @Combining@ part.
+pattern StrongCentralizationStrokeBelow :: CombiningCharacter
+pattern StrongCentralizationStrokeBelow = CombiningStrongCentralizationStrokeBelow
+
+-- | A pattern synonym for 'CombiningParenthesesAbove', the name without the @Combining@ part.
+pattern ParenthesesAbove :: CombiningCharacter
+pattern ParenthesesAbove = CombiningParenthesesAbove
+
+-- | A pattern synonym for 'CombiningDoubleParenthesesAbove', the name without the @Combining@ part.
+pattern DoubleParenthesesAbove :: CombiningCharacter
+pattern DoubleParenthesesAbove = CombiningDoubleParenthesesAbove
+
+-- | A pattern synonym for 'CombiningParenthesesBelow', the name without the @Combining@ part.
+pattern ParenthesesBelow :: CombiningCharacter
+pattern ParenthesesBelow = CombiningParenthesesBelow
+
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningTegeh', the name without the @Combining@ part.
+pattern BalineseMusicalSymbolTegeh :: CombiningCharacter
+pattern BalineseMusicalSymbolTegeh = BalineseMusicalSymbolCombiningTegeh
+
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningEndep', the name without the @Combining@ part.
+pattern BalineseMusicalSymbolEndep :: CombiningCharacter
+pattern BalineseMusicalSymbolEndep = BalineseMusicalSymbolCombiningEndep
+
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningKempul', the name without the @Combining@ part.
+pattern BalineseMusicalSymbolKempul :: CombiningCharacter
+pattern BalineseMusicalSymbolKempul = BalineseMusicalSymbolCombiningKempul
+
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningKempli', the name without the @Combining@ part.
+pattern BalineseMusicalSymbolKempli :: CombiningCharacter
+pattern BalineseMusicalSymbolKempli = BalineseMusicalSymbolCombiningKempli
+
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningJegogan', the name without the @Combining@ part.
+pattern BalineseMusicalSymbolJegogan :: CombiningCharacter
+pattern BalineseMusicalSymbolJegogan = BalineseMusicalSymbolCombiningJegogan
+
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningKempulWithJegogan', the name without the @Combining@ part.
+pattern BalineseMusicalSymbolKempulWithJegogan :: CombiningCharacter
+pattern BalineseMusicalSymbolKempulWithJegogan = BalineseMusicalSymbolCombiningKempulWithJegogan
+
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningKempliWithJegogan', the name without the @Combining@ part.
+pattern BalineseMusicalSymbolKempliWithJegogan :: CombiningCharacter
+pattern BalineseMusicalSymbolKempliWithJegogan = BalineseMusicalSymbolCombiningKempliWithJegogan
+
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningBende', the name without the @Combining@ part.
+pattern BalineseMusicalSymbolBende :: CombiningCharacter
+pattern BalineseMusicalSymbolBende = BalineseMusicalSymbolCombiningBende
+
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningGong', the name without the @Combining@ part.
+pattern BalineseMusicalSymbolGong :: CombiningCharacter
+pattern BalineseMusicalSymbolGong = BalineseMusicalSymbolCombiningGong
+
+-- | A pattern synonym for 'CombiningDottedGraveAccent', the name without the @Combining@ part.
+pattern DottedGraveAccent :: CombiningCharacter
+pattern DottedGraveAccent = CombiningDottedGraveAccent
+
+-- | A pattern synonym for 'CombiningDottedAcuteAccent', the name without the @Combining@ part.
+pattern DottedAcuteAccent :: CombiningCharacter
+pattern DottedAcuteAccent = CombiningDottedAcuteAccent
+
+-- | A pattern synonym for 'CombiningSnakeBelow', the name without the @Combining@ part.
+pattern SnakeBelow :: CombiningCharacter
+pattern SnakeBelow = CombiningSnakeBelow
+
+-- | A pattern synonym for 'CombiningSuspensionMark', the name without the @Combining@ part.
+pattern SuspensionMark :: CombiningCharacter
+pattern SuspensionMark = CombiningSuspensionMark
+
+-- | A pattern synonym for 'CombiningMacronAcute', the name without the @Combining@ part.
+pattern MacronAcute :: CombiningCharacter
+pattern MacronAcute = CombiningMacronAcute
+
+-- | A pattern synonym for 'CombiningGraveMacron', the name without the @Combining@ part.
+pattern GraveMacron :: CombiningCharacter
+pattern GraveMacron = CombiningGraveMacron
+
+-- | A pattern synonym for 'CombiningMacronGrave', the name without the @Combining@ part.
+pattern MacronGrave :: CombiningCharacter
+pattern MacronGrave = CombiningMacronGrave
+
+-- | A pattern synonym for 'CombiningAcuteMacron', the name without the @Combining@ part.
+pattern AcuteMacron :: CombiningCharacter
+pattern AcuteMacron = CombiningAcuteMacron
+
+-- | A pattern synonym for 'CombiningGraveAcuteGrave', the name without the @Combining@ part.
+pattern GraveAcuteGrave :: CombiningCharacter
+pattern GraveAcuteGrave = CombiningGraveAcuteGrave
+
+-- | A pattern synonym for 'CombiningAcuteGraveAcute', the name without the @Combining@ part.
+pattern AcuteGraveAcute :: CombiningCharacter
+pattern AcuteGraveAcute = CombiningAcuteGraveAcute
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterRBelow', the name without the @Combining@ part.
+pattern LatinSmallLetterRBelow :: CombiningCharacter
+pattern LatinSmallLetterRBelow = CombiningLatinSmallLetterRBelow
+
+-- | A pattern synonym for 'CombiningBreveMacron', the name without the @Combining@ part.
+pattern BreveMacron :: CombiningCharacter
+pattern BreveMacron = CombiningBreveMacron
+
+-- | A pattern synonym for 'CombiningMacronBreve', the name without the @Combining@ part.
+pattern MacronBreve :: CombiningCharacter
+pattern MacronBreve = CombiningMacronBreve
+
+-- | A pattern synonym for 'CombiningDoubleCircumflexAbove', the name without the @Combining@ part.
+pattern DoubleCircumflexAbove :: CombiningCharacter
+pattern DoubleCircumflexAbove = CombiningDoubleCircumflexAbove
+
+-- | A pattern synonym for 'CombiningOgonekAbove', the name without the @Combining@ part.
+pattern OgonekAbove :: CombiningCharacter
+pattern OgonekAbove = CombiningOgonekAbove
+
+-- | A pattern synonym for 'CombiningZigzagBelow', the name without the @Combining@ part.
+pattern ZigzagBelow :: CombiningCharacter
+pattern ZigzagBelow = CombiningZigzagBelow
+
+-- | A pattern synonym for 'CombiningIsBelow', the name without the @Combining@ part.
+pattern IsBelow :: CombiningCharacter
+pattern IsBelow = CombiningIsBelow
+
+-- | A pattern synonym for 'CombiningUrAbove', the name without the @Combining@ part.
+pattern UrAbove :: CombiningCharacter
+pattern UrAbove = CombiningUrAbove
+
+-- | A pattern synonym for 'CombiningUsAbove', the name without the @Combining@ part.
+pattern UsAbove :: CombiningCharacter
+pattern UsAbove = CombiningUsAbove
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterFlattenedOpenAAbove', the name without the @Combining@ part.
+pattern LatinSmallLetterFlattenedOpenAAbove :: CombiningCharacter
+pattern LatinSmallLetterFlattenedOpenAAbove = CombiningLatinSmallLetterFlattenedOpenAAbove
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterAe', the name without the @Combining@ part.
+pattern LatinSmallLetterAe :: CombiningCharacter
+pattern LatinSmallLetterAe = CombiningLatinSmallLetterAe
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterAo', the name without the @Combining@ part.
+pattern LatinSmallLetterAo :: CombiningCharacter
+pattern LatinSmallLetterAo = CombiningLatinSmallLetterAo
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterAv', the name without the @Combining@ part.
+pattern LatinSmallLetterAv :: CombiningCharacter
+pattern LatinSmallLetterAv = CombiningLatinSmallLetterAv
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterCCedilla', the name without the @Combining@ part.
+pattern LatinSmallLetterCCedilla :: CombiningCharacter
+pattern LatinSmallLetterCCedilla = CombiningLatinSmallLetterCCedilla
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterInsularD', the name without the @Combining@ part.
+pattern LatinSmallLetterInsularD :: CombiningCharacter
+pattern LatinSmallLetterInsularD = CombiningLatinSmallLetterInsularD
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterEth', the name without the @Combining@ part.
+pattern LatinSmallLetterEth :: CombiningCharacter
+pattern LatinSmallLetterEth = CombiningLatinSmallLetterEth
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterG', the name without the @Combining@ part.
+pattern LatinSmallLetterG :: CombiningCharacter
+pattern LatinSmallLetterG = CombiningLatinSmallLetterG
+
+-- | A pattern synonym for 'CombiningLatinLetterSmallCapitalG', the name without the @Combining@ part.
+pattern LatinLetterSmallCapitalG :: CombiningCharacter
+pattern LatinLetterSmallCapitalG = CombiningLatinLetterSmallCapitalG
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterK', the name without the @Combining@ part.
+pattern LatinSmallLetterK :: CombiningCharacter
+pattern LatinSmallLetterK = CombiningLatinSmallLetterK
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterL', the name without the @Combining@ part.
+pattern LatinSmallLetterL :: CombiningCharacter
+pattern LatinSmallLetterL = CombiningLatinSmallLetterL
+
+-- | A pattern synonym for 'CombiningLatinLetterSmallCapitalL', the name without the @Combining@ part.
+pattern LatinLetterSmallCapitalL :: CombiningCharacter
+pattern LatinLetterSmallCapitalL = CombiningLatinLetterSmallCapitalL
+
+-- | A pattern synonym for 'CombiningLatinLetterSmallCapitalM', the name without the @Combining@ part.
+pattern LatinLetterSmallCapitalM :: CombiningCharacter
+pattern LatinLetterSmallCapitalM = CombiningLatinLetterSmallCapitalM
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterN', the name without the @Combining@ part.
+pattern LatinSmallLetterN :: CombiningCharacter
+pattern LatinSmallLetterN = CombiningLatinSmallLetterN
+
+-- | A pattern synonym for 'CombiningLatinLetterSmallCapitalN', the name without the @Combining@ part.
+pattern LatinLetterSmallCapitalN :: CombiningCharacter
+pattern LatinLetterSmallCapitalN = CombiningLatinLetterSmallCapitalN
+
+-- | A pattern synonym for 'CombiningLatinLetterSmallCapitalR', the name without the @Combining@ part.
+pattern LatinLetterSmallCapitalR :: CombiningCharacter
+pattern LatinLetterSmallCapitalR = CombiningLatinLetterSmallCapitalR
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterRRotunda', the name without the @Combining@ part.
+pattern LatinSmallLetterRRotunda :: CombiningCharacter
+pattern LatinSmallLetterRRotunda = CombiningLatinSmallLetterRRotunda
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterS', the name without the @Combining@ part.
+pattern LatinSmallLetterS :: CombiningCharacter
+pattern LatinSmallLetterS = CombiningLatinSmallLetterS
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterLongS', the name without the @Combining@ part.
+pattern LatinSmallLetterLongS :: CombiningCharacter
+pattern LatinSmallLetterLongS = CombiningLatinSmallLetterLongS
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterZ', the name without the @Combining@ part.
+pattern LatinSmallLetterZ :: CombiningCharacter
+pattern LatinSmallLetterZ = CombiningLatinSmallLetterZ
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterAlpha', the name without the @Combining@ part.
+pattern LatinSmallLetterAlpha :: CombiningCharacter
+pattern LatinSmallLetterAlpha = CombiningLatinSmallLetterAlpha
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterB', the name without the @Combining@ part.
+pattern LatinSmallLetterB :: CombiningCharacter
+pattern LatinSmallLetterB = CombiningLatinSmallLetterB
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterBeta', the name without the @Combining@ part.
+pattern LatinSmallLetterBeta :: CombiningCharacter
+pattern LatinSmallLetterBeta = CombiningLatinSmallLetterBeta
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterSchwa', the name without the @Combining@ part.
+pattern LatinSmallLetterSchwa :: CombiningCharacter
+pattern LatinSmallLetterSchwa = CombiningLatinSmallLetterSchwa
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterF', the name without the @Combining@ part.
+pattern LatinSmallLetterF :: CombiningCharacter
+pattern LatinSmallLetterF = CombiningLatinSmallLetterF
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterLWithDoubleMiddleTilde', the name without the @Combining@ part.
+pattern LatinSmallLetterLWithDoubleMiddleTilde :: CombiningCharacter
+pattern LatinSmallLetterLWithDoubleMiddleTilde = CombiningLatinSmallLetterLWithDoubleMiddleTilde
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterOWithLightCentralizationStroke', the name without the @Combining@ part.
+pattern LatinSmallLetterOWithLightCentralizationStroke :: CombiningCharacter
+pattern LatinSmallLetterOWithLightCentralizationStroke = CombiningLatinSmallLetterOWithLightCentralizationStroke
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterP', the name without the @Combining@ part.
+pattern LatinSmallLetterP :: CombiningCharacter
+pattern LatinSmallLetterP = CombiningLatinSmallLetterP
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterEsh', the name without the @Combining@ part.
+pattern LatinSmallLetterEsh :: CombiningCharacter
+pattern LatinSmallLetterEsh = CombiningLatinSmallLetterEsh
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterUWithLightCentralizationStroke', the name without the @Combining@ part.
+pattern LatinSmallLetterUWithLightCentralizationStroke :: CombiningCharacter
+pattern LatinSmallLetterUWithLightCentralizationStroke = CombiningLatinSmallLetterUWithLightCentralizationStroke
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterW', the name without the @Combining@ part.
+pattern LatinSmallLetterW :: CombiningCharacter
+pattern LatinSmallLetterW = CombiningLatinSmallLetterW
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterAWithDiaeresis', the name without the @Combining@ part.
+pattern LatinSmallLetterAWithDiaeresis :: CombiningCharacter
+pattern LatinSmallLetterAWithDiaeresis = CombiningLatinSmallLetterAWithDiaeresis
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterOWithDiaeresis', the name without the @Combining@ part.
+pattern LatinSmallLetterOWithDiaeresis :: CombiningCharacter
+pattern LatinSmallLetterOWithDiaeresis = CombiningLatinSmallLetterOWithDiaeresis
+
+-- | A pattern synonym for 'CombiningLatinSmallLetterUWithDiaeresis', the name without the @Combining@ part.
+pattern LatinSmallLetterUWithDiaeresis :: CombiningCharacter
+pattern LatinSmallLetterUWithDiaeresis = CombiningLatinSmallLetterUWithDiaeresis
+
+-- | A pattern synonym for 'CombiningUpTackAbove', the name without the @Combining@ part.
+pattern UpTackAbove :: CombiningCharacter
+pattern UpTackAbove = CombiningUpTackAbove
+
+-- | A pattern synonym for 'CombiningDeletionMark', the name without the @Combining@ part.
+pattern DeletionMark :: CombiningCharacter
+pattern DeletionMark = CombiningDeletionMark
+
+-- | A pattern synonym for 'CombiningDoubleInvertedBreveBelow', the name without the @Combining@ part.
+pattern DoubleInvertedBreveBelow :: CombiningCharacter
+pattern DoubleInvertedBreveBelow = CombiningDoubleInvertedBreveBelow
+
+-- | A pattern synonym for 'CombiningAlmostEqualToBelow', the name without the @Combining@ part.
+pattern AlmostEqualToBelow :: CombiningCharacter
+pattern AlmostEqualToBelow = CombiningAlmostEqualToBelow
+
+-- | A pattern synonym for 'CombiningLeftArrowheadAbove', the name without the @Combining@ part.
+pattern LeftArrowheadAbove :: CombiningCharacter
+pattern LeftArrowheadAbove = CombiningLeftArrowheadAbove
+
+-- | A pattern synonym for 'CombiningRightArrowheadAndDownArrowheadBelow', the name without the @Combining@ part.
+pattern RightArrowheadAndDownArrowheadBelow :: CombiningCharacter
+pattern RightArrowheadAndDownArrowheadBelow = CombiningRightArrowheadAndDownArrowheadBelow
+
+-- | A pattern synonym for 'CombiningLeftHarpoonAbove', the name without the @Combining@ part.
+pattern LeftHarpoonAbove :: CombiningCharacter
+pattern LeftHarpoonAbove = CombiningLeftHarpoonAbove
+
+-- | A pattern synonym for 'CombiningRightHarpoonAbove', the name without the @Combining@ part.
+pattern RightHarpoonAbove :: CombiningCharacter
+pattern RightHarpoonAbove = CombiningRightHarpoonAbove
+
+-- | A pattern synonym for 'CombiningLongVerticalLineOverlay', the name without the @Combining@ part.
+pattern LongVerticalLineOverlay :: CombiningCharacter
+pattern LongVerticalLineOverlay = CombiningLongVerticalLineOverlay
+
+-- | A pattern synonym for 'CombiningShortVerticalLineOverlay', the name without the @Combining@ part.
+pattern ShortVerticalLineOverlay :: CombiningCharacter
+pattern ShortVerticalLineOverlay = CombiningShortVerticalLineOverlay
+
+-- | A pattern synonym for 'CombiningAnticlockwiseArrowAbove', the name without the @Combining@ part.
+pattern AnticlockwiseArrowAbove :: CombiningCharacter
+pattern AnticlockwiseArrowAbove = CombiningAnticlockwiseArrowAbove
+
+-- | A pattern synonym for 'CombiningClockwiseArrowAbove', the name without the @Combining@ part.
+pattern ClockwiseArrowAbove :: CombiningCharacter
+pattern ClockwiseArrowAbove = CombiningClockwiseArrowAbove
+
+-- | A pattern synonym for 'CombiningLeftArrowAbove', the name without the @Combining@ part.
+pattern LeftArrowAbove :: CombiningCharacter
+pattern LeftArrowAbove = CombiningLeftArrowAbove
+
+-- | A pattern synonym for 'CombiningRightArrowAbove', the name without the @Combining@ part.
+pattern RightArrowAbove :: CombiningCharacter
+pattern RightArrowAbove = CombiningRightArrowAbove
+
+-- | A pattern synonym for 'CombiningRingOverlay', the name without the @Combining@ part.
+pattern RingOverlay :: CombiningCharacter
+pattern RingOverlay = CombiningRingOverlay
+
+-- | A pattern synonym for 'CombiningClockwiseRingOverlay', the name without the @Combining@ part.
+pattern ClockwiseRingOverlay :: CombiningCharacter
+pattern ClockwiseRingOverlay = CombiningClockwiseRingOverlay
+
+-- | A pattern synonym for 'CombiningAnticlockwiseRingOverlay', the name without the @Combining@ part.
+pattern AnticlockwiseRingOverlay :: CombiningCharacter
+pattern AnticlockwiseRingOverlay = CombiningAnticlockwiseRingOverlay
+
+-- | A pattern synonym for 'CombiningThreeDotsAbove', the name without the @Combining@ part.
+pattern ThreeDotsAbove :: CombiningCharacter
+pattern ThreeDotsAbove = CombiningThreeDotsAbove
+
+-- | A pattern synonym for 'CombiningFourDotsAbove', the name without the @Combining@ part.
+pattern FourDotsAbove :: CombiningCharacter
+pattern FourDotsAbove = CombiningFourDotsAbove
+
+-- | A pattern synonym for 'CombiningLeftRightArrowAbove', the name without the @Combining@ part.
+pattern LeftRightArrowAbove :: CombiningCharacter
+pattern LeftRightArrowAbove = CombiningLeftRightArrowAbove
+
+-- | A pattern synonym for 'CombiningReverseSolidusOverlay', the name without the @Combining@ part.
+pattern ReverseSolidusOverlay :: CombiningCharacter
+pattern ReverseSolidusOverlay = CombiningReverseSolidusOverlay
+
+-- | A pattern synonym for 'CombiningDoubleVerticalStrokeOverlay', the name without the @Combining@ part.
+pattern DoubleVerticalStrokeOverlay :: CombiningCharacter
+pattern DoubleVerticalStrokeOverlay = CombiningDoubleVerticalStrokeOverlay
+
+-- | A pattern synonym for 'CombiningAnnuitySymbol', the name without the @Combining@ part.
+pattern AnnuitySymbol :: CombiningCharacter
+pattern AnnuitySymbol = CombiningAnnuitySymbol
+
+-- | A pattern synonym for 'CombiningTripleUnderdot', the name without the @Combining@ part.
+pattern TripleUnderdot :: CombiningCharacter
+pattern TripleUnderdot = CombiningTripleUnderdot
+
+-- | A pattern synonym for 'CombiningWideBridgeAbove', the name without the @Combining@ part.
+pattern WideBridgeAbove :: CombiningCharacter
+pattern WideBridgeAbove = CombiningWideBridgeAbove
+
+-- | A pattern synonym for 'CombiningLeftwardsArrowOverlay', the name without the @Combining@ part.
+pattern LeftwardsArrowOverlay :: CombiningCharacter
+pattern LeftwardsArrowOverlay = CombiningLeftwardsArrowOverlay
+
+-- | A pattern synonym for 'CombiningLongDoubleSolidusOverlay', the name without the @Combining@ part.
+pattern LongDoubleSolidusOverlay :: CombiningCharacter
+pattern LongDoubleSolidusOverlay = CombiningLongDoubleSolidusOverlay
+
+-- | A pattern synonym for 'CombiningRightwardsHarpoonWithBarbDownwards', the name without the @Combining@ part.
+pattern RightwardsHarpoonWithBarbDownwards :: CombiningCharacter
+pattern RightwardsHarpoonWithBarbDownwards = CombiningRightwardsHarpoonWithBarbDownwards
+
+-- | A pattern synonym for 'CombiningLeftwardsHarpoonWithBarbDownwards', the name without the @Combining@ part.
+pattern LeftwardsHarpoonWithBarbDownwards :: CombiningCharacter
+pattern LeftwardsHarpoonWithBarbDownwards = CombiningLeftwardsHarpoonWithBarbDownwards
+
+-- | A pattern synonym for 'CombiningLeftArrowBelow', the name without the @Combining@ part.
+pattern LeftArrowBelow :: CombiningCharacter
+pattern LeftArrowBelow = CombiningLeftArrowBelow
+
+-- | A pattern synonym for 'CombiningRightArrowBelow', the name without the @Combining@ part.
+pattern RightArrowBelow :: CombiningCharacter
+pattern RightArrowBelow = CombiningRightArrowBelow
+
+-- | A pattern synonym for 'CombiningAsteriskAbove', the name without the @Combining@ part.
+pattern AsteriskAbove :: CombiningCharacter
+pattern AsteriskAbove = CombiningAsteriskAbove
+
+-- | A pattern synonym for 'CopticCombiningNiAbove', the name without the @Combining@ part.
+pattern CopticNiAbove :: CombiningCharacter
+pattern CopticNiAbove = CopticCombiningNiAbove
+
+-- | A pattern synonym for 'CopticCombiningSpiritusAsper', the name without the @Combining@ part.
+pattern CopticSpiritusAsper :: CombiningCharacter
+pattern CopticSpiritusAsper = CopticCombiningSpiritusAsper
+
+-- | A pattern synonym for 'CopticCombiningSpiritusLenis', the name without the @Combining@ part.
+pattern CopticSpiritusLenis :: CombiningCharacter
+pattern CopticSpiritusLenis = CopticCombiningSpiritusLenis
+
+-- | A pattern synonym for 'CombiningCyrillicLetterBe', the name without the @Combining@ part.
+pattern CyrillicLetterBe :: CombiningCharacter
+pattern CyrillicLetterBe = CombiningCyrillicLetterBe
+
+-- | A pattern synonym for 'CombiningCyrillicLetterVe', the name without the @Combining@ part.
+pattern CyrillicLetterVe :: CombiningCharacter
+pattern CyrillicLetterVe = CombiningCyrillicLetterVe
+
+-- | A pattern synonym for 'CombiningCyrillicLetterGhe', the name without the @Combining@ part.
+pattern CyrillicLetterGhe :: CombiningCharacter
+pattern CyrillicLetterGhe = CombiningCyrillicLetterGhe
+
+-- | A pattern synonym for 'CombiningCyrillicLetterDe', the name without the @Combining@ part.
+pattern CyrillicLetterDe :: CombiningCharacter
+pattern CyrillicLetterDe = CombiningCyrillicLetterDe
+
+-- | A pattern synonym for 'CombiningCyrillicLetterZhe', the name without the @Combining@ part.
+pattern CyrillicLetterZhe :: CombiningCharacter
+pattern CyrillicLetterZhe = CombiningCyrillicLetterZhe
+
+-- | A pattern synonym for 'CombiningCyrillicLetterZe', the name without the @Combining@ part.
+pattern CyrillicLetterZe :: CombiningCharacter
+pattern CyrillicLetterZe = CombiningCyrillicLetterZe
+
+-- | A pattern synonym for 'CombiningCyrillicLetterKa', the name without the @Combining@ part.
+pattern CyrillicLetterKa :: CombiningCharacter
+pattern CyrillicLetterKa = CombiningCyrillicLetterKa
+
+-- | A pattern synonym for 'CombiningCyrillicLetterEl', the name without the @Combining@ part.
+pattern CyrillicLetterEl :: CombiningCharacter
+pattern CyrillicLetterEl = CombiningCyrillicLetterEl
+
+-- | A pattern synonym for 'CombiningCyrillicLetterEm', the name without the @Combining@ part.
+pattern CyrillicLetterEm :: CombiningCharacter
+pattern CyrillicLetterEm = CombiningCyrillicLetterEm
+
+-- | A pattern synonym for 'CombiningCyrillicLetterEn', the name without the @Combining@ part.
+pattern CyrillicLetterEn :: CombiningCharacter
+pattern CyrillicLetterEn = CombiningCyrillicLetterEn
+
+-- | A pattern synonym for 'CombiningCyrillicLetterO', the name without the @Combining@ part.
+pattern CyrillicLetterO :: CombiningCharacter
+pattern CyrillicLetterO = CombiningCyrillicLetterO
+
+-- | A pattern synonym for 'CombiningCyrillicLetterPe', the name without the @Combining@ part.
+pattern CyrillicLetterPe :: CombiningCharacter
+pattern CyrillicLetterPe = CombiningCyrillicLetterPe
+
+-- | A pattern synonym for 'CombiningCyrillicLetterEr', the name without the @Combining@ part.
+pattern CyrillicLetterEr :: CombiningCharacter
+pattern CyrillicLetterEr = CombiningCyrillicLetterEr
+
+-- | A pattern synonym for 'CombiningCyrillicLetterEs', the name without the @Combining@ part.
+pattern CyrillicLetterEs :: CombiningCharacter
+pattern CyrillicLetterEs = CombiningCyrillicLetterEs
+
+-- | A pattern synonym for 'CombiningCyrillicLetterTe', the name without the @Combining@ part.
+pattern CyrillicLetterTe :: CombiningCharacter
+pattern CyrillicLetterTe = CombiningCyrillicLetterTe
+
+-- | A pattern synonym for 'CombiningCyrillicLetterHa', the name without the @Combining@ part.
+pattern CyrillicLetterHa :: CombiningCharacter
+pattern CyrillicLetterHa = CombiningCyrillicLetterHa
+
+-- | A pattern synonym for 'CombiningCyrillicLetterTse', the name without the @Combining@ part.
+pattern CyrillicLetterTse :: CombiningCharacter
+pattern CyrillicLetterTse = CombiningCyrillicLetterTse
+
+-- | A pattern synonym for 'CombiningCyrillicLetterChe', the name without the @Combining@ part.
+pattern CyrillicLetterChe :: CombiningCharacter
+pattern CyrillicLetterChe = CombiningCyrillicLetterChe
+
+-- | A pattern synonym for 'CombiningCyrillicLetterSha', the name without the @Combining@ part.
+pattern CyrillicLetterSha :: CombiningCharacter
+pattern CyrillicLetterSha = CombiningCyrillicLetterSha
+
+-- | A pattern synonym for 'CombiningCyrillicLetterShcha', the name without the @Combining@ part.
+pattern CyrillicLetterShcha :: CombiningCharacter
+pattern CyrillicLetterShcha = CombiningCyrillicLetterShcha
+
+-- | A pattern synonym for 'CombiningCyrillicLetterFita', the name without the @Combining@ part.
+pattern CyrillicLetterFita :: CombiningCharacter
+pattern CyrillicLetterFita = CombiningCyrillicLetterFita
+
+-- | A pattern synonym for 'CombiningCyrillicLetterEsTe', the name without the @Combining@ part.
+pattern CyrillicLetterEsTe :: CombiningCharacter
+pattern CyrillicLetterEsTe = CombiningCyrillicLetterEsTe
+
+-- | A pattern synonym for 'CombiningCyrillicLetterA', the name without the @Combining@ part.
+pattern CyrillicLetterA :: CombiningCharacter
+pattern CyrillicLetterA = CombiningCyrillicLetterA
+
+-- | A pattern synonym for 'CombiningCyrillicLetterIe', the name without the @Combining@ part.
+pattern CyrillicLetterIe :: CombiningCharacter
+pattern CyrillicLetterIe = CombiningCyrillicLetterIe
+
+-- | A pattern synonym for 'CombiningCyrillicLetterDjerv', the name without the @Combining@ part.
+pattern CyrillicLetterDjerv :: CombiningCharacter
+pattern CyrillicLetterDjerv = CombiningCyrillicLetterDjerv
+
+-- | A pattern synonym for 'CombiningCyrillicLetterMonographUk', the name without the @Combining@ part.
+pattern CyrillicLetterMonographUk :: CombiningCharacter
+pattern CyrillicLetterMonographUk = CombiningCyrillicLetterMonographUk
+
+-- | A pattern synonym for 'CombiningCyrillicLetterYat', the name without the @Combining@ part.
+pattern CyrillicLetterYat :: CombiningCharacter
+pattern CyrillicLetterYat = CombiningCyrillicLetterYat
+
+-- | A pattern synonym for 'CombiningCyrillicLetterYu', the name without the @Combining@ part.
+pattern CyrillicLetterYu :: CombiningCharacter
+pattern CyrillicLetterYu = CombiningCyrillicLetterYu
+
+-- | A pattern synonym for 'CombiningCyrillicLetterIotifiedA', the name without the @Combining@ part.
+pattern CyrillicLetterIotifiedA :: CombiningCharacter
+pattern CyrillicLetterIotifiedA = CombiningCyrillicLetterIotifiedA
+
+-- | A pattern synonym for 'CombiningCyrillicLetterLittleYus', the name without the @Combining@ part.
+pattern CyrillicLetterLittleYus :: CombiningCharacter
+pattern CyrillicLetterLittleYus = CombiningCyrillicLetterLittleYus
+
+-- | A pattern synonym for 'CombiningCyrillicLetterBigYus', the name without the @Combining@ part.
+pattern CyrillicLetterBigYus :: CombiningCharacter
+pattern CyrillicLetterBigYus = CombiningCyrillicLetterBigYus
+
+-- | A pattern synonym for 'CombiningCyrillicLetterIotifiedBigYus', the name without the @Combining@ part.
+pattern CyrillicLetterIotifiedBigYus :: CombiningCharacter
+pattern CyrillicLetterIotifiedBigYus = CombiningCyrillicLetterIotifiedBigYus
+
+-- | A pattern synonym for 'CombiningKatakanaHiraganaVoicedSoundMark', the name without the @Combining@ part.
+pattern KatakanaHiraganaVoicedSoundMark :: CombiningCharacter
+pattern KatakanaHiraganaVoicedSoundMark = CombiningKatakanaHiraganaVoicedSoundMark
+
+-- | A pattern synonym for 'CombiningKatakanaHiraganaSemiVoicedSoundMark', the name without the @Combining@ part.
+pattern KatakanaHiraganaSemiVoicedSoundMark :: CombiningCharacter
+pattern KatakanaHiraganaSemiVoicedSoundMark = CombiningKatakanaHiraganaSemiVoicedSoundMark
+
+-- | A pattern synonym for 'CombiningCyrillicVzmet', the name without the @Combining@ part.
+pattern CyrillicVzmet :: CombiningCharacter
+pattern CyrillicVzmet = CombiningCyrillicVzmet
+
+-- | A pattern synonym for 'CombiningCyrillicLetterUkrainianIe', the name without the @Combining@ part.
+pattern CyrillicLetterUkrainianIe :: CombiningCharacter
+pattern CyrillicLetterUkrainianIe = CombiningCyrillicLetterUkrainianIe
+
+-- | A pattern synonym for 'CombiningCyrillicLetterI', the name without the @Combining@ part.
+pattern CyrillicLetterI :: CombiningCharacter
+pattern CyrillicLetterI = CombiningCyrillicLetterI
+
+-- | A pattern synonym for 'CombiningCyrillicLetterYi', the name without the @Combining@ part.
+pattern CyrillicLetterYi :: CombiningCharacter
+pattern CyrillicLetterYi = CombiningCyrillicLetterYi
+
+-- | A pattern synonym for 'CombiningCyrillicLetterU', the name without the @Combining@ part.
+pattern CyrillicLetterU :: CombiningCharacter
+pattern CyrillicLetterU = CombiningCyrillicLetterU
+
+-- | A pattern synonym for 'CombiningCyrillicLetterHardSign', the name without the @Combining@ part.
+pattern CyrillicLetterHardSign :: CombiningCharacter
+pattern CyrillicLetterHardSign = CombiningCyrillicLetterHardSign
+
+-- | A pattern synonym for 'CombiningCyrillicLetterYeru', the name without the @Combining@ part.
+pattern CyrillicLetterYeru :: CombiningCharacter
+pattern CyrillicLetterYeru = CombiningCyrillicLetterYeru
+
+-- | A pattern synonym for 'CombiningCyrillicLetterSoftSign', the name without the @Combining@ part.
+pattern CyrillicLetterSoftSign :: CombiningCharacter
+pattern CyrillicLetterSoftSign = CombiningCyrillicLetterSoftSign
+
+-- | A pattern synonym for 'CombiningCyrillicLetterOmega', the name without the @Combining@ part.
+pattern CyrillicLetterOmega :: CombiningCharacter
+pattern CyrillicLetterOmega = CombiningCyrillicLetterOmega
+
+-- | A pattern synonym for 'CombiningCyrillicKavyka', the name without the @Combining@ part.
+pattern CyrillicKavyka :: CombiningCharacter
+pattern CyrillicKavyka = CombiningCyrillicKavyka
+
+-- | A pattern synonym for 'CombiningCyrillicPayerok', the name without the @Combining@ part.
+pattern CyrillicPayerok :: CombiningCharacter
+pattern CyrillicPayerok = CombiningCyrillicPayerok
+
+-- | A pattern synonym for 'CombiningCyrillicLetterEf', the name without the @Combining@ part.
+pattern CyrillicLetterEf :: CombiningCharacter
+pattern CyrillicLetterEf = CombiningCyrillicLetterEf
+
+-- | A pattern synonym for 'CombiningCyrillicLetterIotifiedE', the name without the @Combining@ part.
+pattern CyrillicLetterIotifiedE :: CombiningCharacter
+pattern CyrillicLetterIotifiedE = CombiningCyrillicLetterIotifiedE
+
+-- | A pattern synonym for 'BamumCombiningMarkKoqndon', the name without the @Combining@ part.
+pattern BamumMarkKoqndon :: CombiningCharacter
+pattern BamumMarkKoqndon = BamumCombiningMarkKoqndon
+
+-- | A pattern synonym for 'BamumCombiningMarkTukwentis', the name without the @Combining@ part.
+pattern BamumMarkTukwentis :: CombiningCharacter
+pattern BamumMarkTukwentis = BamumCombiningMarkTukwentis
+
+-- | A pattern synonym for 'CombiningDevanagariDigitZero', the name without the @Combining@ part.
+pattern DevanagariDigitZero :: CombiningCharacter
+pattern DevanagariDigitZero = CombiningDevanagariDigitZero
+
+-- | A pattern synonym for 'CombiningDevanagariDigitOne', the name without the @Combining@ part.
+pattern DevanagariDigitOne :: CombiningCharacter
+pattern DevanagariDigitOne = CombiningDevanagariDigitOne
+
+-- | A pattern synonym for 'CombiningDevanagariDigitTwo', the name without the @Combining@ part.
+pattern DevanagariDigitTwo :: CombiningCharacter
+pattern DevanagariDigitTwo = CombiningDevanagariDigitTwo
+
+-- | A pattern synonym for 'CombiningDevanagariDigitThree', the name without the @Combining@ part.
+pattern DevanagariDigitThree :: CombiningCharacter
+pattern DevanagariDigitThree = CombiningDevanagariDigitThree
+
+-- | A pattern synonym for 'CombiningDevanagariDigitFour', the name without the @Combining@ part.
+pattern DevanagariDigitFour :: CombiningCharacter
+pattern DevanagariDigitFour = CombiningDevanagariDigitFour
+
+-- | A pattern synonym for 'CombiningDevanagariDigitFive', the name without the @Combining@ part.
+pattern DevanagariDigitFive :: CombiningCharacter
+pattern DevanagariDigitFive = CombiningDevanagariDigitFive
+
+-- | A pattern synonym for 'CombiningDevanagariDigitSix', the name without the @Combining@ part.
+pattern DevanagariDigitSix :: CombiningCharacter
+pattern DevanagariDigitSix = CombiningDevanagariDigitSix
+
+-- | A pattern synonym for 'CombiningDevanagariDigitSeven', the name without the @Combining@ part.
+pattern DevanagariDigitSeven :: CombiningCharacter
+pattern DevanagariDigitSeven = CombiningDevanagariDigitSeven
+
+-- | A pattern synonym for 'CombiningDevanagariDigitEight', the name without the @Combining@ part.
+pattern DevanagariDigitEight :: CombiningCharacter
+pattern DevanagariDigitEight = CombiningDevanagariDigitEight
+
+-- | A pattern synonym for 'CombiningDevanagariDigitNine', the name without the @Combining@ part.
+pattern DevanagariDigitNine :: CombiningCharacter
+pattern DevanagariDigitNine = CombiningDevanagariDigitNine
+
+-- | A pattern synonym for 'CombiningDevanagariLetterA', the name without the @Combining@ part.
+pattern DevanagariLetterA :: CombiningCharacter
+pattern DevanagariLetterA = CombiningDevanagariLetterA
+
+-- | A pattern synonym for 'CombiningDevanagariLetterU', the name without the @Combining@ part.
+pattern DevanagariLetterU :: CombiningCharacter
+pattern DevanagariLetterU = CombiningDevanagariLetterU
+
+-- | A pattern synonym for 'CombiningDevanagariLetterKa', the name without the @Combining@ part.
+pattern DevanagariLetterKa :: CombiningCharacter
+pattern DevanagariLetterKa = CombiningDevanagariLetterKa
+
+-- | A pattern synonym for 'CombiningDevanagariLetterNa', the name without the @Combining@ part.
+pattern DevanagariLetterNa :: CombiningCharacter
+pattern DevanagariLetterNa = CombiningDevanagariLetterNa
+
+-- | A pattern synonym for 'CombiningDevanagariLetterPa', the name without the @Combining@ part.
+pattern DevanagariLetterPa :: CombiningCharacter
+pattern DevanagariLetterPa = CombiningDevanagariLetterPa
+
+-- | A pattern synonym for 'CombiningDevanagariLetterRa', the name without the @Combining@ part.
+pattern DevanagariLetterRa :: CombiningCharacter
+pattern DevanagariLetterRa = CombiningDevanagariLetterRa
+
+-- | A pattern synonym for 'CombiningDevanagariLetterVi', the name without the @Combining@ part.
+pattern DevanagariLetterVi :: CombiningCharacter
+pattern DevanagariLetterVi = CombiningDevanagariLetterVi
+
+-- | A pattern synonym for 'CombiningDevanagariSignAvagraha', the name without the @Combining@ part.
+pattern DevanagariSignAvagraha :: CombiningCharacter
+pattern DevanagariSignAvagraha = CombiningDevanagariSignAvagraha
+
+-- | A pattern synonym for 'CombiningLigatureLeftHalf', the name without the @Combining@ part.
+pattern LigatureLeftHalf :: CombiningCharacter
+pattern LigatureLeftHalf = CombiningLigatureLeftHalf
+
+-- | A pattern synonym for 'CombiningLigatureRightHalf', the name without the @Combining@ part.
+pattern LigatureRightHalf :: CombiningCharacter
+pattern LigatureRightHalf = CombiningLigatureRightHalf
+
+-- | A pattern synonym for 'CombiningDoubleTildeLeftHalf', the name without the @Combining@ part.
+pattern DoubleTildeLeftHalf :: CombiningCharacter
+pattern DoubleTildeLeftHalf = CombiningDoubleTildeLeftHalf
+
+-- | A pattern synonym for 'CombiningDoubleTildeRightHalf', the name without the @Combining@ part.
+pattern DoubleTildeRightHalf :: CombiningCharacter
+pattern DoubleTildeRightHalf = CombiningDoubleTildeRightHalf
+
+-- | A pattern synonym for 'CombiningMacronLeftHalf', the name without the @Combining@ part.
+pattern MacronLeftHalf :: CombiningCharacter
+pattern MacronLeftHalf = CombiningMacronLeftHalf
+
+-- | A pattern synonym for 'CombiningMacronRightHalf', the name without the @Combining@ part.
+pattern MacronRightHalf :: CombiningCharacter
+pattern MacronRightHalf = CombiningMacronRightHalf
+
+-- | A pattern synonym for 'CombiningConjoiningMacron', the name without the @Combining@ part.
+pattern ConjoiningMacron :: CombiningCharacter
+pattern ConjoiningMacron = CombiningConjoiningMacron
+
+-- | A pattern synonym for 'CombiningLigatureLeftHalfBelow', the name without the @Combining@ part.
+pattern LigatureLeftHalfBelow :: CombiningCharacter
+pattern LigatureLeftHalfBelow = CombiningLigatureLeftHalfBelow
+
+-- | A pattern synonym for 'CombiningLigatureRightHalfBelow', the name without the @Combining@ part.
+pattern LigatureRightHalfBelow :: CombiningCharacter
+pattern LigatureRightHalfBelow = CombiningLigatureRightHalfBelow
+
+-- | A pattern synonym for 'CombiningTildeLeftHalfBelow', the name without the @Combining@ part.
+pattern TildeLeftHalfBelow :: CombiningCharacter
+pattern TildeLeftHalfBelow = CombiningTildeLeftHalfBelow
+
+-- | A pattern synonym for 'CombiningTildeRightHalfBelow', the name without the @Combining@ part.
+pattern TildeRightHalfBelow :: CombiningCharacter
+pattern TildeRightHalfBelow = CombiningTildeRightHalfBelow
+
+-- | A pattern synonym for 'CombiningMacronLeftHalfBelow', the name without the @Combining@ part.
+pattern MacronLeftHalfBelow :: CombiningCharacter
+pattern MacronLeftHalfBelow = CombiningMacronLeftHalfBelow
+
+-- | A pattern synonym for 'CombiningMacronRightHalfBelow', the name without the @Combining@ part.
+pattern MacronRightHalfBelow :: CombiningCharacter
+pattern MacronRightHalfBelow = CombiningMacronRightHalfBelow
+
+-- | A pattern synonym for 'CombiningConjoiningMacronBelow', the name without the @Combining@ part.
+pattern ConjoiningMacronBelow :: CombiningCharacter
+pattern ConjoiningMacronBelow = CombiningConjoiningMacronBelow
+
+-- | A pattern synonym for 'CombiningCyrillicTitloLeftHalf', the name without the @Combining@ part.
+pattern CyrillicTitloLeftHalf :: CombiningCharacter
+pattern CyrillicTitloLeftHalf = CombiningCyrillicTitloLeftHalf
+
+-- | A pattern synonym for 'CombiningCyrillicTitloRightHalf', the name without the @Combining@ part.
+pattern CyrillicTitloRightHalf :: CombiningCharacter
+pattern CyrillicTitloRightHalf = CombiningCyrillicTitloRightHalf
+
+-- | A pattern synonym for 'PhaistosDiscSignCombiningObliqueStroke', the name without the @Combining@ part.
+pattern PhaistosDiscSignObliqueStroke :: CombiningCharacter
+pattern PhaistosDiscSignObliqueStroke = PhaistosDiscSignCombiningObliqueStroke
+
+-- | A pattern synonym for 'CombiningOldPermicLetterAn', the name without the @Combining@ part.
+pattern OldPermicLetterAn :: CombiningCharacter
+pattern OldPermicLetterAn = CombiningOldPermicLetterAn
+
+-- | A pattern synonym for 'CombiningOldPermicLetterDoi', the name without the @Combining@ part.
+pattern OldPermicLetterDoi :: CombiningCharacter
+pattern OldPermicLetterDoi = CombiningOldPermicLetterDoi
+
+-- | A pattern synonym for 'CombiningOldPermicLetterZata', the name without the @Combining@ part.
+pattern OldPermicLetterZata :: CombiningCharacter
+pattern OldPermicLetterZata = CombiningOldPermicLetterZata
+
+-- | A pattern synonym for 'CombiningOldPermicLetterNenoe', the name without the @Combining@ part.
+pattern OldPermicLetterNenoe :: CombiningCharacter
+pattern OldPermicLetterNenoe = CombiningOldPermicLetterNenoe
+
+-- | A pattern synonym for 'CombiningOldPermicLetterSii', the name without the @Combining@ part.
+pattern OldPermicLetterSii :: CombiningCharacter
+pattern OldPermicLetterSii = CombiningOldPermicLetterSii
+
+-- | A pattern synonym for 'CombiningGranthaDigitZero', the name without the @Combining@ part.
+pattern GranthaDigitZero :: CombiningCharacter
+pattern GranthaDigitZero = CombiningGranthaDigitZero
+
+-- | A pattern synonym for 'CombiningGranthaDigitOne', the name without the @Combining@ part.
+pattern GranthaDigitOne :: CombiningCharacter
+pattern GranthaDigitOne = CombiningGranthaDigitOne
+
+-- | A pattern synonym for 'CombiningGranthaDigitTwo', the name without the @Combining@ part.
+pattern GranthaDigitTwo :: CombiningCharacter
+pattern GranthaDigitTwo = CombiningGranthaDigitTwo
+
+-- | A pattern synonym for 'CombiningGranthaDigitThree', the name without the @Combining@ part.
+pattern GranthaDigitThree :: CombiningCharacter
+pattern GranthaDigitThree = CombiningGranthaDigitThree
+
+-- | A pattern synonym for 'CombiningGranthaDigitFour', the name without the @Combining@ part.
+pattern GranthaDigitFour :: CombiningCharacter
+pattern GranthaDigitFour = CombiningGranthaDigitFour
+
+-- | A pattern synonym for 'CombiningGranthaDigitFive', the name without the @Combining@ part.
+pattern GranthaDigitFive :: CombiningCharacter
+pattern GranthaDigitFive = CombiningGranthaDigitFive
+
+-- | A pattern synonym for 'CombiningGranthaDigitSix', the name without the @Combining@ part.
+pattern GranthaDigitSix :: CombiningCharacter
+pattern GranthaDigitSix = CombiningGranthaDigitSix
+
+-- | A pattern synonym for 'CombiningGranthaLetterA', the name without the @Combining@ part.
+pattern GranthaLetterA :: CombiningCharacter
+pattern GranthaLetterA = CombiningGranthaLetterA
+
+-- | A pattern synonym for 'CombiningGranthaLetterKa', the name without the @Combining@ part.
+pattern GranthaLetterKa :: CombiningCharacter
+pattern GranthaLetterKa = CombiningGranthaLetterKa
+
+-- | A pattern synonym for 'CombiningGranthaLetterNa', the name without the @Combining@ part.
+pattern GranthaLetterNa :: CombiningCharacter
+pattern GranthaLetterNa = CombiningGranthaLetterNa
+
+-- | A pattern synonym for 'CombiningGranthaLetterVi', the name without the @Combining@ part.
+pattern GranthaLetterVi :: CombiningCharacter
+pattern GranthaLetterVi = CombiningGranthaLetterVi
+
+-- | A pattern synonym for 'CombiningGranthaLetterPa', the name without the @Combining@ part.
+pattern GranthaLetterPa :: CombiningCharacter
+pattern GranthaLetterPa = CombiningGranthaLetterPa
+
+-- | A pattern synonym for 'BassaVahCombiningHighTone', the name without the @Combining@ part.
+pattern BassaVahHighTone :: CombiningCharacter
+pattern BassaVahHighTone = BassaVahCombiningHighTone
+
+-- | A pattern synonym for 'BassaVahCombiningLowTone', the name without the @Combining@ part.
+pattern BassaVahLowTone :: CombiningCharacter
+pattern BassaVahLowTone = BassaVahCombiningLowTone
+
+-- | A pattern synonym for 'BassaVahCombiningMidTone', the name without the @Combining@ part.
+pattern BassaVahMidTone :: CombiningCharacter
+pattern BassaVahMidTone = BassaVahCombiningMidTone
+
+-- | A pattern synonym for 'BassaVahCombiningLowMidTone', the name without the @Combining@ part.
+pattern BassaVahLowMidTone :: CombiningCharacter
+pattern BassaVahLowMidTone = BassaVahCombiningLowMidTone
+
+-- | A pattern synonym for 'BassaVahCombiningHighLowTone', the name without the @Combining@ part.
+pattern BassaVahHighLowTone :: CombiningCharacter
+pattern BassaVahHighLowTone = BassaVahCombiningHighLowTone
+
+-- | A pattern synonym for 'MusicalSymbolCombiningStem', the name without the @Combining@ part.
+pattern MusicalSymbolStem :: CombiningCharacter
+pattern MusicalSymbolStem = MusicalSymbolCombiningStem
+
+-- | A pattern synonym for 'MusicalSymbolCombiningSprechgesangStem', the name without the @Combining@ part.
+pattern MusicalSymbolSprechgesangStem :: CombiningCharacter
+pattern MusicalSymbolSprechgesangStem = MusicalSymbolCombiningSprechgesangStem
+
+-- | A pattern synonym for 'MusicalSymbolCombiningTremolo1', the name without the @Combining@ part.
+pattern MusicalSymbolTremolo1 :: CombiningCharacter
+pattern MusicalSymbolTremolo1 = MusicalSymbolCombiningTremolo1
+
+-- | A pattern synonym for 'MusicalSymbolCombiningTremolo2', the name without the @Combining@ part.
+pattern MusicalSymbolTremolo2 :: CombiningCharacter
+pattern MusicalSymbolTremolo2 = MusicalSymbolCombiningTremolo2
+
+-- | A pattern synonym for 'MusicalSymbolCombiningTremolo3', the name without the @Combining@ part.
+pattern MusicalSymbolTremolo3 :: CombiningCharacter
+pattern MusicalSymbolTremolo3 = MusicalSymbolCombiningTremolo3
+
+-- | A pattern synonym for 'MusicalSymbolCombiningAugmentationDot', the name without the @Combining@ part.
+pattern MusicalSymbolAugmentationDot :: CombiningCharacter
+pattern MusicalSymbolAugmentationDot = MusicalSymbolCombiningAugmentationDot
+
+-- | A pattern synonym for 'MusicalSymbolCombiningFlag1', the name without the @Combining@ part.
+pattern MusicalSymbolFlag1 :: CombiningCharacter
+pattern MusicalSymbolFlag1 = MusicalSymbolCombiningFlag1
+
+-- | A pattern synonym for 'MusicalSymbolCombiningFlag2', the name without the @Combining@ part.
+pattern MusicalSymbolFlag2 :: CombiningCharacter
+pattern MusicalSymbolFlag2 = MusicalSymbolCombiningFlag2
+
+-- | A pattern synonym for 'MusicalSymbolCombiningFlag3', the name without the @Combining@ part.
+pattern MusicalSymbolFlag3 :: CombiningCharacter
+pattern MusicalSymbolFlag3 = MusicalSymbolCombiningFlag3
+
+-- | A pattern synonym for 'MusicalSymbolCombiningFlag4', the name without the @Combining@ part.
+pattern MusicalSymbolFlag4 :: CombiningCharacter
+pattern MusicalSymbolFlag4 = MusicalSymbolCombiningFlag4
+
+-- | A pattern synonym for 'MusicalSymbolCombiningFlag5', the name without the @Combining@ part.
+pattern MusicalSymbolFlag5 :: CombiningCharacter
+pattern MusicalSymbolFlag5 = MusicalSymbolCombiningFlag5
+
+-- | A pattern synonym for 'MusicalSymbolCombiningAccent', the name without the @Combining@ part.
+pattern MusicalSymbolAccent :: CombiningCharacter
+pattern MusicalSymbolAccent = MusicalSymbolCombiningAccent
+
+-- | A pattern synonym for 'MusicalSymbolCombiningStaccato', the name without the @Combining@ part.
+pattern MusicalSymbolStaccato :: CombiningCharacter
+pattern MusicalSymbolStaccato = MusicalSymbolCombiningStaccato
+
+-- | A pattern synonym for 'MusicalSymbolCombiningTenuto', the name without the @Combining@ part.
+pattern MusicalSymbolTenuto :: CombiningCharacter
+pattern MusicalSymbolTenuto = MusicalSymbolCombiningTenuto
+
+-- | A pattern synonym for 'MusicalSymbolCombiningStaccatissimo', the name without the @Combining@ part.
+pattern MusicalSymbolStaccatissimo :: CombiningCharacter
+pattern MusicalSymbolStaccatissimo = MusicalSymbolCombiningStaccatissimo
+
+-- | A pattern synonym for 'MusicalSymbolCombiningMarcato', the name without the @Combining@ part.
+pattern MusicalSymbolMarcato :: CombiningCharacter
+pattern MusicalSymbolMarcato = MusicalSymbolCombiningMarcato
+
+-- | A pattern synonym for 'MusicalSymbolCombiningMarcatoStaccato', the name without the @Combining@ part.
+pattern MusicalSymbolMarcatoStaccato :: CombiningCharacter
+pattern MusicalSymbolMarcatoStaccato = MusicalSymbolCombiningMarcatoStaccato
+
+-- | A pattern synonym for 'MusicalSymbolCombiningAccentStaccato', the name without the @Combining@ part.
+pattern MusicalSymbolAccentStaccato :: CombiningCharacter
+pattern MusicalSymbolAccentStaccato = MusicalSymbolCombiningAccentStaccato
+
+-- | A pattern synonym for 'MusicalSymbolCombiningLoure', the name without the @Combining@ part.
+pattern MusicalSymbolLoure :: CombiningCharacter
+pattern MusicalSymbolLoure = MusicalSymbolCombiningLoure
+
+-- | A pattern synonym for 'MusicalSymbolCombiningDoit', the name without the @Combining@ part.
+pattern MusicalSymbolDoit :: CombiningCharacter
+pattern MusicalSymbolDoit = MusicalSymbolCombiningDoit
+
+-- | A pattern synonym for 'MusicalSymbolCombiningRip', the name without the @Combining@ part.
+pattern MusicalSymbolRip :: CombiningCharacter
+pattern MusicalSymbolRip = MusicalSymbolCombiningRip
+
+-- | A pattern synonym for 'MusicalSymbolCombiningFlip', the name without the @Combining@ part.
+pattern MusicalSymbolFlip :: CombiningCharacter
+pattern MusicalSymbolFlip = MusicalSymbolCombiningFlip
+
+-- | A pattern synonym for 'MusicalSymbolCombiningSmear', the name without the @Combining@ part.
+pattern MusicalSymbolSmear :: CombiningCharacter
+pattern MusicalSymbolSmear = MusicalSymbolCombiningSmear
+
+-- | A pattern synonym for 'MusicalSymbolCombiningBend', the name without the @Combining@ part.
+pattern MusicalSymbolBend :: CombiningCharacter
+pattern MusicalSymbolBend = MusicalSymbolCombiningBend
+
+-- | A pattern synonym for 'MusicalSymbolCombiningDoubleTongue', the name without the @Combining@ part.
+pattern MusicalSymbolDoubleTongue :: CombiningCharacter
+pattern MusicalSymbolDoubleTongue = MusicalSymbolCombiningDoubleTongue
+
+-- | A pattern synonym for 'MusicalSymbolCombiningTripleTongue', the name without the @Combining@ part.
+pattern MusicalSymbolTripleTongue :: CombiningCharacter
+pattern MusicalSymbolTripleTongue = MusicalSymbolCombiningTripleTongue
+
+-- | A pattern synonym for 'MusicalSymbolCombiningDownBow', the name without the @Combining@ part.
+pattern MusicalSymbolDownBow :: CombiningCharacter
+pattern MusicalSymbolDownBow = MusicalSymbolCombiningDownBow
+
+-- | A pattern synonym for 'MusicalSymbolCombiningUpBow', the name without the @Combining@ part.
+pattern MusicalSymbolUpBow :: CombiningCharacter
+pattern MusicalSymbolUpBow = MusicalSymbolCombiningUpBow
+
+-- | A pattern synonym for 'MusicalSymbolCombiningHarmonic', the name without the @Combining@ part.
+pattern MusicalSymbolHarmonic :: CombiningCharacter
+pattern MusicalSymbolHarmonic = MusicalSymbolCombiningHarmonic
+
+-- | A pattern synonym for 'MusicalSymbolCombiningSnapPizzicato', the name without the @Combining@ part.
+pattern MusicalSymbolSnapPizzicato :: CombiningCharacter
+pattern MusicalSymbolSnapPizzicato = MusicalSymbolCombiningSnapPizzicato
+
+-- | A pattern synonym for 'CombiningGreekMusicalTriseme', the name without the @Combining@ part.
+pattern GreekMusicalTriseme :: CombiningCharacter
+pattern GreekMusicalTriseme = CombiningGreekMusicalTriseme
+
+-- | A pattern synonym for 'CombiningGreekMusicalTetraseme', the name without the @Combining@ part.
+pattern GreekMusicalTetraseme :: CombiningCharacter
+pattern GreekMusicalTetraseme = CombiningGreekMusicalTetraseme
+
+-- | A pattern synonym for 'CombiningGreekMusicalPentaseme', the name without the @Combining@ part.
+pattern GreekMusicalPentaseme :: CombiningCharacter
+pattern GreekMusicalPentaseme = CombiningGreekMusicalPentaseme
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterAzu', the name without the @Combining@ part.
+pattern GlagoliticLetterAzu :: CombiningCharacter
+pattern GlagoliticLetterAzu = CombiningGlagoliticLetterAzu
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterBuky', the name without the @Combining@ part.
+pattern GlagoliticLetterBuky :: CombiningCharacter
+pattern GlagoliticLetterBuky = CombiningGlagoliticLetterBuky
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterVede', the name without the @Combining@ part.
+pattern GlagoliticLetterVede :: CombiningCharacter
+pattern GlagoliticLetterVede = CombiningGlagoliticLetterVede
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterGlagoli', the name without the @Combining@ part.
+pattern GlagoliticLetterGlagoli :: CombiningCharacter
+pattern GlagoliticLetterGlagoli = CombiningGlagoliticLetterGlagoli
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterDobro', the name without the @Combining@ part.
+pattern GlagoliticLetterDobro :: CombiningCharacter
+pattern GlagoliticLetterDobro = CombiningGlagoliticLetterDobro
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterYestu', the name without the @Combining@ part.
+pattern GlagoliticLetterYestu :: CombiningCharacter
+pattern GlagoliticLetterYestu = CombiningGlagoliticLetterYestu
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterZhivete', the name without the @Combining@ part.
+pattern GlagoliticLetterZhivete :: CombiningCharacter
+pattern GlagoliticLetterZhivete = CombiningGlagoliticLetterZhivete
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterZemlja', the name without the @Combining@ part.
+pattern GlagoliticLetterZemlja :: CombiningCharacter
+pattern GlagoliticLetterZemlja = CombiningGlagoliticLetterZemlja
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterIzhe', the name without the @Combining@ part.
+pattern GlagoliticLetterIzhe :: CombiningCharacter
+pattern GlagoliticLetterIzhe = CombiningGlagoliticLetterIzhe
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterInitialIzhe', the name without the @Combining@ part.
+pattern GlagoliticLetterInitialIzhe :: CombiningCharacter
+pattern GlagoliticLetterInitialIzhe = CombiningGlagoliticLetterInitialIzhe
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterI', the name without the @Combining@ part.
+pattern GlagoliticLetterI :: CombiningCharacter
+pattern GlagoliticLetterI = CombiningGlagoliticLetterI
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterDjervi', the name without the @Combining@ part.
+pattern GlagoliticLetterDjervi :: CombiningCharacter
+pattern GlagoliticLetterDjervi = CombiningGlagoliticLetterDjervi
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterKako', the name without the @Combining@ part.
+pattern GlagoliticLetterKako :: CombiningCharacter
+pattern GlagoliticLetterKako = CombiningGlagoliticLetterKako
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterLjudije', the name without the @Combining@ part.
+pattern GlagoliticLetterLjudije :: CombiningCharacter
+pattern GlagoliticLetterLjudije = CombiningGlagoliticLetterLjudije
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterMyslite', the name without the @Combining@ part.
+pattern GlagoliticLetterMyslite :: CombiningCharacter
+pattern GlagoliticLetterMyslite = CombiningGlagoliticLetterMyslite
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterNashi', the name without the @Combining@ part.
+pattern GlagoliticLetterNashi :: CombiningCharacter
+pattern GlagoliticLetterNashi = CombiningGlagoliticLetterNashi
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterOnu', the name without the @Combining@ part.
+pattern GlagoliticLetterOnu :: CombiningCharacter
+pattern GlagoliticLetterOnu = CombiningGlagoliticLetterOnu
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterPokoji', the name without the @Combining@ part.
+pattern GlagoliticLetterPokoji :: CombiningCharacter
+pattern GlagoliticLetterPokoji = CombiningGlagoliticLetterPokoji
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterRitsi', the name without the @Combining@ part.
+pattern GlagoliticLetterRitsi :: CombiningCharacter
+pattern GlagoliticLetterRitsi = CombiningGlagoliticLetterRitsi
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterSlovo', the name without the @Combining@ part.
+pattern GlagoliticLetterSlovo :: CombiningCharacter
+pattern GlagoliticLetterSlovo = CombiningGlagoliticLetterSlovo
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterTvrido', the name without the @Combining@ part.
+pattern GlagoliticLetterTvrido :: CombiningCharacter
+pattern GlagoliticLetterTvrido = CombiningGlagoliticLetterTvrido
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterUku', the name without the @Combining@ part.
+pattern GlagoliticLetterUku :: CombiningCharacter
+pattern GlagoliticLetterUku = CombiningGlagoliticLetterUku
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterFritu', the name without the @Combining@ part.
+pattern GlagoliticLetterFritu :: CombiningCharacter
+pattern GlagoliticLetterFritu = CombiningGlagoliticLetterFritu
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterHeru', the name without the @Combining@ part.
+pattern GlagoliticLetterHeru :: CombiningCharacter
+pattern GlagoliticLetterHeru = CombiningGlagoliticLetterHeru
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterShta', the name without the @Combining@ part.
+pattern GlagoliticLetterShta :: CombiningCharacter
+pattern GlagoliticLetterShta = CombiningGlagoliticLetterShta
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterTsi', the name without the @Combining@ part.
+pattern GlagoliticLetterTsi :: CombiningCharacter
+pattern GlagoliticLetterTsi = CombiningGlagoliticLetterTsi
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterChrivi', the name without the @Combining@ part.
+pattern GlagoliticLetterChrivi :: CombiningCharacter
+pattern GlagoliticLetterChrivi = CombiningGlagoliticLetterChrivi
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterSha', the name without the @Combining@ part.
+pattern GlagoliticLetterSha :: CombiningCharacter
+pattern GlagoliticLetterSha = CombiningGlagoliticLetterSha
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterYeru', the name without the @Combining@ part.
+pattern GlagoliticLetterYeru :: CombiningCharacter
+pattern GlagoliticLetterYeru = CombiningGlagoliticLetterYeru
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterYeri', the name without the @Combining@ part.
+pattern GlagoliticLetterYeri :: CombiningCharacter
+pattern GlagoliticLetterYeri = CombiningGlagoliticLetterYeri
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterYati', the name without the @Combining@ part.
+pattern GlagoliticLetterYati :: CombiningCharacter
+pattern GlagoliticLetterYati = CombiningGlagoliticLetterYati
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterYu', the name without the @Combining@ part.
+pattern GlagoliticLetterYu :: CombiningCharacter
+pattern GlagoliticLetterYu = CombiningGlagoliticLetterYu
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterSmallYus', the name without the @Combining@ part.
+pattern GlagoliticLetterSmallYus :: CombiningCharacter
+pattern GlagoliticLetterSmallYus = CombiningGlagoliticLetterSmallYus
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterYo', the name without the @Combining@ part.
+pattern GlagoliticLetterYo :: CombiningCharacter
+pattern GlagoliticLetterYo = CombiningGlagoliticLetterYo
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterIotatedSmallYus', the name without the @Combining@ part.
+pattern GlagoliticLetterIotatedSmallYus :: CombiningCharacter
+pattern GlagoliticLetterIotatedSmallYus = CombiningGlagoliticLetterIotatedSmallYus
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterBigYus', the name without the @Combining@ part.
+pattern GlagoliticLetterBigYus :: CombiningCharacter
+pattern GlagoliticLetterBigYus = CombiningGlagoliticLetterBigYus
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterIotatedBigYus', the name without the @Combining@ part.
+pattern GlagoliticLetterIotatedBigYus :: CombiningCharacter
+pattern GlagoliticLetterIotatedBigYus = CombiningGlagoliticLetterIotatedBigYus
+
+-- | A pattern synonym for 'CombiningGlagoliticLetterFita', the name without the @Combining@ part.
+pattern GlagoliticLetterFita :: CombiningCharacter
+pattern GlagoliticLetterFita = CombiningGlagoliticLetterFita
+
+-- | A pattern synonym for 'MendeKikakuiCombiningNumberTeens', the name without the @Combining@ part.
+pattern MendeKikakuiNumberTeens :: CombiningCharacter
+pattern MendeKikakuiNumberTeens = MendeKikakuiCombiningNumberTeens
+
+-- | A pattern synonym for 'MendeKikakuiCombiningNumberTens', the name without the @Combining@ part.
+pattern MendeKikakuiNumberTens :: CombiningCharacter
+pattern MendeKikakuiNumberTens = MendeKikakuiCombiningNumberTens
+
+-- | A pattern synonym for 'MendeKikakuiCombiningNumberHundreds', the name without the @Combining@ part.
+pattern MendeKikakuiNumberHundreds :: CombiningCharacter
+pattern MendeKikakuiNumberHundreds = MendeKikakuiCombiningNumberHundreds
+
+-- | A pattern synonym for 'MendeKikakuiCombiningNumberThousands', the name without the @Combining@ part.
+pattern MendeKikakuiNumberThousands :: CombiningCharacter
+pattern MendeKikakuiNumberThousands = MendeKikakuiCombiningNumberThousands
+
+-- | A pattern synonym for 'MendeKikakuiCombiningNumberTenThousands', the name without the @Combining@ part.
+pattern MendeKikakuiNumberTenThousands :: CombiningCharacter
+pattern MendeKikakuiNumberTenThousands = MendeKikakuiCombiningNumberTenThousands
+
+-- | A pattern synonym for 'MendeKikakuiCombiningNumberHundredThousands', the name without the @Combining@ part.
+pattern MendeKikakuiNumberHundredThousands :: CombiningCharacter
+pattern MendeKikakuiNumberHundredThousands = MendeKikakuiCombiningNumberHundredThousands
+
+-- | A pattern synonym for 'MendeKikakuiCombiningNumberMillions', the name without the @Combining@ part.
+pattern MendeKikakuiNumberMillions :: CombiningCharacter
+pattern MendeKikakuiNumberMillions = MendeKikakuiCombiningNumberMillions
