@@ -7,7 +7,7 @@ Maintainer  : hapytexeu+gh@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-In Unicode a total of 814 codepoints are defined as /combining/ characters. These characters are put after another character, to manipulate the previous one. For example by putting a /grave accent/ on an @a@.
+In Unicode a total of 839 codepoints are defined as /combining/ characters. These characters are put after another character, to manipulate the previous one. For example by putting a /grave accent/ on an @a@.
 
 This module aims to make it more convenient to work with combining characters. It provides functions to map the 'CombiningCharacter's to 'Char's and vice versa. It furthermore defines an operator '(*^)' that can
 be used to apply one, or multiple 'CombiningCharacter's to a given character. We use a typeclass for this to allow working with different types. This allows "stacking" combining characters like:
@@ -25,9 +25,11 @@ module Data.Char.Combining (
     -- * A set of combining characters
   , CombiningSequence(..)
     -- * Conversions from and to 'CombiningCharacter'
-  , combiningToUnicode, combiningCharacter, combiningCharacter', isCombiningCharacter
+  , combiningToUnicode, combiningCharacter, combiningCharacter', isCombiningCharacter, stripCombiningSequence, stripCombinings
     -- * Applying a 'CombiningCharacter' to a 'Char'
   , ApplyCombine((*^))
+    -- * Decompose characters
+  , decomposeCombining, decomposeCombiningSequence
     -- * Pattern synonyms for the combining characters
   ,  pattern GraveAccent                                   , pattern AcuteAccent                                   , pattern CircumflexAccent                              , pattern Tilde
   ,  pattern Macron                                        , pattern Overline                                      , pattern Breve                                         , pattern DotAbove
@@ -140,6 +142,9 @@ module Data.Char.Combining (
 import Data.List.NonEmpty(NonEmpty((:|)), (<|), toList)
 import Data.String(IsString(fromString))
 import Data.Text(Text, cons, pack, singleton)
+import qualified Data.Text as T
+
+import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
 infixr 8 *^
 
@@ -476,21 +481,35 @@ data CombiningCharacter
   | DevanagariGraveAccent  -- ^ The combining character @DEVANAGARI GRAVE ACCENT@ from the Unicode standard, defined by @'\\x0953'@ (&#x2022;&#x0953;).
   | DevanagariAcuteAccent  -- ^ The combining character @DEVANAGARI ACUTE ACCENT@ from the Unicode standard, defined by @'\\x0954'@ (&#x2022;&#x0954;).
   | BengaliSignNukta  -- ^ The combining character @BENGALI SIGN NUKTA@ from the Unicode standard, defined by @'\\x09bc'@ (&#x2022;&#x09bc;).
+  | BengaliVowelSignAa  -- ^ The combining character @BENGALI VOWEL SIGN AA@ from the Unicode standard, defined by @'\\x09be'@ (&#x2022;&#x09be;).
   | BengaliSignVirama  -- ^ The combining character @BENGALI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x09cd'@ (&#x2022;&#x09cd;).
+  | BengaliAuLengthMark  -- ^ The combining character @BENGALI AU LENGTH MARK@ from the Unicode standard, defined by @'\\x09d7'@ (&#x2022;&#x09d7;).
   | GurmukhiSignNukta  -- ^ The combining character @GURMUKHI SIGN NUKTA@ from the Unicode standard, defined by @'\\x0a3c'@ (&#x2022;&#x0a3c;).
   | GurmukhiSignVirama  -- ^ The combining character @GURMUKHI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x0a4d'@ (&#x2022;&#x0a4d;).
   | GujaratiSignNukta  -- ^ The combining character @GUJARATI SIGN NUKTA@ from the Unicode standard, defined by @'\\x0abc'@ (&#x2022;&#x0abc;).
   | GujaratiSignVirama  -- ^ The combining character @GUJARATI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x0acd'@ (&#x2022;&#x0acd;).
   | OriyaSignNukta  -- ^ The combining character @ORIYA SIGN NUKTA@ from the Unicode standard, defined by @'\\x0b3c'@ (&#x2022;&#x0b3c;).
+  | OriyaVowelSignAa  -- ^ The combining character @ORIYA VOWEL SIGN AA@ from the Unicode standard, defined by @'\\x0b3e'@ (&#x2022;&#x0b3e;).
   | OriyaSignVirama  -- ^ The combining character @ORIYA SIGN VIRAMA@ from the Unicode standard, defined by @'\\x0b4d'@ (&#x2022;&#x0b4d;).
+  | OriyaAiLengthMark  -- ^ The combining character @ORIYA AI LENGTH MARK@ from the Unicode standard, defined by @'\\x0b56'@ (&#x2022;&#x0b56;).
+  | OriyaAuLengthMark  -- ^ The combining character @ORIYA AU LENGTH MARK@ from the Unicode standard, defined by @'\\x0b57'@ (&#x2022;&#x0b57;).
+  | TamilVowelSignAa  -- ^ The combining character @TAMIL VOWEL SIGN AA@ from the Unicode standard, defined by @'\\x0bbe'@ (&#x2022;&#x0bbe;).
   | TamilSignVirama  -- ^ The combining character @TAMIL SIGN VIRAMA@ from the Unicode standard, defined by @'\\x0bcd'@ (&#x2022;&#x0bcd;).
+  | TamilAuLengthMark  -- ^ The combining character @TAMIL AU LENGTH MARK@ from the Unicode standard, defined by @'\\x0bd7'@ (&#x2022;&#x0bd7;).
   | TeluguSignVirama  -- ^ The combining character @TELUGU SIGN VIRAMA@ from the Unicode standard, defined by @'\\x0c4d'@ (&#x2022;&#x0c4d;).
   | TeluguLengthMark  -- ^ The combining character @TELUGU LENGTH MARK@ from the Unicode standard, defined by @'\\x0c55'@ (&#x2022;&#x0c55;).
   | TeluguAiLengthMark  -- ^ The combining character @TELUGU AI LENGTH MARK@ from the Unicode standard, defined by @'\\x0c56'@ (&#x2022;&#x0c56;).
   | KannadaSignNukta  -- ^ The combining character @KANNADA SIGN NUKTA@ from the Unicode standard, defined by @'\\x0cbc'@ (&#x2022;&#x0cbc;).
+  | KannadaVowelSignUu  -- ^ The combining character @KANNADA VOWEL SIGN UU@ from the Unicode standard, defined by @'\\x0cc2'@ (&#x2022;&#x0cc2;).
   | KannadaSignVirama  -- ^ The combining character @KANNADA SIGN VIRAMA@ from the Unicode standard, defined by @'\\x0ccd'@ (&#x2022;&#x0ccd;).
+  | KannadaLengthMark  -- ^ The combining character @KANNADA LENGTH MARK@ from the Unicode standard, defined by @'\\x0cd5'@ (&#x2022;&#x0cd5;).
+  | KannadaAiLengthMark  -- ^ The combining character @KANNADA AI LENGTH MARK@ from the Unicode standard, defined by @'\\x0cd6'@ (&#x2022;&#x0cd6;).
+  | MalayalamVowelSignAa  -- ^ The combining character @MALAYALAM VOWEL SIGN AA@ from the Unicode standard, defined by @'\\x0d3e'@ (&#x2022;&#x0d3e;).
   | MalayalamSignVirama  -- ^ The combining character @MALAYALAM SIGN VIRAMA@ from the Unicode standard, defined by @'\\x0d4d'@ (&#x2022;&#x0d4d;).
+  | MalayalamAuLengthMark  -- ^ The combining character @MALAYALAM AU LENGTH MARK@ from the Unicode standard, defined by @'\\x0d57'@ (&#x2022;&#x0d57;).
   | SinhalaSignAlLakuna  -- ^ The combining character @SINHALA SIGN AL-LAKUNA@ from the Unicode standard, defined by @'\\x0dca'@ (&#x2022;&#x0dca;).
+  | SinhalaVowelSignAelaPilla  -- ^ The combining character @SINHALA VOWEL SIGN AELA-PILLA@ from the Unicode standard, defined by @'\\x0dcf'@ (&#x2022;&#x0dcf;).
+  | SinhalaVowelSignGayanukitta  -- ^ The combining character @SINHALA VOWEL SIGN GAYANUKITTA@ from the Unicode standard, defined by @'\\x0ddf'@ (&#x2022;&#x0ddf;).
   | ThaiCharacterSaraU  -- ^ The combining character @THAI CHARACTER SARA U@ from the Unicode standard, defined by @'\\x0e38'@ (&#x2022;&#x0e38;).
   | ThaiCharacterSaraUu  -- ^ The combining character @THAI CHARACTER SARA UU@ from the Unicode standard, defined by @'\\x0e39'@ (&#x2022;&#x0e39;).
   | ThaiCharacterPhinthu  -- ^ The combining character @THAI CHARACTER PHINTHU@ from the Unicode standard, defined by @'\\x0e3a'@ (&#x2022;&#x0e3a;).
@@ -522,7 +541,10 @@ data CombiningCharacter
   | TibetanMarkHalanta  -- ^ The combining character @TIBETAN MARK HALANTA@ from the Unicode standard, defined by @'\\x0f84'@ (&#x2022;&#x0f84;).
   | TibetanSignLciRtags  -- ^ The combining character @TIBETAN SIGN LCI RTAGS@ from the Unicode standard, defined by @'\\x0f86'@ (&#x2022;&#x0f86;).
   | TibetanSignYangRtags  -- ^ The combining character @TIBETAN SIGN YANG RTAGS@ from the Unicode standard, defined by @'\\x0f87'@ (&#x2022;&#x0f87;).
+  | TibetanSubjoinedLetterSsa  -- ^ The combining character @TIBETAN SUBJOINED LETTER SSA@ from the Unicode standard, defined by @'\\x0fb5'@ (&#x2022;&#x0fb5;).
+  | TibetanSubjoinedLetterHa  -- ^ The combining character @TIBETAN SUBJOINED LETTER HA@ from the Unicode standard, defined by @'\\x0fb7'@ (&#x2022;&#x0fb7;).
   | TibetanSymbolPadmaGdan  -- ^ The combining character @TIBETAN SYMBOL PADMA GDAN@ from the Unicode standard, defined by @'\\x0fc6'@ (&#x2022;&#x0fc6;).
+  | MyanmarVowelSignIi  -- ^ The combining character @MYANMAR VOWEL SIGN II@ from the Unicode standard, defined by @'\\x102e'@ (&#x2022;&#x102e;).
   | MyanmarSignDotBelow  -- ^ The combining character @MYANMAR SIGN DOT BELOW@ from the Unicode standard, defined by @'\\x1037'@ (&#x2022;&#x1037;).
   | MyanmarSignVirama  -- ^ The combining character @MYANMAR SIGN VIRAMA@ from the Unicode standard, defined by @'\\x1039'@ (&#x2022;&#x1039;).
   | MyanmarSignAsat  -- ^ The combining character @MYANMAR SIGN ASAT@ from the Unicode standard, defined by @'\\x103a'@ (&#x2022;&#x103a;).
@@ -541,11 +563,11 @@ data CombiningCharacter
   | BugineseVowelSignI  -- ^ The combining character @BUGINESE VOWEL SIGN I@ from the Unicode standard, defined by @'\\x1a17'@ (&#x2022;&#x1a17;).
   | BugineseVowelSignU  -- ^ The combining character @BUGINESE VOWEL SIGN U@ from the Unicode standard, defined by @'\\x1a18'@ (&#x2022;&#x1a18;).
   | TaiThamSignSakot  -- ^ The combining character @TAI THAM SIGN SAKOT@ from the Unicode standard, defined by @'\\x1a60'@ (&#x2022;&#x1a60;).
-  | TaiThamSignTone1  -- ^ The combining character @TAI THAM SIGN TONE1@ from the Unicode standard, defined by @'\\x1a75'@ (&#x2022;&#x1a75;).
-  | TaiThamSignTone2  -- ^ The combining character @TAI THAM SIGN TONE2@ from the Unicode standard, defined by @'\\x1a76'@ (&#x2022;&#x1a76;).
-  | TaiThamSignKhuenTone3  -- ^ The combining character @TAI THAM SIGN KHUEN TONE3@ from the Unicode standard, defined by @'\\x1a77'@ (&#x2022;&#x1a77;).
-  | TaiThamSignKhuenTone4  -- ^ The combining character @TAI THAM SIGN KHUEN TONE4@ from the Unicode standard, defined by @'\\x1a78'@ (&#x2022;&#x1a78;).
-  | TaiThamSignKhuenTone5  -- ^ The combining character @TAI THAM SIGN KHUEN TONE5@ from the Unicode standard, defined by @'\\x1a79'@ (&#x2022;&#x1a79;).
+  | TaiThamSignTone1  -- ^ The combining character @TAI THAM SIGN TONE-1@ from the Unicode standard, defined by @'\\x1a75'@ (&#x2022;&#x1a75;).
+  | TaiThamSignTone2  -- ^ The combining character @TAI THAM SIGN TONE-2@ from the Unicode standard, defined by @'\\x1a76'@ (&#x2022;&#x1a76;).
+  | TaiThamSignKhuenTone3  -- ^ The combining character @TAI THAM SIGN KHUEN TONE-3@ from the Unicode standard, defined by @'\\x1a77'@ (&#x2022;&#x1a77;).
+  | TaiThamSignKhuenTone4  -- ^ The combining character @TAI THAM SIGN KHUEN TONE-4@ from the Unicode standard, defined by @'\\x1a78'@ (&#x2022;&#x1a78;).
+  | TaiThamSignKhuenTone5  -- ^ The combining character @TAI THAM SIGN KHUEN TONE-5@ from the Unicode standard, defined by @'\\x1a79'@ (&#x2022;&#x1a79;).
   | TaiThamSignRaHaam  -- ^ The combining character @TAI THAM SIGN RA HAAM@ from the Unicode standard, defined by @'\\x1a7a'@ (&#x2022;&#x1a7a;).
   | TaiThamSignMaiSam  -- ^ The combining character @TAI THAM SIGN MAI SAM@ from the Unicode standard, defined by @'\\x1a7b'@ (&#x2022;&#x1a7b;).
   | TaiThamSignKhuenLueKaran  -- ^ The combining character @TAI THAM SIGN KHUEN-LUE KARAN@ from the Unicode standard, defined by @'\\x1a7c'@ (&#x2022;&#x1a7c;).
@@ -565,6 +587,7 @@ data CombiningCharacter
   | CombiningDoubleParenthesesAbove  -- ^ The combining character @COMBINING DOUBLE PARENTHESES ABOVE@ from the Unicode standard, defined by @'\\x1abc'@ (&#x2022;&#x1abc;).
   | CombiningParenthesesBelow  -- ^ The combining character @COMBINING PARENTHESES BELOW@ from the Unicode standard, defined by @'\\x1abd'@ (&#x2022;&#x1abd;).
   | BalineseSignRerekan  -- ^ The combining character @BALINESE SIGN REREKAN@ from the Unicode standard, defined by @'\\x1b34'@ (&#x2022;&#x1b34;).
+  | BalineseVowelSignTedung  -- ^ The combining character @BALINESE VOWEL SIGN TEDUNG@ from the Unicode standard, defined by @'\\x1b35'@ (&#x2022;&#x1b35;).
   | BalineseAdegAdeg  -- ^ The combining character @BALINESE ADEG ADEG@ from the Unicode standard, defined by @'\\x1b44'@ (&#x2022;&#x1b44;).
   | BalineseMusicalSymbolCombiningTegeh  -- ^ The combining character @BALINESE MUSICAL SYMBOL COMBINING TEGEH@ from the Unicode standard, defined by @'\\x1b6b'@ (&#x2022;&#x1b6b;).
   | BalineseMusicalSymbolCombiningEndep  -- ^ The combining character @BALINESE MUSICAL SYMBOL COMBINING ENDEP@ from the Unicode standard, defined by @'\\x1b6c'@ (&#x2022;&#x1b6c;).
@@ -828,6 +851,7 @@ data CombiningCharacter
   | ChakmaSignCandrabindu  -- ^ The combining character @CHAKMA SIGN CANDRABINDU@ from the Unicode standard, defined by @'\\x11100'@ (&#x2022;&#x11100;).
   | ChakmaSignAnusvara  -- ^ The combining character @CHAKMA SIGN ANUSVARA@ from the Unicode standard, defined by @'\\x11101'@ (&#x2022;&#x11101;).
   | ChakmaSignVisarga  -- ^ The combining character @CHAKMA SIGN VISARGA@ from the Unicode standard, defined by @'\\x11102'@ (&#x2022;&#x11102;).
+  | ChakmaVowelSignA  -- ^ The combining character @CHAKMA VOWEL SIGN A@ from the Unicode standard, defined by @'\\x11127'@ (&#x2022;&#x11127;).
   | ChakmaVirama  -- ^ The combining character @CHAKMA VIRAMA@ from the Unicode standard, defined by @'\\x11133'@ (&#x2022;&#x11133;).
   | ChakmaMaayyaa  -- ^ The combining character @CHAKMA MAAYYAA@ from the Unicode standard, defined by @'\\x11134'@ (&#x2022;&#x11134;).
   | MahajaniSignNukta  -- ^ The combining character @MAHAJANI SIGN NUKTA@ from the Unicode standard, defined by @'\\x11173'@ (&#x2022;&#x11173;).
@@ -838,7 +862,9 @@ data CombiningCharacter
   | KhudawadiSignNukta  -- ^ The combining character @KHUDAWADI SIGN NUKTA@ from the Unicode standard, defined by @'\\x112e9'@ (&#x2022;&#x112e9;).
   | KhudawadiSignVirama  -- ^ The combining character @KHUDAWADI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x112ea'@ (&#x2022;&#x112ea;).
   | GranthaSignNukta  -- ^ The combining character @GRANTHA SIGN NUKTA@ from the Unicode standard, defined by @'\\x1133c'@ (&#x2022;&#x1133c;).
+  | GranthaVowelSignAa  -- ^ The combining character @GRANTHA VOWEL SIGN AA@ from the Unicode standard, defined by @'\\x1133e'@ (&#x2022;&#x1133e;).
   | GranthaSignVirama  -- ^ The combining character @GRANTHA SIGN VIRAMA@ from the Unicode standard, defined by @'\\x1134d'@ (&#x2022;&#x1134d;).
+  | GranthaAuLengthMark  -- ^ The combining character @GRANTHA AU LENGTH MARK@ from the Unicode standard, defined by @'\\x11357'@ (&#x2022;&#x11357;).
   | CombiningGranthaDigitZero  -- ^ The combining character @COMBINING GRANTHA DIGIT ZERO@ from the Unicode standard, defined by @'\\x11366'@ (&#x2022;&#x11366;).
   | CombiningGranthaDigitOne  -- ^ The combining character @COMBINING GRANTHA DIGIT ONE@ from the Unicode standard, defined by @'\\x11367'@ (&#x2022;&#x11367;).
   | CombiningGranthaDigitTwo  -- ^ The combining character @COMBINING GRANTHA DIGIT TWO@ from the Unicode standard, defined by @'\\x11368'@ (&#x2022;&#x11368;).
@@ -853,8 +879,12 @@ data CombiningCharacter
   | CombiningGranthaLetterPa  -- ^ The combining character @COMBINING GRANTHA LETTER PA@ from the Unicode standard, defined by @'\\x11374'@ (&#x2022;&#x11374;).
   | NewaSignVirama  -- ^ The combining character @NEWA SIGN VIRAMA@ from the Unicode standard, defined by @'\\x11442'@ (&#x2022;&#x11442;).
   | NewaSignNukta  -- ^ The combining character @NEWA SIGN NUKTA@ from the Unicode standard, defined by @'\\x11446'@ (&#x2022;&#x11446;).
+  | TirhutaVowelSignAa  -- ^ The combining character @TIRHUTA VOWEL SIGN AA@ from the Unicode standard, defined by @'\\x114b0'@ (&#x2022;&#x114b0;).
+  | TirhutaVowelSignShortE  -- ^ The combining character @TIRHUTA VOWEL SIGN SHORT E@ from the Unicode standard, defined by @'\\x114ba'@ (&#x2022;&#x114ba;).
+  | TirhutaVowelSignShortO  -- ^ The combining character @TIRHUTA VOWEL SIGN SHORT O@ from the Unicode standard, defined by @'\\x114bd'@ (&#x2022;&#x114bd;).
   | TirhutaSignVirama  -- ^ The combining character @TIRHUTA SIGN VIRAMA@ from the Unicode standard, defined by @'\\x114c2'@ (&#x2022;&#x114c2;).
   | TirhutaSignNukta  -- ^ The combining character @TIRHUTA SIGN NUKTA@ from the Unicode standard, defined by @'\\x114c3'@ (&#x2022;&#x114c3;).
+  | SiddhamVowelSignAa  -- ^ The combining character @SIDDHAM VOWEL SIGN AA@ from the Unicode standard, defined by @'\\x115af'@ (&#x2022;&#x115af;).
   | SiddhamSignVirama  -- ^ The combining character @SIDDHAM SIGN VIRAMA@ from the Unicode standard, defined by @'\\x115bf'@ (&#x2022;&#x115bf;).
   | SiddhamSignNukta  -- ^ The combining character @SIDDHAM SIGN NUKTA@ from the Unicode standard, defined by @'\\x115c0'@ (&#x2022;&#x115c0;).
   | ModiSignVirama  -- ^ The combining character @MODI SIGN VIRAMA@ from the Unicode standard, defined by @'\\x1163f'@ (&#x2022;&#x1163f;).
@@ -877,15 +907,15 @@ data CombiningCharacter
   | DuployanDoubleMark  -- ^ The combining character @DUPLOYAN DOUBLE MARK@ from the Unicode standard, defined by @'\\x1bc9e'@ (&#x2022;&#x1bc9e;).
   | MusicalSymbolCombiningStem  -- ^ The combining character @MUSICAL SYMBOL COMBINING STEM@ from the Unicode standard, defined by @'\\x1d165'@ (&#x2022;&#x1d165;).
   | MusicalSymbolCombiningSprechgesangStem  -- ^ The combining character @MUSICAL SYMBOL COMBINING SPRECHGESANG STEM@ from the Unicode standard, defined by @'\\x1d166'@ (&#x2022;&#x1d166;).
-  | MusicalSymbolCombiningTremolo1  -- ^ The combining character @MUSICAL SYMBOL COMBINING TREMOLO1@ from the Unicode standard, defined by @'\\x1d167'@ (&#x2022;&#x1d167;).
-  | MusicalSymbolCombiningTremolo2  -- ^ The combining character @MUSICAL SYMBOL COMBINING TREMOLO2@ from the Unicode standard, defined by @'\\x1d168'@ (&#x2022;&#x1d168;).
-  | MusicalSymbolCombiningTremolo3  -- ^ The combining character @MUSICAL SYMBOL COMBINING TREMOLO3@ from the Unicode standard, defined by @'\\x1d169'@ (&#x2022;&#x1d169;).
+  | MusicalSymbolCombiningTremolo1  -- ^ The combining character @MUSICAL SYMBOL COMBINING TREMOLO-1@ from the Unicode standard, defined by @'\\x1d167'@ (&#x2022;&#x1d167;).
+  | MusicalSymbolCombiningTremolo2  -- ^ The combining character @MUSICAL SYMBOL COMBINING TREMOLO-2@ from the Unicode standard, defined by @'\\x1d168'@ (&#x2022;&#x1d168;).
+  | MusicalSymbolCombiningTremolo3  -- ^ The combining character @MUSICAL SYMBOL COMBINING TREMOLO-3@ from the Unicode standard, defined by @'\\x1d169'@ (&#x2022;&#x1d169;).
   | MusicalSymbolCombiningAugmentationDot  -- ^ The combining character @MUSICAL SYMBOL COMBINING AUGMENTATION DOT@ from the Unicode standard, defined by @'\\x1d16d'@ (&#x2022;&#x1d16d;).
-  | MusicalSymbolCombiningFlag1  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG1@ from the Unicode standard, defined by @'\\x1d16e'@ (&#x2022;&#x1d16e;).
-  | MusicalSymbolCombiningFlag2  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG2@ from the Unicode standard, defined by @'\\x1d16f'@ (&#x2022;&#x1d16f;).
-  | MusicalSymbolCombiningFlag3  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG3@ from the Unicode standard, defined by @'\\x1d170'@ (&#x2022;&#x1d170;).
-  | MusicalSymbolCombiningFlag4  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG4@ from the Unicode standard, defined by @'\\x1d171'@ (&#x2022;&#x1d171;).
-  | MusicalSymbolCombiningFlag5  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG5@ from the Unicode standard, defined by @'\\x1d172'@ (&#x2022;&#x1d172;).
+  | MusicalSymbolCombiningFlag1  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG-1@ from the Unicode standard, defined by @'\\x1d16e'@ (&#x2022;&#x1d16e;).
+  | MusicalSymbolCombiningFlag2  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG-2@ from the Unicode standard, defined by @'\\x1d16f'@ (&#x2022;&#x1d16f;).
+  | MusicalSymbolCombiningFlag3  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG-3@ from the Unicode standard, defined by @'\\x1d170'@ (&#x2022;&#x1d170;).
+  | MusicalSymbolCombiningFlag4  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG-4@ from the Unicode standard, defined by @'\\x1d171'@ (&#x2022;&#x1d171;).
+  | MusicalSymbolCombiningFlag5  -- ^ The combining character @MUSICAL SYMBOL COMBINING FLAG-5@ from the Unicode standard, defined by @'\\x1d172'@ (&#x2022;&#x1d172;).
   | MusicalSymbolCombiningAccent  -- ^ The combining character @MUSICAL SYMBOL COMBINING ACCENT@ from the Unicode standard, defined by @'\\x1d17b'@ (&#x2022;&#x1d17b;).
   | MusicalSymbolCombiningStaccato  -- ^ The combining character @MUSICAL SYMBOL COMBINING STACCATO@ from the Unicode standard, defined by @'\\x1d17c'@ (&#x2022;&#x1d17c;).
   | MusicalSymbolCombiningTenuto  -- ^ The combining character @MUSICAL SYMBOL COMBINING TENUTO@ from the Unicode standard, defined by @'\\x1d17d'@ (&#x2022;&#x1d17d;).
@@ -998,7 +1028,6 @@ instance ApplyCombine Char CombiningCharacter Text where
 
 instance ApplyCombine Char CombiningSequence Text where
     (*^) c (CombiningSequence cs) = cons c (pack (map combiningToUnicode (toList cs)))
-
 
 -- | Convert the given 'CombiningCharacter' to a 'Char' in Unicode, this
 -- codepoints need a preceding codepoint to be applied to.
@@ -1335,21 +1364,35 @@ combiningToUnicode DevanagariStressSignAnudatta = '\x0952'
 combiningToUnicode DevanagariGraveAccent = '\x0953'
 combiningToUnicode DevanagariAcuteAccent = '\x0954'
 combiningToUnicode BengaliSignNukta = '\x09bc'
+combiningToUnicode BengaliVowelSignAa = '\x09be'
 combiningToUnicode BengaliSignVirama = '\x09cd'
+combiningToUnicode BengaliAuLengthMark = '\x09d7'
 combiningToUnicode GurmukhiSignNukta = '\x0a3c'
 combiningToUnicode GurmukhiSignVirama = '\x0a4d'
 combiningToUnicode GujaratiSignNukta = '\x0abc'
 combiningToUnicode GujaratiSignVirama = '\x0acd'
 combiningToUnicode OriyaSignNukta = '\x0b3c'
+combiningToUnicode OriyaVowelSignAa = '\x0b3e'
 combiningToUnicode OriyaSignVirama = '\x0b4d'
+combiningToUnicode OriyaAiLengthMark = '\x0b56'
+combiningToUnicode OriyaAuLengthMark = '\x0b57'
+combiningToUnicode TamilVowelSignAa = '\x0bbe'
 combiningToUnicode TamilSignVirama = '\x0bcd'
+combiningToUnicode TamilAuLengthMark = '\x0bd7'
 combiningToUnicode TeluguSignVirama = '\x0c4d'
 combiningToUnicode TeluguLengthMark = '\x0c55'
 combiningToUnicode TeluguAiLengthMark = '\x0c56'
 combiningToUnicode KannadaSignNukta = '\x0cbc'
+combiningToUnicode KannadaVowelSignUu = '\x0cc2'
 combiningToUnicode KannadaSignVirama = '\x0ccd'
+combiningToUnicode KannadaLengthMark = '\x0cd5'
+combiningToUnicode KannadaAiLengthMark = '\x0cd6'
+combiningToUnicode MalayalamVowelSignAa = '\x0d3e'
 combiningToUnicode MalayalamSignVirama = '\x0d4d'
+combiningToUnicode MalayalamAuLengthMark = '\x0d57'
 combiningToUnicode SinhalaSignAlLakuna = '\x0dca'
+combiningToUnicode SinhalaVowelSignAelaPilla = '\x0dcf'
+combiningToUnicode SinhalaVowelSignGayanukitta = '\x0ddf'
 combiningToUnicode ThaiCharacterSaraU = '\x0e38'
 combiningToUnicode ThaiCharacterSaraUu = '\x0e39'
 combiningToUnicode ThaiCharacterPhinthu = '\x0e3a'
@@ -1381,7 +1424,10 @@ combiningToUnicode TibetanSignSnaLdan = '\x0f83'
 combiningToUnicode TibetanMarkHalanta = '\x0f84'
 combiningToUnicode TibetanSignLciRtags = '\x0f86'
 combiningToUnicode TibetanSignYangRtags = '\x0f87'
+combiningToUnicode TibetanSubjoinedLetterSsa = '\x0fb5'
+combiningToUnicode TibetanSubjoinedLetterHa = '\x0fb7'
 combiningToUnicode TibetanSymbolPadmaGdan = '\x0fc6'
+combiningToUnicode MyanmarVowelSignIi = '\x102e'
 combiningToUnicode MyanmarSignDotBelow = '\x1037'
 combiningToUnicode MyanmarSignVirama = '\x1039'
 combiningToUnicode MyanmarSignAsat = '\x103a'
@@ -1424,6 +1470,7 @@ combiningToUnicode CombiningParenthesesAbove = '\x1abb'
 combiningToUnicode CombiningDoubleParenthesesAbove = '\x1abc'
 combiningToUnicode CombiningParenthesesBelow = '\x1abd'
 combiningToUnicode BalineseSignRerekan = '\x1b34'
+combiningToUnicode BalineseVowelSignTedung = '\x1b35'
 combiningToUnicode BalineseAdegAdeg = '\x1b44'
 combiningToUnicode BalineseMusicalSymbolCombiningTegeh = '\x1b6b'
 combiningToUnicode BalineseMusicalSymbolCombiningEndep = '\x1b6c'
@@ -1687,6 +1734,7 @@ combiningToUnicode KaithiSignNukta = '\x110ba'
 combiningToUnicode ChakmaSignCandrabindu = '\x11100'
 combiningToUnicode ChakmaSignAnusvara = '\x11101'
 combiningToUnicode ChakmaSignVisarga = '\x11102'
+combiningToUnicode ChakmaVowelSignA = '\x11127'
 combiningToUnicode ChakmaVirama = '\x11133'
 combiningToUnicode ChakmaMaayyaa = '\x11134'
 combiningToUnicode MahajaniSignNukta = '\x11173'
@@ -1697,7 +1745,9 @@ combiningToUnicode KhojkiSignNukta = '\x11236'
 combiningToUnicode KhudawadiSignNukta = '\x112e9'
 combiningToUnicode KhudawadiSignVirama = '\x112ea'
 combiningToUnicode GranthaSignNukta = '\x1133c'
+combiningToUnicode GranthaVowelSignAa = '\x1133e'
 combiningToUnicode GranthaSignVirama = '\x1134d'
+combiningToUnicode GranthaAuLengthMark = '\x11357'
 combiningToUnicode CombiningGranthaDigitZero = '\x11366'
 combiningToUnicode CombiningGranthaDigitOne = '\x11367'
 combiningToUnicode CombiningGranthaDigitTwo = '\x11368'
@@ -1712,8 +1762,12 @@ combiningToUnicode CombiningGranthaLetterVi = '\x11373'
 combiningToUnicode CombiningGranthaLetterPa = '\x11374'
 combiningToUnicode NewaSignVirama = '\x11442'
 combiningToUnicode NewaSignNukta = '\x11446'
+combiningToUnicode TirhutaVowelSignAa = '\x114b0'
+combiningToUnicode TirhutaVowelSignShortE = '\x114ba'
+combiningToUnicode TirhutaVowelSignShortO = '\x114bd'
 combiningToUnicode TirhutaSignVirama = '\x114c2'
 combiningToUnicode TirhutaSignNukta = '\x114c3'
+combiningToUnicode SiddhamVowelSignAa = '\x115af'
 combiningToUnicode SiddhamSignVirama = '\x115bf'
 combiningToUnicode SiddhamSignNukta = '\x115c0'
 combiningToUnicode ModiSignVirama = '\x1163f'
@@ -1831,25 +1885,38 @@ isCombiningCharacter '\x711' = True
 isCombiningCharacter '\x93c' = True
 isCombiningCharacter '\x94d' = True
 isCombiningCharacter '\x9bc' = True
+isCombiningCharacter '\x9be' = True
 isCombiningCharacter '\x9cd' = True
+isCombiningCharacter '\x9d7' = True
 isCombiningCharacter '\xa3c' = True
 isCombiningCharacter '\xa4d' = True
 isCombiningCharacter '\xabc' = True
 isCombiningCharacter '\xacd' = True
 isCombiningCharacter '\xb3c' = True
+isCombiningCharacter '\xb3e' = True
 isCombiningCharacter '\xb4d' = True
+isCombiningCharacter '\xbbe' = True
 isCombiningCharacter '\xbcd' = True
+isCombiningCharacter '\xbd7' = True
 isCombiningCharacter '\xc4d' = True
 isCombiningCharacter '\xcbc' = True
+isCombiningCharacter '\xcc2' = True
 isCombiningCharacter '\xccd' = True
+isCombiningCharacter '\xd3e' = True
 isCombiningCharacter '\xd4d' = True
+isCombiningCharacter '\xd57' = True
 isCombiningCharacter '\xdca' = True
+isCombiningCharacter '\xdcf' = True
+isCombiningCharacter '\xddf' = True
 isCombiningCharacter '\xf35' = True
 isCombiningCharacter '\xf37' = True
 isCombiningCharacter '\xf39' = True
 isCombiningCharacter '\xf74' = True
 isCombiningCharacter '\xf80' = True
+isCombiningCharacter '\xfb5' = True
+isCombiningCharacter '\xfb7' = True
 isCombiningCharacter '\xfc6' = True
+isCombiningCharacter '\x102e' = True
 isCombiningCharacter '\x1037' = True
 isCombiningCharacter '\x108d' = True
 isCombiningCharacter '\x1714' = True
@@ -1859,7 +1926,6 @@ isCombiningCharacter '\x17dd' = True
 isCombiningCharacter '\x18a9' = True
 isCombiningCharacter '\x1a60' = True
 isCombiningCharacter '\x1a7f' = True
-isCombiningCharacter '\x1b34' = True
 isCombiningCharacter '\x1b44' = True
 isCombiningCharacter '\x1be6' = True
 isCombiningCharacter '\x1c37' = True
@@ -1885,13 +1951,20 @@ isCombiningCharacter '\x10a0f' = True
 isCombiningCharacter '\x10a3f' = True
 isCombiningCharacter '\x11046' = True
 isCombiningCharacter '\x1107f' = True
+isCombiningCharacter '\x11127' = True
 isCombiningCharacter '\x11173' = True
 isCombiningCharacter '\x111c0' = True
 isCombiningCharacter '\x111ca' = True
 isCombiningCharacter '\x1133c' = True
+isCombiningCharacter '\x1133e' = True
 isCombiningCharacter '\x1134d' = True
+isCombiningCharacter '\x11357' = True
 isCombiningCharacter '\x11442' = True
 isCombiningCharacter '\x11446' = True
+isCombiningCharacter '\x114b0' = True
+isCombiningCharacter '\x114ba' = True
+isCombiningCharacter '\x114bd' = True
+isCombiningCharacter '\x115af' = True
 isCombiningCharacter '\x1163f' = True
 isCombiningCharacter '\x1172b' = True
 isCombiningCharacter '\x11c3f' = True
@@ -1963,13 +2036,16 @@ isCombiningCharacter c
   || ('\x5c1' <= c && c <= '\x5c2')
   || ('\x5c4' <= c && c <= '\x5c5')
   || ('\x6e7' <= c && c <= '\x6e8')
+  || ('\xb56' <= c && c <= '\xb57')
   || ('\xc55' <= c && c <= '\xc56')
+  || ('\xcd5' <= c && c <= '\xcd6')
   || ('\xeb8' <= c && c <= '\xeb9')
   || ('\xf18' <= c && c <= '\xf19')
   || ('\xf71' <= c && c <= '\xf72')
   || ('\xf86' <= c && c <= '\xf87')
   || ('\x1039' <= c && c <= '\x103a')
   || ('\x1a17' <= c && c <= '\x1a18')
+  || ('\x1b34' <= c && c <= '\x1b35')
   || ('\x1baa' <= c && c <= '\x1bab')
   || ('\x1bf2' <= c && c <= '\x1bf3')
   || ('\x1cf8' <= c && c <= '\x1cf9')
@@ -2333,21 +2409,35 @@ combiningCharacter '\x0952' = Just DevanagariStressSignAnudatta
 combiningCharacter '\x0953' = Just DevanagariGraveAccent
 combiningCharacter '\x0954' = Just DevanagariAcuteAccent
 combiningCharacter '\x09bc' = Just BengaliSignNukta
+combiningCharacter '\x09be' = Just BengaliVowelSignAa
 combiningCharacter '\x09cd' = Just BengaliSignVirama
+combiningCharacter '\x09d7' = Just BengaliAuLengthMark
 combiningCharacter '\x0a3c' = Just GurmukhiSignNukta
 combiningCharacter '\x0a4d' = Just GurmukhiSignVirama
 combiningCharacter '\x0abc' = Just GujaratiSignNukta
 combiningCharacter '\x0acd' = Just GujaratiSignVirama
 combiningCharacter '\x0b3c' = Just OriyaSignNukta
+combiningCharacter '\x0b3e' = Just OriyaVowelSignAa
 combiningCharacter '\x0b4d' = Just OriyaSignVirama
+combiningCharacter '\x0b56' = Just OriyaAiLengthMark
+combiningCharacter '\x0b57' = Just OriyaAuLengthMark
+combiningCharacter '\x0bbe' = Just TamilVowelSignAa
 combiningCharacter '\x0bcd' = Just TamilSignVirama
+combiningCharacter '\x0bd7' = Just TamilAuLengthMark
 combiningCharacter '\x0c4d' = Just TeluguSignVirama
 combiningCharacter '\x0c55' = Just TeluguLengthMark
 combiningCharacter '\x0c56' = Just TeluguAiLengthMark
 combiningCharacter '\x0cbc' = Just KannadaSignNukta
+combiningCharacter '\x0cc2' = Just KannadaVowelSignUu
 combiningCharacter '\x0ccd' = Just KannadaSignVirama
+combiningCharacter '\x0cd5' = Just KannadaLengthMark
+combiningCharacter '\x0cd6' = Just KannadaAiLengthMark
+combiningCharacter '\x0d3e' = Just MalayalamVowelSignAa
 combiningCharacter '\x0d4d' = Just MalayalamSignVirama
+combiningCharacter '\x0d57' = Just MalayalamAuLengthMark
 combiningCharacter '\x0dca' = Just SinhalaSignAlLakuna
+combiningCharacter '\x0dcf' = Just SinhalaVowelSignAelaPilla
+combiningCharacter '\x0ddf' = Just SinhalaVowelSignGayanukitta
 combiningCharacter '\x0e38' = Just ThaiCharacterSaraU
 combiningCharacter '\x0e39' = Just ThaiCharacterSaraUu
 combiningCharacter '\x0e3a' = Just ThaiCharacterPhinthu
@@ -2379,7 +2469,10 @@ combiningCharacter '\x0f83' = Just TibetanSignSnaLdan
 combiningCharacter '\x0f84' = Just TibetanMarkHalanta
 combiningCharacter '\x0f86' = Just TibetanSignLciRtags
 combiningCharacter '\x0f87' = Just TibetanSignYangRtags
+combiningCharacter '\x0fb5' = Just TibetanSubjoinedLetterSsa
+combiningCharacter '\x0fb7' = Just TibetanSubjoinedLetterHa
 combiningCharacter '\x0fc6' = Just TibetanSymbolPadmaGdan
+combiningCharacter '\x102e' = Just MyanmarVowelSignIi
 combiningCharacter '\x1037' = Just MyanmarSignDotBelow
 combiningCharacter '\x1039' = Just MyanmarSignVirama
 combiningCharacter '\x103a' = Just MyanmarSignAsat
@@ -2422,6 +2515,7 @@ combiningCharacter '\x1abb' = Just CombiningParenthesesAbove
 combiningCharacter '\x1abc' = Just CombiningDoubleParenthesesAbove
 combiningCharacter '\x1abd' = Just CombiningParenthesesBelow
 combiningCharacter '\x1b34' = Just BalineseSignRerekan
+combiningCharacter '\x1b35' = Just BalineseVowelSignTedung
 combiningCharacter '\x1b44' = Just BalineseAdegAdeg
 combiningCharacter '\x1b6b' = Just BalineseMusicalSymbolCombiningTegeh
 combiningCharacter '\x1b6c' = Just BalineseMusicalSymbolCombiningEndep
@@ -2685,6 +2779,7 @@ combiningCharacter '\x110ba' = Just KaithiSignNukta
 combiningCharacter '\x11100' = Just ChakmaSignCandrabindu
 combiningCharacter '\x11101' = Just ChakmaSignAnusvara
 combiningCharacter '\x11102' = Just ChakmaSignVisarga
+combiningCharacter '\x11127' = Just ChakmaVowelSignA
 combiningCharacter '\x11133' = Just ChakmaVirama
 combiningCharacter '\x11134' = Just ChakmaMaayyaa
 combiningCharacter '\x11173' = Just MahajaniSignNukta
@@ -2695,7 +2790,9 @@ combiningCharacter '\x11236' = Just KhojkiSignNukta
 combiningCharacter '\x112e9' = Just KhudawadiSignNukta
 combiningCharacter '\x112ea' = Just KhudawadiSignVirama
 combiningCharacter '\x1133c' = Just GranthaSignNukta
+combiningCharacter '\x1133e' = Just GranthaVowelSignAa
 combiningCharacter '\x1134d' = Just GranthaSignVirama
+combiningCharacter '\x11357' = Just GranthaAuLengthMark
 combiningCharacter '\x11366' = Just CombiningGranthaDigitZero
 combiningCharacter '\x11367' = Just CombiningGranthaDigitOne
 combiningCharacter '\x11368' = Just CombiningGranthaDigitTwo
@@ -2710,8 +2807,12 @@ combiningCharacter '\x11373' = Just CombiningGranthaLetterVi
 combiningCharacter '\x11374' = Just CombiningGranthaLetterPa
 combiningCharacter '\x11442' = Just NewaSignVirama
 combiningCharacter '\x11446' = Just NewaSignNukta
+combiningCharacter '\x114b0' = Just TirhutaVowelSignAa
+combiningCharacter '\x114ba' = Just TirhutaVowelSignShortE
+combiningCharacter '\x114bd' = Just TirhutaVowelSignShortO
 combiningCharacter '\x114c2' = Just TirhutaSignVirama
 combiningCharacter '\x114c3' = Just TirhutaSignNukta
+combiningCharacter '\x115af' = Just SiddhamVowelSignAa
 combiningCharacter '\x115bf' = Just SiddhamSignVirama
 combiningCharacter '\x115c0' = Just SiddhamSignNukta
 combiningCharacter '\x1163f' = Just ModiSignVirama
@@ -2819,1698 +2920,2771 @@ combiningCharacter '\x1e949' = Just AdlamGeminateConsonantModifier
 combiningCharacter '\x1e94a' = Just AdlamNukta
 combiningCharacter _ = Nothing
 
--- | A pattern synonym for 'CombiningGraveAccent', the name without the @Combining@ part, defined by @'\x300'@ (&#x2022;&#x300;).
+-- | Convert the given 'Char'acter to a 2-tuple that contains the "root"
+-- character, and a set of 'CombiningCharacter's that can be applied to
+-- construct that character. Characters that do not contain a combining
+-- character return an empty list for the list of 'CombiningCharacter's.
+--
+-- For a 'Char' that is a 'CombiningCharacter' itself, it will return a
+-- 2-tuple with that character as first item, and an empty list of
+-- 'CombiningCharacter's.
+decomposeCombiningSequence
+  :: Char -- ^ The 'Char'acter to decompose.
+  -> (Char, [CombiningCharacter]) -- ^ A 2-tuple with the "root" 'Char'acter and the list of 'CombiningCharacter's that are applied to it.
+decomposeCombiningSequence c
+    | Just (c', cc) <- decomposeCombining c = (cc:) <$> decomposeCombiningSequence c'
+    | otherwise = (c, [])
+
+-- | Convert the given 'Char'acter to its "root" character that omits all the
+-- applied 'CombiningCharacter's. If the given 'Char'acter is a
+-- 'CombiningCharacter' itself, then this is returned.
+stripCombiningSequence
+  :: Char  -- ^ The 'Char'acter that should be stripped from its applied 'CombiningCharacter's.
+  -> Char -- ^ The "root" 'Char'acter that is the given 'Char'acter stripped from the applied 'CombiningCharacter's.
+stripCombiningSequence c
+    | Just (c', _) <- decomposeCombining c = stripCombiningSequence c'
+    | otherwise = c
+
+-- | Remove the 'CombiningCharacter's in the 'Text' and the ones that are
+-- applied to a character through "composition". This function is useful for
+-- example to remove diacritics from a 'Text' object.
+stripCombinings
+  :: Text  -- ^ The given 'Text' object to strip 'CombiningCharacter's from, both through filtering and decomposing.
+  -> Text  -- ^ A 'Text' object where the 'CombiningCharacter's are filtered out.
+stripCombinings = T.filter (not . isCombiningCharacter) . T.map stripCombiningSequence
+
+-- | Convert a given character that can be represented a 'Char' and a
+-- 'CombiningCharacter' to a 2-tuple that contains this combination.
+-- The returning 'Char' (the first item in the 2-tuple) can still be a composed
+-- form, and thus can sometimes be passed again through this function.
+decomposeCombining
+  :: Char  -- ^ The given 'Char'acter to decompose.
+  -> Maybe (Char, CombiningCharacter)  -- ^ A 2-tuple of a 'Char'acter and a 'CombiningCharacter' wrapped in a 'Just' if the 'Char' can be decomposed; 'Nothing' otherwise.
+decomposeCombining '\x00c0' = Just ('A', CombiningGraveAccent)
+decomposeCombining '\x00c1' = Just ('A', CombiningAcuteAccent)
+decomposeCombining '\x00c2' = Just ('A', CombiningCircumflexAccent)
+decomposeCombining '\x00c3' = Just ('A', CombiningTilde)
+decomposeCombining '\x00c4' = Just ('A', CombiningDiaeresis)
+decomposeCombining '\x00c5' = Just ('A', CombiningRingAbove)
+decomposeCombining '\x00c7' = Just ('C', CombiningCedilla)
+decomposeCombining '\x00c8' = Just ('E', CombiningGraveAccent)
+decomposeCombining '\x00c9' = Just ('E', CombiningAcuteAccent)
+decomposeCombining '\x00ca' = Just ('E', CombiningCircumflexAccent)
+decomposeCombining '\x00cb' = Just ('E', CombiningDiaeresis)
+decomposeCombining '\x00cc' = Just ('I', CombiningGraveAccent)
+decomposeCombining '\x00cd' = Just ('I', CombiningAcuteAccent)
+decomposeCombining '\x00ce' = Just ('I', CombiningCircumflexAccent)
+decomposeCombining '\x00cf' = Just ('I', CombiningDiaeresis)
+decomposeCombining '\x00d1' = Just ('N', CombiningTilde)
+decomposeCombining '\x00d2' = Just ('O', CombiningGraveAccent)
+decomposeCombining '\x00d3' = Just ('O', CombiningAcuteAccent)
+decomposeCombining '\x00d4' = Just ('O', CombiningCircumflexAccent)
+decomposeCombining '\x00d5' = Just ('O', CombiningTilde)
+decomposeCombining '\x00d6' = Just ('O', CombiningDiaeresis)
+decomposeCombining '\x00d9' = Just ('U', CombiningGraveAccent)
+decomposeCombining '\x00da' = Just ('U', CombiningAcuteAccent)
+decomposeCombining '\x00db' = Just ('U', CombiningCircumflexAccent)
+decomposeCombining '\x00dc' = Just ('U', CombiningDiaeresis)
+decomposeCombining '\x00dd' = Just ('Y', CombiningAcuteAccent)
+decomposeCombining '\x00e0' = Just ('a', CombiningGraveAccent)
+decomposeCombining '\x00e1' = Just ('a', CombiningAcuteAccent)
+decomposeCombining '\x00e2' = Just ('a', CombiningCircumflexAccent)
+decomposeCombining '\x00e3' = Just ('a', CombiningTilde)
+decomposeCombining '\x00e4' = Just ('a', CombiningDiaeresis)
+decomposeCombining '\x00e5' = Just ('a', CombiningRingAbove)
+decomposeCombining '\x00e7' = Just ('c', CombiningCedilla)
+decomposeCombining '\x00e8' = Just ('e', CombiningGraveAccent)
+decomposeCombining '\x00e9' = Just ('e', CombiningAcuteAccent)
+decomposeCombining '\x00ea' = Just ('e', CombiningCircumflexAccent)
+decomposeCombining '\x00eb' = Just ('e', CombiningDiaeresis)
+decomposeCombining '\x00ec' = Just ('i', CombiningGraveAccent)
+decomposeCombining '\x00ed' = Just ('i', CombiningAcuteAccent)
+decomposeCombining '\x00ee' = Just ('i', CombiningCircumflexAccent)
+decomposeCombining '\x00ef' = Just ('i', CombiningDiaeresis)
+decomposeCombining '\x00f1' = Just ('n', CombiningTilde)
+decomposeCombining '\x00f2' = Just ('o', CombiningGraveAccent)
+decomposeCombining '\x00f3' = Just ('o', CombiningAcuteAccent)
+decomposeCombining '\x00f4' = Just ('o', CombiningCircumflexAccent)
+decomposeCombining '\x00f5' = Just ('o', CombiningTilde)
+decomposeCombining '\x00f6' = Just ('o', CombiningDiaeresis)
+decomposeCombining '\x00f9' = Just ('u', CombiningGraveAccent)
+decomposeCombining '\x00fa' = Just ('u', CombiningAcuteAccent)
+decomposeCombining '\x00fb' = Just ('u', CombiningCircumflexAccent)
+decomposeCombining '\x00fc' = Just ('u', CombiningDiaeresis)
+decomposeCombining '\x00fd' = Just ('y', CombiningAcuteAccent)
+decomposeCombining '\x00ff' = Just ('y', CombiningDiaeresis)
+decomposeCombining '\x0100' = Just ('A', CombiningMacron)
+decomposeCombining '\x0101' = Just ('a', CombiningMacron)
+decomposeCombining '\x0102' = Just ('A', CombiningBreve)
+decomposeCombining '\x0103' = Just ('a', CombiningBreve)
+decomposeCombining '\x0104' = Just ('A', CombiningOgonek)
+decomposeCombining '\x0105' = Just ('a', CombiningOgonek)
+decomposeCombining '\x0106' = Just ('C', CombiningAcuteAccent)
+decomposeCombining '\x0107' = Just ('c', CombiningAcuteAccent)
+decomposeCombining '\x0108' = Just ('C', CombiningCircumflexAccent)
+decomposeCombining '\x0109' = Just ('c', CombiningCircumflexAccent)
+decomposeCombining '\x010a' = Just ('C', CombiningDotAbove)
+decomposeCombining '\x010b' = Just ('c', CombiningDotAbove)
+decomposeCombining '\x010c' = Just ('C', CombiningCaron)
+decomposeCombining '\x010d' = Just ('c', CombiningCaron)
+decomposeCombining '\x010e' = Just ('D', CombiningCaron)
+decomposeCombining '\x010f' = Just ('d', CombiningCaron)
+decomposeCombining '\x0112' = Just ('E', CombiningMacron)
+decomposeCombining '\x0113' = Just ('e', CombiningMacron)
+decomposeCombining '\x0114' = Just ('E', CombiningBreve)
+decomposeCombining '\x0115' = Just ('e', CombiningBreve)
+decomposeCombining '\x0116' = Just ('E', CombiningDotAbove)
+decomposeCombining '\x0117' = Just ('e', CombiningDotAbove)
+decomposeCombining '\x0118' = Just ('E', CombiningOgonek)
+decomposeCombining '\x0119' = Just ('e', CombiningOgonek)
+decomposeCombining '\x011a' = Just ('E', CombiningCaron)
+decomposeCombining '\x011b' = Just ('e', CombiningCaron)
+decomposeCombining '\x011c' = Just ('G', CombiningCircumflexAccent)
+decomposeCombining '\x011d' = Just ('g', CombiningCircumflexAccent)
+decomposeCombining '\x011e' = Just ('G', CombiningBreve)
+decomposeCombining '\x011f' = Just ('g', CombiningBreve)
+decomposeCombining '\x0120' = Just ('G', CombiningDotAbove)
+decomposeCombining '\x0121' = Just ('g', CombiningDotAbove)
+decomposeCombining '\x0122' = Just ('G', CombiningCedilla)
+decomposeCombining '\x0123' = Just ('g', CombiningCedilla)
+decomposeCombining '\x0124' = Just ('H', CombiningCircumflexAccent)
+decomposeCombining '\x0125' = Just ('h', CombiningCircumflexAccent)
+decomposeCombining '\x0128' = Just ('I', CombiningTilde)
+decomposeCombining '\x0129' = Just ('i', CombiningTilde)
+decomposeCombining '\x012a' = Just ('I', CombiningMacron)
+decomposeCombining '\x012b' = Just ('i', CombiningMacron)
+decomposeCombining '\x012c' = Just ('I', CombiningBreve)
+decomposeCombining '\x012d' = Just ('i', CombiningBreve)
+decomposeCombining '\x012e' = Just ('I', CombiningOgonek)
+decomposeCombining '\x012f' = Just ('i', CombiningOgonek)
+decomposeCombining '\x0130' = Just ('I', CombiningDotAbove)
+decomposeCombining '\x0134' = Just ('J', CombiningCircumflexAccent)
+decomposeCombining '\x0135' = Just ('j', CombiningCircumflexAccent)
+decomposeCombining '\x0136' = Just ('K', CombiningCedilla)
+decomposeCombining '\x0137' = Just ('k', CombiningCedilla)
+decomposeCombining '\x0139' = Just ('L', CombiningAcuteAccent)
+decomposeCombining '\x013a' = Just ('l', CombiningAcuteAccent)
+decomposeCombining '\x013b' = Just ('L', CombiningCedilla)
+decomposeCombining '\x013c' = Just ('l', CombiningCedilla)
+decomposeCombining '\x013d' = Just ('L', CombiningCaron)
+decomposeCombining '\x013e' = Just ('l', CombiningCaron)
+decomposeCombining '\x0143' = Just ('N', CombiningAcuteAccent)
+decomposeCombining '\x0144' = Just ('n', CombiningAcuteAccent)
+decomposeCombining '\x0145' = Just ('N', CombiningCedilla)
+decomposeCombining '\x0146' = Just ('n', CombiningCedilla)
+decomposeCombining '\x0147' = Just ('N', CombiningCaron)
+decomposeCombining '\x0148' = Just ('n', CombiningCaron)
+decomposeCombining '\x014c' = Just ('O', CombiningMacron)
+decomposeCombining '\x014d' = Just ('o', CombiningMacron)
+decomposeCombining '\x014e' = Just ('O', CombiningBreve)
+decomposeCombining '\x014f' = Just ('o', CombiningBreve)
+decomposeCombining '\x0150' = Just ('O', CombiningDoubleAcuteAccent)
+decomposeCombining '\x0151' = Just ('o', CombiningDoubleAcuteAccent)
+decomposeCombining '\x0154' = Just ('R', CombiningAcuteAccent)
+decomposeCombining '\x0155' = Just ('r', CombiningAcuteAccent)
+decomposeCombining '\x0156' = Just ('R', CombiningCedilla)
+decomposeCombining '\x0157' = Just ('r', CombiningCedilla)
+decomposeCombining '\x0158' = Just ('R', CombiningCaron)
+decomposeCombining '\x0159' = Just ('r', CombiningCaron)
+decomposeCombining '\x015a' = Just ('S', CombiningAcuteAccent)
+decomposeCombining '\x015b' = Just ('s', CombiningAcuteAccent)
+decomposeCombining '\x015c' = Just ('S', CombiningCircumflexAccent)
+decomposeCombining '\x015d' = Just ('s', CombiningCircumflexAccent)
+decomposeCombining '\x015e' = Just ('S', CombiningCedilla)
+decomposeCombining '\x015f' = Just ('s', CombiningCedilla)
+decomposeCombining '\x0160' = Just ('S', CombiningCaron)
+decomposeCombining '\x0161' = Just ('s', CombiningCaron)
+decomposeCombining '\x0162' = Just ('T', CombiningCedilla)
+decomposeCombining '\x0163' = Just ('t', CombiningCedilla)
+decomposeCombining '\x0164' = Just ('T', CombiningCaron)
+decomposeCombining '\x0165' = Just ('t', CombiningCaron)
+decomposeCombining '\x0168' = Just ('U', CombiningTilde)
+decomposeCombining '\x0169' = Just ('u', CombiningTilde)
+decomposeCombining '\x016a' = Just ('U', CombiningMacron)
+decomposeCombining '\x016b' = Just ('u', CombiningMacron)
+decomposeCombining '\x016c' = Just ('U', CombiningBreve)
+decomposeCombining '\x016d' = Just ('u', CombiningBreve)
+decomposeCombining '\x016e' = Just ('U', CombiningRingAbove)
+decomposeCombining '\x016f' = Just ('u', CombiningRingAbove)
+decomposeCombining '\x0170' = Just ('U', CombiningDoubleAcuteAccent)
+decomposeCombining '\x0171' = Just ('u', CombiningDoubleAcuteAccent)
+decomposeCombining '\x0172' = Just ('U', CombiningOgonek)
+decomposeCombining '\x0173' = Just ('u', CombiningOgonek)
+decomposeCombining '\x0174' = Just ('W', CombiningCircumflexAccent)
+decomposeCombining '\x0175' = Just ('w', CombiningCircumflexAccent)
+decomposeCombining '\x0176' = Just ('Y', CombiningCircumflexAccent)
+decomposeCombining '\x0177' = Just ('y', CombiningCircumflexAccent)
+decomposeCombining '\x0178' = Just ('Y', CombiningDiaeresis)
+decomposeCombining '\x0179' = Just ('Z', CombiningAcuteAccent)
+decomposeCombining '\x017a' = Just ('z', CombiningAcuteAccent)
+decomposeCombining '\x017b' = Just ('Z', CombiningDotAbove)
+decomposeCombining '\x017c' = Just ('z', CombiningDotAbove)
+decomposeCombining '\x017d' = Just ('Z', CombiningCaron)
+decomposeCombining '\x017e' = Just ('z', CombiningCaron)
+decomposeCombining '\x01a0' = Just ('O', CombiningHorn)
+decomposeCombining '\x01a1' = Just ('o', CombiningHorn)
+decomposeCombining '\x01af' = Just ('U', CombiningHorn)
+decomposeCombining '\x01b0' = Just ('u', CombiningHorn)
+decomposeCombining '\x01cd' = Just ('A', CombiningCaron)
+decomposeCombining '\x01ce' = Just ('a', CombiningCaron)
+decomposeCombining '\x01cf' = Just ('I', CombiningCaron)
+decomposeCombining '\x01d0' = Just ('i', CombiningCaron)
+decomposeCombining '\x01d1' = Just ('O', CombiningCaron)
+decomposeCombining '\x01d2' = Just ('o', CombiningCaron)
+decomposeCombining '\x01d3' = Just ('U', CombiningCaron)
+decomposeCombining '\x01d4' = Just ('u', CombiningCaron)
+decomposeCombining '\x01d5' = Just ('\x00dc', CombiningMacron)
+decomposeCombining '\x01d6' = Just ('\x00fc', CombiningMacron)
+decomposeCombining '\x01d7' = Just ('\x00dc', CombiningAcuteAccent)
+decomposeCombining '\x01d8' = Just ('\x00fc', CombiningAcuteAccent)
+decomposeCombining '\x01d9' = Just ('\x00dc', CombiningCaron)
+decomposeCombining '\x01da' = Just ('\x00fc', CombiningCaron)
+decomposeCombining '\x01db' = Just ('\x00dc', CombiningGraveAccent)
+decomposeCombining '\x01dc' = Just ('\x00fc', CombiningGraveAccent)
+decomposeCombining '\x01de' = Just ('\x00c4', CombiningMacron)
+decomposeCombining '\x01df' = Just ('\x00e4', CombiningMacron)
+decomposeCombining '\x01e0' = Just ('\x0226', CombiningMacron)
+decomposeCombining '\x01e1' = Just ('\x0227', CombiningMacron)
+decomposeCombining '\x01e2' = Just ('\x00c6', CombiningMacron)
+decomposeCombining '\x01e3' = Just ('\x00e6', CombiningMacron)
+decomposeCombining '\x01e6' = Just ('G', CombiningCaron)
+decomposeCombining '\x01e7' = Just ('g', CombiningCaron)
+decomposeCombining '\x01e8' = Just ('K', CombiningCaron)
+decomposeCombining '\x01e9' = Just ('k', CombiningCaron)
+decomposeCombining '\x01ea' = Just ('O', CombiningOgonek)
+decomposeCombining '\x01eb' = Just ('o', CombiningOgonek)
+decomposeCombining '\x01ec' = Just ('\x01ea', CombiningMacron)
+decomposeCombining '\x01ed' = Just ('\x01eb', CombiningMacron)
+decomposeCombining '\x01ee' = Just ('\x01b7', CombiningCaron)
+decomposeCombining '\x01ef' = Just ('\x0292', CombiningCaron)
+decomposeCombining '\x01f0' = Just ('j', CombiningCaron)
+decomposeCombining '\x01f4' = Just ('G', CombiningAcuteAccent)
+decomposeCombining '\x01f5' = Just ('g', CombiningAcuteAccent)
+decomposeCombining '\x01f8' = Just ('N', CombiningGraveAccent)
+decomposeCombining '\x01f9' = Just ('n', CombiningGraveAccent)
+decomposeCombining '\x01fa' = Just ('\x00c5', CombiningAcuteAccent)
+decomposeCombining '\x01fb' = Just ('\x00e5', CombiningAcuteAccent)
+decomposeCombining '\x01fc' = Just ('\x00c6', CombiningAcuteAccent)
+decomposeCombining '\x01fd' = Just ('\x00e6', CombiningAcuteAccent)
+decomposeCombining '\x01fe' = Just ('\x00d8', CombiningAcuteAccent)
+decomposeCombining '\x01ff' = Just ('\x00f8', CombiningAcuteAccent)
+decomposeCombining '\x0200' = Just ('A', CombiningDoubleGraveAccent)
+decomposeCombining '\x0201' = Just ('a', CombiningDoubleGraveAccent)
+decomposeCombining '\x0202' = Just ('A', CombiningInvertedBreve)
+decomposeCombining '\x0203' = Just ('a', CombiningInvertedBreve)
+decomposeCombining '\x0204' = Just ('E', CombiningDoubleGraveAccent)
+decomposeCombining '\x0205' = Just ('e', CombiningDoubleGraveAccent)
+decomposeCombining '\x0206' = Just ('E', CombiningInvertedBreve)
+decomposeCombining '\x0207' = Just ('e', CombiningInvertedBreve)
+decomposeCombining '\x0208' = Just ('I', CombiningDoubleGraveAccent)
+decomposeCombining '\x0209' = Just ('i', CombiningDoubleGraveAccent)
+decomposeCombining '\x020a' = Just ('I', CombiningInvertedBreve)
+decomposeCombining '\x020b' = Just ('i', CombiningInvertedBreve)
+decomposeCombining '\x020c' = Just ('O', CombiningDoubleGraveAccent)
+decomposeCombining '\x020d' = Just ('o', CombiningDoubleGraveAccent)
+decomposeCombining '\x020e' = Just ('O', CombiningInvertedBreve)
+decomposeCombining '\x020f' = Just ('o', CombiningInvertedBreve)
+decomposeCombining '\x0210' = Just ('R', CombiningDoubleGraveAccent)
+decomposeCombining '\x0211' = Just ('r', CombiningDoubleGraveAccent)
+decomposeCombining '\x0212' = Just ('R', CombiningInvertedBreve)
+decomposeCombining '\x0213' = Just ('r', CombiningInvertedBreve)
+decomposeCombining '\x0214' = Just ('U', CombiningDoubleGraveAccent)
+decomposeCombining '\x0215' = Just ('u', CombiningDoubleGraveAccent)
+decomposeCombining '\x0216' = Just ('U', CombiningInvertedBreve)
+decomposeCombining '\x0217' = Just ('u', CombiningInvertedBreve)
+decomposeCombining '\x0218' = Just ('S', CombiningCommaBelow)
+decomposeCombining '\x0219' = Just ('s', CombiningCommaBelow)
+decomposeCombining '\x021a' = Just ('T', CombiningCommaBelow)
+decomposeCombining '\x021b' = Just ('t', CombiningCommaBelow)
+decomposeCombining '\x021e' = Just ('H', CombiningCaron)
+decomposeCombining '\x021f' = Just ('h', CombiningCaron)
+decomposeCombining '\x0226' = Just ('A', CombiningDotAbove)
+decomposeCombining '\x0227' = Just ('a', CombiningDotAbove)
+decomposeCombining '\x0228' = Just ('E', CombiningCedilla)
+decomposeCombining '\x0229' = Just ('e', CombiningCedilla)
+decomposeCombining '\x022a' = Just ('\x00d6', CombiningMacron)
+decomposeCombining '\x022b' = Just ('\x00f6', CombiningMacron)
+decomposeCombining '\x022c' = Just ('\x00d5', CombiningMacron)
+decomposeCombining '\x022d' = Just ('\x00f5', CombiningMacron)
+decomposeCombining '\x022e' = Just ('O', CombiningDotAbove)
+decomposeCombining '\x022f' = Just ('o', CombiningDotAbove)
+decomposeCombining '\x0230' = Just ('\x022e', CombiningMacron)
+decomposeCombining '\x0231' = Just ('\x022f', CombiningMacron)
+decomposeCombining '\x0232' = Just ('Y', CombiningMacron)
+decomposeCombining '\x0233' = Just ('y', CombiningMacron)
+decomposeCombining '\x0344' = Just ('\x0308', CombiningAcuteAccent)
+decomposeCombining '\x0385' = Just ('\x00a8', CombiningAcuteAccent)
+decomposeCombining '\x0386' = Just ('\x0391', CombiningAcuteAccent)
+decomposeCombining '\x0388' = Just ('\x0395', CombiningAcuteAccent)
+decomposeCombining '\x0389' = Just ('\x0397', CombiningAcuteAccent)
+decomposeCombining '\x038a' = Just ('\x0399', CombiningAcuteAccent)
+decomposeCombining '\x038c' = Just ('\x039f', CombiningAcuteAccent)
+decomposeCombining '\x038e' = Just ('\x03a5', CombiningAcuteAccent)
+decomposeCombining '\x038f' = Just ('\x03a9', CombiningAcuteAccent)
+decomposeCombining '\x0390' = Just ('\x03ca', CombiningAcuteAccent)
+decomposeCombining '\x03aa' = Just ('\x0399', CombiningDiaeresis)
+decomposeCombining '\x03ab' = Just ('\x03a5', CombiningDiaeresis)
+decomposeCombining '\x03ac' = Just ('\x03b1', CombiningAcuteAccent)
+decomposeCombining '\x03ad' = Just ('\x03b5', CombiningAcuteAccent)
+decomposeCombining '\x03ae' = Just ('\x03b7', CombiningAcuteAccent)
+decomposeCombining '\x03af' = Just ('\x03b9', CombiningAcuteAccent)
+decomposeCombining '\x03b0' = Just ('\x03cb', CombiningAcuteAccent)
+decomposeCombining '\x03ca' = Just ('\x03b9', CombiningDiaeresis)
+decomposeCombining '\x03cb' = Just ('\x03c5', CombiningDiaeresis)
+decomposeCombining '\x03cc' = Just ('\x03bf', CombiningAcuteAccent)
+decomposeCombining '\x03cd' = Just ('\x03c5', CombiningAcuteAccent)
+decomposeCombining '\x03ce' = Just ('\x03c9', CombiningAcuteAccent)
+decomposeCombining '\x03d3' = Just ('\x03d2', CombiningAcuteAccent)
+decomposeCombining '\x03d4' = Just ('\x03d2', CombiningDiaeresis)
+decomposeCombining '\x0400' = Just ('\x0415', CombiningGraveAccent)
+decomposeCombining '\x0401' = Just ('\x0415', CombiningDiaeresis)
+decomposeCombining '\x0403' = Just ('\x0413', CombiningAcuteAccent)
+decomposeCombining '\x0407' = Just ('\x0406', CombiningDiaeresis)
+decomposeCombining '\x040c' = Just ('\x041a', CombiningAcuteAccent)
+decomposeCombining '\x040d' = Just ('\x0418', CombiningGraveAccent)
+decomposeCombining '\x040e' = Just ('\x0423', CombiningBreve)
+decomposeCombining '\x0419' = Just ('\x0418', CombiningBreve)
+decomposeCombining '\x0439' = Just ('\x0438', CombiningBreve)
+decomposeCombining '\x0450' = Just ('\x0435', CombiningGraveAccent)
+decomposeCombining '\x0451' = Just ('\x0435', CombiningDiaeresis)
+decomposeCombining '\x0453' = Just ('\x0433', CombiningAcuteAccent)
+decomposeCombining '\x0457' = Just ('\x0456', CombiningDiaeresis)
+decomposeCombining '\x045c' = Just ('\x043a', CombiningAcuteAccent)
+decomposeCombining '\x045d' = Just ('\x0438', CombiningGraveAccent)
+decomposeCombining '\x045e' = Just ('\x0443', CombiningBreve)
+decomposeCombining '\x0476' = Just ('\x0474', CombiningDoubleGraveAccent)
+decomposeCombining '\x0477' = Just ('\x0475', CombiningDoubleGraveAccent)
+decomposeCombining '\x04c1' = Just ('\x0416', CombiningBreve)
+decomposeCombining '\x04c2' = Just ('\x0436', CombiningBreve)
+decomposeCombining '\x04d0' = Just ('\x0410', CombiningBreve)
+decomposeCombining '\x04d1' = Just ('\x0430', CombiningBreve)
+decomposeCombining '\x04d2' = Just ('\x0410', CombiningDiaeresis)
+decomposeCombining '\x04d3' = Just ('\x0430', CombiningDiaeresis)
+decomposeCombining '\x04d6' = Just ('\x0415', CombiningBreve)
+decomposeCombining '\x04d7' = Just ('\x0435', CombiningBreve)
+decomposeCombining '\x04da' = Just ('\x04d8', CombiningDiaeresis)
+decomposeCombining '\x04db' = Just ('\x04d9', CombiningDiaeresis)
+decomposeCombining '\x04dc' = Just ('\x0416', CombiningDiaeresis)
+decomposeCombining '\x04dd' = Just ('\x0436', CombiningDiaeresis)
+decomposeCombining '\x04de' = Just ('\x0417', CombiningDiaeresis)
+decomposeCombining '\x04df' = Just ('\x0437', CombiningDiaeresis)
+decomposeCombining '\x04e2' = Just ('\x0418', CombiningMacron)
+decomposeCombining '\x04e3' = Just ('\x0438', CombiningMacron)
+decomposeCombining '\x04e4' = Just ('\x0418', CombiningDiaeresis)
+decomposeCombining '\x04e5' = Just ('\x0438', CombiningDiaeresis)
+decomposeCombining '\x04e6' = Just ('\x041e', CombiningDiaeresis)
+decomposeCombining '\x04e7' = Just ('\x043e', CombiningDiaeresis)
+decomposeCombining '\x04ea' = Just ('\x04e8', CombiningDiaeresis)
+decomposeCombining '\x04eb' = Just ('\x04e9', CombiningDiaeresis)
+decomposeCombining '\x04ec' = Just ('\x042d', CombiningDiaeresis)
+decomposeCombining '\x04ed' = Just ('\x044d', CombiningDiaeresis)
+decomposeCombining '\x04ee' = Just ('\x0423', CombiningMacron)
+decomposeCombining '\x04ef' = Just ('\x0443', CombiningMacron)
+decomposeCombining '\x04f0' = Just ('\x0423', CombiningDiaeresis)
+decomposeCombining '\x04f1' = Just ('\x0443', CombiningDiaeresis)
+decomposeCombining '\x04f2' = Just ('\x0423', CombiningDoubleAcuteAccent)
+decomposeCombining '\x04f3' = Just ('\x0443', CombiningDoubleAcuteAccent)
+decomposeCombining '\x04f4' = Just ('\x0427', CombiningDiaeresis)
+decomposeCombining '\x04f5' = Just ('\x0447', CombiningDiaeresis)
+decomposeCombining '\x04f8' = Just ('\x042b', CombiningDiaeresis)
+decomposeCombining '\x04f9' = Just ('\x044b', CombiningDiaeresis)
+decomposeCombining '\x0622' = Just ('\x0627', ArabicMaddahAbove)
+decomposeCombining '\x0623' = Just ('\x0627', ArabicHamzaAbove)
+decomposeCombining '\x0624' = Just ('\x0648', ArabicHamzaAbove)
+decomposeCombining '\x0625' = Just ('\x0627', ArabicHamzaBelow)
+decomposeCombining '\x0626' = Just ('\x064a', ArabicHamzaAbove)
+decomposeCombining '\x06c0' = Just ('\x06d5', ArabicHamzaAbove)
+decomposeCombining '\x06c2' = Just ('\x06c1', ArabicHamzaAbove)
+decomposeCombining '\x06d3' = Just ('\x06d2', ArabicHamzaAbove)
+decomposeCombining '\x0929' = Just ('\x0928', DevanagariSignNukta)
+decomposeCombining '\x0931' = Just ('\x0930', DevanagariSignNukta)
+decomposeCombining '\x0934' = Just ('\x0933', DevanagariSignNukta)
+decomposeCombining '\x0958' = Just ('\x0915', DevanagariSignNukta)
+decomposeCombining '\x0959' = Just ('\x0916', DevanagariSignNukta)
+decomposeCombining '\x095a' = Just ('\x0917', DevanagariSignNukta)
+decomposeCombining '\x095b' = Just ('\x091c', DevanagariSignNukta)
+decomposeCombining '\x095c' = Just ('\x0921', DevanagariSignNukta)
+decomposeCombining '\x095d' = Just ('\x0922', DevanagariSignNukta)
+decomposeCombining '\x095e' = Just ('\x092b', DevanagariSignNukta)
+decomposeCombining '\x095f' = Just ('\x092f', DevanagariSignNukta)
+decomposeCombining '\x09cb' = Just ('\x09c7', BengaliVowelSignAa)
+decomposeCombining '\x09cc' = Just ('\x09c7', BengaliAuLengthMark)
+decomposeCombining '\x09dc' = Just ('\x09a1', BengaliSignNukta)
+decomposeCombining '\x09dd' = Just ('\x09a2', BengaliSignNukta)
+decomposeCombining '\x09df' = Just ('\x09af', BengaliSignNukta)
+decomposeCombining '\x0a33' = Just ('\x0a32', GurmukhiSignNukta)
+decomposeCombining '\x0a36' = Just ('\x0a38', GurmukhiSignNukta)
+decomposeCombining '\x0a59' = Just ('\x0a16', GurmukhiSignNukta)
+decomposeCombining '\x0a5a' = Just ('\x0a17', GurmukhiSignNukta)
+decomposeCombining '\x0a5b' = Just ('\x0a1c', GurmukhiSignNukta)
+decomposeCombining '\x0a5e' = Just ('\x0a2b', GurmukhiSignNukta)
+decomposeCombining '\x0b48' = Just ('\x0b47', OriyaAiLengthMark)
+decomposeCombining '\x0b4b' = Just ('\x0b47', OriyaVowelSignAa)
+decomposeCombining '\x0b4c' = Just ('\x0b47', OriyaAuLengthMark)
+decomposeCombining '\x0b5c' = Just ('\x0b21', OriyaSignNukta)
+decomposeCombining '\x0b5d' = Just ('\x0b22', OriyaSignNukta)
+decomposeCombining '\x0b94' = Just ('\x0b92', TamilAuLengthMark)
+decomposeCombining '\x0bca' = Just ('\x0bc6', TamilVowelSignAa)
+decomposeCombining '\x0bcb' = Just ('\x0bc7', TamilVowelSignAa)
+decomposeCombining '\x0bcc' = Just ('\x0bc6', TamilAuLengthMark)
+decomposeCombining '\x0c48' = Just ('\x0c46', TeluguAiLengthMark)
+decomposeCombining '\x0cc0' = Just ('\x0cbf', KannadaLengthMark)
+decomposeCombining '\x0cc7' = Just ('\x0cc6', KannadaLengthMark)
+decomposeCombining '\x0cc8' = Just ('\x0cc6', KannadaAiLengthMark)
+decomposeCombining '\x0cca' = Just ('\x0cc6', KannadaVowelSignUu)
+decomposeCombining '\x0ccb' = Just ('\x0cca', KannadaLengthMark)
+decomposeCombining '\x0d4a' = Just ('\x0d46', MalayalamVowelSignAa)
+decomposeCombining '\x0d4b' = Just ('\x0d47', MalayalamVowelSignAa)
+decomposeCombining '\x0d4c' = Just ('\x0d46', MalayalamAuLengthMark)
+decomposeCombining '\x0dda' = Just ('\x0dd9', SinhalaSignAlLakuna)
+decomposeCombining '\x0ddc' = Just ('\x0dd9', SinhalaVowelSignAelaPilla)
+decomposeCombining '\x0ddd' = Just ('\x0ddc', SinhalaSignAlLakuna)
+decomposeCombining '\x0dde' = Just ('\x0dd9', SinhalaVowelSignGayanukitta)
+decomposeCombining '\x0f43' = Just ('\x0f42', TibetanSubjoinedLetterHa)
+decomposeCombining '\x0f4d' = Just ('\x0f4c', TibetanSubjoinedLetterHa)
+decomposeCombining '\x0f52' = Just ('\x0f51', TibetanSubjoinedLetterHa)
+decomposeCombining '\x0f57' = Just ('\x0f56', TibetanSubjoinedLetterHa)
+decomposeCombining '\x0f5c' = Just ('\x0f5b', TibetanSubjoinedLetterHa)
+decomposeCombining '\x0f69' = Just ('\x0f40', TibetanSubjoinedLetterSsa)
+decomposeCombining '\x0f73' = Just ('\x0f71', TibetanVowelSignI)
+decomposeCombining '\x0f75' = Just ('\x0f71', TibetanVowelSignU)
+decomposeCombining '\x0f76' = Just ('\x0fb2', TibetanVowelSignReversedI)
+decomposeCombining '\x0f78' = Just ('\x0fb3', TibetanVowelSignReversedI)
+decomposeCombining '\x0f81' = Just ('\x0f71', TibetanVowelSignReversedI)
+decomposeCombining '\x0f93' = Just ('\x0f92', TibetanSubjoinedLetterHa)
+decomposeCombining '\x0f9d' = Just ('\x0f9c', TibetanSubjoinedLetterHa)
+decomposeCombining '\x0fa2' = Just ('\x0fa1', TibetanSubjoinedLetterHa)
+decomposeCombining '\x0fa7' = Just ('\x0fa6', TibetanSubjoinedLetterHa)
+decomposeCombining '\x0fac' = Just ('\x0fab', TibetanSubjoinedLetterHa)
+decomposeCombining '\x0fb9' = Just ('\x0f90', TibetanSubjoinedLetterSsa)
+decomposeCombining '\x1026' = Just ('\x1025', MyanmarVowelSignIi)
+decomposeCombining '\x1b06' = Just ('\x1b05', BalineseVowelSignTedung)
+decomposeCombining '\x1b08' = Just ('\x1b07', BalineseVowelSignTedung)
+decomposeCombining '\x1b0a' = Just ('\x1b09', BalineseVowelSignTedung)
+decomposeCombining '\x1b0c' = Just ('\x1b0b', BalineseVowelSignTedung)
+decomposeCombining '\x1b0e' = Just ('\x1b0d', BalineseVowelSignTedung)
+decomposeCombining '\x1b12' = Just ('\x1b11', BalineseVowelSignTedung)
+decomposeCombining '\x1b3b' = Just ('\x1b3a', BalineseVowelSignTedung)
+decomposeCombining '\x1b3d' = Just ('\x1b3c', BalineseVowelSignTedung)
+decomposeCombining '\x1b40' = Just ('\x1b3e', BalineseVowelSignTedung)
+decomposeCombining '\x1b41' = Just ('\x1b3f', BalineseVowelSignTedung)
+decomposeCombining '\x1b43' = Just ('\x1b42', BalineseVowelSignTedung)
+decomposeCombining '\x1e00' = Just ('A', CombiningRingBelow)
+decomposeCombining '\x1e01' = Just ('a', CombiningRingBelow)
+decomposeCombining '\x1e02' = Just ('B', CombiningDotAbove)
+decomposeCombining '\x1e03' = Just ('b', CombiningDotAbove)
+decomposeCombining '\x1e04' = Just ('B', CombiningDotBelow)
+decomposeCombining '\x1e05' = Just ('b', CombiningDotBelow)
+decomposeCombining '\x1e06' = Just ('B', CombiningMacronBelow)
+decomposeCombining '\x1e07' = Just ('b', CombiningMacronBelow)
+decomposeCombining '\x1e08' = Just ('\x00c7', CombiningAcuteAccent)
+decomposeCombining '\x1e09' = Just ('\x00e7', CombiningAcuteAccent)
+decomposeCombining '\x1e0a' = Just ('D', CombiningDotAbove)
+decomposeCombining '\x1e0b' = Just ('d', CombiningDotAbove)
+decomposeCombining '\x1e0c' = Just ('D', CombiningDotBelow)
+decomposeCombining '\x1e0d' = Just ('d', CombiningDotBelow)
+decomposeCombining '\x1e0e' = Just ('D', CombiningMacronBelow)
+decomposeCombining '\x1e0f' = Just ('d', CombiningMacronBelow)
+decomposeCombining '\x1e10' = Just ('D', CombiningCedilla)
+decomposeCombining '\x1e11' = Just ('d', CombiningCedilla)
+decomposeCombining '\x1e12' = Just ('D', CombiningCircumflexAccentBelow)
+decomposeCombining '\x1e13' = Just ('d', CombiningCircumflexAccentBelow)
+decomposeCombining '\x1e14' = Just ('\x0112', CombiningGraveAccent)
+decomposeCombining '\x1e15' = Just ('\x0113', CombiningGraveAccent)
+decomposeCombining '\x1e16' = Just ('\x0112', CombiningAcuteAccent)
+decomposeCombining '\x1e17' = Just ('\x0113', CombiningAcuteAccent)
+decomposeCombining '\x1e18' = Just ('E', CombiningCircumflexAccentBelow)
+decomposeCombining '\x1e19' = Just ('e', CombiningCircumflexAccentBelow)
+decomposeCombining '\x1e1a' = Just ('E', CombiningTildeBelow)
+decomposeCombining '\x1e1b' = Just ('e', CombiningTildeBelow)
+decomposeCombining '\x1e1c' = Just ('\x0228', CombiningBreve)
+decomposeCombining '\x1e1d' = Just ('\x0229', CombiningBreve)
+decomposeCombining '\x1e1e' = Just ('F', CombiningDotAbove)
+decomposeCombining '\x1e1f' = Just ('f', CombiningDotAbove)
+decomposeCombining '\x1e20' = Just ('G', CombiningMacron)
+decomposeCombining '\x1e21' = Just ('g', CombiningMacron)
+decomposeCombining '\x1e22' = Just ('H', CombiningDotAbove)
+decomposeCombining '\x1e23' = Just ('h', CombiningDotAbove)
+decomposeCombining '\x1e24' = Just ('H', CombiningDotBelow)
+decomposeCombining '\x1e25' = Just ('h', CombiningDotBelow)
+decomposeCombining '\x1e26' = Just ('H', CombiningDiaeresis)
+decomposeCombining '\x1e27' = Just ('h', CombiningDiaeresis)
+decomposeCombining '\x1e28' = Just ('H', CombiningCedilla)
+decomposeCombining '\x1e29' = Just ('h', CombiningCedilla)
+decomposeCombining '\x1e2a' = Just ('H', CombiningBreveBelow)
+decomposeCombining '\x1e2b' = Just ('h', CombiningBreveBelow)
+decomposeCombining '\x1e2c' = Just ('I', CombiningTildeBelow)
+decomposeCombining '\x1e2d' = Just ('i', CombiningTildeBelow)
+decomposeCombining '\x1e2e' = Just ('\x00cf', CombiningAcuteAccent)
+decomposeCombining '\x1e2f' = Just ('\x00ef', CombiningAcuteAccent)
+decomposeCombining '\x1e30' = Just ('K', CombiningAcuteAccent)
+decomposeCombining '\x1e31' = Just ('k', CombiningAcuteAccent)
+decomposeCombining '\x1e32' = Just ('K', CombiningDotBelow)
+decomposeCombining '\x1e33' = Just ('k', CombiningDotBelow)
+decomposeCombining '\x1e34' = Just ('K', CombiningMacronBelow)
+decomposeCombining '\x1e35' = Just ('k', CombiningMacronBelow)
+decomposeCombining '\x1e36' = Just ('L', CombiningDotBelow)
+decomposeCombining '\x1e37' = Just ('l', CombiningDotBelow)
+decomposeCombining '\x1e38' = Just ('\x1e36', CombiningMacron)
+decomposeCombining '\x1e39' = Just ('\x1e37', CombiningMacron)
+decomposeCombining '\x1e3a' = Just ('L', CombiningMacronBelow)
+decomposeCombining '\x1e3b' = Just ('l', CombiningMacronBelow)
+decomposeCombining '\x1e3c' = Just ('L', CombiningCircumflexAccentBelow)
+decomposeCombining '\x1e3d' = Just ('l', CombiningCircumflexAccentBelow)
+decomposeCombining '\x1e3e' = Just ('M', CombiningAcuteAccent)
+decomposeCombining '\x1e3f' = Just ('m', CombiningAcuteAccent)
+decomposeCombining '\x1e40' = Just ('M', CombiningDotAbove)
+decomposeCombining '\x1e41' = Just ('m', CombiningDotAbove)
+decomposeCombining '\x1e42' = Just ('M', CombiningDotBelow)
+decomposeCombining '\x1e43' = Just ('m', CombiningDotBelow)
+decomposeCombining '\x1e44' = Just ('N', CombiningDotAbove)
+decomposeCombining '\x1e45' = Just ('n', CombiningDotAbove)
+decomposeCombining '\x1e46' = Just ('N', CombiningDotBelow)
+decomposeCombining '\x1e47' = Just ('n', CombiningDotBelow)
+decomposeCombining '\x1e48' = Just ('N', CombiningMacronBelow)
+decomposeCombining '\x1e49' = Just ('n', CombiningMacronBelow)
+decomposeCombining '\x1e4a' = Just ('N', CombiningCircumflexAccentBelow)
+decomposeCombining '\x1e4b' = Just ('n', CombiningCircumflexAccentBelow)
+decomposeCombining '\x1e4c' = Just ('\x00d5', CombiningAcuteAccent)
+decomposeCombining '\x1e4d' = Just ('\x00f5', CombiningAcuteAccent)
+decomposeCombining '\x1e4e' = Just ('\x00d5', CombiningDiaeresis)
+decomposeCombining '\x1e4f' = Just ('\x00f5', CombiningDiaeresis)
+decomposeCombining '\x1e50' = Just ('\x014c', CombiningGraveAccent)
+decomposeCombining '\x1e51' = Just ('\x014d', CombiningGraveAccent)
+decomposeCombining '\x1e52' = Just ('\x014c', CombiningAcuteAccent)
+decomposeCombining '\x1e53' = Just ('\x014d', CombiningAcuteAccent)
+decomposeCombining '\x1e54' = Just ('P', CombiningAcuteAccent)
+decomposeCombining '\x1e55' = Just ('p', CombiningAcuteAccent)
+decomposeCombining '\x1e56' = Just ('P', CombiningDotAbove)
+decomposeCombining '\x1e57' = Just ('p', CombiningDotAbove)
+decomposeCombining '\x1e58' = Just ('R', CombiningDotAbove)
+decomposeCombining '\x1e59' = Just ('r', CombiningDotAbove)
+decomposeCombining '\x1e5a' = Just ('R', CombiningDotBelow)
+decomposeCombining '\x1e5b' = Just ('r', CombiningDotBelow)
+decomposeCombining '\x1e5c' = Just ('\x1e5a', CombiningMacron)
+decomposeCombining '\x1e5d' = Just ('\x1e5b', CombiningMacron)
+decomposeCombining '\x1e5e' = Just ('R', CombiningMacronBelow)
+decomposeCombining '\x1e5f' = Just ('r', CombiningMacronBelow)
+decomposeCombining '\x1e60' = Just ('S', CombiningDotAbove)
+decomposeCombining '\x1e61' = Just ('s', CombiningDotAbove)
+decomposeCombining '\x1e62' = Just ('S', CombiningDotBelow)
+decomposeCombining '\x1e63' = Just ('s', CombiningDotBelow)
+decomposeCombining '\x1e64' = Just ('\x015a', CombiningDotAbove)
+decomposeCombining '\x1e65' = Just ('\x015b', CombiningDotAbove)
+decomposeCombining '\x1e66' = Just ('\x0160', CombiningDotAbove)
+decomposeCombining '\x1e67' = Just ('\x0161', CombiningDotAbove)
+decomposeCombining '\x1e68' = Just ('\x1e62', CombiningDotAbove)
+decomposeCombining '\x1e69' = Just ('\x1e63', CombiningDotAbove)
+decomposeCombining '\x1e6a' = Just ('T', CombiningDotAbove)
+decomposeCombining '\x1e6b' = Just ('t', CombiningDotAbove)
+decomposeCombining '\x1e6c' = Just ('T', CombiningDotBelow)
+decomposeCombining '\x1e6d' = Just ('t', CombiningDotBelow)
+decomposeCombining '\x1e6e' = Just ('T', CombiningMacronBelow)
+decomposeCombining '\x1e6f' = Just ('t', CombiningMacronBelow)
+decomposeCombining '\x1e70' = Just ('T', CombiningCircumflexAccentBelow)
+decomposeCombining '\x1e71' = Just ('t', CombiningCircumflexAccentBelow)
+decomposeCombining '\x1e72' = Just ('U', CombiningDiaeresisBelow)
+decomposeCombining '\x1e73' = Just ('u', CombiningDiaeresisBelow)
+decomposeCombining '\x1e74' = Just ('U', CombiningTildeBelow)
+decomposeCombining '\x1e75' = Just ('u', CombiningTildeBelow)
+decomposeCombining '\x1e76' = Just ('U', CombiningCircumflexAccentBelow)
+decomposeCombining '\x1e77' = Just ('u', CombiningCircumflexAccentBelow)
+decomposeCombining '\x1e78' = Just ('\x0168', CombiningAcuteAccent)
+decomposeCombining '\x1e79' = Just ('\x0169', CombiningAcuteAccent)
+decomposeCombining '\x1e7a' = Just ('\x016a', CombiningDiaeresis)
+decomposeCombining '\x1e7b' = Just ('\x016b', CombiningDiaeresis)
+decomposeCombining '\x1e7c' = Just ('V', CombiningTilde)
+decomposeCombining '\x1e7d' = Just ('v', CombiningTilde)
+decomposeCombining '\x1e7e' = Just ('V', CombiningDotBelow)
+decomposeCombining '\x1e7f' = Just ('v', CombiningDotBelow)
+decomposeCombining '\x1e80' = Just ('W', CombiningGraveAccent)
+decomposeCombining '\x1e81' = Just ('w', CombiningGraveAccent)
+decomposeCombining '\x1e82' = Just ('W', CombiningAcuteAccent)
+decomposeCombining '\x1e83' = Just ('w', CombiningAcuteAccent)
+decomposeCombining '\x1e84' = Just ('W', CombiningDiaeresis)
+decomposeCombining '\x1e85' = Just ('w', CombiningDiaeresis)
+decomposeCombining '\x1e86' = Just ('W', CombiningDotAbove)
+decomposeCombining '\x1e87' = Just ('w', CombiningDotAbove)
+decomposeCombining '\x1e88' = Just ('W', CombiningDotBelow)
+decomposeCombining '\x1e89' = Just ('w', CombiningDotBelow)
+decomposeCombining '\x1e8a' = Just ('X', CombiningDotAbove)
+decomposeCombining '\x1e8b' = Just ('x', CombiningDotAbove)
+decomposeCombining '\x1e8c' = Just ('X', CombiningDiaeresis)
+decomposeCombining '\x1e8d' = Just ('x', CombiningDiaeresis)
+decomposeCombining '\x1e8e' = Just ('Y', CombiningDotAbove)
+decomposeCombining '\x1e8f' = Just ('y', CombiningDotAbove)
+decomposeCombining '\x1e90' = Just ('Z', CombiningCircumflexAccent)
+decomposeCombining '\x1e91' = Just ('z', CombiningCircumflexAccent)
+decomposeCombining '\x1e92' = Just ('Z', CombiningDotBelow)
+decomposeCombining '\x1e93' = Just ('z', CombiningDotBelow)
+decomposeCombining '\x1e94' = Just ('Z', CombiningMacronBelow)
+decomposeCombining '\x1e95' = Just ('z', CombiningMacronBelow)
+decomposeCombining '\x1e96' = Just ('h', CombiningMacronBelow)
+decomposeCombining '\x1e97' = Just ('t', CombiningDiaeresis)
+decomposeCombining '\x1e98' = Just ('w', CombiningRingAbove)
+decomposeCombining '\x1e99' = Just ('y', CombiningRingAbove)
+decomposeCombining '\x1e9b' = Just ('\x017f', CombiningDotAbove)
+decomposeCombining '\x1ea0' = Just ('A', CombiningDotBelow)
+decomposeCombining '\x1ea1' = Just ('a', CombiningDotBelow)
+decomposeCombining '\x1ea2' = Just ('A', CombiningHookAbove)
+decomposeCombining '\x1ea3' = Just ('a', CombiningHookAbove)
+decomposeCombining '\x1ea4' = Just ('\x00c2', CombiningAcuteAccent)
+decomposeCombining '\x1ea5' = Just ('\x00e2', CombiningAcuteAccent)
+decomposeCombining '\x1ea6' = Just ('\x00c2', CombiningGraveAccent)
+decomposeCombining '\x1ea7' = Just ('\x00e2', CombiningGraveAccent)
+decomposeCombining '\x1ea8' = Just ('\x00c2', CombiningHookAbove)
+decomposeCombining '\x1ea9' = Just ('\x00e2', CombiningHookAbove)
+decomposeCombining '\x1eaa' = Just ('\x00c2', CombiningTilde)
+decomposeCombining '\x1eab' = Just ('\x00e2', CombiningTilde)
+decomposeCombining '\x1eac' = Just ('\x1ea0', CombiningCircumflexAccent)
+decomposeCombining '\x1ead' = Just ('\x1ea1', CombiningCircumflexAccent)
+decomposeCombining '\x1eae' = Just ('\x0102', CombiningAcuteAccent)
+decomposeCombining '\x1eaf' = Just ('\x0103', CombiningAcuteAccent)
+decomposeCombining '\x1eb0' = Just ('\x0102', CombiningGraveAccent)
+decomposeCombining '\x1eb1' = Just ('\x0103', CombiningGraveAccent)
+decomposeCombining '\x1eb2' = Just ('\x0102', CombiningHookAbove)
+decomposeCombining '\x1eb3' = Just ('\x0103', CombiningHookAbove)
+decomposeCombining '\x1eb4' = Just ('\x0102', CombiningTilde)
+decomposeCombining '\x1eb5' = Just ('\x0103', CombiningTilde)
+decomposeCombining '\x1eb6' = Just ('\x1ea0', CombiningBreve)
+decomposeCombining '\x1eb7' = Just ('\x1ea1', CombiningBreve)
+decomposeCombining '\x1eb8' = Just ('E', CombiningDotBelow)
+decomposeCombining '\x1eb9' = Just ('e', CombiningDotBelow)
+decomposeCombining '\x1eba' = Just ('E', CombiningHookAbove)
+decomposeCombining '\x1ebb' = Just ('e', CombiningHookAbove)
+decomposeCombining '\x1ebc' = Just ('E', CombiningTilde)
+decomposeCombining '\x1ebd' = Just ('e', CombiningTilde)
+decomposeCombining '\x1ebe' = Just ('\x00ca', CombiningAcuteAccent)
+decomposeCombining '\x1ebf' = Just ('\x00ea', CombiningAcuteAccent)
+decomposeCombining '\x1ec0' = Just ('\x00ca', CombiningGraveAccent)
+decomposeCombining '\x1ec1' = Just ('\x00ea', CombiningGraveAccent)
+decomposeCombining '\x1ec2' = Just ('\x00ca', CombiningHookAbove)
+decomposeCombining '\x1ec3' = Just ('\x00ea', CombiningHookAbove)
+decomposeCombining '\x1ec4' = Just ('\x00ca', CombiningTilde)
+decomposeCombining '\x1ec5' = Just ('\x00ea', CombiningTilde)
+decomposeCombining '\x1ec6' = Just ('\x1eb8', CombiningCircumflexAccent)
+decomposeCombining '\x1ec7' = Just ('\x1eb9', CombiningCircumflexAccent)
+decomposeCombining '\x1ec8' = Just ('I', CombiningHookAbove)
+decomposeCombining '\x1ec9' = Just ('i', CombiningHookAbove)
+decomposeCombining '\x1eca' = Just ('I', CombiningDotBelow)
+decomposeCombining '\x1ecb' = Just ('i', CombiningDotBelow)
+decomposeCombining '\x1ecc' = Just ('O', CombiningDotBelow)
+decomposeCombining '\x1ecd' = Just ('o', CombiningDotBelow)
+decomposeCombining '\x1ece' = Just ('O', CombiningHookAbove)
+decomposeCombining '\x1ecf' = Just ('o', CombiningHookAbove)
+decomposeCombining '\x1ed0' = Just ('\x00d4', CombiningAcuteAccent)
+decomposeCombining '\x1ed1' = Just ('\x00f4', CombiningAcuteAccent)
+decomposeCombining '\x1ed2' = Just ('\x00d4', CombiningGraveAccent)
+decomposeCombining '\x1ed3' = Just ('\x00f4', CombiningGraveAccent)
+decomposeCombining '\x1ed4' = Just ('\x00d4', CombiningHookAbove)
+decomposeCombining '\x1ed5' = Just ('\x00f4', CombiningHookAbove)
+decomposeCombining '\x1ed6' = Just ('\x00d4', CombiningTilde)
+decomposeCombining '\x1ed7' = Just ('\x00f4', CombiningTilde)
+decomposeCombining '\x1ed8' = Just ('\x1ecc', CombiningCircumflexAccent)
+decomposeCombining '\x1ed9' = Just ('\x1ecd', CombiningCircumflexAccent)
+decomposeCombining '\x1eda' = Just ('\x01a0', CombiningAcuteAccent)
+decomposeCombining '\x1edb' = Just ('\x01a1', CombiningAcuteAccent)
+decomposeCombining '\x1edc' = Just ('\x01a0', CombiningGraveAccent)
+decomposeCombining '\x1edd' = Just ('\x01a1', CombiningGraveAccent)
+decomposeCombining '\x1ede' = Just ('\x01a0', CombiningHookAbove)
+decomposeCombining '\x1edf' = Just ('\x01a1', CombiningHookAbove)
+decomposeCombining '\x1ee0' = Just ('\x01a0', CombiningTilde)
+decomposeCombining '\x1ee1' = Just ('\x01a1', CombiningTilde)
+decomposeCombining '\x1ee2' = Just ('\x01a0', CombiningDotBelow)
+decomposeCombining '\x1ee3' = Just ('\x01a1', CombiningDotBelow)
+decomposeCombining '\x1ee4' = Just ('U', CombiningDotBelow)
+decomposeCombining '\x1ee5' = Just ('u', CombiningDotBelow)
+decomposeCombining '\x1ee6' = Just ('U', CombiningHookAbove)
+decomposeCombining '\x1ee7' = Just ('u', CombiningHookAbove)
+decomposeCombining '\x1ee8' = Just ('\x01af', CombiningAcuteAccent)
+decomposeCombining '\x1ee9' = Just ('\x01b0', CombiningAcuteAccent)
+decomposeCombining '\x1eea' = Just ('\x01af', CombiningGraveAccent)
+decomposeCombining '\x1eeb' = Just ('\x01b0', CombiningGraveAccent)
+decomposeCombining '\x1eec' = Just ('\x01af', CombiningHookAbove)
+decomposeCombining '\x1eed' = Just ('\x01b0', CombiningHookAbove)
+decomposeCombining '\x1eee' = Just ('\x01af', CombiningTilde)
+decomposeCombining '\x1eef' = Just ('\x01b0', CombiningTilde)
+decomposeCombining '\x1ef0' = Just ('\x01af', CombiningDotBelow)
+decomposeCombining '\x1ef1' = Just ('\x01b0', CombiningDotBelow)
+decomposeCombining '\x1ef2' = Just ('Y', CombiningGraveAccent)
+decomposeCombining '\x1ef3' = Just ('y', CombiningGraveAccent)
+decomposeCombining '\x1ef4' = Just ('Y', CombiningDotBelow)
+decomposeCombining '\x1ef5' = Just ('y', CombiningDotBelow)
+decomposeCombining '\x1ef6' = Just ('Y', CombiningHookAbove)
+decomposeCombining '\x1ef7' = Just ('y', CombiningHookAbove)
+decomposeCombining '\x1ef8' = Just ('Y', CombiningTilde)
+decomposeCombining '\x1ef9' = Just ('y', CombiningTilde)
+decomposeCombining '\x1f00' = Just ('\x03b1', CombiningCommaAbove)
+decomposeCombining '\x1f01' = Just ('\x03b1', CombiningReversedCommaAbove)
+decomposeCombining '\x1f02' = Just ('\x1f00', CombiningGraveAccent)
+decomposeCombining '\x1f03' = Just ('\x1f01', CombiningGraveAccent)
+decomposeCombining '\x1f04' = Just ('\x1f00', CombiningAcuteAccent)
+decomposeCombining '\x1f05' = Just ('\x1f01', CombiningAcuteAccent)
+decomposeCombining '\x1f06' = Just ('\x1f00', CombiningGreekPerispomeni)
+decomposeCombining '\x1f07' = Just ('\x1f01', CombiningGreekPerispomeni)
+decomposeCombining '\x1f08' = Just ('\x0391', CombiningCommaAbove)
+decomposeCombining '\x1f09' = Just ('\x0391', CombiningReversedCommaAbove)
+decomposeCombining '\x1f0a' = Just ('\x1f08', CombiningGraveAccent)
+decomposeCombining '\x1f0b' = Just ('\x1f09', CombiningGraveAccent)
+decomposeCombining '\x1f0c' = Just ('\x1f08', CombiningAcuteAccent)
+decomposeCombining '\x1f0d' = Just ('\x1f09', CombiningAcuteAccent)
+decomposeCombining '\x1f0e' = Just ('\x1f08', CombiningGreekPerispomeni)
+decomposeCombining '\x1f0f' = Just ('\x1f09', CombiningGreekPerispomeni)
+decomposeCombining '\x1f10' = Just ('\x03b5', CombiningCommaAbove)
+decomposeCombining '\x1f11' = Just ('\x03b5', CombiningReversedCommaAbove)
+decomposeCombining '\x1f12' = Just ('\x1f10', CombiningGraveAccent)
+decomposeCombining '\x1f13' = Just ('\x1f11', CombiningGraveAccent)
+decomposeCombining '\x1f14' = Just ('\x1f10', CombiningAcuteAccent)
+decomposeCombining '\x1f15' = Just ('\x1f11', CombiningAcuteAccent)
+decomposeCombining '\x1f18' = Just ('\x0395', CombiningCommaAbove)
+decomposeCombining '\x1f19' = Just ('\x0395', CombiningReversedCommaAbove)
+decomposeCombining '\x1f1a' = Just ('\x1f18', CombiningGraveAccent)
+decomposeCombining '\x1f1b' = Just ('\x1f19', CombiningGraveAccent)
+decomposeCombining '\x1f1c' = Just ('\x1f18', CombiningAcuteAccent)
+decomposeCombining '\x1f1d' = Just ('\x1f19', CombiningAcuteAccent)
+decomposeCombining '\x1f20' = Just ('\x03b7', CombiningCommaAbove)
+decomposeCombining '\x1f21' = Just ('\x03b7', CombiningReversedCommaAbove)
+decomposeCombining '\x1f22' = Just ('\x1f20', CombiningGraveAccent)
+decomposeCombining '\x1f23' = Just ('\x1f21', CombiningGraveAccent)
+decomposeCombining '\x1f24' = Just ('\x1f20', CombiningAcuteAccent)
+decomposeCombining '\x1f25' = Just ('\x1f21', CombiningAcuteAccent)
+decomposeCombining '\x1f26' = Just ('\x1f20', CombiningGreekPerispomeni)
+decomposeCombining '\x1f27' = Just ('\x1f21', CombiningGreekPerispomeni)
+decomposeCombining '\x1f28' = Just ('\x0397', CombiningCommaAbove)
+decomposeCombining '\x1f29' = Just ('\x0397', CombiningReversedCommaAbove)
+decomposeCombining '\x1f2a' = Just ('\x1f28', CombiningGraveAccent)
+decomposeCombining '\x1f2b' = Just ('\x1f29', CombiningGraveAccent)
+decomposeCombining '\x1f2c' = Just ('\x1f28', CombiningAcuteAccent)
+decomposeCombining '\x1f2d' = Just ('\x1f29', CombiningAcuteAccent)
+decomposeCombining '\x1f2e' = Just ('\x1f28', CombiningGreekPerispomeni)
+decomposeCombining '\x1f2f' = Just ('\x1f29', CombiningGreekPerispomeni)
+decomposeCombining '\x1f30' = Just ('\x03b9', CombiningCommaAbove)
+decomposeCombining '\x1f31' = Just ('\x03b9', CombiningReversedCommaAbove)
+decomposeCombining '\x1f32' = Just ('\x1f30', CombiningGraveAccent)
+decomposeCombining '\x1f33' = Just ('\x1f31', CombiningGraveAccent)
+decomposeCombining '\x1f34' = Just ('\x1f30', CombiningAcuteAccent)
+decomposeCombining '\x1f35' = Just ('\x1f31', CombiningAcuteAccent)
+decomposeCombining '\x1f36' = Just ('\x1f30', CombiningGreekPerispomeni)
+decomposeCombining '\x1f37' = Just ('\x1f31', CombiningGreekPerispomeni)
+decomposeCombining '\x1f38' = Just ('\x0399', CombiningCommaAbove)
+decomposeCombining '\x1f39' = Just ('\x0399', CombiningReversedCommaAbove)
+decomposeCombining '\x1f3a' = Just ('\x1f38', CombiningGraveAccent)
+decomposeCombining '\x1f3b' = Just ('\x1f39', CombiningGraveAccent)
+decomposeCombining '\x1f3c' = Just ('\x1f38', CombiningAcuteAccent)
+decomposeCombining '\x1f3d' = Just ('\x1f39', CombiningAcuteAccent)
+decomposeCombining '\x1f3e' = Just ('\x1f38', CombiningGreekPerispomeni)
+decomposeCombining '\x1f3f' = Just ('\x1f39', CombiningGreekPerispomeni)
+decomposeCombining '\x1f40' = Just ('\x03bf', CombiningCommaAbove)
+decomposeCombining '\x1f41' = Just ('\x03bf', CombiningReversedCommaAbove)
+decomposeCombining '\x1f42' = Just ('\x1f40', CombiningGraveAccent)
+decomposeCombining '\x1f43' = Just ('\x1f41', CombiningGraveAccent)
+decomposeCombining '\x1f44' = Just ('\x1f40', CombiningAcuteAccent)
+decomposeCombining '\x1f45' = Just ('\x1f41', CombiningAcuteAccent)
+decomposeCombining '\x1f48' = Just ('\x039f', CombiningCommaAbove)
+decomposeCombining '\x1f49' = Just ('\x039f', CombiningReversedCommaAbove)
+decomposeCombining '\x1f4a' = Just ('\x1f48', CombiningGraveAccent)
+decomposeCombining '\x1f4b' = Just ('\x1f49', CombiningGraveAccent)
+decomposeCombining '\x1f4c' = Just ('\x1f48', CombiningAcuteAccent)
+decomposeCombining '\x1f4d' = Just ('\x1f49', CombiningAcuteAccent)
+decomposeCombining '\x1f50' = Just ('\x03c5', CombiningCommaAbove)
+decomposeCombining '\x1f51' = Just ('\x03c5', CombiningReversedCommaAbove)
+decomposeCombining '\x1f52' = Just ('\x1f50', CombiningGraveAccent)
+decomposeCombining '\x1f53' = Just ('\x1f51', CombiningGraveAccent)
+decomposeCombining '\x1f54' = Just ('\x1f50', CombiningAcuteAccent)
+decomposeCombining '\x1f55' = Just ('\x1f51', CombiningAcuteAccent)
+decomposeCombining '\x1f56' = Just ('\x1f50', CombiningGreekPerispomeni)
+decomposeCombining '\x1f57' = Just ('\x1f51', CombiningGreekPerispomeni)
+decomposeCombining '\x1f59' = Just ('\x03a5', CombiningReversedCommaAbove)
+decomposeCombining '\x1f5b' = Just ('\x1f59', CombiningGraveAccent)
+decomposeCombining '\x1f5d' = Just ('\x1f59', CombiningAcuteAccent)
+decomposeCombining '\x1f5f' = Just ('\x1f59', CombiningGreekPerispomeni)
+decomposeCombining '\x1f60' = Just ('\x03c9', CombiningCommaAbove)
+decomposeCombining '\x1f61' = Just ('\x03c9', CombiningReversedCommaAbove)
+decomposeCombining '\x1f62' = Just ('\x1f60', CombiningGraveAccent)
+decomposeCombining '\x1f63' = Just ('\x1f61', CombiningGraveAccent)
+decomposeCombining '\x1f64' = Just ('\x1f60', CombiningAcuteAccent)
+decomposeCombining '\x1f65' = Just ('\x1f61', CombiningAcuteAccent)
+decomposeCombining '\x1f66' = Just ('\x1f60', CombiningGreekPerispomeni)
+decomposeCombining '\x1f67' = Just ('\x1f61', CombiningGreekPerispomeni)
+decomposeCombining '\x1f68' = Just ('\x03a9', CombiningCommaAbove)
+decomposeCombining '\x1f69' = Just ('\x03a9', CombiningReversedCommaAbove)
+decomposeCombining '\x1f6a' = Just ('\x1f68', CombiningGraveAccent)
+decomposeCombining '\x1f6b' = Just ('\x1f69', CombiningGraveAccent)
+decomposeCombining '\x1f6c' = Just ('\x1f68', CombiningAcuteAccent)
+decomposeCombining '\x1f6d' = Just ('\x1f69', CombiningAcuteAccent)
+decomposeCombining '\x1f6e' = Just ('\x1f68', CombiningGreekPerispomeni)
+decomposeCombining '\x1f6f' = Just ('\x1f69', CombiningGreekPerispomeni)
+decomposeCombining '\x1f70' = Just ('\x03b1', CombiningGraveAccent)
+decomposeCombining '\x1f72' = Just ('\x03b5', CombiningGraveAccent)
+decomposeCombining '\x1f74' = Just ('\x03b7', CombiningGraveAccent)
+decomposeCombining '\x1f76' = Just ('\x03b9', CombiningGraveAccent)
+decomposeCombining '\x1f78' = Just ('\x03bf', CombiningGraveAccent)
+decomposeCombining '\x1f7a' = Just ('\x03c5', CombiningGraveAccent)
+decomposeCombining '\x1f7c' = Just ('\x03c9', CombiningGraveAccent)
+decomposeCombining '\x1f80' = Just ('\x1f00', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f81' = Just ('\x1f01', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f82' = Just ('\x1f02', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f83' = Just ('\x1f03', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f84' = Just ('\x1f04', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f85' = Just ('\x1f05', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f86' = Just ('\x1f06', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f87' = Just ('\x1f07', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f88' = Just ('\x1f08', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f89' = Just ('\x1f09', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f8a' = Just ('\x1f0a', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f8b' = Just ('\x1f0b', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f8c' = Just ('\x1f0c', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f8d' = Just ('\x1f0d', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f8e' = Just ('\x1f0e', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f8f' = Just ('\x1f0f', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f90' = Just ('\x1f20', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f91' = Just ('\x1f21', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f92' = Just ('\x1f22', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f93' = Just ('\x1f23', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f94' = Just ('\x1f24', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f95' = Just ('\x1f25', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f96' = Just ('\x1f26', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f97' = Just ('\x1f27', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f98' = Just ('\x1f28', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f99' = Just ('\x1f29', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f9a' = Just ('\x1f2a', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f9b' = Just ('\x1f2b', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f9c' = Just ('\x1f2c', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f9d' = Just ('\x1f2d', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f9e' = Just ('\x1f2e', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1f9f' = Just ('\x1f2f', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fa0' = Just ('\x1f60', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fa1' = Just ('\x1f61', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fa2' = Just ('\x1f62', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fa3' = Just ('\x1f63', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fa4' = Just ('\x1f64', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fa5' = Just ('\x1f65', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fa6' = Just ('\x1f66', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fa7' = Just ('\x1f67', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fa8' = Just ('\x1f68', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fa9' = Just ('\x1f69', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1faa' = Just ('\x1f6a', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fab' = Just ('\x1f6b', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fac' = Just ('\x1f6c', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fad' = Just ('\x1f6d', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fae' = Just ('\x1f6e', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1faf' = Just ('\x1f6f', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fb0' = Just ('\x03b1', CombiningBreve)
+decomposeCombining '\x1fb1' = Just ('\x03b1', CombiningMacron)
+decomposeCombining '\x1fb2' = Just ('\x1f70', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fb3' = Just ('\x03b1', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fb4' = Just ('\x03ac', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fb6' = Just ('\x03b1', CombiningGreekPerispomeni)
+decomposeCombining '\x1fb7' = Just ('\x1fb6', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fb8' = Just ('\x0391', CombiningBreve)
+decomposeCombining '\x1fb9' = Just ('\x0391', CombiningMacron)
+decomposeCombining '\x1fba' = Just ('\x0391', CombiningGraveAccent)
+decomposeCombining '\x1fbc' = Just ('\x0391', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fc1' = Just ('\x00a8', CombiningGreekPerispomeni)
+decomposeCombining '\x1fc2' = Just ('\x1f74', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fc3' = Just ('\x03b7', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fc4' = Just ('\x03ae', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fc6' = Just ('\x03b7', CombiningGreekPerispomeni)
+decomposeCombining '\x1fc7' = Just ('\x1fc6', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fc8' = Just ('\x0395', CombiningGraveAccent)
+decomposeCombining '\x1fca' = Just ('\x0397', CombiningGraveAccent)
+decomposeCombining '\x1fcc' = Just ('\x0397', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1fcd' = Just ('\x1fbf', CombiningGraveAccent)
+decomposeCombining '\x1fce' = Just ('\x1fbf', CombiningAcuteAccent)
+decomposeCombining '\x1fcf' = Just ('\x1fbf', CombiningGreekPerispomeni)
+decomposeCombining '\x1fd0' = Just ('\x03b9', CombiningBreve)
+decomposeCombining '\x1fd1' = Just ('\x03b9', CombiningMacron)
+decomposeCombining '\x1fd2' = Just ('\x03ca', CombiningGraveAccent)
+decomposeCombining '\x1fd6' = Just ('\x03b9', CombiningGreekPerispomeni)
+decomposeCombining '\x1fd7' = Just ('\x03ca', CombiningGreekPerispomeni)
+decomposeCombining '\x1fd8' = Just ('\x0399', CombiningBreve)
+decomposeCombining '\x1fd9' = Just ('\x0399', CombiningMacron)
+decomposeCombining '\x1fda' = Just ('\x0399', CombiningGraveAccent)
+decomposeCombining '\x1fdd' = Just ('\x1ffe', CombiningGraveAccent)
+decomposeCombining '\x1fde' = Just ('\x1ffe', CombiningAcuteAccent)
+decomposeCombining '\x1fdf' = Just ('\x1ffe', CombiningGreekPerispomeni)
+decomposeCombining '\x1fe0' = Just ('\x03c5', CombiningBreve)
+decomposeCombining '\x1fe1' = Just ('\x03c5', CombiningMacron)
+decomposeCombining '\x1fe2' = Just ('\x03cb', CombiningGraveAccent)
+decomposeCombining '\x1fe4' = Just ('\x03c1', CombiningCommaAbove)
+decomposeCombining '\x1fe5' = Just ('\x03c1', CombiningReversedCommaAbove)
+decomposeCombining '\x1fe6' = Just ('\x03c5', CombiningGreekPerispomeni)
+decomposeCombining '\x1fe7' = Just ('\x03cb', CombiningGreekPerispomeni)
+decomposeCombining '\x1fe8' = Just ('\x03a5', CombiningBreve)
+decomposeCombining '\x1fe9' = Just ('\x03a5', CombiningMacron)
+decomposeCombining '\x1fea' = Just ('\x03a5', CombiningGraveAccent)
+decomposeCombining '\x1fec' = Just ('\x03a1', CombiningReversedCommaAbove)
+decomposeCombining '\x1fed' = Just ('\x00a8', CombiningGraveAccent)
+decomposeCombining '\x1ff2' = Just ('\x1f7c', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1ff3' = Just ('\x03c9', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1ff4' = Just ('\x03ce', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1ff6' = Just ('\x03c9', CombiningGreekPerispomeni)
+decomposeCombining '\x1ff7' = Just ('\x1ff6', CombiningGreekYpogegrammeni)
+decomposeCombining '\x1ff8' = Just ('\x039f', CombiningGraveAccent)
+decomposeCombining '\x1ffa' = Just ('\x03a9', CombiningGraveAccent)
+decomposeCombining '\x1ffc' = Just ('\x03a9', CombiningGreekYpogegrammeni)
+decomposeCombining '\x219a' = Just ('\x2190', CombiningLongSolidusOverlay)
+decomposeCombining '\x219b' = Just ('\x2192', CombiningLongSolidusOverlay)
+decomposeCombining '\x21ae' = Just ('\x2194', CombiningLongSolidusOverlay)
+decomposeCombining '\x21cd' = Just ('\x21d0', CombiningLongSolidusOverlay)
+decomposeCombining '\x21ce' = Just ('\x21d4', CombiningLongSolidusOverlay)
+decomposeCombining '\x21cf' = Just ('\x21d2', CombiningLongSolidusOverlay)
+decomposeCombining '\x2204' = Just ('\x2203', CombiningLongSolidusOverlay)
+decomposeCombining '\x2209' = Just ('\x2208', CombiningLongSolidusOverlay)
+decomposeCombining '\x220c' = Just ('\x220b', CombiningLongSolidusOverlay)
+decomposeCombining '\x2224' = Just ('\x2223', CombiningLongSolidusOverlay)
+decomposeCombining '\x2226' = Just ('\x2225', CombiningLongSolidusOverlay)
+decomposeCombining '\x2241' = Just ('\x223c', CombiningLongSolidusOverlay)
+decomposeCombining '\x2244' = Just ('\x2243', CombiningLongSolidusOverlay)
+decomposeCombining '\x2247' = Just ('\x2245', CombiningLongSolidusOverlay)
+decomposeCombining '\x2249' = Just ('\x2248', CombiningLongSolidusOverlay)
+decomposeCombining '\x2260' = Just ('=', CombiningLongSolidusOverlay)
+decomposeCombining '\x2262' = Just ('\x2261', CombiningLongSolidusOverlay)
+decomposeCombining '\x226d' = Just ('\x224d', CombiningLongSolidusOverlay)
+decomposeCombining '\x226e' = Just ('<', CombiningLongSolidusOverlay)
+decomposeCombining '\x226f' = Just ('>', CombiningLongSolidusOverlay)
+decomposeCombining '\x2270' = Just ('\x2264', CombiningLongSolidusOverlay)
+decomposeCombining '\x2271' = Just ('\x2265', CombiningLongSolidusOverlay)
+decomposeCombining '\x2274' = Just ('\x2272', CombiningLongSolidusOverlay)
+decomposeCombining '\x2275' = Just ('\x2273', CombiningLongSolidusOverlay)
+decomposeCombining '\x2278' = Just ('\x2276', CombiningLongSolidusOverlay)
+decomposeCombining '\x2279' = Just ('\x2277', CombiningLongSolidusOverlay)
+decomposeCombining '\x2280' = Just ('\x227a', CombiningLongSolidusOverlay)
+decomposeCombining '\x2281' = Just ('\x227b', CombiningLongSolidusOverlay)
+decomposeCombining '\x2284' = Just ('\x2282', CombiningLongSolidusOverlay)
+decomposeCombining '\x2285' = Just ('\x2283', CombiningLongSolidusOverlay)
+decomposeCombining '\x2288' = Just ('\x2286', CombiningLongSolidusOverlay)
+decomposeCombining '\x2289' = Just ('\x2287', CombiningLongSolidusOverlay)
+decomposeCombining '\x22ac' = Just ('\x22a2', CombiningLongSolidusOverlay)
+decomposeCombining '\x22ad' = Just ('\x22a8', CombiningLongSolidusOverlay)
+decomposeCombining '\x22ae' = Just ('\x22a9', CombiningLongSolidusOverlay)
+decomposeCombining '\x22af' = Just ('\x22ab', CombiningLongSolidusOverlay)
+decomposeCombining '\x22e0' = Just ('\x227c', CombiningLongSolidusOverlay)
+decomposeCombining '\x22e1' = Just ('\x227d', CombiningLongSolidusOverlay)
+decomposeCombining '\x22e2' = Just ('\x2291', CombiningLongSolidusOverlay)
+decomposeCombining '\x22e3' = Just ('\x2292', CombiningLongSolidusOverlay)
+decomposeCombining '\x22ea' = Just ('\x22b2', CombiningLongSolidusOverlay)
+decomposeCombining '\x22eb' = Just ('\x22b3', CombiningLongSolidusOverlay)
+decomposeCombining '\x22ec' = Just ('\x22b4', CombiningLongSolidusOverlay)
+decomposeCombining '\x22ed' = Just ('\x22b5', CombiningLongSolidusOverlay)
+decomposeCombining '\x2adc' = Just ('\x2add', CombiningLongSolidusOverlay)
+decomposeCombining '\x304c' = Just ('\x304b', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x304e' = Just ('\x304d', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x3050' = Just ('\x304f', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x3052' = Just ('\x3051', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x3054' = Just ('\x3053', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x3056' = Just ('\x3055', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x3058' = Just ('\x3057', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x305a' = Just ('\x3059', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x305c' = Just ('\x305b', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x305e' = Just ('\x305d', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x3060' = Just ('\x305f', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x3062' = Just ('\x3061', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x3065' = Just ('\x3064', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x3067' = Just ('\x3066', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x3069' = Just ('\x3068', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x3070' = Just ('\x306f', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x3071' = Just ('\x306f', CombiningKatakanaHiraganaSemiVoicedSoundMark)
+decomposeCombining '\x3073' = Just ('\x3072', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x3074' = Just ('\x3072', CombiningKatakanaHiraganaSemiVoicedSoundMark)
+decomposeCombining '\x3076' = Just ('\x3075', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x3077' = Just ('\x3075', CombiningKatakanaHiraganaSemiVoicedSoundMark)
+decomposeCombining '\x3079' = Just ('\x3078', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x307a' = Just ('\x3078', CombiningKatakanaHiraganaSemiVoicedSoundMark)
+decomposeCombining '\x307c' = Just ('\x307b', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x307d' = Just ('\x307b', CombiningKatakanaHiraganaSemiVoicedSoundMark)
+decomposeCombining '\x3094' = Just ('\x3046', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x309e' = Just ('\x309d', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30ac' = Just ('\x30ab', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30ae' = Just ('\x30ad', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30b0' = Just ('\x30af', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30b2' = Just ('\x30b1', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30b4' = Just ('\x30b3', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30b6' = Just ('\x30b5', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30b8' = Just ('\x30b7', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30ba' = Just ('\x30b9', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30bc' = Just ('\x30bb', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30be' = Just ('\x30bd', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30c0' = Just ('\x30bf', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30c2' = Just ('\x30c1', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30c5' = Just ('\x30c4', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30c7' = Just ('\x30c6', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30c9' = Just ('\x30c8', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30d0' = Just ('\x30cf', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30d1' = Just ('\x30cf', CombiningKatakanaHiraganaSemiVoicedSoundMark)
+decomposeCombining '\x30d3' = Just ('\x30d2', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30d4' = Just ('\x30d2', CombiningKatakanaHiraganaSemiVoicedSoundMark)
+decomposeCombining '\x30d6' = Just ('\x30d5', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30d7' = Just ('\x30d5', CombiningKatakanaHiraganaSemiVoicedSoundMark)
+decomposeCombining '\x30d9' = Just ('\x30d8', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30da' = Just ('\x30d8', CombiningKatakanaHiraganaSemiVoicedSoundMark)
+decomposeCombining '\x30dc' = Just ('\x30db', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30dd' = Just ('\x30db', CombiningKatakanaHiraganaSemiVoicedSoundMark)
+decomposeCombining '\x30f4' = Just ('\x30a6', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30f7' = Just ('\x30ef', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30f8' = Just ('\x30f0', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30f9' = Just ('\x30f1', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30fa' = Just ('\x30f2', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\x30fe' = Just ('\x30fd', CombiningKatakanaHiraganaVoicedSoundMark)
+decomposeCombining '\xfb1d' = Just ('\x05d9', HebrewPointHiriq)
+decomposeCombining '\xfb1f' = Just ('\x05f2', HebrewPointPatah)
+decomposeCombining '\xfb2a' = Just ('\x05e9', HebrewPointShinDot)
+decomposeCombining '\xfb2b' = Just ('\x05e9', HebrewPointSinDot)
+decomposeCombining '\xfb2c' = Just ('\xfb49', HebrewPointShinDot)
+decomposeCombining '\xfb2d' = Just ('\xfb49', HebrewPointSinDot)
+decomposeCombining '\xfb2e' = Just ('\x05d0', HebrewPointPatah)
+decomposeCombining '\xfb2f' = Just ('\x05d0', HebrewPointQamats)
+decomposeCombining '\xfb30' = Just ('\x05d0', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb31' = Just ('\x05d1', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb32' = Just ('\x05d2', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb33' = Just ('\x05d3', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb34' = Just ('\x05d4', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb35' = Just ('\x05d5', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb36' = Just ('\x05d6', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb38' = Just ('\x05d8', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb39' = Just ('\x05d9', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb3a' = Just ('\x05da', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb3b' = Just ('\x05db', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb3c' = Just ('\x05dc', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb3e' = Just ('\x05de', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb40' = Just ('\x05e0', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb41' = Just ('\x05e1', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb43' = Just ('\x05e3', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb44' = Just ('\x05e4', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb46' = Just ('\x05e6', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb47' = Just ('\x05e7', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb48' = Just ('\x05e8', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb49' = Just ('\x05e9', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb4a' = Just ('\x05ea', HebrewPointDageshOrMapiq)
+decomposeCombining '\xfb4b' = Just ('\x05d5', HebrewPointHolam)
+decomposeCombining '\xfb4c' = Just ('\x05d1', HebrewPointRafe)
+decomposeCombining '\xfb4d' = Just ('\x05db', HebrewPointRafe)
+decomposeCombining '\xfb4e' = Just ('\x05e4', HebrewPointRafe)
+decomposeCombining '\x1109a' = Just ('\x11099', KaithiSignNukta)
+decomposeCombining '\x1109c' = Just ('\x1109b', KaithiSignNukta)
+decomposeCombining '\x110ab' = Just ('\x110a5', KaithiSignNukta)
+decomposeCombining '\x1112e' = Just ('\x11131', ChakmaVowelSignA)
+decomposeCombining '\x1112f' = Just ('\x11132', ChakmaVowelSignA)
+decomposeCombining '\x1134b' = Just ('\x11347', GranthaVowelSignAa)
+decomposeCombining '\x1134c' = Just ('\x11347', GranthaAuLengthMark)
+decomposeCombining '\x114bb' = Just ('\x114b9', TirhutaVowelSignShortE)
+decomposeCombining '\x114bc' = Just ('\x114b9', TirhutaVowelSignAa)
+decomposeCombining '\x114be' = Just ('\x114b9', TirhutaVowelSignShortO)
+decomposeCombining '\x115ba' = Just ('\x115b8', SiddhamVowelSignAa)
+decomposeCombining '\x115bb' = Just ('\x115b9', SiddhamVowelSignAa)
+decomposeCombining '\x1d15e' = Just ('\x1d157', MusicalSymbolCombiningStem)
+decomposeCombining '\x1d15f' = Just ('\x1d158', MusicalSymbolCombiningStem)
+decomposeCombining '\x1d160' = Just ('\x1d15f', MusicalSymbolCombiningFlag1)
+decomposeCombining '\x1d161' = Just ('\x1d15f', MusicalSymbolCombiningFlag2)
+decomposeCombining '\x1d162' = Just ('\x1d15f', MusicalSymbolCombiningFlag3)
+decomposeCombining '\x1d163' = Just ('\x1d15f', MusicalSymbolCombiningFlag4)
+decomposeCombining '\x1d164' = Just ('\x1d15f', MusicalSymbolCombiningFlag5)
+decomposeCombining '\x1d1bb' = Just ('\x1d1b9', MusicalSymbolCombiningStem)
+decomposeCombining '\x1d1bc' = Just ('\x1d1ba', MusicalSymbolCombiningStem)
+decomposeCombining '\x1d1bd' = Just ('\x1d1bb', MusicalSymbolCombiningFlag1)
+decomposeCombining '\x1d1be' = Just ('\x1d1bc', MusicalSymbolCombiningFlag1)
+decomposeCombining '\x1d1bf' = Just ('\x1d1bb', MusicalSymbolCombiningFlag2)
+decomposeCombining '\x1d1c0' = Just ('\x1d1bc', MusicalSymbolCombiningFlag2)
+decomposeCombining _ = Nothing
+
+-- | A pattern synonym for 'CombiningGraveAccent', the name without the @Combining@ part, defined by @'\\x0300'@ (&#x2022;&#x0300;).
 pattern GraveAccent :: CombiningCharacter
 pattern GraveAccent = CombiningGraveAccent
 
--- | A pattern synonym for 'CombiningAcuteAccent', the name without the @Combining@ part, defined by @'\x301'@ (&#x2022;&#x301;).
+-- | A pattern synonym for 'CombiningAcuteAccent', the name without the @Combining@ part, defined by @'\\x0301'@ (&#x2022;&#x0301;).
 pattern AcuteAccent :: CombiningCharacter
 pattern AcuteAccent = CombiningAcuteAccent
 
--- | A pattern synonym for 'CombiningCircumflexAccent', the name without the @Combining@ part, defined by @'\x302'@ (&#x2022;&#x302;).
+-- | A pattern synonym for 'CombiningCircumflexAccent', the name without the @Combining@ part, defined by @'\\x0302'@ (&#x2022;&#x0302;).
 pattern CircumflexAccent :: CombiningCharacter
 pattern CircumflexAccent = CombiningCircumflexAccent
 
--- | A pattern synonym for 'CombiningTilde', the name without the @Combining@ part, defined by @'\x303'@ (&#x2022;&#x303;).
+-- | A pattern synonym for 'CombiningTilde', the name without the @Combining@ part, defined by @'\\x0303'@ (&#x2022;&#x0303;).
 pattern Tilde :: CombiningCharacter
 pattern Tilde = CombiningTilde
 
--- | A pattern synonym for 'CombiningMacron', the name without the @Combining@ part, defined by @'\x304'@ (&#x2022;&#x304;).
+-- | A pattern synonym for 'CombiningMacron', the name without the @Combining@ part, defined by @'\\x0304'@ (&#x2022;&#x0304;).
 pattern Macron :: CombiningCharacter
 pattern Macron = CombiningMacron
 
--- | A pattern synonym for 'CombiningOverline', the name without the @Combining@ part, defined by @'\x305'@ (&#x2022;&#x305;).
+-- | A pattern synonym for 'CombiningOverline', the name without the @Combining@ part, defined by @'\\x0305'@ (&#x2022;&#x0305;).
 pattern Overline :: CombiningCharacter
 pattern Overline = CombiningOverline
 
--- | A pattern synonym for 'CombiningBreve', the name without the @Combining@ part, defined by @'\x306'@ (&#x2022;&#x306;).
+-- | A pattern synonym for 'CombiningBreve', the name without the @Combining@ part, defined by @'\\x0306'@ (&#x2022;&#x0306;).
 pattern Breve :: CombiningCharacter
 pattern Breve = CombiningBreve
 
--- | A pattern synonym for 'CombiningDotAbove', the name without the @Combining@ part, defined by @'\x307'@ (&#x2022;&#x307;).
+-- | A pattern synonym for 'CombiningDotAbove', the name without the @Combining@ part, defined by @'\\x0307'@ (&#x2022;&#x0307;).
 pattern DotAbove :: CombiningCharacter
 pattern DotAbove = CombiningDotAbove
 
--- | A pattern synonym for 'CombiningDiaeresis', the name without the @Combining@ part, defined by @'\x308'@ (&#x2022;&#x308;).
+-- | A pattern synonym for 'CombiningDiaeresis', the name without the @Combining@ part, defined by @'\\x0308'@ (&#x2022;&#x0308;).
 pattern Diaeresis :: CombiningCharacter
 pattern Diaeresis = CombiningDiaeresis
 
--- | A pattern synonym for 'CombiningHookAbove', the name without the @Combining@ part, defined by @'\x309'@ (&#x2022;&#x309;).
+-- | A pattern synonym for 'CombiningHookAbove', the name without the @Combining@ part, defined by @'\\x0309'@ (&#x2022;&#x0309;).
 pattern HookAbove :: CombiningCharacter
 pattern HookAbove = CombiningHookAbove
 
--- | A pattern synonym for 'CombiningRingAbove', the name without the @Combining@ part, defined by @'\x30a'@ (&#x2022;&#x30a;).
+-- | A pattern synonym for 'CombiningRingAbove', the name without the @Combining@ part, defined by @'\\x030a'@ (&#x2022;&#x030a;).
 pattern RingAbove :: CombiningCharacter
 pattern RingAbove = CombiningRingAbove
 
--- | A pattern synonym for 'CombiningDoubleAcuteAccent', the name without the @Combining@ part, defined by @'\x30b'@ (&#x2022;&#x30b;).
+-- | A pattern synonym for 'CombiningDoubleAcuteAccent', the name without the @Combining@ part, defined by @'\\x030b'@ (&#x2022;&#x030b;).
 pattern DoubleAcuteAccent :: CombiningCharacter
 pattern DoubleAcuteAccent = CombiningDoubleAcuteAccent
 
--- | A pattern synonym for 'CombiningCaron', the name without the @Combining@ part, defined by @'\x30c'@ (&#x2022;&#x30c;).
+-- | A pattern synonym for 'CombiningCaron', the name without the @Combining@ part, defined by @'\\x030c'@ (&#x2022;&#x030c;).
 pattern Caron :: CombiningCharacter
 pattern Caron = CombiningCaron
 
--- | A pattern synonym for 'CombiningVerticalLineAbove', the name without the @Combining@ part, defined by @'\x30d'@ (&#x2022;&#x30d;).
+-- | A pattern synonym for 'CombiningVerticalLineAbove', the name without the @Combining@ part, defined by @'\\x030d'@ (&#x2022;&#x030d;).
 pattern VerticalLineAbove :: CombiningCharacter
 pattern VerticalLineAbove = CombiningVerticalLineAbove
 
--- | A pattern synonym for 'CombiningDoubleVerticalLineAbove', the name without the @Combining@ part, defined by @'\x30e'@ (&#x2022;&#x30e;).
+-- | A pattern synonym for 'CombiningDoubleVerticalLineAbove', the name without the @Combining@ part, defined by @'\\x030e'@ (&#x2022;&#x030e;).
 pattern DoubleVerticalLineAbove :: CombiningCharacter
 pattern DoubleVerticalLineAbove = CombiningDoubleVerticalLineAbove
 
--- | A pattern synonym for 'CombiningDoubleGraveAccent', the name without the @Combining@ part, defined by @'\x30f'@ (&#x2022;&#x30f;).
+-- | A pattern synonym for 'CombiningDoubleGraveAccent', the name without the @Combining@ part, defined by @'\\x030f'@ (&#x2022;&#x030f;).
 pattern DoubleGraveAccent :: CombiningCharacter
 pattern DoubleGraveAccent = CombiningDoubleGraveAccent
 
--- | A pattern synonym for 'CombiningCandrabindu', the name without the @Combining@ part, defined by @'\x310'@ (&#x2022;&#x310;).
+-- | A pattern synonym for 'CombiningCandrabindu', the name without the @Combining@ part, defined by @'\\x0310'@ (&#x2022;&#x0310;).
 pattern Candrabindu :: CombiningCharacter
 pattern Candrabindu = CombiningCandrabindu
 
--- | A pattern synonym for 'CombiningInvertedBreve', the name without the @Combining@ part, defined by @'\x311'@ (&#x2022;&#x311;).
+-- | A pattern synonym for 'CombiningInvertedBreve', the name without the @Combining@ part, defined by @'\\x0311'@ (&#x2022;&#x0311;).
 pattern InvertedBreve :: CombiningCharacter
 pattern InvertedBreve = CombiningInvertedBreve
 
--- | A pattern synonym for 'CombiningTurnedCommaAbove', the name without the @Combining@ part, defined by @'\x312'@ (&#x2022;&#x312;).
+-- | A pattern synonym for 'CombiningTurnedCommaAbove', the name without the @Combining@ part, defined by @'\\x0312'@ (&#x2022;&#x0312;).
 pattern TurnedCommaAbove :: CombiningCharacter
 pattern TurnedCommaAbove = CombiningTurnedCommaAbove
 
--- | A pattern synonym for 'CombiningCommaAbove', the name without the @Combining@ part, defined by @'\x313'@ (&#x2022;&#x313;).
+-- | A pattern synonym for 'CombiningCommaAbove', the name without the @Combining@ part, defined by @'\\x0313'@ (&#x2022;&#x0313;).
 pattern CommaAbove :: CombiningCharacter
 pattern CommaAbove = CombiningCommaAbove
 
--- | A pattern synonym for 'CombiningReversedCommaAbove', the name without the @Combining@ part, defined by @'\x314'@ (&#x2022;&#x314;).
+-- | A pattern synonym for 'CombiningReversedCommaAbove', the name without the @Combining@ part, defined by @'\\x0314'@ (&#x2022;&#x0314;).
 pattern ReversedCommaAbove :: CombiningCharacter
 pattern ReversedCommaAbove = CombiningReversedCommaAbove
 
--- | A pattern synonym for 'CombiningCommaAboveRight', the name without the @Combining@ part, defined by @'\x315'@ (&#x2022;&#x315;).
+-- | A pattern synonym for 'CombiningCommaAboveRight', the name without the @Combining@ part, defined by @'\\x0315'@ (&#x2022;&#x0315;).
 pattern CommaAboveRight :: CombiningCharacter
 pattern CommaAboveRight = CombiningCommaAboveRight
 
--- | A pattern synonym for 'CombiningGraveAccentBelow', the name without the @Combining@ part, defined by @'\x316'@ (&#x2022;&#x316;).
+-- | A pattern synonym for 'CombiningGraveAccentBelow', the name without the @Combining@ part, defined by @'\\x0316'@ (&#x2022;&#x0316;).
 pattern GraveAccentBelow :: CombiningCharacter
 pattern GraveAccentBelow = CombiningGraveAccentBelow
 
--- | A pattern synonym for 'CombiningAcuteAccentBelow', the name without the @Combining@ part, defined by @'\x317'@ (&#x2022;&#x317;).
+-- | A pattern synonym for 'CombiningAcuteAccentBelow', the name without the @Combining@ part, defined by @'\\x0317'@ (&#x2022;&#x0317;).
 pattern AcuteAccentBelow :: CombiningCharacter
 pattern AcuteAccentBelow = CombiningAcuteAccentBelow
 
--- | A pattern synonym for 'CombiningLeftTackBelow', the name without the @Combining@ part, defined by @'\x318'@ (&#x2022;&#x318;).
+-- | A pattern synonym for 'CombiningLeftTackBelow', the name without the @Combining@ part, defined by @'\\x0318'@ (&#x2022;&#x0318;).
 pattern LeftTackBelow :: CombiningCharacter
 pattern LeftTackBelow = CombiningLeftTackBelow
 
--- | A pattern synonym for 'CombiningRightTackBelow', the name without the @Combining@ part, defined by @'\x319'@ (&#x2022;&#x319;).
+-- | A pattern synonym for 'CombiningRightTackBelow', the name without the @Combining@ part, defined by @'\\x0319'@ (&#x2022;&#x0319;).
 pattern RightTackBelow :: CombiningCharacter
 pattern RightTackBelow = CombiningRightTackBelow
 
--- | A pattern synonym for 'CombiningLeftAngleAbove', the name without the @Combining@ part, defined by @'\x31a'@ (&#x2022;&#x31a;).
+-- | A pattern synonym for 'CombiningLeftAngleAbove', the name without the @Combining@ part, defined by @'\\x031a'@ (&#x2022;&#x031a;).
 pattern LeftAngleAbove :: CombiningCharacter
 pattern LeftAngleAbove = CombiningLeftAngleAbove
 
--- | A pattern synonym for 'CombiningHorn', the name without the @Combining@ part, defined by @'\x31b'@ (&#x2022;&#x31b;).
+-- | A pattern synonym for 'CombiningHorn', the name without the @Combining@ part, defined by @'\\x031b'@ (&#x2022;&#x031b;).
 pattern Horn :: CombiningCharacter
 pattern Horn = CombiningHorn
 
--- | A pattern synonym for 'CombiningLeftHalfRingBelow', the name without the @Combining@ part, defined by @'\x31c'@ (&#x2022;&#x31c;).
+-- | A pattern synonym for 'CombiningLeftHalfRingBelow', the name without the @Combining@ part, defined by @'\\x031c'@ (&#x2022;&#x031c;).
 pattern LeftHalfRingBelow :: CombiningCharacter
 pattern LeftHalfRingBelow = CombiningLeftHalfRingBelow
 
--- | A pattern synonym for 'CombiningUpTackBelow', the name without the @Combining@ part, defined by @'\x31d'@ (&#x2022;&#x31d;).
+-- | A pattern synonym for 'CombiningUpTackBelow', the name without the @Combining@ part, defined by @'\\x031d'@ (&#x2022;&#x031d;).
 pattern UpTackBelow :: CombiningCharacter
 pattern UpTackBelow = CombiningUpTackBelow
 
--- | A pattern synonym for 'CombiningDownTackBelow', the name without the @Combining@ part, defined by @'\x31e'@ (&#x2022;&#x31e;).
+-- | A pattern synonym for 'CombiningDownTackBelow', the name without the @Combining@ part, defined by @'\\x031e'@ (&#x2022;&#x031e;).
 pattern DownTackBelow :: CombiningCharacter
 pattern DownTackBelow = CombiningDownTackBelow
 
--- | A pattern synonym for 'CombiningPlusSignBelow', the name without the @Combining@ part, defined by @'\x31f'@ (&#x2022;&#x31f;).
+-- | A pattern synonym for 'CombiningPlusSignBelow', the name without the @Combining@ part, defined by @'\\x031f'@ (&#x2022;&#x031f;).
 pattern PlusSignBelow :: CombiningCharacter
 pattern PlusSignBelow = CombiningPlusSignBelow
 
--- | A pattern synonym for 'CombiningMinusSignBelow', the name without the @Combining@ part, defined by @'\x320'@ (&#x2022;&#x320;).
+-- | A pattern synonym for 'CombiningMinusSignBelow', the name without the @Combining@ part, defined by @'\\x0320'@ (&#x2022;&#x0320;).
 pattern MinusSignBelow :: CombiningCharacter
 pattern MinusSignBelow = CombiningMinusSignBelow
 
--- | A pattern synonym for 'CombiningPalatalizedHookBelow', the name without the @Combining@ part, defined by @'\x321'@ (&#x2022;&#x321;).
+-- | A pattern synonym for 'CombiningPalatalizedHookBelow', the name without the @Combining@ part, defined by @'\\x0321'@ (&#x2022;&#x0321;).
 pattern PalatalizedHookBelow :: CombiningCharacter
 pattern PalatalizedHookBelow = CombiningPalatalizedHookBelow
 
--- | A pattern synonym for 'CombiningRetroflexHookBelow', the name without the @Combining@ part, defined by @'\x322'@ (&#x2022;&#x322;).
+-- | A pattern synonym for 'CombiningRetroflexHookBelow', the name without the @Combining@ part, defined by @'\\x0322'@ (&#x2022;&#x0322;).
 pattern RetroflexHookBelow :: CombiningCharacter
 pattern RetroflexHookBelow = CombiningRetroflexHookBelow
 
--- | A pattern synonym for 'CombiningDotBelow', the name without the @Combining@ part, defined by @'\x323'@ (&#x2022;&#x323;).
+-- | A pattern synonym for 'CombiningDotBelow', the name without the @Combining@ part, defined by @'\\x0323'@ (&#x2022;&#x0323;).
 pattern DotBelow :: CombiningCharacter
 pattern DotBelow = CombiningDotBelow
 
--- | A pattern synonym for 'CombiningDiaeresisBelow', the name without the @Combining@ part, defined by @'\x324'@ (&#x2022;&#x324;).
+-- | A pattern synonym for 'CombiningDiaeresisBelow', the name without the @Combining@ part, defined by @'\\x0324'@ (&#x2022;&#x0324;).
 pattern DiaeresisBelow :: CombiningCharacter
 pattern DiaeresisBelow = CombiningDiaeresisBelow
 
--- | A pattern synonym for 'CombiningRingBelow', the name without the @Combining@ part, defined by @'\x325'@ (&#x2022;&#x325;).
+-- | A pattern synonym for 'CombiningRingBelow', the name without the @Combining@ part, defined by @'\\x0325'@ (&#x2022;&#x0325;).
 pattern RingBelow :: CombiningCharacter
 pattern RingBelow = CombiningRingBelow
 
--- | A pattern synonym for 'CombiningCommaBelow', the name without the @Combining@ part, defined by @'\x326'@ (&#x2022;&#x326;).
+-- | A pattern synonym for 'CombiningCommaBelow', the name without the @Combining@ part, defined by @'\\x0326'@ (&#x2022;&#x0326;).
 pattern CommaBelow :: CombiningCharacter
 pattern CommaBelow = CombiningCommaBelow
 
--- | A pattern synonym for 'CombiningCedilla', the name without the @Combining@ part, defined by @'\x327'@ (&#x2022;&#x327;).
+-- | A pattern synonym for 'CombiningCedilla', the name without the @Combining@ part, defined by @'\\x0327'@ (&#x2022;&#x0327;).
 pattern Cedilla :: CombiningCharacter
 pattern Cedilla = CombiningCedilla
 
--- | A pattern synonym for 'CombiningOgonek', the name without the @Combining@ part, defined by @'\x328'@ (&#x2022;&#x328;).
+-- | A pattern synonym for 'CombiningOgonek', the name without the @Combining@ part, defined by @'\\x0328'@ (&#x2022;&#x0328;).
 pattern Ogonek :: CombiningCharacter
 pattern Ogonek = CombiningOgonek
 
--- | A pattern synonym for 'CombiningVerticalLineBelow', the name without the @Combining@ part, defined by @'\x329'@ (&#x2022;&#x329;).
+-- | A pattern synonym for 'CombiningVerticalLineBelow', the name without the @Combining@ part, defined by @'\\x0329'@ (&#x2022;&#x0329;).
 pattern VerticalLineBelow :: CombiningCharacter
 pattern VerticalLineBelow = CombiningVerticalLineBelow
 
--- | A pattern synonym for 'CombiningBridgeBelow', the name without the @Combining@ part, defined by @'\x32a'@ (&#x2022;&#x32a;).
+-- | A pattern synonym for 'CombiningBridgeBelow', the name without the @Combining@ part, defined by @'\\x032a'@ (&#x2022;&#x032a;).
 pattern BridgeBelow :: CombiningCharacter
 pattern BridgeBelow = CombiningBridgeBelow
 
--- | A pattern synonym for 'CombiningInvertedDoubleArchBelow', the name without the @Combining@ part, defined by @'\x32b'@ (&#x2022;&#x32b;).
+-- | A pattern synonym for 'CombiningInvertedDoubleArchBelow', the name without the @Combining@ part, defined by @'\\x032b'@ (&#x2022;&#x032b;).
 pattern InvertedDoubleArchBelow :: CombiningCharacter
 pattern InvertedDoubleArchBelow = CombiningInvertedDoubleArchBelow
 
--- | A pattern synonym for 'CombiningCaronBelow', the name without the @Combining@ part, defined by @'\x32c'@ (&#x2022;&#x32c;).
+-- | A pattern synonym for 'CombiningCaronBelow', the name without the @Combining@ part, defined by @'\\x032c'@ (&#x2022;&#x032c;).
 pattern CaronBelow :: CombiningCharacter
 pattern CaronBelow = CombiningCaronBelow
 
--- | A pattern synonym for 'CombiningCircumflexAccentBelow', the name without the @Combining@ part, defined by @'\x32d'@ (&#x2022;&#x32d;).
+-- | A pattern synonym for 'CombiningCircumflexAccentBelow', the name without the @Combining@ part, defined by @'\\x032d'@ (&#x2022;&#x032d;).
 pattern CircumflexAccentBelow :: CombiningCharacter
 pattern CircumflexAccentBelow = CombiningCircumflexAccentBelow
 
--- | A pattern synonym for 'CombiningBreveBelow', the name without the @Combining@ part, defined by @'\x32e'@ (&#x2022;&#x32e;).
+-- | A pattern synonym for 'CombiningBreveBelow', the name without the @Combining@ part, defined by @'\\x032e'@ (&#x2022;&#x032e;).
 pattern BreveBelow :: CombiningCharacter
 pattern BreveBelow = CombiningBreveBelow
 
--- | A pattern synonym for 'CombiningInvertedBreveBelow', the name without the @Combining@ part, defined by @'\x32f'@ (&#x2022;&#x32f;).
+-- | A pattern synonym for 'CombiningInvertedBreveBelow', the name without the @Combining@ part, defined by @'\\x032f'@ (&#x2022;&#x032f;).
 pattern InvertedBreveBelow :: CombiningCharacter
 pattern InvertedBreveBelow = CombiningInvertedBreveBelow
 
--- | A pattern synonym for 'CombiningTildeBelow', the name without the @Combining@ part, defined by @'\x330'@ (&#x2022;&#x330;).
+-- | A pattern synonym for 'CombiningTildeBelow', the name without the @Combining@ part, defined by @'\\x0330'@ (&#x2022;&#x0330;).
 pattern TildeBelow :: CombiningCharacter
 pattern TildeBelow = CombiningTildeBelow
 
--- | A pattern synonym for 'CombiningMacronBelow', the name without the @Combining@ part, defined by @'\x331'@ (&#x2022;&#x331;).
+-- | A pattern synonym for 'CombiningMacronBelow', the name without the @Combining@ part, defined by @'\\x0331'@ (&#x2022;&#x0331;).
 pattern MacronBelow :: CombiningCharacter
 pattern MacronBelow = CombiningMacronBelow
 
--- | A pattern synonym for 'CombiningLowLine', the name without the @Combining@ part, defined by @'\x332'@ (&#x2022;&#x332;).
+-- | A pattern synonym for 'CombiningLowLine', the name without the @Combining@ part, defined by @'\\x0332'@ (&#x2022;&#x0332;).
 pattern LowLine :: CombiningCharacter
 pattern LowLine = CombiningLowLine
 
--- | A pattern synonym for 'CombiningDoubleLowLine', the name without the @Combining@ part, defined by @'\x333'@ (&#x2022;&#x333;).
+-- | A pattern synonym for 'CombiningDoubleLowLine', the name without the @Combining@ part, defined by @'\\x0333'@ (&#x2022;&#x0333;).
 pattern DoubleLowLine :: CombiningCharacter
 pattern DoubleLowLine = CombiningDoubleLowLine
 
--- | A pattern synonym for 'CombiningTildeOverlay', the name without the @Combining@ part, defined by @'\x334'@ (&#x2022;&#x334;).
+-- | A pattern synonym for 'CombiningTildeOverlay', the name without the @Combining@ part, defined by @'\\x0334'@ (&#x2022;&#x0334;).
 pattern TildeOverlay :: CombiningCharacter
 pattern TildeOverlay = CombiningTildeOverlay
 
--- | A pattern synonym for 'CombiningShortStrokeOverlay', the name without the @Combining@ part, defined by @'\x335'@ (&#x2022;&#x335;).
+-- | A pattern synonym for 'CombiningShortStrokeOverlay', the name without the @Combining@ part, defined by @'\\x0335'@ (&#x2022;&#x0335;).
 pattern ShortStrokeOverlay :: CombiningCharacter
 pattern ShortStrokeOverlay = CombiningShortStrokeOverlay
 
--- | A pattern synonym for 'CombiningLongStrokeOverlay', the name without the @Combining@ part, defined by @'\x336'@ (&#x2022;&#x336;).
+-- | A pattern synonym for 'CombiningLongStrokeOverlay', the name without the @Combining@ part, defined by @'\\x0336'@ (&#x2022;&#x0336;).
 pattern LongStrokeOverlay :: CombiningCharacter
 pattern LongStrokeOverlay = CombiningLongStrokeOverlay
 
--- | A pattern synonym for 'CombiningShortSolidusOverlay', the name without the @Combining@ part, defined by @'\x337'@ (&#x2022;&#x337;).
+-- | A pattern synonym for 'CombiningShortSolidusOverlay', the name without the @Combining@ part, defined by @'\\x0337'@ (&#x2022;&#x0337;).
 pattern ShortSolidusOverlay :: CombiningCharacter
 pattern ShortSolidusOverlay = CombiningShortSolidusOverlay
 
--- | A pattern synonym for 'CombiningLongSolidusOverlay', the name without the @Combining@ part, defined by @'\x338'@ (&#x2022;&#x338;).
+-- | A pattern synonym for 'CombiningLongSolidusOverlay', the name without the @Combining@ part, defined by @'\\x0338'@ (&#x2022;&#x0338;).
 pattern LongSolidusOverlay :: CombiningCharacter
 pattern LongSolidusOverlay = CombiningLongSolidusOverlay
 
--- | A pattern synonym for 'CombiningRightHalfRingBelow', the name without the @Combining@ part, defined by @'\x339'@ (&#x2022;&#x339;).
+-- | A pattern synonym for 'CombiningRightHalfRingBelow', the name without the @Combining@ part, defined by @'\\x0339'@ (&#x2022;&#x0339;).
 pattern RightHalfRingBelow :: CombiningCharacter
 pattern RightHalfRingBelow = CombiningRightHalfRingBelow
 
--- | A pattern synonym for 'CombiningInvertedBridgeBelow', the name without the @Combining@ part, defined by @'\x33a'@ (&#x2022;&#x33a;).
+-- | A pattern synonym for 'CombiningInvertedBridgeBelow', the name without the @Combining@ part, defined by @'\\x033a'@ (&#x2022;&#x033a;).
 pattern InvertedBridgeBelow :: CombiningCharacter
 pattern InvertedBridgeBelow = CombiningInvertedBridgeBelow
 
--- | A pattern synonym for 'CombiningSquareBelow', the name without the @Combining@ part, defined by @'\x33b'@ (&#x2022;&#x33b;).
+-- | A pattern synonym for 'CombiningSquareBelow', the name without the @Combining@ part, defined by @'\\x033b'@ (&#x2022;&#x033b;).
 pattern SquareBelow :: CombiningCharacter
 pattern SquareBelow = CombiningSquareBelow
 
--- | A pattern synonym for 'CombiningSeagullBelow', the name without the @Combining@ part, defined by @'\x33c'@ (&#x2022;&#x33c;).
+-- | A pattern synonym for 'CombiningSeagullBelow', the name without the @Combining@ part, defined by @'\\x033c'@ (&#x2022;&#x033c;).
 pattern SeagullBelow :: CombiningCharacter
 pattern SeagullBelow = CombiningSeagullBelow
 
--- | A pattern synonym for 'CombiningXAbove', the name without the @Combining@ part, defined by @'\x33d'@ (&#x2022;&#x33d;).
+-- | A pattern synonym for 'CombiningXAbove', the name without the @Combining@ part, defined by @'\\x033d'@ (&#x2022;&#x033d;).
 pattern XAbove :: CombiningCharacter
 pattern XAbove = CombiningXAbove
 
--- | A pattern synonym for 'CombiningVerticalTilde', the name without the @Combining@ part, defined by @'\x33e'@ (&#x2022;&#x33e;).
+-- | A pattern synonym for 'CombiningVerticalTilde', the name without the @Combining@ part, defined by @'\\x033e'@ (&#x2022;&#x033e;).
 pattern VerticalTilde :: CombiningCharacter
 pattern VerticalTilde = CombiningVerticalTilde
 
--- | A pattern synonym for 'CombiningDoubleOverline', the name without the @Combining@ part, defined by @'\x33f'@ (&#x2022;&#x33f;).
+-- | A pattern synonym for 'CombiningDoubleOverline', the name without the @Combining@ part, defined by @'\\x033f'@ (&#x2022;&#x033f;).
 pattern DoubleOverline :: CombiningCharacter
 pattern DoubleOverline = CombiningDoubleOverline
 
--- | A pattern synonym for 'CombiningGraveToneMark', the name without the @Combining@ part, defined by @'\x340'@ (&#x2022;&#x340;).
+-- | A pattern synonym for 'CombiningGraveToneMark', the name without the @Combining@ part, defined by @'\\x0340'@ (&#x2022;&#x0340;).
 pattern GraveToneMark :: CombiningCharacter
 pattern GraveToneMark = CombiningGraveToneMark
 
--- | A pattern synonym for 'CombiningAcuteToneMark', the name without the @Combining@ part, defined by @'\x341'@ (&#x2022;&#x341;).
+-- | A pattern synonym for 'CombiningAcuteToneMark', the name without the @Combining@ part, defined by @'\\x0341'@ (&#x2022;&#x0341;).
 pattern AcuteToneMark :: CombiningCharacter
 pattern AcuteToneMark = CombiningAcuteToneMark
 
--- | A pattern synonym for 'CombiningGreekPerispomeni', the name without the @Combining@ part, defined by @'\x342'@ (&#x2022;&#x342;).
+-- | A pattern synonym for 'CombiningGreekPerispomeni', the name without the @Combining@ part, defined by @'\\x0342'@ (&#x2022;&#x0342;).
 pattern GreekPerispomeni :: CombiningCharacter
 pattern GreekPerispomeni = CombiningGreekPerispomeni
 
--- | A pattern synonym for 'CombiningGreekKoronis', the name without the @Combining@ part, defined by @'\x343'@ (&#x2022;&#x343;).
+-- | A pattern synonym for 'CombiningGreekKoronis', the name without the @Combining@ part, defined by @'\\x0343'@ (&#x2022;&#x0343;).
 pattern GreekKoronis :: CombiningCharacter
 pattern GreekKoronis = CombiningGreekKoronis
 
--- | A pattern synonym for 'CombiningGreekDialytikaTonos', the name without the @Combining@ part, defined by @'\x344'@ (&#x2022;&#x344;).
+-- | A pattern synonym for 'CombiningGreekDialytikaTonos', the name without the @Combining@ part, defined by @'\\x0344'@ (&#x2022;&#x0344;).
 pattern GreekDialytikaTonos :: CombiningCharacter
 pattern GreekDialytikaTonos = CombiningGreekDialytikaTonos
 
--- | A pattern synonym for 'CombiningGreekYpogegrammeni', the name without the @Combining@ part, defined by @'\x345'@ (&#x2022;&#x345;).
+-- | A pattern synonym for 'CombiningGreekYpogegrammeni', the name without the @Combining@ part, defined by @'\\x0345'@ (&#x2022;&#x0345;).
 pattern GreekYpogegrammeni :: CombiningCharacter
 pattern GreekYpogegrammeni = CombiningGreekYpogegrammeni
 
--- | A pattern synonym for 'CombiningBridgeAbove', the name without the @Combining@ part, defined by @'\x346'@ (&#x2022;&#x346;).
+-- | A pattern synonym for 'CombiningBridgeAbove', the name without the @Combining@ part, defined by @'\\x0346'@ (&#x2022;&#x0346;).
 pattern BridgeAbove :: CombiningCharacter
 pattern BridgeAbove = CombiningBridgeAbove
 
--- | A pattern synonym for 'CombiningEqualsSignBelow', the name without the @Combining@ part, defined by @'\x347'@ (&#x2022;&#x347;).
+-- | A pattern synonym for 'CombiningEqualsSignBelow', the name without the @Combining@ part, defined by @'\\x0347'@ (&#x2022;&#x0347;).
 pattern EqualsSignBelow :: CombiningCharacter
 pattern EqualsSignBelow = CombiningEqualsSignBelow
 
--- | A pattern synonym for 'CombiningDoubleVerticalLineBelow', the name without the @Combining@ part, defined by @'\x348'@ (&#x2022;&#x348;).
+-- | A pattern synonym for 'CombiningDoubleVerticalLineBelow', the name without the @Combining@ part, defined by @'\\x0348'@ (&#x2022;&#x0348;).
 pattern DoubleVerticalLineBelow :: CombiningCharacter
 pattern DoubleVerticalLineBelow = CombiningDoubleVerticalLineBelow
 
--- | A pattern synonym for 'CombiningLeftAngleBelow', the name without the @Combining@ part, defined by @'\x349'@ (&#x2022;&#x349;).
+-- | A pattern synonym for 'CombiningLeftAngleBelow', the name without the @Combining@ part, defined by @'\\x0349'@ (&#x2022;&#x0349;).
 pattern LeftAngleBelow :: CombiningCharacter
 pattern LeftAngleBelow = CombiningLeftAngleBelow
 
--- | A pattern synonym for 'CombiningNotTildeAbove', the name without the @Combining@ part, defined by @'\x34a'@ (&#x2022;&#x34a;).
+-- | A pattern synonym for 'CombiningNotTildeAbove', the name without the @Combining@ part, defined by @'\\x034a'@ (&#x2022;&#x034a;).
 pattern NotTildeAbove :: CombiningCharacter
 pattern NotTildeAbove = CombiningNotTildeAbove
 
--- | A pattern synonym for 'CombiningHomotheticAbove', the name without the @Combining@ part, defined by @'\x34b'@ (&#x2022;&#x34b;).
+-- | A pattern synonym for 'CombiningHomotheticAbove', the name without the @Combining@ part, defined by @'\\x034b'@ (&#x2022;&#x034b;).
 pattern HomotheticAbove :: CombiningCharacter
 pattern HomotheticAbove = CombiningHomotheticAbove
 
--- | A pattern synonym for 'CombiningAlmostEqualToAbove', the name without the @Combining@ part, defined by @'\x34c'@ (&#x2022;&#x34c;).
+-- | A pattern synonym for 'CombiningAlmostEqualToAbove', the name without the @Combining@ part, defined by @'\\x034c'@ (&#x2022;&#x034c;).
 pattern AlmostEqualToAbove :: CombiningCharacter
 pattern AlmostEqualToAbove = CombiningAlmostEqualToAbove
 
--- | A pattern synonym for 'CombiningLeftRightArrowBelow', the name without the @Combining@ part, defined by @'\x34d'@ (&#x2022;&#x34d;).
+-- | A pattern synonym for 'CombiningLeftRightArrowBelow', the name without the @Combining@ part, defined by @'\\x034d'@ (&#x2022;&#x034d;).
 pattern LeftRightArrowBelow :: CombiningCharacter
 pattern LeftRightArrowBelow = CombiningLeftRightArrowBelow
 
--- | A pattern synonym for 'CombiningUpwardsArrowBelow', the name without the @Combining@ part, defined by @'\x34e'@ (&#x2022;&#x34e;).
+-- | A pattern synonym for 'CombiningUpwardsArrowBelow', the name without the @Combining@ part, defined by @'\\x034e'@ (&#x2022;&#x034e;).
 pattern UpwardsArrowBelow :: CombiningCharacter
 pattern UpwardsArrowBelow = CombiningUpwardsArrowBelow
 
--- | A pattern synonym for 'CombiningRightArrowheadAbove', the name without the @Combining@ part, defined by @'\x350'@ (&#x2022;&#x350;).
+-- | A pattern synonym for 'CombiningRightArrowheadAbove', the name without the @Combining@ part, defined by @'\\x0350'@ (&#x2022;&#x0350;).
 pattern RightArrowheadAbove :: CombiningCharacter
 pattern RightArrowheadAbove = CombiningRightArrowheadAbove
 
--- | A pattern synonym for 'CombiningLeftHalfRingAbove', the name without the @Combining@ part, defined by @'\x351'@ (&#x2022;&#x351;).
+-- | A pattern synonym for 'CombiningLeftHalfRingAbove', the name without the @Combining@ part, defined by @'\\x0351'@ (&#x2022;&#x0351;).
 pattern LeftHalfRingAbove :: CombiningCharacter
 pattern LeftHalfRingAbove = CombiningLeftHalfRingAbove
 
--- | A pattern synonym for 'CombiningFermata', the name without the @Combining@ part, defined by @'\x352'@ (&#x2022;&#x352;).
+-- | A pattern synonym for 'CombiningFermata', the name without the @Combining@ part, defined by @'\\x0352'@ (&#x2022;&#x0352;).
 pattern Fermata :: CombiningCharacter
 pattern Fermata = CombiningFermata
 
--- | A pattern synonym for 'CombiningXBelow', the name without the @Combining@ part, defined by @'\x353'@ (&#x2022;&#x353;).
+-- | A pattern synonym for 'CombiningXBelow', the name without the @Combining@ part, defined by @'\\x0353'@ (&#x2022;&#x0353;).
 pattern XBelow :: CombiningCharacter
 pattern XBelow = CombiningXBelow
 
--- | A pattern synonym for 'CombiningLeftArrowheadBelow', the name without the @Combining@ part, defined by @'\x354'@ (&#x2022;&#x354;).
+-- | A pattern synonym for 'CombiningLeftArrowheadBelow', the name without the @Combining@ part, defined by @'\\x0354'@ (&#x2022;&#x0354;).
 pattern LeftArrowheadBelow :: CombiningCharacter
 pattern LeftArrowheadBelow = CombiningLeftArrowheadBelow
 
--- | A pattern synonym for 'CombiningRightArrowheadBelow', the name without the @Combining@ part, defined by @'\x355'@ (&#x2022;&#x355;).
+-- | A pattern synonym for 'CombiningRightArrowheadBelow', the name without the @Combining@ part, defined by @'\\x0355'@ (&#x2022;&#x0355;).
 pattern RightArrowheadBelow :: CombiningCharacter
 pattern RightArrowheadBelow = CombiningRightArrowheadBelow
 
--- | A pattern synonym for 'CombiningRightArrowheadAndUpArrowheadBelow', the name without the @Combining@ part, defined by @'\x356'@ (&#x2022;&#x356;).
+-- | A pattern synonym for 'CombiningRightArrowheadAndUpArrowheadBelow', the name without the @Combining@ part, defined by @'\\x0356'@ (&#x2022;&#x0356;).
 pattern RightArrowheadAndUpArrowheadBelow :: CombiningCharacter
 pattern RightArrowheadAndUpArrowheadBelow = CombiningRightArrowheadAndUpArrowheadBelow
 
--- | A pattern synonym for 'CombiningRightHalfRingAbove', the name without the @Combining@ part, defined by @'\x357'@ (&#x2022;&#x357;).
+-- | A pattern synonym for 'CombiningRightHalfRingAbove', the name without the @Combining@ part, defined by @'\\x0357'@ (&#x2022;&#x0357;).
 pattern RightHalfRingAbove :: CombiningCharacter
 pattern RightHalfRingAbove = CombiningRightHalfRingAbove
 
--- | A pattern synonym for 'CombiningDotAboveRight', the name without the @Combining@ part, defined by @'\x358'@ (&#x2022;&#x358;).
+-- | A pattern synonym for 'CombiningDotAboveRight', the name without the @Combining@ part, defined by @'\\x0358'@ (&#x2022;&#x0358;).
 pattern DotAboveRight :: CombiningCharacter
 pattern DotAboveRight = CombiningDotAboveRight
 
--- | A pattern synonym for 'CombiningAsteriskBelow', the name without the @Combining@ part, defined by @'\x359'@ (&#x2022;&#x359;).
+-- | A pattern synonym for 'CombiningAsteriskBelow', the name without the @Combining@ part, defined by @'\\x0359'@ (&#x2022;&#x0359;).
 pattern AsteriskBelow :: CombiningCharacter
 pattern AsteriskBelow = CombiningAsteriskBelow
 
--- | A pattern synonym for 'CombiningDoubleRingBelow', the name without the @Combining@ part, defined by @'\x35a'@ (&#x2022;&#x35a;).
+-- | A pattern synonym for 'CombiningDoubleRingBelow', the name without the @Combining@ part, defined by @'\\x035a'@ (&#x2022;&#x035a;).
 pattern DoubleRingBelow :: CombiningCharacter
 pattern DoubleRingBelow = CombiningDoubleRingBelow
 
--- | A pattern synonym for 'CombiningZigzagAbove', the name without the @Combining@ part, defined by @'\x35b'@ (&#x2022;&#x35b;).
+-- | A pattern synonym for 'CombiningZigzagAbove', the name without the @Combining@ part, defined by @'\\x035b'@ (&#x2022;&#x035b;).
 pattern ZigzagAbove :: CombiningCharacter
 pattern ZigzagAbove = CombiningZigzagAbove
 
--- | A pattern synonym for 'CombiningDoubleBreveBelow', the name without the @Combining@ part, defined by @'\x35c'@ (&#x2022;&#x35c;).
+-- | A pattern synonym for 'CombiningDoubleBreveBelow', the name without the @Combining@ part, defined by @'\\x035c'@ (&#x2022;&#x035c;).
 pattern DoubleBreveBelow :: CombiningCharacter
 pattern DoubleBreveBelow = CombiningDoubleBreveBelow
 
--- | A pattern synonym for 'CombiningDoubleBreve', the name without the @Combining@ part, defined by @'\x35d'@ (&#x2022;&#x35d;).
+-- | A pattern synonym for 'CombiningDoubleBreve', the name without the @Combining@ part, defined by @'\\x035d'@ (&#x2022;&#x035d;).
 pattern DoubleBreve :: CombiningCharacter
 pattern DoubleBreve = CombiningDoubleBreve
 
--- | A pattern synonym for 'CombiningDoubleMacron', the name without the @Combining@ part, defined by @'\x35e'@ (&#x2022;&#x35e;).
+-- | A pattern synonym for 'CombiningDoubleMacron', the name without the @Combining@ part, defined by @'\\x035e'@ (&#x2022;&#x035e;).
 pattern DoubleMacron :: CombiningCharacter
 pattern DoubleMacron = CombiningDoubleMacron
 
--- | A pattern synonym for 'CombiningDoubleMacronBelow', the name without the @Combining@ part, defined by @'\x35f'@ (&#x2022;&#x35f;).
+-- | A pattern synonym for 'CombiningDoubleMacronBelow', the name without the @Combining@ part, defined by @'\\x035f'@ (&#x2022;&#x035f;).
 pattern DoubleMacronBelow :: CombiningCharacter
 pattern DoubleMacronBelow = CombiningDoubleMacronBelow
 
--- | A pattern synonym for 'CombiningDoubleTilde', the name without the @Combining@ part, defined by @'\x360'@ (&#x2022;&#x360;).
+-- | A pattern synonym for 'CombiningDoubleTilde', the name without the @Combining@ part, defined by @'\\x0360'@ (&#x2022;&#x0360;).
 pattern DoubleTilde :: CombiningCharacter
 pattern DoubleTilde = CombiningDoubleTilde
 
--- | A pattern synonym for 'CombiningDoubleInvertedBreve', the name without the @Combining@ part, defined by @'\x361'@ (&#x2022;&#x361;).
+-- | A pattern synonym for 'CombiningDoubleInvertedBreve', the name without the @Combining@ part, defined by @'\\x0361'@ (&#x2022;&#x0361;).
 pattern DoubleInvertedBreve :: CombiningCharacter
 pattern DoubleInvertedBreve = CombiningDoubleInvertedBreve
 
--- | A pattern synonym for 'CombiningDoubleRightwardsArrowBelow', the name without the @Combining@ part, defined by @'\x362'@ (&#x2022;&#x362;).
+-- | A pattern synonym for 'CombiningDoubleRightwardsArrowBelow', the name without the @Combining@ part, defined by @'\\x0362'@ (&#x2022;&#x0362;).
 pattern DoubleRightwardsArrowBelow :: CombiningCharacter
 pattern DoubleRightwardsArrowBelow = CombiningDoubleRightwardsArrowBelow
 
--- | A pattern synonym for 'CombiningLatinSmallLetterA', the name without the @Combining@ part, defined by @'\x363'@ (&#x2022;&#x363;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterA', the name without the @Combining@ part, defined by @'\\x0363'@ (&#x2022;&#x0363;).
 pattern LatinSmallLetterA :: CombiningCharacter
 pattern LatinSmallLetterA = CombiningLatinSmallLetterA
 
--- | A pattern synonym for 'CombiningLatinSmallLetterE', the name without the @Combining@ part, defined by @'\x364'@ (&#x2022;&#x364;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterE', the name without the @Combining@ part, defined by @'\\x0364'@ (&#x2022;&#x0364;).
 pattern LatinSmallLetterE :: CombiningCharacter
 pattern LatinSmallLetterE = CombiningLatinSmallLetterE
 
--- | A pattern synonym for 'CombiningLatinSmallLetterI', the name without the @Combining@ part, defined by @'\x365'@ (&#x2022;&#x365;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterI', the name without the @Combining@ part, defined by @'\\x0365'@ (&#x2022;&#x0365;).
 pattern LatinSmallLetterI :: CombiningCharacter
 pattern LatinSmallLetterI = CombiningLatinSmallLetterI
 
--- | A pattern synonym for 'CombiningLatinSmallLetterO', the name without the @Combining@ part, defined by @'\x366'@ (&#x2022;&#x366;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterO', the name without the @Combining@ part, defined by @'\\x0366'@ (&#x2022;&#x0366;).
 pattern LatinSmallLetterO :: CombiningCharacter
 pattern LatinSmallLetterO = CombiningLatinSmallLetterO
 
--- | A pattern synonym for 'CombiningLatinSmallLetterU', the name without the @Combining@ part, defined by @'\x367'@ (&#x2022;&#x367;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterU', the name without the @Combining@ part, defined by @'\\x0367'@ (&#x2022;&#x0367;).
 pattern LatinSmallLetterU :: CombiningCharacter
 pattern LatinSmallLetterU = CombiningLatinSmallLetterU
 
--- | A pattern synonym for 'CombiningLatinSmallLetterC', the name without the @Combining@ part, defined by @'\x368'@ (&#x2022;&#x368;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterC', the name without the @Combining@ part, defined by @'\\x0368'@ (&#x2022;&#x0368;).
 pattern LatinSmallLetterC :: CombiningCharacter
 pattern LatinSmallLetterC = CombiningLatinSmallLetterC
 
--- | A pattern synonym for 'CombiningLatinSmallLetterD', the name without the @Combining@ part, defined by @'\x369'@ (&#x2022;&#x369;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterD', the name without the @Combining@ part, defined by @'\\x0369'@ (&#x2022;&#x0369;).
 pattern LatinSmallLetterD :: CombiningCharacter
 pattern LatinSmallLetterD = CombiningLatinSmallLetterD
 
--- | A pattern synonym for 'CombiningLatinSmallLetterH', the name without the @Combining@ part, defined by @'\x36a'@ (&#x2022;&#x36a;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterH', the name without the @Combining@ part, defined by @'\\x036a'@ (&#x2022;&#x036a;).
 pattern LatinSmallLetterH :: CombiningCharacter
 pattern LatinSmallLetterH = CombiningLatinSmallLetterH
 
--- | A pattern synonym for 'CombiningLatinSmallLetterM', the name without the @Combining@ part, defined by @'\x36b'@ (&#x2022;&#x36b;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterM', the name without the @Combining@ part, defined by @'\\x036b'@ (&#x2022;&#x036b;).
 pattern LatinSmallLetterM :: CombiningCharacter
 pattern LatinSmallLetterM = CombiningLatinSmallLetterM
 
--- | A pattern synonym for 'CombiningLatinSmallLetterR', the name without the @Combining@ part, defined by @'\x36c'@ (&#x2022;&#x36c;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterR', the name without the @Combining@ part, defined by @'\\x036c'@ (&#x2022;&#x036c;).
 pattern LatinSmallLetterR :: CombiningCharacter
 pattern LatinSmallLetterR = CombiningLatinSmallLetterR
 
--- | A pattern synonym for 'CombiningLatinSmallLetterT', the name without the @Combining@ part, defined by @'\x36d'@ (&#x2022;&#x36d;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterT', the name without the @Combining@ part, defined by @'\\x036d'@ (&#x2022;&#x036d;).
 pattern LatinSmallLetterT :: CombiningCharacter
 pattern LatinSmallLetterT = CombiningLatinSmallLetterT
 
--- | A pattern synonym for 'CombiningLatinSmallLetterV', the name without the @Combining@ part, defined by @'\x36e'@ (&#x2022;&#x36e;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterV', the name without the @Combining@ part, defined by @'\\x036e'@ (&#x2022;&#x036e;).
 pattern LatinSmallLetterV :: CombiningCharacter
 pattern LatinSmallLetterV = CombiningLatinSmallLetterV
 
--- | A pattern synonym for 'CombiningLatinSmallLetterX', the name without the @Combining@ part, defined by @'\x36f'@ (&#x2022;&#x36f;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterX', the name without the @Combining@ part, defined by @'\\x036f'@ (&#x2022;&#x036f;).
 pattern LatinSmallLetterX :: CombiningCharacter
 pattern LatinSmallLetterX = CombiningLatinSmallLetterX
 
--- | A pattern synonym for 'CombiningCyrillicTitlo', the name without the @Combining@ part, defined by @'\x483'@ (&#x2022;&#x483;).
+-- | A pattern synonym for 'CombiningCyrillicTitlo', the name without the @Combining@ part, defined by @'\\x0483'@ (&#x2022;&#x0483;).
 pattern CyrillicTitlo :: CombiningCharacter
 pattern CyrillicTitlo = CombiningCyrillicTitlo
 
--- | A pattern synonym for 'CombiningCyrillicPalatalization', the name without the @Combining@ part, defined by @'\x484'@ (&#x2022;&#x484;).
+-- | A pattern synonym for 'CombiningCyrillicPalatalization', the name without the @Combining@ part, defined by @'\\x0484'@ (&#x2022;&#x0484;).
 pattern CyrillicPalatalization :: CombiningCharacter
 pattern CyrillicPalatalization = CombiningCyrillicPalatalization
 
--- | A pattern synonym for 'CombiningCyrillicDasiaPneumata', the name without the @Combining@ part, defined by @'\x485'@ (&#x2022;&#x485;).
+-- | A pattern synonym for 'CombiningCyrillicDasiaPneumata', the name without the @Combining@ part, defined by @'\\x0485'@ (&#x2022;&#x0485;).
 pattern CyrillicDasiaPneumata :: CombiningCharacter
 pattern CyrillicDasiaPneumata = CombiningCyrillicDasiaPneumata
 
--- | A pattern synonym for 'CombiningCyrillicPsiliPneumata', the name without the @Combining@ part, defined by @'\x486'@ (&#x2022;&#x486;).
+-- | A pattern synonym for 'CombiningCyrillicPsiliPneumata', the name without the @Combining@ part, defined by @'\\x0486'@ (&#x2022;&#x0486;).
 pattern CyrillicPsiliPneumata :: CombiningCharacter
 pattern CyrillicPsiliPneumata = CombiningCyrillicPsiliPneumata
 
--- | A pattern synonym for 'CombiningCyrillicPokrytie', the name without the @Combining@ part, defined by @'\x487'@ (&#x2022;&#x487;).
+-- | A pattern synonym for 'CombiningCyrillicPokrytie', the name without the @Combining@ part, defined by @'\\x0487'@ (&#x2022;&#x0487;).
 pattern CyrillicPokrytie :: CombiningCharacter
 pattern CyrillicPokrytie = CombiningCyrillicPokrytie
 
--- | A pattern synonym for 'NkoCombiningShortHighTone', the name without the @Combining@ part, defined by @'\x7eb'@ (&#x2022;&#x7eb;).
+-- | A pattern synonym for 'NkoCombiningShortHighTone', the name without the @Combining@ part, defined by @'\\x07eb'@ (&#x2022;&#x07eb;).
 pattern NkoShortHighTone :: CombiningCharacter
 pattern NkoShortHighTone = NkoCombiningShortHighTone
 
--- | A pattern synonym for 'NkoCombiningShortLowTone', the name without the @Combining@ part, defined by @'\x7ec'@ (&#x2022;&#x7ec;).
+-- | A pattern synonym for 'NkoCombiningShortLowTone', the name without the @Combining@ part, defined by @'\\x07ec'@ (&#x2022;&#x07ec;).
 pattern NkoShortLowTone :: CombiningCharacter
 pattern NkoShortLowTone = NkoCombiningShortLowTone
 
--- | A pattern synonym for 'NkoCombiningShortRisingTone', the name without the @Combining@ part, defined by @'\x7ed'@ (&#x2022;&#x7ed;).
+-- | A pattern synonym for 'NkoCombiningShortRisingTone', the name without the @Combining@ part, defined by @'\\x07ed'@ (&#x2022;&#x07ed;).
 pattern NkoShortRisingTone :: CombiningCharacter
 pattern NkoShortRisingTone = NkoCombiningShortRisingTone
 
--- | A pattern synonym for 'NkoCombiningLongDescendingTone', the name without the @Combining@ part, defined by @'\x7ee'@ (&#x2022;&#x7ee;).
+-- | A pattern synonym for 'NkoCombiningLongDescendingTone', the name without the @Combining@ part, defined by @'\\x07ee'@ (&#x2022;&#x07ee;).
 pattern NkoLongDescendingTone :: CombiningCharacter
 pattern NkoLongDescendingTone = NkoCombiningLongDescendingTone
 
--- | A pattern synonym for 'NkoCombiningLongHighTone', the name without the @Combining@ part, defined by @'\x7ef'@ (&#x2022;&#x7ef;).
+-- | A pattern synonym for 'NkoCombiningLongHighTone', the name without the @Combining@ part, defined by @'\\x07ef'@ (&#x2022;&#x07ef;).
 pattern NkoLongHighTone :: CombiningCharacter
 pattern NkoLongHighTone = NkoCombiningLongHighTone
 
--- | A pattern synonym for 'NkoCombiningLongLowTone', the name without the @Combining@ part, defined by @'\x7f0'@ (&#x2022;&#x7f0;).
+-- | A pattern synonym for 'NkoCombiningLongLowTone', the name without the @Combining@ part, defined by @'\\x07f0'@ (&#x2022;&#x07f0;).
 pattern NkoLongLowTone :: CombiningCharacter
 pattern NkoLongLowTone = NkoCombiningLongLowTone
 
--- | A pattern synonym for 'NkoCombiningLongRisingTone', the name without the @Combining@ part, defined by @'\x7f1'@ (&#x2022;&#x7f1;).
+-- | A pattern synonym for 'NkoCombiningLongRisingTone', the name without the @Combining@ part, defined by @'\\x07f1'@ (&#x2022;&#x07f1;).
 pattern NkoLongRisingTone :: CombiningCharacter
 pattern NkoLongRisingTone = NkoCombiningLongRisingTone
 
--- | A pattern synonym for 'NkoCombiningNasalizationMark', the name without the @Combining@ part, defined by @'\x7f2'@ (&#x2022;&#x7f2;).
+-- | A pattern synonym for 'NkoCombiningNasalizationMark', the name without the @Combining@ part, defined by @'\\x07f2'@ (&#x2022;&#x07f2;).
 pattern NkoNasalizationMark :: CombiningCharacter
 pattern NkoNasalizationMark = NkoCombiningNasalizationMark
 
--- | A pattern synonym for 'NkoCombiningDoubleDotAbove', the name without the @Combining@ part, defined by @'\x7f3'@ (&#x2022;&#x7f3;).
+-- | A pattern synonym for 'NkoCombiningDoubleDotAbove', the name without the @Combining@ part, defined by @'\\x07f3'@ (&#x2022;&#x07f3;).
 pattern NkoDoubleDotAbove :: CombiningCharacter
 pattern NkoDoubleDotAbove = NkoCombiningDoubleDotAbove
 
--- | A pattern synonym for 'EthiopicCombiningGeminationAndVowelLengthMark', the name without the @Combining@ part, defined by @'\x135d'@ (&#x2022;&#x135d;).
+-- | A pattern synonym for 'EthiopicCombiningGeminationAndVowelLengthMark', the name without the @Combining@ part, defined by @'\\x135d'@ (&#x2022;&#x135d;).
 pattern EthiopicGeminationAndVowelLengthMark :: CombiningCharacter
 pattern EthiopicGeminationAndVowelLengthMark = EthiopicCombiningGeminationAndVowelLengthMark
 
--- | A pattern synonym for 'EthiopicCombiningVowelLengthMark', the name without the @Combining@ part, defined by @'\x135e'@ (&#x2022;&#x135e;).
+-- | A pattern synonym for 'EthiopicCombiningVowelLengthMark', the name without the @Combining@ part, defined by @'\\x135e'@ (&#x2022;&#x135e;).
 pattern EthiopicVowelLengthMark :: CombiningCharacter
 pattern EthiopicVowelLengthMark = EthiopicCombiningVowelLengthMark
 
--- | A pattern synonym for 'EthiopicCombiningGeminationMark', the name without the @Combining@ part, defined by @'\x135f'@ (&#x2022;&#x135f;).
+-- | A pattern synonym for 'EthiopicCombiningGeminationMark', the name without the @Combining@ part, defined by @'\\x135f'@ (&#x2022;&#x135f;).
 pattern EthiopicGeminationMark :: CombiningCharacter
 pattern EthiopicGeminationMark = EthiopicCombiningGeminationMark
 
--- | A pattern synonym for 'TaiThamCombiningCryptogrammicDot', the name without the @Combining@ part, defined by @'\x1a7f'@ (&#x2022;&#x1a7f;).
+-- | A pattern synonym for 'TaiThamCombiningCryptogrammicDot', the name without the @Combining@ part, defined by @'\\x1a7f'@ (&#x2022;&#x1a7f;).
 pattern TaiThamCryptogrammicDot :: CombiningCharacter
 pattern TaiThamCryptogrammicDot = TaiThamCombiningCryptogrammicDot
 
--- | A pattern synonym for 'CombiningDoubledCircumflexAccent', the name without the @Combining@ part, defined by @'\x1ab0'@ (&#x2022;&#x1ab0;).
+-- | A pattern synonym for 'CombiningDoubledCircumflexAccent', the name without the @Combining@ part, defined by @'\\x1ab0'@ (&#x2022;&#x1ab0;).
 pattern DoubledCircumflexAccent :: CombiningCharacter
 pattern DoubledCircumflexAccent = CombiningDoubledCircumflexAccent
 
--- | A pattern synonym for 'CombiningDiaeresisRing', the name without the @Combining@ part, defined by @'\x1ab1'@ (&#x2022;&#x1ab1;).
+-- | A pattern synonym for 'CombiningDiaeresisRing', the name without the @Combining@ part, defined by @'\\x1ab1'@ (&#x2022;&#x1ab1;).
 pattern DiaeresisRing :: CombiningCharacter
 pattern DiaeresisRing = CombiningDiaeresisRing
 
--- | A pattern synonym for 'CombiningInfinity', the name without the @Combining@ part, defined by @'\x1ab2'@ (&#x2022;&#x1ab2;).
+-- | A pattern synonym for 'CombiningInfinity', the name without the @Combining@ part, defined by @'\\x1ab2'@ (&#x2022;&#x1ab2;).
 pattern Infinity :: CombiningCharacter
 pattern Infinity = CombiningInfinity
 
--- | A pattern synonym for 'CombiningDownwardsArrow', the name without the @Combining@ part, defined by @'\x1ab3'@ (&#x2022;&#x1ab3;).
+-- | A pattern synonym for 'CombiningDownwardsArrow', the name without the @Combining@ part, defined by @'\\x1ab3'@ (&#x2022;&#x1ab3;).
 pattern DownwardsArrow :: CombiningCharacter
 pattern DownwardsArrow = CombiningDownwardsArrow
 
--- | A pattern synonym for 'CombiningTripleDot', the name without the @Combining@ part, defined by @'\x1ab4'@ (&#x2022;&#x1ab4;).
+-- | A pattern synonym for 'CombiningTripleDot', the name without the @Combining@ part, defined by @'\\x1ab4'@ (&#x2022;&#x1ab4;).
 pattern TripleDot :: CombiningCharacter
 pattern TripleDot = CombiningTripleDot
 
--- | A pattern synonym for 'CombiningXXBelow', the name without the @Combining@ part, defined by @'\x1ab5'@ (&#x2022;&#x1ab5;).
+-- | A pattern synonym for 'CombiningXXBelow', the name without the @Combining@ part, defined by @'\\x1ab5'@ (&#x2022;&#x1ab5;).
 pattern XXBelow :: CombiningCharacter
 pattern XXBelow = CombiningXXBelow
 
--- | A pattern synonym for 'CombiningWigglyLineBelow', the name without the @Combining@ part, defined by @'\x1ab6'@ (&#x2022;&#x1ab6;).
+-- | A pattern synonym for 'CombiningWigglyLineBelow', the name without the @Combining@ part, defined by @'\\x1ab6'@ (&#x2022;&#x1ab6;).
 pattern WigglyLineBelow :: CombiningCharacter
 pattern WigglyLineBelow = CombiningWigglyLineBelow
 
--- | A pattern synonym for 'CombiningOpenMarkBelow', the name without the @Combining@ part, defined by @'\x1ab7'@ (&#x2022;&#x1ab7;).
+-- | A pattern synonym for 'CombiningOpenMarkBelow', the name without the @Combining@ part, defined by @'\\x1ab7'@ (&#x2022;&#x1ab7;).
 pattern OpenMarkBelow :: CombiningCharacter
 pattern OpenMarkBelow = CombiningOpenMarkBelow
 
--- | A pattern synonym for 'CombiningDoubleOpenMarkBelow', the name without the @Combining@ part, defined by @'\x1ab8'@ (&#x2022;&#x1ab8;).
+-- | A pattern synonym for 'CombiningDoubleOpenMarkBelow', the name without the @Combining@ part, defined by @'\\x1ab8'@ (&#x2022;&#x1ab8;).
 pattern DoubleOpenMarkBelow :: CombiningCharacter
 pattern DoubleOpenMarkBelow = CombiningDoubleOpenMarkBelow
 
--- | A pattern synonym for 'CombiningLightCentralizationStrokeBelow', the name without the @Combining@ part, defined by @'\x1ab9'@ (&#x2022;&#x1ab9;).
+-- | A pattern synonym for 'CombiningLightCentralizationStrokeBelow', the name without the @Combining@ part, defined by @'\\x1ab9'@ (&#x2022;&#x1ab9;).
 pattern LightCentralizationStrokeBelow :: CombiningCharacter
 pattern LightCentralizationStrokeBelow = CombiningLightCentralizationStrokeBelow
 
--- | A pattern synonym for 'CombiningStrongCentralizationStrokeBelow', the name without the @Combining@ part, defined by @'\x1aba'@ (&#x2022;&#x1aba;).
+-- | A pattern synonym for 'CombiningStrongCentralizationStrokeBelow', the name without the @Combining@ part, defined by @'\\x1aba'@ (&#x2022;&#x1aba;).
 pattern StrongCentralizationStrokeBelow :: CombiningCharacter
 pattern StrongCentralizationStrokeBelow = CombiningStrongCentralizationStrokeBelow
 
--- | A pattern synonym for 'CombiningParenthesesAbove', the name without the @Combining@ part, defined by @'\x1abb'@ (&#x2022;&#x1abb;).
+-- | A pattern synonym for 'CombiningParenthesesAbove', the name without the @Combining@ part, defined by @'\\x1abb'@ (&#x2022;&#x1abb;).
 pattern ParenthesesAbove :: CombiningCharacter
 pattern ParenthesesAbove = CombiningParenthesesAbove
 
--- | A pattern synonym for 'CombiningDoubleParenthesesAbove', the name without the @Combining@ part, defined by @'\x1abc'@ (&#x2022;&#x1abc;).
+-- | A pattern synonym for 'CombiningDoubleParenthesesAbove', the name without the @Combining@ part, defined by @'\\x1abc'@ (&#x2022;&#x1abc;).
 pattern DoubleParenthesesAbove :: CombiningCharacter
 pattern DoubleParenthesesAbove = CombiningDoubleParenthesesAbove
 
--- | A pattern synonym for 'CombiningParenthesesBelow', the name without the @Combining@ part, defined by @'\x1abd'@ (&#x2022;&#x1abd;).
+-- | A pattern synonym for 'CombiningParenthesesBelow', the name without the @Combining@ part, defined by @'\\x1abd'@ (&#x2022;&#x1abd;).
 pattern ParenthesesBelow :: CombiningCharacter
 pattern ParenthesesBelow = CombiningParenthesesBelow
 
--- | A pattern synonym for 'BalineseMusicalSymbolCombiningTegeh', the name without the @Combining@ part, defined by @'\x1b6b'@ (&#x2022;&#x1b6b;).
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningTegeh', the name without the @Combining@ part, defined by @'\\x1b6b'@ (&#x2022;&#x1b6b;).
 pattern BalineseMusicalSymbolTegeh :: CombiningCharacter
 pattern BalineseMusicalSymbolTegeh = BalineseMusicalSymbolCombiningTegeh
 
--- | A pattern synonym for 'BalineseMusicalSymbolCombiningEndep', the name without the @Combining@ part, defined by @'\x1b6c'@ (&#x2022;&#x1b6c;).
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningEndep', the name without the @Combining@ part, defined by @'\\x1b6c'@ (&#x2022;&#x1b6c;).
 pattern BalineseMusicalSymbolEndep :: CombiningCharacter
 pattern BalineseMusicalSymbolEndep = BalineseMusicalSymbolCombiningEndep
 
--- | A pattern synonym for 'BalineseMusicalSymbolCombiningKempul', the name without the @Combining@ part, defined by @'\x1b6d'@ (&#x2022;&#x1b6d;).
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningKempul', the name without the @Combining@ part, defined by @'\\x1b6d'@ (&#x2022;&#x1b6d;).
 pattern BalineseMusicalSymbolKempul :: CombiningCharacter
 pattern BalineseMusicalSymbolKempul = BalineseMusicalSymbolCombiningKempul
 
--- | A pattern synonym for 'BalineseMusicalSymbolCombiningKempli', the name without the @Combining@ part, defined by @'\x1b6e'@ (&#x2022;&#x1b6e;).
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningKempli', the name without the @Combining@ part, defined by @'\\x1b6e'@ (&#x2022;&#x1b6e;).
 pattern BalineseMusicalSymbolKempli :: CombiningCharacter
 pattern BalineseMusicalSymbolKempli = BalineseMusicalSymbolCombiningKempli
 
--- | A pattern synonym for 'BalineseMusicalSymbolCombiningJegogan', the name without the @Combining@ part, defined by @'\x1b6f'@ (&#x2022;&#x1b6f;).
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningJegogan', the name without the @Combining@ part, defined by @'\\x1b6f'@ (&#x2022;&#x1b6f;).
 pattern BalineseMusicalSymbolJegogan :: CombiningCharacter
 pattern BalineseMusicalSymbolJegogan = BalineseMusicalSymbolCombiningJegogan
 
--- | A pattern synonym for 'BalineseMusicalSymbolCombiningKempulWithJegogan', the name without the @Combining@ part, defined by @'\x1b70'@ (&#x2022;&#x1b70;).
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningKempulWithJegogan', the name without the @Combining@ part, defined by @'\\x1b70'@ (&#x2022;&#x1b70;).
 pattern BalineseMusicalSymbolKempulWithJegogan :: CombiningCharacter
 pattern BalineseMusicalSymbolKempulWithJegogan = BalineseMusicalSymbolCombiningKempulWithJegogan
 
--- | A pattern synonym for 'BalineseMusicalSymbolCombiningKempliWithJegogan', the name without the @Combining@ part, defined by @'\x1b71'@ (&#x2022;&#x1b71;).
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningKempliWithJegogan', the name without the @Combining@ part, defined by @'\\x1b71'@ (&#x2022;&#x1b71;).
 pattern BalineseMusicalSymbolKempliWithJegogan :: CombiningCharacter
 pattern BalineseMusicalSymbolKempliWithJegogan = BalineseMusicalSymbolCombiningKempliWithJegogan
 
--- | A pattern synonym for 'BalineseMusicalSymbolCombiningBende', the name without the @Combining@ part, defined by @'\x1b72'@ (&#x2022;&#x1b72;).
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningBende', the name without the @Combining@ part, defined by @'\\x1b72'@ (&#x2022;&#x1b72;).
 pattern BalineseMusicalSymbolBende :: CombiningCharacter
 pattern BalineseMusicalSymbolBende = BalineseMusicalSymbolCombiningBende
 
--- | A pattern synonym for 'BalineseMusicalSymbolCombiningGong', the name without the @Combining@ part, defined by @'\x1b73'@ (&#x2022;&#x1b73;).
+-- | A pattern synonym for 'BalineseMusicalSymbolCombiningGong', the name without the @Combining@ part, defined by @'\\x1b73'@ (&#x2022;&#x1b73;).
 pattern BalineseMusicalSymbolGong :: CombiningCharacter
 pattern BalineseMusicalSymbolGong = BalineseMusicalSymbolCombiningGong
 
--- | A pattern synonym for 'CombiningDottedGraveAccent', the name without the @Combining@ part, defined by @'\x1dc0'@ (&#x2022;&#x1dc0;).
+-- | A pattern synonym for 'CombiningDottedGraveAccent', the name without the @Combining@ part, defined by @'\\x1dc0'@ (&#x2022;&#x1dc0;).
 pattern DottedGraveAccent :: CombiningCharacter
 pattern DottedGraveAccent = CombiningDottedGraveAccent
 
--- | A pattern synonym for 'CombiningDottedAcuteAccent', the name without the @Combining@ part, defined by @'\x1dc1'@ (&#x2022;&#x1dc1;).
+-- | A pattern synonym for 'CombiningDottedAcuteAccent', the name without the @Combining@ part, defined by @'\\x1dc1'@ (&#x2022;&#x1dc1;).
 pattern DottedAcuteAccent :: CombiningCharacter
 pattern DottedAcuteAccent = CombiningDottedAcuteAccent
 
--- | A pattern synonym for 'CombiningSnakeBelow', the name without the @Combining@ part, defined by @'\x1dc2'@ (&#x2022;&#x1dc2;).
+-- | A pattern synonym for 'CombiningSnakeBelow', the name without the @Combining@ part, defined by @'\\x1dc2'@ (&#x2022;&#x1dc2;).
 pattern SnakeBelow :: CombiningCharacter
 pattern SnakeBelow = CombiningSnakeBelow
 
--- | A pattern synonym for 'CombiningSuspensionMark', the name without the @Combining@ part, defined by @'\x1dc3'@ (&#x2022;&#x1dc3;).
+-- | A pattern synonym for 'CombiningSuspensionMark', the name without the @Combining@ part, defined by @'\\x1dc3'@ (&#x2022;&#x1dc3;).
 pattern SuspensionMark :: CombiningCharacter
 pattern SuspensionMark = CombiningSuspensionMark
 
--- | A pattern synonym for 'CombiningMacronAcute', the name without the @Combining@ part, defined by @'\x1dc4'@ (&#x2022;&#x1dc4;).
+-- | A pattern synonym for 'CombiningMacronAcute', the name without the @Combining@ part, defined by @'\\x1dc4'@ (&#x2022;&#x1dc4;).
 pattern MacronAcute :: CombiningCharacter
 pattern MacronAcute = CombiningMacronAcute
 
--- | A pattern synonym for 'CombiningGraveMacron', the name without the @Combining@ part, defined by @'\x1dc5'@ (&#x2022;&#x1dc5;).
+-- | A pattern synonym for 'CombiningGraveMacron', the name without the @Combining@ part, defined by @'\\x1dc5'@ (&#x2022;&#x1dc5;).
 pattern GraveMacron :: CombiningCharacter
 pattern GraveMacron = CombiningGraveMacron
 
--- | A pattern synonym for 'CombiningMacronGrave', the name without the @Combining@ part, defined by @'\x1dc6'@ (&#x2022;&#x1dc6;).
+-- | A pattern synonym for 'CombiningMacronGrave', the name without the @Combining@ part, defined by @'\\x1dc6'@ (&#x2022;&#x1dc6;).
 pattern MacronGrave :: CombiningCharacter
 pattern MacronGrave = CombiningMacronGrave
 
--- | A pattern synonym for 'CombiningAcuteMacron', the name without the @Combining@ part, defined by @'\x1dc7'@ (&#x2022;&#x1dc7;).
+-- | A pattern synonym for 'CombiningAcuteMacron', the name without the @Combining@ part, defined by @'\\x1dc7'@ (&#x2022;&#x1dc7;).
 pattern AcuteMacron :: CombiningCharacter
 pattern AcuteMacron = CombiningAcuteMacron
 
--- | A pattern synonym for 'CombiningGraveAcuteGrave', the name without the @Combining@ part, defined by @'\x1dc8'@ (&#x2022;&#x1dc8;).
+-- | A pattern synonym for 'CombiningGraveAcuteGrave', the name without the @Combining@ part, defined by @'\\x1dc8'@ (&#x2022;&#x1dc8;).
 pattern GraveAcuteGrave :: CombiningCharacter
 pattern GraveAcuteGrave = CombiningGraveAcuteGrave
 
--- | A pattern synonym for 'CombiningAcuteGraveAcute', the name without the @Combining@ part, defined by @'\x1dc9'@ (&#x2022;&#x1dc9;).
+-- | A pattern synonym for 'CombiningAcuteGraveAcute', the name without the @Combining@ part, defined by @'\\x1dc9'@ (&#x2022;&#x1dc9;).
 pattern AcuteGraveAcute :: CombiningCharacter
 pattern AcuteGraveAcute = CombiningAcuteGraveAcute
 
--- | A pattern synonym for 'CombiningLatinSmallLetterRBelow', the name without the @Combining@ part, defined by @'\x1dca'@ (&#x2022;&#x1dca;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterRBelow', the name without the @Combining@ part, defined by @'\\x1dca'@ (&#x2022;&#x1dca;).
 pattern LatinSmallLetterRBelow :: CombiningCharacter
 pattern LatinSmallLetterRBelow = CombiningLatinSmallLetterRBelow
 
--- | A pattern synonym for 'CombiningBreveMacron', the name without the @Combining@ part, defined by @'\x1dcb'@ (&#x2022;&#x1dcb;).
+-- | A pattern synonym for 'CombiningBreveMacron', the name without the @Combining@ part, defined by @'\\x1dcb'@ (&#x2022;&#x1dcb;).
 pattern BreveMacron :: CombiningCharacter
 pattern BreveMacron = CombiningBreveMacron
 
--- | A pattern synonym for 'CombiningMacronBreve', the name without the @Combining@ part, defined by @'\x1dcc'@ (&#x2022;&#x1dcc;).
+-- | A pattern synonym for 'CombiningMacronBreve', the name without the @Combining@ part, defined by @'\\x1dcc'@ (&#x2022;&#x1dcc;).
 pattern MacronBreve :: CombiningCharacter
 pattern MacronBreve = CombiningMacronBreve
 
--- | A pattern synonym for 'CombiningDoubleCircumflexAbove', the name without the @Combining@ part, defined by @'\x1dcd'@ (&#x2022;&#x1dcd;).
+-- | A pattern synonym for 'CombiningDoubleCircumflexAbove', the name without the @Combining@ part, defined by @'\\x1dcd'@ (&#x2022;&#x1dcd;).
 pattern DoubleCircumflexAbove :: CombiningCharacter
 pattern DoubleCircumflexAbove = CombiningDoubleCircumflexAbove
 
--- | A pattern synonym for 'CombiningOgonekAbove', the name without the @Combining@ part, defined by @'\x1dce'@ (&#x2022;&#x1dce;).
+-- | A pattern synonym for 'CombiningOgonekAbove', the name without the @Combining@ part, defined by @'\\x1dce'@ (&#x2022;&#x1dce;).
 pattern OgonekAbove :: CombiningCharacter
 pattern OgonekAbove = CombiningOgonekAbove
 
--- | A pattern synonym for 'CombiningZigzagBelow', the name without the @Combining@ part, defined by @'\x1dcf'@ (&#x2022;&#x1dcf;).
+-- | A pattern synonym for 'CombiningZigzagBelow', the name without the @Combining@ part, defined by @'\\x1dcf'@ (&#x2022;&#x1dcf;).
 pattern ZigzagBelow :: CombiningCharacter
 pattern ZigzagBelow = CombiningZigzagBelow
 
--- | A pattern synonym for 'CombiningIsBelow', the name without the @Combining@ part, defined by @'\x1dd0'@ (&#x2022;&#x1dd0;).
+-- | A pattern synonym for 'CombiningIsBelow', the name without the @Combining@ part, defined by @'\\x1dd0'@ (&#x2022;&#x1dd0;).
 pattern IsBelow :: CombiningCharacter
 pattern IsBelow = CombiningIsBelow
 
--- | A pattern synonym for 'CombiningUrAbove', the name without the @Combining@ part, defined by @'\x1dd1'@ (&#x2022;&#x1dd1;).
+-- | A pattern synonym for 'CombiningUrAbove', the name without the @Combining@ part, defined by @'\\x1dd1'@ (&#x2022;&#x1dd1;).
 pattern UrAbove :: CombiningCharacter
 pattern UrAbove = CombiningUrAbove
 
--- | A pattern synonym for 'CombiningUsAbove', the name without the @Combining@ part, defined by @'\x1dd2'@ (&#x2022;&#x1dd2;).
+-- | A pattern synonym for 'CombiningUsAbove', the name without the @Combining@ part, defined by @'\\x1dd2'@ (&#x2022;&#x1dd2;).
 pattern UsAbove :: CombiningCharacter
 pattern UsAbove = CombiningUsAbove
 
--- | A pattern synonym for 'CombiningLatinSmallLetterFlattenedOpenAAbove', the name without the @Combining@ part, defined by @'\x1dd3'@ (&#x2022;&#x1dd3;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterFlattenedOpenAAbove', the name without the @Combining@ part, defined by @'\\x1dd3'@ (&#x2022;&#x1dd3;).
 pattern LatinSmallLetterFlattenedOpenAAbove :: CombiningCharacter
 pattern LatinSmallLetterFlattenedOpenAAbove = CombiningLatinSmallLetterFlattenedOpenAAbove
 
--- | A pattern synonym for 'CombiningLatinSmallLetterAe', the name without the @Combining@ part, defined by @'\x1dd4'@ (&#x2022;&#x1dd4;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterAe', the name without the @Combining@ part, defined by @'\\x1dd4'@ (&#x2022;&#x1dd4;).
 pattern LatinSmallLetterAe :: CombiningCharacter
 pattern LatinSmallLetterAe = CombiningLatinSmallLetterAe
 
--- | A pattern synonym for 'CombiningLatinSmallLetterAo', the name without the @Combining@ part, defined by @'\x1dd5'@ (&#x2022;&#x1dd5;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterAo', the name without the @Combining@ part, defined by @'\\x1dd5'@ (&#x2022;&#x1dd5;).
 pattern LatinSmallLetterAo :: CombiningCharacter
 pattern LatinSmallLetterAo = CombiningLatinSmallLetterAo
 
--- | A pattern synonym for 'CombiningLatinSmallLetterAv', the name without the @Combining@ part, defined by @'\x1dd6'@ (&#x2022;&#x1dd6;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterAv', the name without the @Combining@ part, defined by @'\\x1dd6'@ (&#x2022;&#x1dd6;).
 pattern LatinSmallLetterAv :: CombiningCharacter
 pattern LatinSmallLetterAv = CombiningLatinSmallLetterAv
 
--- | A pattern synonym for 'CombiningLatinSmallLetterCCedilla', the name without the @Combining@ part, defined by @'\x1dd7'@ (&#x2022;&#x1dd7;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterCCedilla', the name without the @Combining@ part, defined by @'\\x1dd7'@ (&#x2022;&#x1dd7;).
 pattern LatinSmallLetterCCedilla :: CombiningCharacter
 pattern LatinSmallLetterCCedilla = CombiningLatinSmallLetterCCedilla
 
--- | A pattern synonym for 'CombiningLatinSmallLetterInsularD', the name without the @Combining@ part, defined by @'\x1dd8'@ (&#x2022;&#x1dd8;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterInsularD', the name without the @Combining@ part, defined by @'\\x1dd8'@ (&#x2022;&#x1dd8;).
 pattern LatinSmallLetterInsularD :: CombiningCharacter
 pattern LatinSmallLetterInsularD = CombiningLatinSmallLetterInsularD
 
--- | A pattern synonym for 'CombiningLatinSmallLetterEth', the name without the @Combining@ part, defined by @'\x1dd9'@ (&#x2022;&#x1dd9;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterEth', the name without the @Combining@ part, defined by @'\\x1dd9'@ (&#x2022;&#x1dd9;).
 pattern LatinSmallLetterEth :: CombiningCharacter
 pattern LatinSmallLetterEth = CombiningLatinSmallLetterEth
 
--- | A pattern synonym for 'CombiningLatinSmallLetterG', the name without the @Combining@ part, defined by @'\x1dda'@ (&#x2022;&#x1dda;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterG', the name without the @Combining@ part, defined by @'\\x1dda'@ (&#x2022;&#x1dda;).
 pattern LatinSmallLetterG :: CombiningCharacter
 pattern LatinSmallLetterG = CombiningLatinSmallLetterG
 
--- | A pattern synonym for 'CombiningLatinLetterSmallCapitalG', the name without the @Combining@ part, defined by @'\x1ddb'@ (&#x2022;&#x1ddb;).
+-- | A pattern synonym for 'CombiningLatinLetterSmallCapitalG', the name without the @Combining@ part, defined by @'\\x1ddb'@ (&#x2022;&#x1ddb;).
 pattern LatinLetterSmallCapitalG :: CombiningCharacter
 pattern LatinLetterSmallCapitalG = CombiningLatinLetterSmallCapitalG
 
--- | A pattern synonym for 'CombiningLatinSmallLetterK', the name without the @Combining@ part, defined by @'\x1ddc'@ (&#x2022;&#x1ddc;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterK', the name without the @Combining@ part, defined by @'\\x1ddc'@ (&#x2022;&#x1ddc;).
 pattern LatinSmallLetterK :: CombiningCharacter
 pattern LatinSmallLetterK = CombiningLatinSmallLetterK
 
--- | A pattern synonym for 'CombiningLatinSmallLetterL', the name without the @Combining@ part, defined by @'\x1ddd'@ (&#x2022;&#x1ddd;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterL', the name without the @Combining@ part, defined by @'\\x1ddd'@ (&#x2022;&#x1ddd;).
 pattern LatinSmallLetterL :: CombiningCharacter
 pattern LatinSmallLetterL = CombiningLatinSmallLetterL
 
--- | A pattern synonym for 'CombiningLatinLetterSmallCapitalL', the name without the @Combining@ part, defined by @'\x1dde'@ (&#x2022;&#x1dde;).
+-- | A pattern synonym for 'CombiningLatinLetterSmallCapitalL', the name without the @Combining@ part, defined by @'\\x1dde'@ (&#x2022;&#x1dde;).
 pattern LatinLetterSmallCapitalL :: CombiningCharacter
 pattern LatinLetterSmallCapitalL = CombiningLatinLetterSmallCapitalL
 
--- | A pattern synonym for 'CombiningLatinLetterSmallCapitalM', the name without the @Combining@ part, defined by @'\x1ddf'@ (&#x2022;&#x1ddf;).
+-- | A pattern synonym for 'CombiningLatinLetterSmallCapitalM', the name without the @Combining@ part, defined by @'\\x1ddf'@ (&#x2022;&#x1ddf;).
 pattern LatinLetterSmallCapitalM :: CombiningCharacter
 pattern LatinLetterSmallCapitalM = CombiningLatinLetterSmallCapitalM
 
--- | A pattern synonym for 'CombiningLatinSmallLetterN', the name without the @Combining@ part, defined by @'\x1de0'@ (&#x2022;&#x1de0;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterN', the name without the @Combining@ part, defined by @'\\x1de0'@ (&#x2022;&#x1de0;).
 pattern LatinSmallLetterN :: CombiningCharacter
 pattern LatinSmallLetterN = CombiningLatinSmallLetterN
 
--- | A pattern synonym for 'CombiningLatinLetterSmallCapitalN', the name without the @Combining@ part, defined by @'\x1de1'@ (&#x2022;&#x1de1;).
+-- | A pattern synonym for 'CombiningLatinLetterSmallCapitalN', the name without the @Combining@ part, defined by @'\\x1de1'@ (&#x2022;&#x1de1;).
 pattern LatinLetterSmallCapitalN :: CombiningCharacter
 pattern LatinLetterSmallCapitalN = CombiningLatinLetterSmallCapitalN
 
--- | A pattern synonym for 'CombiningLatinLetterSmallCapitalR', the name without the @Combining@ part, defined by @'\x1de2'@ (&#x2022;&#x1de2;).
+-- | A pattern synonym for 'CombiningLatinLetterSmallCapitalR', the name without the @Combining@ part, defined by @'\\x1de2'@ (&#x2022;&#x1de2;).
 pattern LatinLetterSmallCapitalR :: CombiningCharacter
 pattern LatinLetterSmallCapitalR = CombiningLatinLetterSmallCapitalR
 
--- | A pattern synonym for 'CombiningLatinSmallLetterRRotunda', the name without the @Combining@ part, defined by @'\x1de3'@ (&#x2022;&#x1de3;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterRRotunda', the name without the @Combining@ part, defined by @'\\x1de3'@ (&#x2022;&#x1de3;).
 pattern LatinSmallLetterRRotunda :: CombiningCharacter
 pattern LatinSmallLetterRRotunda = CombiningLatinSmallLetterRRotunda
 
--- | A pattern synonym for 'CombiningLatinSmallLetterS', the name without the @Combining@ part, defined by @'\x1de4'@ (&#x2022;&#x1de4;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterS', the name without the @Combining@ part, defined by @'\\x1de4'@ (&#x2022;&#x1de4;).
 pattern LatinSmallLetterS :: CombiningCharacter
 pattern LatinSmallLetterS = CombiningLatinSmallLetterS
 
--- | A pattern synonym for 'CombiningLatinSmallLetterLongS', the name without the @Combining@ part, defined by @'\x1de5'@ (&#x2022;&#x1de5;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterLongS', the name without the @Combining@ part, defined by @'\\x1de5'@ (&#x2022;&#x1de5;).
 pattern LatinSmallLetterLongS :: CombiningCharacter
 pattern LatinSmallLetterLongS = CombiningLatinSmallLetterLongS
 
--- | A pattern synonym for 'CombiningLatinSmallLetterZ', the name without the @Combining@ part, defined by @'\x1de6'@ (&#x2022;&#x1de6;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterZ', the name without the @Combining@ part, defined by @'\\x1de6'@ (&#x2022;&#x1de6;).
 pattern LatinSmallLetterZ :: CombiningCharacter
 pattern LatinSmallLetterZ = CombiningLatinSmallLetterZ
 
--- | A pattern synonym for 'CombiningLatinSmallLetterAlpha', the name without the @Combining@ part, defined by @'\x1de7'@ (&#x2022;&#x1de7;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterAlpha', the name without the @Combining@ part, defined by @'\\x1de7'@ (&#x2022;&#x1de7;).
 pattern LatinSmallLetterAlpha :: CombiningCharacter
 pattern LatinSmallLetterAlpha = CombiningLatinSmallLetterAlpha
 
--- | A pattern synonym for 'CombiningLatinSmallLetterB', the name without the @Combining@ part, defined by @'\x1de8'@ (&#x2022;&#x1de8;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterB', the name without the @Combining@ part, defined by @'\\x1de8'@ (&#x2022;&#x1de8;).
 pattern LatinSmallLetterB :: CombiningCharacter
 pattern LatinSmallLetterB = CombiningLatinSmallLetterB
 
--- | A pattern synonym for 'CombiningLatinSmallLetterBeta', the name without the @Combining@ part, defined by @'\x1de9'@ (&#x2022;&#x1de9;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterBeta', the name without the @Combining@ part, defined by @'\\x1de9'@ (&#x2022;&#x1de9;).
 pattern LatinSmallLetterBeta :: CombiningCharacter
 pattern LatinSmallLetterBeta = CombiningLatinSmallLetterBeta
 
--- | A pattern synonym for 'CombiningLatinSmallLetterSchwa', the name without the @Combining@ part, defined by @'\x1dea'@ (&#x2022;&#x1dea;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterSchwa', the name without the @Combining@ part, defined by @'\\x1dea'@ (&#x2022;&#x1dea;).
 pattern LatinSmallLetterSchwa :: CombiningCharacter
 pattern LatinSmallLetterSchwa = CombiningLatinSmallLetterSchwa
 
--- | A pattern synonym for 'CombiningLatinSmallLetterF', the name without the @Combining@ part, defined by @'\x1deb'@ (&#x2022;&#x1deb;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterF', the name without the @Combining@ part, defined by @'\\x1deb'@ (&#x2022;&#x1deb;).
 pattern LatinSmallLetterF :: CombiningCharacter
 pattern LatinSmallLetterF = CombiningLatinSmallLetterF
 
--- | A pattern synonym for 'CombiningLatinSmallLetterLWithDoubleMiddleTilde', the name without the @Combining@ part, defined by @'\x1dec'@ (&#x2022;&#x1dec;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterLWithDoubleMiddleTilde', the name without the @Combining@ part, defined by @'\\x1dec'@ (&#x2022;&#x1dec;).
 pattern LatinSmallLetterLWithDoubleMiddleTilde :: CombiningCharacter
 pattern LatinSmallLetterLWithDoubleMiddleTilde = CombiningLatinSmallLetterLWithDoubleMiddleTilde
 
--- | A pattern synonym for 'CombiningLatinSmallLetterOWithLightCentralizationStroke', the name without the @Combining@ part, defined by @'\x1ded'@ (&#x2022;&#x1ded;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterOWithLightCentralizationStroke', the name without the @Combining@ part, defined by @'\\x1ded'@ (&#x2022;&#x1ded;).
 pattern LatinSmallLetterOWithLightCentralizationStroke :: CombiningCharacter
 pattern LatinSmallLetterOWithLightCentralizationStroke = CombiningLatinSmallLetterOWithLightCentralizationStroke
 
--- | A pattern synonym for 'CombiningLatinSmallLetterP', the name without the @Combining@ part, defined by @'\x1dee'@ (&#x2022;&#x1dee;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterP', the name without the @Combining@ part, defined by @'\\x1dee'@ (&#x2022;&#x1dee;).
 pattern LatinSmallLetterP :: CombiningCharacter
 pattern LatinSmallLetterP = CombiningLatinSmallLetterP
 
--- | A pattern synonym for 'CombiningLatinSmallLetterEsh', the name without the @Combining@ part, defined by @'\x1def'@ (&#x2022;&#x1def;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterEsh', the name without the @Combining@ part, defined by @'\\x1def'@ (&#x2022;&#x1def;).
 pattern LatinSmallLetterEsh :: CombiningCharacter
 pattern LatinSmallLetterEsh = CombiningLatinSmallLetterEsh
 
--- | A pattern synonym for 'CombiningLatinSmallLetterUWithLightCentralizationStroke', the name without the @Combining@ part, defined by @'\x1df0'@ (&#x2022;&#x1df0;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterUWithLightCentralizationStroke', the name without the @Combining@ part, defined by @'\\x1df0'@ (&#x2022;&#x1df0;).
 pattern LatinSmallLetterUWithLightCentralizationStroke :: CombiningCharacter
 pattern LatinSmallLetterUWithLightCentralizationStroke = CombiningLatinSmallLetterUWithLightCentralizationStroke
 
--- | A pattern synonym for 'CombiningLatinSmallLetterW', the name without the @Combining@ part, defined by @'\x1df1'@ (&#x2022;&#x1df1;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterW', the name without the @Combining@ part, defined by @'\\x1df1'@ (&#x2022;&#x1df1;).
 pattern LatinSmallLetterW :: CombiningCharacter
 pattern LatinSmallLetterW = CombiningLatinSmallLetterW
 
--- | A pattern synonym for 'CombiningLatinSmallLetterAWithDiaeresis', the name without the @Combining@ part, defined by @'\x1df2'@ (&#x2022;&#x1df2;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterAWithDiaeresis', the name without the @Combining@ part, defined by @'\\x1df2'@ (&#x2022;&#x1df2;).
 pattern LatinSmallLetterAWithDiaeresis :: CombiningCharacter
 pattern LatinSmallLetterAWithDiaeresis = CombiningLatinSmallLetterAWithDiaeresis
 
--- | A pattern synonym for 'CombiningLatinSmallLetterOWithDiaeresis', the name without the @Combining@ part, defined by @'\x1df3'@ (&#x2022;&#x1df3;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterOWithDiaeresis', the name without the @Combining@ part, defined by @'\\x1df3'@ (&#x2022;&#x1df3;).
 pattern LatinSmallLetterOWithDiaeresis :: CombiningCharacter
 pattern LatinSmallLetterOWithDiaeresis = CombiningLatinSmallLetterOWithDiaeresis
 
--- | A pattern synonym for 'CombiningLatinSmallLetterUWithDiaeresis', the name without the @Combining@ part, defined by @'\x1df4'@ (&#x2022;&#x1df4;).
+-- | A pattern synonym for 'CombiningLatinSmallLetterUWithDiaeresis', the name without the @Combining@ part, defined by @'\\x1df4'@ (&#x2022;&#x1df4;).
 pattern LatinSmallLetterUWithDiaeresis :: CombiningCharacter
 pattern LatinSmallLetterUWithDiaeresis = CombiningLatinSmallLetterUWithDiaeresis
 
--- | A pattern synonym for 'CombiningUpTackAbove', the name without the @Combining@ part, defined by @'\x1df5'@ (&#x2022;&#x1df5;).
+-- | A pattern synonym for 'CombiningUpTackAbove', the name without the @Combining@ part, defined by @'\\x1df5'@ (&#x2022;&#x1df5;).
 pattern UpTackAbove :: CombiningCharacter
 pattern UpTackAbove = CombiningUpTackAbove
 
--- | A pattern synonym for 'CombiningDeletionMark', the name without the @Combining@ part, defined by @'\x1dfb'@ (&#x2022;&#x1dfb;).
+-- | A pattern synonym for 'CombiningDeletionMark', the name without the @Combining@ part, defined by @'\\x1dfb'@ (&#x2022;&#x1dfb;).
 pattern DeletionMark :: CombiningCharacter
 pattern DeletionMark = CombiningDeletionMark
 
--- | A pattern synonym for 'CombiningDoubleInvertedBreveBelow', the name without the @Combining@ part, defined by @'\x1dfc'@ (&#x2022;&#x1dfc;).
+-- | A pattern synonym for 'CombiningDoubleInvertedBreveBelow', the name without the @Combining@ part, defined by @'\\x1dfc'@ (&#x2022;&#x1dfc;).
 pattern DoubleInvertedBreveBelow :: CombiningCharacter
 pattern DoubleInvertedBreveBelow = CombiningDoubleInvertedBreveBelow
 
--- | A pattern synonym for 'CombiningAlmostEqualToBelow', the name without the @Combining@ part, defined by @'\x1dfd'@ (&#x2022;&#x1dfd;).
+-- | A pattern synonym for 'CombiningAlmostEqualToBelow', the name without the @Combining@ part, defined by @'\\x1dfd'@ (&#x2022;&#x1dfd;).
 pattern AlmostEqualToBelow :: CombiningCharacter
 pattern AlmostEqualToBelow = CombiningAlmostEqualToBelow
 
--- | A pattern synonym for 'CombiningLeftArrowheadAbove', the name without the @Combining@ part, defined by @'\x1dfe'@ (&#x2022;&#x1dfe;).
+-- | A pattern synonym for 'CombiningLeftArrowheadAbove', the name without the @Combining@ part, defined by @'\\x1dfe'@ (&#x2022;&#x1dfe;).
 pattern LeftArrowheadAbove :: CombiningCharacter
 pattern LeftArrowheadAbove = CombiningLeftArrowheadAbove
 
--- | A pattern synonym for 'CombiningRightArrowheadAndDownArrowheadBelow', the name without the @Combining@ part, defined by @'\x1dff'@ (&#x2022;&#x1dff;).
+-- | A pattern synonym for 'CombiningRightArrowheadAndDownArrowheadBelow', the name without the @Combining@ part, defined by @'\\x1dff'@ (&#x2022;&#x1dff;).
 pattern RightArrowheadAndDownArrowheadBelow :: CombiningCharacter
 pattern RightArrowheadAndDownArrowheadBelow = CombiningRightArrowheadAndDownArrowheadBelow
 
--- | A pattern synonym for 'CombiningLeftHarpoonAbove', the name without the @Combining@ part, defined by @'\x20d0'@ (&#x2022;&#x20d0;).
+-- | A pattern synonym for 'CombiningLeftHarpoonAbove', the name without the @Combining@ part, defined by @'\\x20d0'@ (&#x2022;&#x20d0;).
 pattern LeftHarpoonAbove :: CombiningCharacter
 pattern LeftHarpoonAbove = CombiningLeftHarpoonAbove
 
--- | A pattern synonym for 'CombiningRightHarpoonAbove', the name without the @Combining@ part, defined by @'\x20d1'@ (&#x2022;&#x20d1;).
+-- | A pattern synonym for 'CombiningRightHarpoonAbove', the name without the @Combining@ part, defined by @'\\x20d1'@ (&#x2022;&#x20d1;).
 pattern RightHarpoonAbove :: CombiningCharacter
 pattern RightHarpoonAbove = CombiningRightHarpoonAbove
 
--- | A pattern synonym for 'CombiningLongVerticalLineOverlay', the name without the @Combining@ part, defined by @'\x20d2'@ (&#x2022;&#x20d2;).
+-- | A pattern synonym for 'CombiningLongVerticalLineOverlay', the name without the @Combining@ part, defined by @'\\x20d2'@ (&#x2022;&#x20d2;).
 pattern LongVerticalLineOverlay :: CombiningCharacter
 pattern LongVerticalLineOverlay = CombiningLongVerticalLineOverlay
 
--- | A pattern synonym for 'CombiningShortVerticalLineOverlay', the name without the @Combining@ part, defined by @'\x20d3'@ (&#x2022;&#x20d3;).
+-- | A pattern synonym for 'CombiningShortVerticalLineOverlay', the name without the @Combining@ part, defined by @'\\x20d3'@ (&#x2022;&#x20d3;).
 pattern ShortVerticalLineOverlay :: CombiningCharacter
 pattern ShortVerticalLineOverlay = CombiningShortVerticalLineOverlay
 
--- | A pattern synonym for 'CombiningAnticlockwiseArrowAbove', the name without the @Combining@ part, defined by @'\x20d4'@ (&#x2022;&#x20d4;).
+-- | A pattern synonym for 'CombiningAnticlockwiseArrowAbove', the name without the @Combining@ part, defined by @'\\x20d4'@ (&#x2022;&#x20d4;).
 pattern AnticlockwiseArrowAbove :: CombiningCharacter
 pattern AnticlockwiseArrowAbove = CombiningAnticlockwiseArrowAbove
 
--- | A pattern synonym for 'CombiningClockwiseArrowAbove', the name without the @Combining@ part, defined by @'\x20d5'@ (&#x2022;&#x20d5;).
+-- | A pattern synonym for 'CombiningClockwiseArrowAbove', the name without the @Combining@ part, defined by @'\\x20d5'@ (&#x2022;&#x20d5;).
 pattern ClockwiseArrowAbove :: CombiningCharacter
 pattern ClockwiseArrowAbove = CombiningClockwiseArrowAbove
 
--- | A pattern synonym for 'CombiningLeftArrowAbove', the name without the @Combining@ part, defined by @'\x20d6'@ (&#x2022;&#x20d6;).
+-- | A pattern synonym for 'CombiningLeftArrowAbove', the name without the @Combining@ part, defined by @'\\x20d6'@ (&#x2022;&#x20d6;).
 pattern LeftArrowAbove :: CombiningCharacter
 pattern LeftArrowAbove = CombiningLeftArrowAbove
 
--- | A pattern synonym for 'CombiningRightArrowAbove', the name without the @Combining@ part, defined by @'\x20d7'@ (&#x2022;&#x20d7;).
+-- | A pattern synonym for 'CombiningRightArrowAbove', the name without the @Combining@ part, defined by @'\\x20d7'@ (&#x2022;&#x20d7;).
 pattern RightArrowAbove :: CombiningCharacter
 pattern RightArrowAbove = CombiningRightArrowAbove
 
--- | A pattern synonym for 'CombiningRingOverlay', the name without the @Combining@ part, defined by @'\x20d8'@ (&#x2022;&#x20d8;).
+-- | A pattern synonym for 'CombiningRingOverlay', the name without the @Combining@ part, defined by @'\\x20d8'@ (&#x2022;&#x20d8;).
 pattern RingOverlay :: CombiningCharacter
 pattern RingOverlay = CombiningRingOverlay
 
--- | A pattern synonym for 'CombiningClockwiseRingOverlay', the name without the @Combining@ part, defined by @'\x20d9'@ (&#x2022;&#x20d9;).
+-- | A pattern synonym for 'CombiningClockwiseRingOverlay', the name without the @Combining@ part, defined by @'\\x20d9'@ (&#x2022;&#x20d9;).
 pattern ClockwiseRingOverlay :: CombiningCharacter
 pattern ClockwiseRingOverlay = CombiningClockwiseRingOverlay
 
--- | A pattern synonym for 'CombiningAnticlockwiseRingOverlay', the name without the @Combining@ part, defined by @'\x20da'@ (&#x2022;&#x20da;).
+-- | A pattern synonym for 'CombiningAnticlockwiseRingOverlay', the name without the @Combining@ part, defined by @'\\x20da'@ (&#x2022;&#x20da;).
 pattern AnticlockwiseRingOverlay :: CombiningCharacter
 pattern AnticlockwiseRingOverlay = CombiningAnticlockwiseRingOverlay
 
--- | A pattern synonym for 'CombiningThreeDotsAbove', the name without the @Combining@ part, defined by @'\x20db'@ (&#x2022;&#x20db;).
+-- | A pattern synonym for 'CombiningThreeDotsAbove', the name without the @Combining@ part, defined by @'\\x20db'@ (&#x2022;&#x20db;).
 pattern ThreeDotsAbove :: CombiningCharacter
 pattern ThreeDotsAbove = CombiningThreeDotsAbove
 
--- | A pattern synonym for 'CombiningFourDotsAbove', the name without the @Combining@ part, defined by @'\x20dc'@ (&#x2022;&#x20dc;).
+-- | A pattern synonym for 'CombiningFourDotsAbove', the name without the @Combining@ part, defined by @'\\x20dc'@ (&#x2022;&#x20dc;).
 pattern FourDotsAbove :: CombiningCharacter
 pattern FourDotsAbove = CombiningFourDotsAbove
 
--- | A pattern synonym for 'CombiningLeftRightArrowAbove', the name without the @Combining@ part, defined by @'\x20e1'@ (&#x2022;&#x20e1;).
+-- | A pattern synonym for 'CombiningLeftRightArrowAbove', the name without the @Combining@ part, defined by @'\\x20e1'@ (&#x2022;&#x20e1;).
 pattern LeftRightArrowAbove :: CombiningCharacter
 pattern LeftRightArrowAbove = CombiningLeftRightArrowAbove
 
--- | A pattern synonym for 'CombiningReverseSolidusOverlay', the name without the @Combining@ part, defined by @'\x20e5'@ (&#x2022;&#x20e5;).
+-- | A pattern synonym for 'CombiningReverseSolidusOverlay', the name without the @Combining@ part, defined by @'\\x20e5'@ (&#x2022;&#x20e5;).
 pattern ReverseSolidusOverlay :: CombiningCharacter
 pattern ReverseSolidusOverlay = CombiningReverseSolidusOverlay
 
--- | A pattern synonym for 'CombiningDoubleVerticalStrokeOverlay', the name without the @Combining@ part, defined by @'\x20e6'@ (&#x2022;&#x20e6;).
+-- | A pattern synonym for 'CombiningDoubleVerticalStrokeOverlay', the name without the @Combining@ part, defined by @'\\x20e6'@ (&#x2022;&#x20e6;).
 pattern DoubleVerticalStrokeOverlay :: CombiningCharacter
 pattern DoubleVerticalStrokeOverlay = CombiningDoubleVerticalStrokeOverlay
 
--- | A pattern synonym for 'CombiningAnnuitySymbol', the name without the @Combining@ part, defined by @'\x20e7'@ (&#x2022;&#x20e7;).
+-- | A pattern synonym for 'CombiningAnnuitySymbol', the name without the @Combining@ part, defined by @'\\x20e7'@ (&#x2022;&#x20e7;).
 pattern AnnuitySymbol :: CombiningCharacter
 pattern AnnuitySymbol = CombiningAnnuitySymbol
 
--- | A pattern synonym for 'CombiningTripleUnderdot', the name without the @Combining@ part, defined by @'\x20e8'@ (&#x2022;&#x20e8;).
+-- | A pattern synonym for 'CombiningTripleUnderdot', the name without the @Combining@ part, defined by @'\\x20e8'@ (&#x2022;&#x20e8;).
 pattern TripleUnderdot :: CombiningCharacter
 pattern TripleUnderdot = CombiningTripleUnderdot
 
--- | A pattern synonym for 'CombiningWideBridgeAbove', the name without the @Combining@ part, defined by @'\x20e9'@ (&#x2022;&#x20e9;).
+-- | A pattern synonym for 'CombiningWideBridgeAbove', the name without the @Combining@ part, defined by @'\\x20e9'@ (&#x2022;&#x20e9;).
 pattern WideBridgeAbove :: CombiningCharacter
 pattern WideBridgeAbove = CombiningWideBridgeAbove
 
--- | A pattern synonym for 'CombiningLeftwardsArrowOverlay', the name without the @Combining@ part, defined by @'\x20ea'@ (&#x2022;&#x20ea;).
+-- | A pattern synonym for 'CombiningLeftwardsArrowOverlay', the name without the @Combining@ part, defined by @'\\x20ea'@ (&#x2022;&#x20ea;).
 pattern LeftwardsArrowOverlay :: CombiningCharacter
 pattern LeftwardsArrowOverlay = CombiningLeftwardsArrowOverlay
 
--- | A pattern synonym for 'CombiningLongDoubleSolidusOverlay', the name without the @Combining@ part, defined by @'\x20eb'@ (&#x2022;&#x20eb;).
+-- | A pattern synonym for 'CombiningLongDoubleSolidusOverlay', the name without the @Combining@ part, defined by @'\\x20eb'@ (&#x2022;&#x20eb;).
 pattern LongDoubleSolidusOverlay :: CombiningCharacter
 pattern LongDoubleSolidusOverlay = CombiningLongDoubleSolidusOverlay
 
--- | A pattern synonym for 'CombiningRightwardsHarpoonWithBarbDownwards', the name without the @Combining@ part, defined by @'\x20ec'@ (&#x2022;&#x20ec;).
+-- | A pattern synonym for 'CombiningRightwardsHarpoonWithBarbDownwards', the name without the @Combining@ part, defined by @'\\x20ec'@ (&#x2022;&#x20ec;).
 pattern RightwardsHarpoonWithBarbDownwards :: CombiningCharacter
 pattern RightwardsHarpoonWithBarbDownwards = CombiningRightwardsHarpoonWithBarbDownwards
 
--- | A pattern synonym for 'CombiningLeftwardsHarpoonWithBarbDownwards', the name without the @Combining@ part, defined by @'\x20ed'@ (&#x2022;&#x20ed;).
+-- | A pattern synonym for 'CombiningLeftwardsHarpoonWithBarbDownwards', the name without the @Combining@ part, defined by @'\\x20ed'@ (&#x2022;&#x20ed;).
 pattern LeftwardsHarpoonWithBarbDownwards :: CombiningCharacter
 pattern LeftwardsHarpoonWithBarbDownwards = CombiningLeftwardsHarpoonWithBarbDownwards
 
--- | A pattern synonym for 'CombiningLeftArrowBelow', the name without the @Combining@ part, defined by @'\x20ee'@ (&#x2022;&#x20ee;).
+-- | A pattern synonym for 'CombiningLeftArrowBelow', the name without the @Combining@ part, defined by @'\\x20ee'@ (&#x2022;&#x20ee;).
 pattern LeftArrowBelow :: CombiningCharacter
 pattern LeftArrowBelow = CombiningLeftArrowBelow
 
--- | A pattern synonym for 'CombiningRightArrowBelow', the name without the @Combining@ part, defined by @'\x20ef'@ (&#x2022;&#x20ef;).
+-- | A pattern synonym for 'CombiningRightArrowBelow', the name without the @Combining@ part, defined by @'\\x20ef'@ (&#x2022;&#x20ef;).
 pattern RightArrowBelow :: CombiningCharacter
 pattern RightArrowBelow = CombiningRightArrowBelow
 
--- | A pattern synonym for 'CombiningAsteriskAbove', the name without the @Combining@ part, defined by @'\x20f0'@ (&#x2022;&#x20f0;).
+-- | A pattern synonym for 'CombiningAsteriskAbove', the name without the @Combining@ part, defined by @'\\x20f0'@ (&#x2022;&#x20f0;).
 pattern AsteriskAbove :: CombiningCharacter
 pattern AsteriskAbove = CombiningAsteriskAbove
 
--- | A pattern synonym for 'CopticCombiningNiAbove', the name without the @Combining@ part, defined by @'\x2cef'@ (&#x2022;&#x2cef;).
+-- | A pattern synonym for 'CopticCombiningNiAbove', the name without the @Combining@ part, defined by @'\\x2cef'@ (&#x2022;&#x2cef;).
 pattern CopticNiAbove :: CombiningCharacter
 pattern CopticNiAbove = CopticCombiningNiAbove
 
--- | A pattern synonym for 'CopticCombiningSpiritusAsper', the name without the @Combining@ part, defined by @'\x2cf0'@ (&#x2022;&#x2cf0;).
+-- | A pattern synonym for 'CopticCombiningSpiritusAsper', the name without the @Combining@ part, defined by @'\\x2cf0'@ (&#x2022;&#x2cf0;).
 pattern CopticSpiritusAsper :: CombiningCharacter
 pattern CopticSpiritusAsper = CopticCombiningSpiritusAsper
 
--- | A pattern synonym for 'CopticCombiningSpiritusLenis', the name without the @Combining@ part, defined by @'\x2cf1'@ (&#x2022;&#x2cf1;).
+-- | A pattern synonym for 'CopticCombiningSpiritusLenis', the name without the @Combining@ part, defined by @'\\x2cf1'@ (&#x2022;&#x2cf1;).
 pattern CopticSpiritusLenis :: CombiningCharacter
 pattern CopticSpiritusLenis = CopticCombiningSpiritusLenis
 
--- | A pattern synonym for 'CombiningCyrillicLetterBe', the name without the @Combining@ part, defined by @'\x2de0'@ (&#x2022;&#x2de0;).
+-- | A pattern synonym for 'CombiningCyrillicLetterBe', the name without the @Combining@ part, defined by @'\\x2de0'@ (&#x2022;&#x2de0;).
 pattern CyrillicLetterBe :: CombiningCharacter
 pattern CyrillicLetterBe = CombiningCyrillicLetterBe
 
--- | A pattern synonym for 'CombiningCyrillicLetterVe', the name without the @Combining@ part, defined by @'\x2de1'@ (&#x2022;&#x2de1;).
+-- | A pattern synonym for 'CombiningCyrillicLetterVe', the name without the @Combining@ part, defined by @'\\x2de1'@ (&#x2022;&#x2de1;).
 pattern CyrillicLetterVe :: CombiningCharacter
 pattern CyrillicLetterVe = CombiningCyrillicLetterVe
 
--- | A pattern synonym for 'CombiningCyrillicLetterGhe', the name without the @Combining@ part, defined by @'\x2de2'@ (&#x2022;&#x2de2;).
+-- | A pattern synonym for 'CombiningCyrillicLetterGhe', the name without the @Combining@ part, defined by @'\\x2de2'@ (&#x2022;&#x2de2;).
 pattern CyrillicLetterGhe :: CombiningCharacter
 pattern CyrillicLetterGhe = CombiningCyrillicLetterGhe
 
--- | A pattern synonym for 'CombiningCyrillicLetterDe', the name without the @Combining@ part, defined by @'\x2de3'@ (&#x2022;&#x2de3;).
+-- | A pattern synonym for 'CombiningCyrillicLetterDe', the name without the @Combining@ part, defined by @'\\x2de3'@ (&#x2022;&#x2de3;).
 pattern CyrillicLetterDe :: CombiningCharacter
 pattern CyrillicLetterDe = CombiningCyrillicLetterDe
 
--- | A pattern synonym for 'CombiningCyrillicLetterZhe', the name without the @Combining@ part, defined by @'\x2de4'@ (&#x2022;&#x2de4;).
+-- | A pattern synonym for 'CombiningCyrillicLetterZhe', the name without the @Combining@ part, defined by @'\\x2de4'@ (&#x2022;&#x2de4;).
 pattern CyrillicLetterZhe :: CombiningCharacter
 pattern CyrillicLetterZhe = CombiningCyrillicLetterZhe
 
--- | A pattern synonym for 'CombiningCyrillicLetterZe', the name without the @Combining@ part, defined by @'\x2de5'@ (&#x2022;&#x2de5;).
+-- | A pattern synonym for 'CombiningCyrillicLetterZe', the name without the @Combining@ part, defined by @'\\x2de5'@ (&#x2022;&#x2de5;).
 pattern CyrillicLetterZe :: CombiningCharacter
 pattern CyrillicLetterZe = CombiningCyrillicLetterZe
 
--- | A pattern synonym for 'CombiningCyrillicLetterKa', the name without the @Combining@ part, defined by @'\x2de6'@ (&#x2022;&#x2de6;).
+-- | A pattern synonym for 'CombiningCyrillicLetterKa', the name without the @Combining@ part, defined by @'\\x2de6'@ (&#x2022;&#x2de6;).
 pattern CyrillicLetterKa :: CombiningCharacter
 pattern CyrillicLetterKa = CombiningCyrillicLetterKa
 
--- | A pattern synonym for 'CombiningCyrillicLetterEl', the name without the @Combining@ part, defined by @'\x2de7'@ (&#x2022;&#x2de7;).
+-- | A pattern synonym for 'CombiningCyrillicLetterEl', the name without the @Combining@ part, defined by @'\\x2de7'@ (&#x2022;&#x2de7;).
 pattern CyrillicLetterEl :: CombiningCharacter
 pattern CyrillicLetterEl = CombiningCyrillicLetterEl
 
--- | A pattern synonym for 'CombiningCyrillicLetterEm', the name without the @Combining@ part, defined by @'\x2de8'@ (&#x2022;&#x2de8;).
+-- | A pattern synonym for 'CombiningCyrillicLetterEm', the name without the @Combining@ part, defined by @'\\x2de8'@ (&#x2022;&#x2de8;).
 pattern CyrillicLetterEm :: CombiningCharacter
 pattern CyrillicLetterEm = CombiningCyrillicLetterEm
 
--- | A pattern synonym for 'CombiningCyrillicLetterEn', the name without the @Combining@ part, defined by @'\x2de9'@ (&#x2022;&#x2de9;).
+-- | A pattern synonym for 'CombiningCyrillicLetterEn', the name without the @Combining@ part, defined by @'\\x2de9'@ (&#x2022;&#x2de9;).
 pattern CyrillicLetterEn :: CombiningCharacter
 pattern CyrillicLetterEn = CombiningCyrillicLetterEn
 
--- | A pattern synonym for 'CombiningCyrillicLetterO', the name without the @Combining@ part, defined by @'\x2dea'@ (&#x2022;&#x2dea;).
+-- | A pattern synonym for 'CombiningCyrillicLetterO', the name without the @Combining@ part, defined by @'\\x2dea'@ (&#x2022;&#x2dea;).
 pattern CyrillicLetterO :: CombiningCharacter
 pattern CyrillicLetterO = CombiningCyrillicLetterO
 
--- | A pattern synonym for 'CombiningCyrillicLetterPe', the name without the @Combining@ part, defined by @'\x2deb'@ (&#x2022;&#x2deb;).
+-- | A pattern synonym for 'CombiningCyrillicLetterPe', the name without the @Combining@ part, defined by @'\\x2deb'@ (&#x2022;&#x2deb;).
 pattern CyrillicLetterPe :: CombiningCharacter
 pattern CyrillicLetterPe = CombiningCyrillicLetterPe
 
--- | A pattern synonym for 'CombiningCyrillicLetterEr', the name without the @Combining@ part, defined by @'\x2dec'@ (&#x2022;&#x2dec;).
+-- | A pattern synonym for 'CombiningCyrillicLetterEr', the name without the @Combining@ part, defined by @'\\x2dec'@ (&#x2022;&#x2dec;).
 pattern CyrillicLetterEr :: CombiningCharacter
 pattern CyrillicLetterEr = CombiningCyrillicLetterEr
 
--- | A pattern synonym for 'CombiningCyrillicLetterEs', the name without the @Combining@ part, defined by @'\x2ded'@ (&#x2022;&#x2ded;).
+-- | A pattern synonym for 'CombiningCyrillicLetterEs', the name without the @Combining@ part, defined by @'\\x2ded'@ (&#x2022;&#x2ded;).
 pattern CyrillicLetterEs :: CombiningCharacter
 pattern CyrillicLetterEs = CombiningCyrillicLetterEs
 
--- | A pattern synonym for 'CombiningCyrillicLetterTe', the name without the @Combining@ part, defined by @'\x2dee'@ (&#x2022;&#x2dee;).
+-- | A pattern synonym for 'CombiningCyrillicLetterTe', the name without the @Combining@ part, defined by @'\\x2dee'@ (&#x2022;&#x2dee;).
 pattern CyrillicLetterTe :: CombiningCharacter
 pattern CyrillicLetterTe = CombiningCyrillicLetterTe
 
--- | A pattern synonym for 'CombiningCyrillicLetterHa', the name without the @Combining@ part, defined by @'\x2def'@ (&#x2022;&#x2def;).
+-- | A pattern synonym for 'CombiningCyrillicLetterHa', the name without the @Combining@ part, defined by @'\\x2def'@ (&#x2022;&#x2def;).
 pattern CyrillicLetterHa :: CombiningCharacter
 pattern CyrillicLetterHa = CombiningCyrillicLetterHa
 
--- | A pattern synonym for 'CombiningCyrillicLetterTse', the name without the @Combining@ part, defined by @'\x2df0'@ (&#x2022;&#x2df0;).
+-- | A pattern synonym for 'CombiningCyrillicLetterTse', the name without the @Combining@ part, defined by @'\\x2df0'@ (&#x2022;&#x2df0;).
 pattern CyrillicLetterTse :: CombiningCharacter
 pattern CyrillicLetterTse = CombiningCyrillicLetterTse
 
--- | A pattern synonym for 'CombiningCyrillicLetterChe', the name without the @Combining@ part, defined by @'\x2df1'@ (&#x2022;&#x2df1;).
+-- | A pattern synonym for 'CombiningCyrillicLetterChe', the name without the @Combining@ part, defined by @'\\x2df1'@ (&#x2022;&#x2df1;).
 pattern CyrillicLetterChe :: CombiningCharacter
 pattern CyrillicLetterChe = CombiningCyrillicLetterChe
 
--- | A pattern synonym for 'CombiningCyrillicLetterSha', the name without the @Combining@ part, defined by @'\x2df2'@ (&#x2022;&#x2df2;).
+-- | A pattern synonym for 'CombiningCyrillicLetterSha', the name without the @Combining@ part, defined by @'\\x2df2'@ (&#x2022;&#x2df2;).
 pattern CyrillicLetterSha :: CombiningCharacter
 pattern CyrillicLetterSha = CombiningCyrillicLetterSha
 
--- | A pattern synonym for 'CombiningCyrillicLetterShcha', the name without the @Combining@ part, defined by @'\x2df3'@ (&#x2022;&#x2df3;).
+-- | A pattern synonym for 'CombiningCyrillicLetterShcha', the name without the @Combining@ part, defined by @'\\x2df3'@ (&#x2022;&#x2df3;).
 pattern CyrillicLetterShcha :: CombiningCharacter
 pattern CyrillicLetterShcha = CombiningCyrillicLetterShcha
 
--- | A pattern synonym for 'CombiningCyrillicLetterFita', the name without the @Combining@ part, defined by @'\x2df4'@ (&#x2022;&#x2df4;).
+-- | A pattern synonym for 'CombiningCyrillicLetterFita', the name without the @Combining@ part, defined by @'\\x2df4'@ (&#x2022;&#x2df4;).
 pattern CyrillicLetterFita :: CombiningCharacter
 pattern CyrillicLetterFita = CombiningCyrillicLetterFita
 
--- | A pattern synonym for 'CombiningCyrillicLetterEsTe', the name without the @Combining@ part, defined by @'\x2df5'@ (&#x2022;&#x2df5;).
+-- | A pattern synonym for 'CombiningCyrillicLetterEsTe', the name without the @Combining@ part, defined by @'\\x2df5'@ (&#x2022;&#x2df5;).
 pattern CyrillicLetterEsTe :: CombiningCharacter
 pattern CyrillicLetterEsTe = CombiningCyrillicLetterEsTe
 
--- | A pattern synonym for 'CombiningCyrillicLetterA', the name without the @Combining@ part, defined by @'\x2df6'@ (&#x2022;&#x2df6;).
+-- | A pattern synonym for 'CombiningCyrillicLetterA', the name without the @Combining@ part, defined by @'\\x2df6'@ (&#x2022;&#x2df6;).
 pattern CyrillicLetterA :: CombiningCharacter
 pattern CyrillicLetterA = CombiningCyrillicLetterA
 
--- | A pattern synonym for 'CombiningCyrillicLetterIe', the name without the @Combining@ part, defined by @'\x2df7'@ (&#x2022;&#x2df7;).
+-- | A pattern synonym for 'CombiningCyrillicLetterIe', the name without the @Combining@ part, defined by @'\\x2df7'@ (&#x2022;&#x2df7;).
 pattern CyrillicLetterIe :: CombiningCharacter
 pattern CyrillicLetterIe = CombiningCyrillicLetterIe
 
--- | A pattern synonym for 'CombiningCyrillicLetterDjerv', the name without the @Combining@ part, defined by @'\x2df8'@ (&#x2022;&#x2df8;).
+-- | A pattern synonym for 'CombiningCyrillicLetterDjerv', the name without the @Combining@ part, defined by @'\\x2df8'@ (&#x2022;&#x2df8;).
 pattern CyrillicLetterDjerv :: CombiningCharacter
 pattern CyrillicLetterDjerv = CombiningCyrillicLetterDjerv
 
--- | A pattern synonym for 'CombiningCyrillicLetterMonographUk', the name without the @Combining@ part, defined by @'\x2df9'@ (&#x2022;&#x2df9;).
+-- | A pattern synonym for 'CombiningCyrillicLetterMonographUk', the name without the @Combining@ part, defined by @'\\x2df9'@ (&#x2022;&#x2df9;).
 pattern CyrillicLetterMonographUk :: CombiningCharacter
 pattern CyrillicLetterMonographUk = CombiningCyrillicLetterMonographUk
 
--- | A pattern synonym for 'CombiningCyrillicLetterYat', the name without the @Combining@ part, defined by @'\x2dfa'@ (&#x2022;&#x2dfa;).
+-- | A pattern synonym for 'CombiningCyrillicLetterYat', the name without the @Combining@ part, defined by @'\\x2dfa'@ (&#x2022;&#x2dfa;).
 pattern CyrillicLetterYat :: CombiningCharacter
 pattern CyrillicLetterYat = CombiningCyrillicLetterYat
 
--- | A pattern synonym for 'CombiningCyrillicLetterYu', the name without the @Combining@ part, defined by @'\x2dfb'@ (&#x2022;&#x2dfb;).
+-- | A pattern synonym for 'CombiningCyrillicLetterYu', the name without the @Combining@ part, defined by @'\\x2dfb'@ (&#x2022;&#x2dfb;).
 pattern CyrillicLetterYu :: CombiningCharacter
 pattern CyrillicLetterYu = CombiningCyrillicLetterYu
 
--- | A pattern synonym for 'CombiningCyrillicLetterIotifiedA', the name without the @Combining@ part, defined by @'\x2dfc'@ (&#x2022;&#x2dfc;).
+-- | A pattern synonym for 'CombiningCyrillicLetterIotifiedA', the name without the @Combining@ part, defined by @'\\x2dfc'@ (&#x2022;&#x2dfc;).
 pattern CyrillicLetterIotifiedA :: CombiningCharacter
 pattern CyrillicLetterIotifiedA = CombiningCyrillicLetterIotifiedA
 
--- | A pattern synonym for 'CombiningCyrillicLetterLittleYus', the name without the @Combining@ part, defined by @'\x2dfd'@ (&#x2022;&#x2dfd;).
+-- | A pattern synonym for 'CombiningCyrillicLetterLittleYus', the name without the @Combining@ part, defined by @'\\x2dfd'@ (&#x2022;&#x2dfd;).
 pattern CyrillicLetterLittleYus :: CombiningCharacter
 pattern CyrillicLetterLittleYus = CombiningCyrillicLetterLittleYus
 
--- | A pattern synonym for 'CombiningCyrillicLetterBigYus', the name without the @Combining@ part, defined by @'\x2dfe'@ (&#x2022;&#x2dfe;).
+-- | A pattern synonym for 'CombiningCyrillicLetterBigYus', the name without the @Combining@ part, defined by @'\\x2dfe'@ (&#x2022;&#x2dfe;).
 pattern CyrillicLetterBigYus :: CombiningCharacter
 pattern CyrillicLetterBigYus = CombiningCyrillicLetterBigYus
 
--- | A pattern synonym for 'CombiningCyrillicLetterIotifiedBigYus', the name without the @Combining@ part, defined by @'\x2dff'@ (&#x2022;&#x2dff;).
+-- | A pattern synonym for 'CombiningCyrillicLetterIotifiedBigYus', the name without the @Combining@ part, defined by @'\\x2dff'@ (&#x2022;&#x2dff;).
 pattern CyrillicLetterIotifiedBigYus :: CombiningCharacter
 pattern CyrillicLetterIotifiedBigYus = CombiningCyrillicLetterIotifiedBigYus
 
--- | A pattern synonym for 'CombiningKatakanaHiraganaVoicedSoundMark', the name without the @Combining@ part, defined by @'\x3099'@ (&#x2022;&#x3099;).
+-- | A pattern synonym for 'CombiningKatakanaHiraganaVoicedSoundMark', the name without the @Combining@ part, defined by @'\\x3099'@ (&#x2022;&#x3099;).
 pattern KatakanaHiraganaVoicedSoundMark :: CombiningCharacter
 pattern KatakanaHiraganaVoicedSoundMark = CombiningKatakanaHiraganaVoicedSoundMark
 
--- | A pattern synonym for 'CombiningKatakanaHiraganaSemiVoicedSoundMark', the name without the @Combining@ part, defined by @'\x309a'@ (&#x2022;&#x309a;).
+-- | A pattern synonym for 'CombiningKatakanaHiraganaSemiVoicedSoundMark', the name without the @Combining@ part, defined by @'\\x309a'@ (&#x2022;&#x309a;).
 pattern KatakanaHiraganaSemiVoicedSoundMark :: CombiningCharacter
 pattern KatakanaHiraganaSemiVoicedSoundMark = CombiningKatakanaHiraganaSemiVoicedSoundMark
 
--- | A pattern synonym for 'CombiningCyrillicVzmet', the name without the @Combining@ part, defined by @'\xa66f'@ (&#x2022;&#xa66f;).
+-- | A pattern synonym for 'CombiningCyrillicVzmet', the name without the @Combining@ part, defined by @'\\xa66f'@ (&#x2022;&#xa66f;).
 pattern CyrillicVzmet :: CombiningCharacter
 pattern CyrillicVzmet = CombiningCyrillicVzmet
 
--- | A pattern synonym for 'CombiningCyrillicLetterUkrainianIe', the name without the @Combining@ part, defined by @'\xa674'@ (&#x2022;&#xa674;).
+-- | A pattern synonym for 'CombiningCyrillicLetterUkrainianIe', the name without the @Combining@ part, defined by @'\\xa674'@ (&#x2022;&#xa674;).
 pattern CyrillicLetterUkrainianIe :: CombiningCharacter
 pattern CyrillicLetterUkrainianIe = CombiningCyrillicLetterUkrainianIe
 
--- | A pattern synonym for 'CombiningCyrillicLetterI', the name without the @Combining@ part, defined by @'\xa675'@ (&#x2022;&#xa675;).
+-- | A pattern synonym for 'CombiningCyrillicLetterI', the name without the @Combining@ part, defined by @'\\xa675'@ (&#x2022;&#xa675;).
 pattern CyrillicLetterI :: CombiningCharacter
 pattern CyrillicLetterI = CombiningCyrillicLetterI
 
--- | A pattern synonym for 'CombiningCyrillicLetterYi', the name without the @Combining@ part, defined by @'\xa676'@ (&#x2022;&#xa676;).
+-- | A pattern synonym for 'CombiningCyrillicLetterYi', the name without the @Combining@ part, defined by @'\\xa676'@ (&#x2022;&#xa676;).
 pattern CyrillicLetterYi :: CombiningCharacter
 pattern CyrillicLetterYi = CombiningCyrillicLetterYi
 
--- | A pattern synonym for 'CombiningCyrillicLetterU', the name without the @Combining@ part, defined by @'\xa677'@ (&#x2022;&#xa677;).
+-- | A pattern synonym for 'CombiningCyrillicLetterU', the name without the @Combining@ part, defined by @'\\xa677'@ (&#x2022;&#xa677;).
 pattern CyrillicLetterU :: CombiningCharacter
 pattern CyrillicLetterU = CombiningCyrillicLetterU
 
--- | A pattern synonym for 'CombiningCyrillicLetterHardSign', the name without the @Combining@ part, defined by @'\xa678'@ (&#x2022;&#xa678;).
+-- | A pattern synonym for 'CombiningCyrillicLetterHardSign', the name without the @Combining@ part, defined by @'\\xa678'@ (&#x2022;&#xa678;).
 pattern CyrillicLetterHardSign :: CombiningCharacter
 pattern CyrillicLetterHardSign = CombiningCyrillicLetterHardSign
 
--- | A pattern synonym for 'CombiningCyrillicLetterYeru', the name without the @Combining@ part, defined by @'\xa679'@ (&#x2022;&#xa679;).
+-- | A pattern synonym for 'CombiningCyrillicLetterYeru', the name without the @Combining@ part, defined by @'\\xa679'@ (&#x2022;&#xa679;).
 pattern CyrillicLetterYeru :: CombiningCharacter
 pattern CyrillicLetterYeru = CombiningCyrillicLetterYeru
 
--- | A pattern synonym for 'CombiningCyrillicLetterSoftSign', the name without the @Combining@ part, defined by @'\xa67a'@ (&#x2022;&#xa67a;).
+-- | A pattern synonym for 'CombiningCyrillicLetterSoftSign', the name without the @Combining@ part, defined by @'\\xa67a'@ (&#x2022;&#xa67a;).
 pattern CyrillicLetterSoftSign :: CombiningCharacter
 pattern CyrillicLetterSoftSign = CombiningCyrillicLetterSoftSign
 
--- | A pattern synonym for 'CombiningCyrillicLetterOmega', the name without the @Combining@ part, defined by @'\xa67b'@ (&#x2022;&#xa67b;).
+-- | A pattern synonym for 'CombiningCyrillicLetterOmega', the name without the @Combining@ part, defined by @'\\xa67b'@ (&#x2022;&#xa67b;).
 pattern CyrillicLetterOmega :: CombiningCharacter
 pattern CyrillicLetterOmega = CombiningCyrillicLetterOmega
 
--- | A pattern synonym for 'CombiningCyrillicKavyka', the name without the @Combining@ part, defined by @'\xa67c'@ (&#x2022;&#xa67c;).
+-- | A pattern synonym for 'CombiningCyrillicKavyka', the name without the @Combining@ part, defined by @'\\xa67c'@ (&#x2022;&#xa67c;).
 pattern CyrillicKavyka :: CombiningCharacter
 pattern CyrillicKavyka = CombiningCyrillicKavyka
 
--- | A pattern synonym for 'CombiningCyrillicPayerok', the name without the @Combining@ part, defined by @'\xa67d'@ (&#x2022;&#xa67d;).
+-- | A pattern synonym for 'CombiningCyrillicPayerok', the name without the @Combining@ part, defined by @'\\xa67d'@ (&#x2022;&#xa67d;).
 pattern CyrillicPayerok :: CombiningCharacter
 pattern CyrillicPayerok = CombiningCyrillicPayerok
 
--- | A pattern synonym for 'CombiningCyrillicLetterEf', the name without the @Combining@ part, defined by @'\xa69e'@ (&#x2022;&#xa69e;).
+-- | A pattern synonym for 'CombiningCyrillicLetterEf', the name without the @Combining@ part, defined by @'\\xa69e'@ (&#x2022;&#xa69e;).
 pattern CyrillicLetterEf :: CombiningCharacter
 pattern CyrillicLetterEf = CombiningCyrillicLetterEf
 
--- | A pattern synonym for 'CombiningCyrillicLetterIotifiedE', the name without the @Combining@ part, defined by @'\xa69f'@ (&#x2022;&#xa69f;).
+-- | A pattern synonym for 'CombiningCyrillicLetterIotifiedE', the name without the @Combining@ part, defined by @'\\xa69f'@ (&#x2022;&#xa69f;).
 pattern CyrillicLetterIotifiedE :: CombiningCharacter
 pattern CyrillicLetterIotifiedE = CombiningCyrillicLetterIotifiedE
 
--- | A pattern synonym for 'BamumCombiningMarkKoqndon', the name without the @Combining@ part, defined by @'\xa6f0'@ (&#x2022;&#xa6f0;).
+-- | A pattern synonym for 'BamumCombiningMarkKoqndon', the name without the @Combining@ part, defined by @'\\xa6f0'@ (&#x2022;&#xa6f0;).
 pattern BamumMarkKoqndon :: CombiningCharacter
 pattern BamumMarkKoqndon = BamumCombiningMarkKoqndon
 
--- | A pattern synonym for 'BamumCombiningMarkTukwentis', the name without the @Combining@ part, defined by @'\xa6f1'@ (&#x2022;&#xa6f1;).
+-- | A pattern synonym for 'BamumCombiningMarkTukwentis', the name without the @Combining@ part, defined by @'\\xa6f1'@ (&#x2022;&#xa6f1;).
 pattern BamumMarkTukwentis :: CombiningCharacter
 pattern BamumMarkTukwentis = BamumCombiningMarkTukwentis
 
--- | A pattern synonym for 'CombiningDevanagariDigitZero', the name without the @Combining@ part, defined by @'\xa8e0'@ (&#x2022;&#xa8e0;).
+-- | A pattern synonym for 'CombiningDevanagariDigitZero', the name without the @Combining@ part, defined by @'\\xa8e0'@ (&#x2022;&#xa8e0;).
 pattern DevanagariDigitZero :: CombiningCharacter
 pattern DevanagariDigitZero = CombiningDevanagariDigitZero
 
--- | A pattern synonym for 'CombiningDevanagariDigitOne', the name without the @Combining@ part, defined by @'\xa8e1'@ (&#x2022;&#xa8e1;).
+-- | A pattern synonym for 'CombiningDevanagariDigitOne', the name without the @Combining@ part, defined by @'\\xa8e1'@ (&#x2022;&#xa8e1;).
 pattern DevanagariDigitOne :: CombiningCharacter
 pattern DevanagariDigitOne = CombiningDevanagariDigitOne
 
--- | A pattern synonym for 'CombiningDevanagariDigitTwo', the name without the @Combining@ part, defined by @'\xa8e2'@ (&#x2022;&#xa8e2;).
+-- | A pattern synonym for 'CombiningDevanagariDigitTwo', the name without the @Combining@ part, defined by @'\\xa8e2'@ (&#x2022;&#xa8e2;).
 pattern DevanagariDigitTwo :: CombiningCharacter
 pattern DevanagariDigitTwo = CombiningDevanagariDigitTwo
 
--- | A pattern synonym for 'CombiningDevanagariDigitThree', the name without the @Combining@ part, defined by @'\xa8e3'@ (&#x2022;&#xa8e3;).
+-- | A pattern synonym for 'CombiningDevanagariDigitThree', the name without the @Combining@ part, defined by @'\\xa8e3'@ (&#x2022;&#xa8e3;).
 pattern DevanagariDigitThree :: CombiningCharacter
 pattern DevanagariDigitThree = CombiningDevanagariDigitThree
 
--- | A pattern synonym for 'CombiningDevanagariDigitFour', the name without the @Combining@ part, defined by @'\xa8e4'@ (&#x2022;&#xa8e4;).
+-- | A pattern synonym for 'CombiningDevanagariDigitFour', the name without the @Combining@ part, defined by @'\\xa8e4'@ (&#x2022;&#xa8e4;).
 pattern DevanagariDigitFour :: CombiningCharacter
 pattern DevanagariDigitFour = CombiningDevanagariDigitFour
 
--- | A pattern synonym for 'CombiningDevanagariDigitFive', the name without the @Combining@ part, defined by @'\xa8e5'@ (&#x2022;&#xa8e5;).
+-- | A pattern synonym for 'CombiningDevanagariDigitFive', the name without the @Combining@ part, defined by @'\\xa8e5'@ (&#x2022;&#xa8e5;).
 pattern DevanagariDigitFive :: CombiningCharacter
 pattern DevanagariDigitFive = CombiningDevanagariDigitFive
 
--- | A pattern synonym for 'CombiningDevanagariDigitSix', the name without the @Combining@ part, defined by @'\xa8e6'@ (&#x2022;&#xa8e6;).
+-- | A pattern synonym for 'CombiningDevanagariDigitSix', the name without the @Combining@ part, defined by @'\\xa8e6'@ (&#x2022;&#xa8e6;).
 pattern DevanagariDigitSix :: CombiningCharacter
 pattern DevanagariDigitSix = CombiningDevanagariDigitSix
 
--- | A pattern synonym for 'CombiningDevanagariDigitSeven', the name without the @Combining@ part, defined by @'\xa8e7'@ (&#x2022;&#xa8e7;).
+-- | A pattern synonym for 'CombiningDevanagariDigitSeven', the name without the @Combining@ part, defined by @'\\xa8e7'@ (&#x2022;&#xa8e7;).
 pattern DevanagariDigitSeven :: CombiningCharacter
 pattern DevanagariDigitSeven = CombiningDevanagariDigitSeven
 
--- | A pattern synonym for 'CombiningDevanagariDigitEight', the name without the @Combining@ part, defined by @'\xa8e8'@ (&#x2022;&#xa8e8;).
+-- | A pattern synonym for 'CombiningDevanagariDigitEight', the name without the @Combining@ part, defined by @'\\xa8e8'@ (&#x2022;&#xa8e8;).
 pattern DevanagariDigitEight :: CombiningCharacter
 pattern DevanagariDigitEight = CombiningDevanagariDigitEight
 
--- | A pattern synonym for 'CombiningDevanagariDigitNine', the name without the @Combining@ part, defined by @'\xa8e9'@ (&#x2022;&#xa8e9;).
+-- | A pattern synonym for 'CombiningDevanagariDigitNine', the name without the @Combining@ part, defined by @'\\xa8e9'@ (&#x2022;&#xa8e9;).
 pattern DevanagariDigitNine :: CombiningCharacter
 pattern DevanagariDigitNine = CombiningDevanagariDigitNine
 
--- | A pattern synonym for 'CombiningDevanagariLetterA', the name without the @Combining@ part, defined by @'\xa8ea'@ (&#x2022;&#xa8ea;).
+-- | A pattern synonym for 'CombiningDevanagariLetterA', the name without the @Combining@ part, defined by @'\\xa8ea'@ (&#x2022;&#xa8ea;).
 pattern DevanagariLetterA :: CombiningCharacter
 pattern DevanagariLetterA = CombiningDevanagariLetterA
 
--- | A pattern synonym for 'CombiningDevanagariLetterU', the name without the @Combining@ part, defined by @'\xa8eb'@ (&#x2022;&#xa8eb;).
+-- | A pattern synonym for 'CombiningDevanagariLetterU', the name without the @Combining@ part, defined by @'\\xa8eb'@ (&#x2022;&#xa8eb;).
 pattern DevanagariLetterU :: CombiningCharacter
 pattern DevanagariLetterU = CombiningDevanagariLetterU
 
--- | A pattern synonym for 'CombiningDevanagariLetterKa', the name without the @Combining@ part, defined by @'\xa8ec'@ (&#x2022;&#xa8ec;).
+-- | A pattern synonym for 'CombiningDevanagariLetterKa', the name without the @Combining@ part, defined by @'\\xa8ec'@ (&#x2022;&#xa8ec;).
 pattern DevanagariLetterKa :: CombiningCharacter
 pattern DevanagariLetterKa = CombiningDevanagariLetterKa
 
--- | A pattern synonym for 'CombiningDevanagariLetterNa', the name without the @Combining@ part, defined by @'\xa8ed'@ (&#x2022;&#xa8ed;).
+-- | A pattern synonym for 'CombiningDevanagariLetterNa', the name without the @Combining@ part, defined by @'\\xa8ed'@ (&#x2022;&#xa8ed;).
 pattern DevanagariLetterNa :: CombiningCharacter
 pattern DevanagariLetterNa = CombiningDevanagariLetterNa
 
--- | A pattern synonym for 'CombiningDevanagariLetterPa', the name without the @Combining@ part, defined by @'\xa8ee'@ (&#x2022;&#xa8ee;).
+-- | A pattern synonym for 'CombiningDevanagariLetterPa', the name without the @Combining@ part, defined by @'\\xa8ee'@ (&#x2022;&#xa8ee;).
 pattern DevanagariLetterPa :: CombiningCharacter
 pattern DevanagariLetterPa = CombiningDevanagariLetterPa
 
--- | A pattern synonym for 'CombiningDevanagariLetterRa', the name without the @Combining@ part, defined by @'\xa8ef'@ (&#x2022;&#xa8ef;).
+-- | A pattern synonym for 'CombiningDevanagariLetterRa', the name without the @Combining@ part, defined by @'\\xa8ef'@ (&#x2022;&#xa8ef;).
 pattern DevanagariLetterRa :: CombiningCharacter
 pattern DevanagariLetterRa = CombiningDevanagariLetterRa
 
--- | A pattern synonym for 'CombiningDevanagariLetterVi', the name without the @Combining@ part, defined by @'\xa8f0'@ (&#x2022;&#xa8f0;).
+-- | A pattern synonym for 'CombiningDevanagariLetterVi', the name without the @Combining@ part, defined by @'\\xa8f0'@ (&#x2022;&#xa8f0;).
 pattern DevanagariLetterVi :: CombiningCharacter
 pattern DevanagariLetterVi = CombiningDevanagariLetterVi
 
--- | A pattern synonym for 'CombiningDevanagariSignAvagraha', the name without the @Combining@ part, defined by @'\xa8f1'@ (&#x2022;&#xa8f1;).
+-- | A pattern synonym for 'CombiningDevanagariSignAvagraha', the name without the @Combining@ part, defined by @'\\xa8f1'@ (&#x2022;&#xa8f1;).
 pattern DevanagariSignAvagraha :: CombiningCharacter
 pattern DevanagariSignAvagraha = CombiningDevanagariSignAvagraha
 
--- | A pattern synonym for 'CombiningLigatureLeftHalf', the name without the @Combining@ part, defined by @'\xfe20'@ (&#x2022;&#xfe20;).
+-- | A pattern synonym for 'CombiningLigatureLeftHalf', the name without the @Combining@ part, defined by @'\\xfe20'@ (&#x2022;&#xfe20;).
 pattern LigatureLeftHalf :: CombiningCharacter
 pattern LigatureLeftHalf = CombiningLigatureLeftHalf
 
--- | A pattern synonym for 'CombiningLigatureRightHalf', the name without the @Combining@ part, defined by @'\xfe21'@ (&#x2022;&#xfe21;).
+-- | A pattern synonym for 'CombiningLigatureRightHalf', the name without the @Combining@ part, defined by @'\\xfe21'@ (&#x2022;&#xfe21;).
 pattern LigatureRightHalf :: CombiningCharacter
 pattern LigatureRightHalf = CombiningLigatureRightHalf
 
--- | A pattern synonym for 'CombiningDoubleTildeLeftHalf', the name without the @Combining@ part, defined by @'\xfe22'@ (&#x2022;&#xfe22;).
+-- | A pattern synonym for 'CombiningDoubleTildeLeftHalf', the name without the @Combining@ part, defined by @'\\xfe22'@ (&#x2022;&#xfe22;).
 pattern DoubleTildeLeftHalf :: CombiningCharacter
 pattern DoubleTildeLeftHalf = CombiningDoubleTildeLeftHalf
 
--- | A pattern synonym for 'CombiningDoubleTildeRightHalf', the name without the @Combining@ part, defined by @'\xfe23'@ (&#x2022;&#xfe23;).
+-- | A pattern synonym for 'CombiningDoubleTildeRightHalf', the name without the @Combining@ part, defined by @'\\xfe23'@ (&#x2022;&#xfe23;).
 pattern DoubleTildeRightHalf :: CombiningCharacter
 pattern DoubleTildeRightHalf = CombiningDoubleTildeRightHalf
 
--- | A pattern synonym for 'CombiningMacronLeftHalf', the name without the @Combining@ part, defined by @'\xfe24'@ (&#x2022;&#xfe24;).
+-- | A pattern synonym for 'CombiningMacronLeftHalf', the name without the @Combining@ part, defined by @'\\xfe24'@ (&#x2022;&#xfe24;).
 pattern MacronLeftHalf :: CombiningCharacter
 pattern MacronLeftHalf = CombiningMacronLeftHalf
 
--- | A pattern synonym for 'CombiningMacronRightHalf', the name without the @Combining@ part, defined by @'\xfe25'@ (&#x2022;&#xfe25;).
+-- | A pattern synonym for 'CombiningMacronRightHalf', the name without the @Combining@ part, defined by @'\\xfe25'@ (&#x2022;&#xfe25;).
 pattern MacronRightHalf :: CombiningCharacter
 pattern MacronRightHalf = CombiningMacronRightHalf
 
--- | A pattern synonym for 'CombiningConjoiningMacron', the name without the @Combining@ part, defined by @'\xfe26'@ (&#x2022;&#xfe26;).
+-- | A pattern synonym for 'CombiningConjoiningMacron', the name without the @Combining@ part, defined by @'\\xfe26'@ (&#x2022;&#xfe26;).
 pattern ConjoiningMacron :: CombiningCharacter
 pattern ConjoiningMacron = CombiningConjoiningMacron
 
--- | A pattern synonym for 'CombiningLigatureLeftHalfBelow', the name without the @Combining@ part, defined by @'\xfe27'@ (&#x2022;&#xfe27;).
+-- | A pattern synonym for 'CombiningLigatureLeftHalfBelow', the name without the @Combining@ part, defined by @'\\xfe27'@ (&#x2022;&#xfe27;).
 pattern LigatureLeftHalfBelow :: CombiningCharacter
 pattern LigatureLeftHalfBelow = CombiningLigatureLeftHalfBelow
 
--- | A pattern synonym for 'CombiningLigatureRightHalfBelow', the name without the @Combining@ part, defined by @'\xfe28'@ (&#x2022;&#xfe28;).
+-- | A pattern synonym for 'CombiningLigatureRightHalfBelow', the name without the @Combining@ part, defined by @'\\xfe28'@ (&#x2022;&#xfe28;).
 pattern LigatureRightHalfBelow :: CombiningCharacter
 pattern LigatureRightHalfBelow = CombiningLigatureRightHalfBelow
 
--- | A pattern synonym for 'CombiningTildeLeftHalfBelow', the name without the @Combining@ part, defined by @'\xfe29'@ (&#x2022;&#xfe29;).
+-- | A pattern synonym for 'CombiningTildeLeftHalfBelow', the name without the @Combining@ part, defined by @'\\xfe29'@ (&#x2022;&#xfe29;).
 pattern TildeLeftHalfBelow :: CombiningCharacter
 pattern TildeLeftHalfBelow = CombiningTildeLeftHalfBelow
 
--- | A pattern synonym for 'CombiningTildeRightHalfBelow', the name without the @Combining@ part, defined by @'\xfe2a'@ (&#x2022;&#xfe2a;).
+-- | A pattern synonym for 'CombiningTildeRightHalfBelow', the name without the @Combining@ part, defined by @'\\xfe2a'@ (&#x2022;&#xfe2a;).
 pattern TildeRightHalfBelow :: CombiningCharacter
 pattern TildeRightHalfBelow = CombiningTildeRightHalfBelow
 
--- | A pattern synonym for 'CombiningMacronLeftHalfBelow', the name without the @Combining@ part, defined by @'\xfe2b'@ (&#x2022;&#xfe2b;).
+-- | A pattern synonym for 'CombiningMacronLeftHalfBelow', the name without the @Combining@ part, defined by @'\\xfe2b'@ (&#x2022;&#xfe2b;).
 pattern MacronLeftHalfBelow :: CombiningCharacter
 pattern MacronLeftHalfBelow = CombiningMacronLeftHalfBelow
 
--- | A pattern synonym for 'CombiningMacronRightHalfBelow', the name without the @Combining@ part, defined by @'\xfe2c'@ (&#x2022;&#xfe2c;).
+-- | A pattern synonym for 'CombiningMacronRightHalfBelow', the name without the @Combining@ part, defined by @'\\xfe2c'@ (&#x2022;&#xfe2c;).
 pattern MacronRightHalfBelow :: CombiningCharacter
 pattern MacronRightHalfBelow = CombiningMacronRightHalfBelow
 
--- | A pattern synonym for 'CombiningConjoiningMacronBelow', the name without the @Combining@ part, defined by @'\xfe2d'@ (&#x2022;&#xfe2d;).
+-- | A pattern synonym for 'CombiningConjoiningMacronBelow', the name without the @Combining@ part, defined by @'\\xfe2d'@ (&#x2022;&#xfe2d;).
 pattern ConjoiningMacronBelow :: CombiningCharacter
 pattern ConjoiningMacronBelow = CombiningConjoiningMacronBelow
 
--- | A pattern synonym for 'CombiningCyrillicTitloLeftHalf', the name without the @Combining@ part, defined by @'\xfe2e'@ (&#x2022;&#xfe2e;).
+-- | A pattern synonym for 'CombiningCyrillicTitloLeftHalf', the name without the @Combining@ part, defined by @'\\xfe2e'@ (&#x2022;&#xfe2e;).
 pattern CyrillicTitloLeftHalf :: CombiningCharacter
 pattern CyrillicTitloLeftHalf = CombiningCyrillicTitloLeftHalf
 
--- | A pattern synonym for 'CombiningCyrillicTitloRightHalf', the name without the @Combining@ part, defined by @'\xfe2f'@ (&#x2022;&#xfe2f;).
+-- | A pattern synonym for 'CombiningCyrillicTitloRightHalf', the name without the @Combining@ part, defined by @'\\xfe2f'@ (&#x2022;&#xfe2f;).
 pattern CyrillicTitloRightHalf :: CombiningCharacter
 pattern CyrillicTitloRightHalf = CombiningCyrillicTitloRightHalf
 
--- | A pattern synonym for 'PhaistosDiscSignCombiningObliqueStroke', the name without the @Combining@ part, defined by @'\x101fd'@ (&#x2022;&#x101fd;).
+-- | A pattern synonym for 'PhaistosDiscSignCombiningObliqueStroke', the name without the @Combining@ part, defined by @'\\x101fd'@ (&#x2022;&#x101fd;).
 pattern PhaistosDiscSignObliqueStroke :: CombiningCharacter
 pattern PhaistosDiscSignObliqueStroke = PhaistosDiscSignCombiningObliqueStroke
 
--- | A pattern synonym for 'CombiningOldPermicLetterAn', the name without the @Combining@ part, defined by @'\x10376'@ (&#x2022;&#x10376;).
+-- | A pattern synonym for 'CombiningOldPermicLetterAn', the name without the @Combining@ part, defined by @'\\x10376'@ (&#x2022;&#x10376;).
 pattern OldPermicLetterAn :: CombiningCharacter
 pattern OldPermicLetterAn = CombiningOldPermicLetterAn
 
--- | A pattern synonym for 'CombiningOldPermicLetterDoi', the name without the @Combining@ part, defined by @'\x10377'@ (&#x2022;&#x10377;).
+-- | A pattern synonym for 'CombiningOldPermicLetterDoi', the name without the @Combining@ part, defined by @'\\x10377'@ (&#x2022;&#x10377;).
 pattern OldPermicLetterDoi :: CombiningCharacter
 pattern OldPermicLetterDoi = CombiningOldPermicLetterDoi
 
--- | A pattern synonym for 'CombiningOldPermicLetterZata', the name without the @Combining@ part, defined by @'\x10378'@ (&#x2022;&#x10378;).
+-- | A pattern synonym for 'CombiningOldPermicLetterZata', the name without the @Combining@ part, defined by @'\\x10378'@ (&#x2022;&#x10378;).
 pattern OldPermicLetterZata :: CombiningCharacter
 pattern OldPermicLetterZata = CombiningOldPermicLetterZata
 
--- | A pattern synonym for 'CombiningOldPermicLetterNenoe', the name without the @Combining@ part, defined by @'\x10379'@ (&#x2022;&#x10379;).
+-- | A pattern synonym for 'CombiningOldPermicLetterNenoe', the name without the @Combining@ part, defined by @'\\x10379'@ (&#x2022;&#x10379;).
 pattern OldPermicLetterNenoe :: CombiningCharacter
 pattern OldPermicLetterNenoe = CombiningOldPermicLetterNenoe
 
--- | A pattern synonym for 'CombiningOldPermicLetterSii', the name without the @Combining@ part, defined by @'\x1037a'@ (&#x2022;&#x1037a;).
+-- | A pattern synonym for 'CombiningOldPermicLetterSii', the name without the @Combining@ part, defined by @'\\x1037a'@ (&#x2022;&#x1037a;).
 pattern OldPermicLetterSii :: CombiningCharacter
 pattern OldPermicLetterSii = CombiningOldPermicLetterSii
 
--- | A pattern synonym for 'CombiningGranthaDigitZero', the name without the @Combining@ part, defined by @'\x11366'@ (&#x2022;&#x11366;).
+-- | A pattern synonym for 'CombiningGranthaDigitZero', the name without the @Combining@ part, defined by @'\\x11366'@ (&#x2022;&#x11366;).
 pattern GranthaDigitZero :: CombiningCharacter
 pattern GranthaDigitZero = CombiningGranthaDigitZero
 
--- | A pattern synonym for 'CombiningGranthaDigitOne', the name without the @Combining@ part, defined by @'\x11367'@ (&#x2022;&#x11367;).
+-- | A pattern synonym for 'CombiningGranthaDigitOne', the name without the @Combining@ part, defined by @'\\x11367'@ (&#x2022;&#x11367;).
 pattern GranthaDigitOne :: CombiningCharacter
 pattern GranthaDigitOne = CombiningGranthaDigitOne
 
--- | A pattern synonym for 'CombiningGranthaDigitTwo', the name without the @Combining@ part, defined by @'\x11368'@ (&#x2022;&#x11368;).
+-- | A pattern synonym for 'CombiningGranthaDigitTwo', the name without the @Combining@ part, defined by @'\\x11368'@ (&#x2022;&#x11368;).
 pattern GranthaDigitTwo :: CombiningCharacter
 pattern GranthaDigitTwo = CombiningGranthaDigitTwo
 
--- | A pattern synonym for 'CombiningGranthaDigitThree', the name without the @Combining@ part, defined by @'\x11369'@ (&#x2022;&#x11369;).
+-- | A pattern synonym for 'CombiningGranthaDigitThree', the name without the @Combining@ part, defined by @'\\x11369'@ (&#x2022;&#x11369;).
 pattern GranthaDigitThree :: CombiningCharacter
 pattern GranthaDigitThree = CombiningGranthaDigitThree
 
--- | A pattern synonym for 'CombiningGranthaDigitFour', the name without the @Combining@ part, defined by @'\x1136a'@ (&#x2022;&#x1136a;).
+-- | A pattern synonym for 'CombiningGranthaDigitFour', the name without the @Combining@ part, defined by @'\\x1136a'@ (&#x2022;&#x1136a;).
 pattern GranthaDigitFour :: CombiningCharacter
 pattern GranthaDigitFour = CombiningGranthaDigitFour
 
--- | A pattern synonym for 'CombiningGranthaDigitFive', the name without the @Combining@ part, defined by @'\x1136b'@ (&#x2022;&#x1136b;).
+-- | A pattern synonym for 'CombiningGranthaDigitFive', the name without the @Combining@ part, defined by @'\\x1136b'@ (&#x2022;&#x1136b;).
 pattern GranthaDigitFive :: CombiningCharacter
 pattern GranthaDigitFive = CombiningGranthaDigitFive
 
--- | A pattern synonym for 'CombiningGranthaDigitSix', the name without the @Combining@ part, defined by @'\x1136c'@ (&#x2022;&#x1136c;).
+-- | A pattern synonym for 'CombiningGranthaDigitSix', the name without the @Combining@ part, defined by @'\\x1136c'@ (&#x2022;&#x1136c;).
 pattern GranthaDigitSix :: CombiningCharacter
 pattern GranthaDigitSix = CombiningGranthaDigitSix
 
--- | A pattern synonym for 'CombiningGranthaLetterA', the name without the @Combining@ part, defined by @'\x11370'@ (&#x2022;&#x11370;).
+-- | A pattern synonym for 'CombiningGranthaLetterA', the name without the @Combining@ part, defined by @'\\x11370'@ (&#x2022;&#x11370;).
 pattern GranthaLetterA :: CombiningCharacter
 pattern GranthaLetterA = CombiningGranthaLetterA
 
--- | A pattern synonym for 'CombiningGranthaLetterKa', the name without the @Combining@ part, defined by @'\x11371'@ (&#x2022;&#x11371;).
+-- | A pattern synonym for 'CombiningGranthaLetterKa', the name without the @Combining@ part, defined by @'\\x11371'@ (&#x2022;&#x11371;).
 pattern GranthaLetterKa :: CombiningCharacter
 pattern GranthaLetterKa = CombiningGranthaLetterKa
 
--- | A pattern synonym for 'CombiningGranthaLetterNa', the name without the @Combining@ part, defined by @'\x11372'@ (&#x2022;&#x11372;).
+-- | A pattern synonym for 'CombiningGranthaLetterNa', the name without the @Combining@ part, defined by @'\\x11372'@ (&#x2022;&#x11372;).
 pattern GranthaLetterNa :: CombiningCharacter
 pattern GranthaLetterNa = CombiningGranthaLetterNa
 
--- | A pattern synonym for 'CombiningGranthaLetterVi', the name without the @Combining@ part, defined by @'\x11373'@ (&#x2022;&#x11373;).
+-- | A pattern synonym for 'CombiningGranthaLetterVi', the name without the @Combining@ part, defined by @'\\x11373'@ (&#x2022;&#x11373;).
 pattern GranthaLetterVi :: CombiningCharacter
 pattern GranthaLetterVi = CombiningGranthaLetterVi
 
--- | A pattern synonym for 'CombiningGranthaLetterPa', the name without the @Combining@ part, defined by @'\x11374'@ (&#x2022;&#x11374;).
+-- | A pattern synonym for 'CombiningGranthaLetterPa', the name without the @Combining@ part, defined by @'\\x11374'@ (&#x2022;&#x11374;).
 pattern GranthaLetterPa :: CombiningCharacter
 pattern GranthaLetterPa = CombiningGranthaLetterPa
 
--- | A pattern synonym for 'BassaVahCombiningHighTone', the name without the @Combining@ part, defined by @'\x16af0'@ (&#x2022;&#x16af0;).
+-- | A pattern synonym for 'BassaVahCombiningHighTone', the name without the @Combining@ part, defined by @'\\x16af0'@ (&#x2022;&#x16af0;).
 pattern BassaVahHighTone :: CombiningCharacter
 pattern BassaVahHighTone = BassaVahCombiningHighTone
 
--- | A pattern synonym for 'BassaVahCombiningLowTone', the name without the @Combining@ part, defined by @'\x16af1'@ (&#x2022;&#x16af1;).
+-- | A pattern synonym for 'BassaVahCombiningLowTone', the name without the @Combining@ part, defined by @'\\x16af1'@ (&#x2022;&#x16af1;).
 pattern BassaVahLowTone :: CombiningCharacter
 pattern BassaVahLowTone = BassaVahCombiningLowTone
 
--- | A pattern synonym for 'BassaVahCombiningMidTone', the name without the @Combining@ part, defined by @'\x16af2'@ (&#x2022;&#x16af2;).
+-- | A pattern synonym for 'BassaVahCombiningMidTone', the name without the @Combining@ part, defined by @'\\x16af2'@ (&#x2022;&#x16af2;).
 pattern BassaVahMidTone :: CombiningCharacter
 pattern BassaVahMidTone = BassaVahCombiningMidTone
 
--- | A pattern synonym for 'BassaVahCombiningLowMidTone', the name without the @Combining@ part, defined by @'\x16af3'@ (&#x2022;&#x16af3;).
+-- | A pattern synonym for 'BassaVahCombiningLowMidTone', the name without the @Combining@ part, defined by @'\\x16af3'@ (&#x2022;&#x16af3;).
 pattern BassaVahLowMidTone :: CombiningCharacter
 pattern BassaVahLowMidTone = BassaVahCombiningLowMidTone
 
--- | A pattern synonym for 'BassaVahCombiningHighLowTone', the name without the @Combining@ part, defined by @'\x16af4'@ (&#x2022;&#x16af4;).
+-- | A pattern synonym for 'BassaVahCombiningHighLowTone', the name without the @Combining@ part, defined by @'\\x16af4'@ (&#x2022;&#x16af4;).
 pattern BassaVahHighLowTone :: CombiningCharacter
 pattern BassaVahHighLowTone = BassaVahCombiningHighLowTone
 
--- | A pattern synonym for 'MusicalSymbolCombiningStem', the name without the @Combining@ part, defined by @'\x1d165'@ (&#x2022;&#x1d165;).
+-- | A pattern synonym for 'MusicalSymbolCombiningStem', the name without the @Combining@ part, defined by @'\\x1d165'@ (&#x2022;&#x1d165;).
 pattern MusicalSymbolStem :: CombiningCharacter
 pattern MusicalSymbolStem = MusicalSymbolCombiningStem
 
--- | A pattern synonym for 'MusicalSymbolCombiningSprechgesangStem', the name without the @Combining@ part, defined by @'\x1d166'@ (&#x2022;&#x1d166;).
+-- | A pattern synonym for 'MusicalSymbolCombiningSprechgesangStem', the name without the @Combining@ part, defined by @'\\x1d166'@ (&#x2022;&#x1d166;).
 pattern MusicalSymbolSprechgesangStem :: CombiningCharacter
 pattern MusicalSymbolSprechgesangStem = MusicalSymbolCombiningSprechgesangStem
 
--- | A pattern synonym for 'MusicalSymbolCombiningTremolo1', the name without the @Combining@ part, defined by @'\x1d167'@ (&#x2022;&#x1d167;).
+-- | A pattern synonym for 'MusicalSymbolCombiningTremolo1', the name without the @Combining@ part, defined by @'\\x1d167'@ (&#x2022;&#x1d167;).
 pattern MusicalSymbolTremolo1 :: CombiningCharacter
 pattern MusicalSymbolTremolo1 = MusicalSymbolCombiningTremolo1
 
--- | A pattern synonym for 'MusicalSymbolCombiningTremolo2', the name without the @Combining@ part, defined by @'\x1d168'@ (&#x2022;&#x1d168;).
+-- | A pattern synonym for 'MusicalSymbolCombiningTremolo2', the name without the @Combining@ part, defined by @'\\x1d168'@ (&#x2022;&#x1d168;).
 pattern MusicalSymbolTremolo2 :: CombiningCharacter
 pattern MusicalSymbolTremolo2 = MusicalSymbolCombiningTremolo2
 
--- | A pattern synonym for 'MusicalSymbolCombiningTremolo3', the name without the @Combining@ part, defined by @'\x1d169'@ (&#x2022;&#x1d169;).
+-- | A pattern synonym for 'MusicalSymbolCombiningTremolo3', the name without the @Combining@ part, defined by @'\\x1d169'@ (&#x2022;&#x1d169;).
 pattern MusicalSymbolTremolo3 :: CombiningCharacter
 pattern MusicalSymbolTremolo3 = MusicalSymbolCombiningTremolo3
 
--- | A pattern synonym for 'MusicalSymbolCombiningAugmentationDot', the name without the @Combining@ part, defined by @'\x1d16d'@ (&#x2022;&#x1d16d;).
+-- | A pattern synonym for 'MusicalSymbolCombiningAugmentationDot', the name without the @Combining@ part, defined by @'\\x1d16d'@ (&#x2022;&#x1d16d;).
 pattern MusicalSymbolAugmentationDot :: CombiningCharacter
 pattern MusicalSymbolAugmentationDot = MusicalSymbolCombiningAugmentationDot
 
--- | A pattern synonym for 'MusicalSymbolCombiningFlag1', the name without the @Combining@ part, defined by @'\x1d16e'@ (&#x2022;&#x1d16e;).
+-- | A pattern synonym for 'MusicalSymbolCombiningFlag1', the name without the @Combining@ part, defined by @'\\x1d16e'@ (&#x2022;&#x1d16e;).
 pattern MusicalSymbolFlag1 :: CombiningCharacter
 pattern MusicalSymbolFlag1 = MusicalSymbolCombiningFlag1
 
--- | A pattern synonym for 'MusicalSymbolCombiningFlag2', the name without the @Combining@ part, defined by @'\x1d16f'@ (&#x2022;&#x1d16f;).
+-- | A pattern synonym for 'MusicalSymbolCombiningFlag2', the name without the @Combining@ part, defined by @'\\x1d16f'@ (&#x2022;&#x1d16f;).
 pattern MusicalSymbolFlag2 :: CombiningCharacter
 pattern MusicalSymbolFlag2 = MusicalSymbolCombiningFlag2
 
--- | A pattern synonym for 'MusicalSymbolCombiningFlag3', the name without the @Combining@ part, defined by @'\x1d170'@ (&#x2022;&#x1d170;).
+-- | A pattern synonym for 'MusicalSymbolCombiningFlag3', the name without the @Combining@ part, defined by @'\\x1d170'@ (&#x2022;&#x1d170;).
 pattern MusicalSymbolFlag3 :: CombiningCharacter
 pattern MusicalSymbolFlag3 = MusicalSymbolCombiningFlag3
 
--- | A pattern synonym for 'MusicalSymbolCombiningFlag4', the name without the @Combining@ part, defined by @'\x1d171'@ (&#x2022;&#x1d171;).
+-- | A pattern synonym for 'MusicalSymbolCombiningFlag4', the name without the @Combining@ part, defined by @'\\x1d171'@ (&#x2022;&#x1d171;).
 pattern MusicalSymbolFlag4 :: CombiningCharacter
 pattern MusicalSymbolFlag4 = MusicalSymbolCombiningFlag4
 
--- | A pattern synonym for 'MusicalSymbolCombiningFlag5', the name without the @Combining@ part, defined by @'\x1d172'@ (&#x2022;&#x1d172;).
+-- | A pattern synonym for 'MusicalSymbolCombiningFlag5', the name without the @Combining@ part, defined by @'\\x1d172'@ (&#x2022;&#x1d172;).
 pattern MusicalSymbolFlag5 :: CombiningCharacter
 pattern MusicalSymbolFlag5 = MusicalSymbolCombiningFlag5
 
--- | A pattern synonym for 'MusicalSymbolCombiningAccent', the name without the @Combining@ part, defined by @'\x1d17b'@ (&#x2022;&#x1d17b;).
+-- | A pattern synonym for 'MusicalSymbolCombiningAccent', the name without the @Combining@ part, defined by @'\\x1d17b'@ (&#x2022;&#x1d17b;).
 pattern MusicalSymbolAccent :: CombiningCharacter
 pattern MusicalSymbolAccent = MusicalSymbolCombiningAccent
 
--- | A pattern synonym for 'MusicalSymbolCombiningStaccato', the name without the @Combining@ part, defined by @'\x1d17c'@ (&#x2022;&#x1d17c;).
+-- | A pattern synonym for 'MusicalSymbolCombiningStaccato', the name without the @Combining@ part, defined by @'\\x1d17c'@ (&#x2022;&#x1d17c;).
 pattern MusicalSymbolStaccato :: CombiningCharacter
 pattern MusicalSymbolStaccato = MusicalSymbolCombiningStaccato
 
--- | A pattern synonym for 'MusicalSymbolCombiningTenuto', the name without the @Combining@ part, defined by @'\x1d17d'@ (&#x2022;&#x1d17d;).
+-- | A pattern synonym for 'MusicalSymbolCombiningTenuto', the name without the @Combining@ part, defined by @'\\x1d17d'@ (&#x2022;&#x1d17d;).
 pattern MusicalSymbolTenuto :: CombiningCharacter
 pattern MusicalSymbolTenuto = MusicalSymbolCombiningTenuto
 
--- | A pattern synonym for 'MusicalSymbolCombiningStaccatissimo', the name without the @Combining@ part, defined by @'\x1d17e'@ (&#x2022;&#x1d17e;).
+-- | A pattern synonym for 'MusicalSymbolCombiningStaccatissimo', the name without the @Combining@ part, defined by @'\\x1d17e'@ (&#x2022;&#x1d17e;).
 pattern MusicalSymbolStaccatissimo :: CombiningCharacter
 pattern MusicalSymbolStaccatissimo = MusicalSymbolCombiningStaccatissimo
 
--- | A pattern synonym for 'MusicalSymbolCombiningMarcato', the name without the @Combining@ part, defined by @'\x1d17f'@ (&#x2022;&#x1d17f;).
+-- | A pattern synonym for 'MusicalSymbolCombiningMarcato', the name without the @Combining@ part, defined by @'\\x1d17f'@ (&#x2022;&#x1d17f;).
 pattern MusicalSymbolMarcato :: CombiningCharacter
 pattern MusicalSymbolMarcato = MusicalSymbolCombiningMarcato
 
--- | A pattern synonym for 'MusicalSymbolCombiningMarcatoStaccato', the name without the @Combining@ part, defined by @'\x1d180'@ (&#x2022;&#x1d180;).
+-- | A pattern synonym for 'MusicalSymbolCombiningMarcatoStaccato', the name without the @Combining@ part, defined by @'\\x1d180'@ (&#x2022;&#x1d180;).
 pattern MusicalSymbolMarcatoStaccato :: CombiningCharacter
 pattern MusicalSymbolMarcatoStaccato = MusicalSymbolCombiningMarcatoStaccato
 
--- | A pattern synonym for 'MusicalSymbolCombiningAccentStaccato', the name without the @Combining@ part, defined by @'\x1d181'@ (&#x2022;&#x1d181;).
+-- | A pattern synonym for 'MusicalSymbolCombiningAccentStaccato', the name without the @Combining@ part, defined by @'\\x1d181'@ (&#x2022;&#x1d181;).
 pattern MusicalSymbolAccentStaccato :: CombiningCharacter
 pattern MusicalSymbolAccentStaccato = MusicalSymbolCombiningAccentStaccato
 
--- | A pattern synonym for 'MusicalSymbolCombiningLoure', the name without the @Combining@ part, defined by @'\x1d182'@ (&#x2022;&#x1d182;).
+-- | A pattern synonym for 'MusicalSymbolCombiningLoure', the name without the @Combining@ part, defined by @'\\x1d182'@ (&#x2022;&#x1d182;).
 pattern MusicalSymbolLoure :: CombiningCharacter
 pattern MusicalSymbolLoure = MusicalSymbolCombiningLoure
 
--- | A pattern synonym for 'MusicalSymbolCombiningDoit', the name without the @Combining@ part, defined by @'\x1d185'@ (&#x2022;&#x1d185;).
+-- | A pattern synonym for 'MusicalSymbolCombiningDoit', the name without the @Combining@ part, defined by @'\\x1d185'@ (&#x2022;&#x1d185;).
 pattern MusicalSymbolDoit :: CombiningCharacter
 pattern MusicalSymbolDoit = MusicalSymbolCombiningDoit
 
--- | A pattern synonym for 'MusicalSymbolCombiningRip', the name without the @Combining@ part, defined by @'\x1d186'@ (&#x2022;&#x1d186;).
+-- | A pattern synonym for 'MusicalSymbolCombiningRip', the name without the @Combining@ part, defined by @'\\x1d186'@ (&#x2022;&#x1d186;).
 pattern MusicalSymbolRip :: CombiningCharacter
 pattern MusicalSymbolRip = MusicalSymbolCombiningRip
 
--- | A pattern synonym for 'MusicalSymbolCombiningFlip', the name without the @Combining@ part, defined by @'\x1d187'@ (&#x2022;&#x1d187;).
+-- | A pattern synonym for 'MusicalSymbolCombiningFlip', the name without the @Combining@ part, defined by @'\\x1d187'@ (&#x2022;&#x1d187;).
 pattern MusicalSymbolFlip :: CombiningCharacter
 pattern MusicalSymbolFlip = MusicalSymbolCombiningFlip
 
--- | A pattern synonym for 'MusicalSymbolCombiningSmear', the name without the @Combining@ part, defined by @'\x1d188'@ (&#x2022;&#x1d188;).
+-- | A pattern synonym for 'MusicalSymbolCombiningSmear', the name without the @Combining@ part, defined by @'\\x1d188'@ (&#x2022;&#x1d188;).
 pattern MusicalSymbolSmear :: CombiningCharacter
 pattern MusicalSymbolSmear = MusicalSymbolCombiningSmear
 
--- | A pattern synonym for 'MusicalSymbolCombiningBend', the name without the @Combining@ part, defined by @'\x1d189'@ (&#x2022;&#x1d189;).
+-- | A pattern synonym for 'MusicalSymbolCombiningBend', the name without the @Combining@ part, defined by @'\\x1d189'@ (&#x2022;&#x1d189;).
 pattern MusicalSymbolBend :: CombiningCharacter
 pattern MusicalSymbolBend = MusicalSymbolCombiningBend
 
--- | A pattern synonym for 'MusicalSymbolCombiningDoubleTongue', the name without the @Combining@ part, defined by @'\x1d18a'@ (&#x2022;&#x1d18a;).
+-- | A pattern synonym for 'MusicalSymbolCombiningDoubleTongue', the name without the @Combining@ part, defined by @'\\x1d18a'@ (&#x2022;&#x1d18a;).
 pattern MusicalSymbolDoubleTongue :: CombiningCharacter
 pattern MusicalSymbolDoubleTongue = MusicalSymbolCombiningDoubleTongue
 
--- | A pattern synonym for 'MusicalSymbolCombiningTripleTongue', the name without the @Combining@ part, defined by @'\x1d18b'@ (&#x2022;&#x1d18b;).
+-- | A pattern synonym for 'MusicalSymbolCombiningTripleTongue', the name without the @Combining@ part, defined by @'\\x1d18b'@ (&#x2022;&#x1d18b;).
 pattern MusicalSymbolTripleTongue :: CombiningCharacter
 pattern MusicalSymbolTripleTongue = MusicalSymbolCombiningTripleTongue
 
--- | A pattern synonym for 'MusicalSymbolCombiningDownBow', the name without the @Combining@ part, defined by @'\x1d1aa'@ (&#x2022;&#x1d1aa;).
+-- | A pattern synonym for 'MusicalSymbolCombiningDownBow', the name without the @Combining@ part, defined by @'\\x1d1aa'@ (&#x2022;&#x1d1aa;).
 pattern MusicalSymbolDownBow :: CombiningCharacter
 pattern MusicalSymbolDownBow = MusicalSymbolCombiningDownBow
 
--- | A pattern synonym for 'MusicalSymbolCombiningUpBow', the name without the @Combining@ part, defined by @'\x1d1ab'@ (&#x2022;&#x1d1ab;).
+-- | A pattern synonym for 'MusicalSymbolCombiningUpBow', the name without the @Combining@ part, defined by @'\\x1d1ab'@ (&#x2022;&#x1d1ab;).
 pattern MusicalSymbolUpBow :: CombiningCharacter
 pattern MusicalSymbolUpBow = MusicalSymbolCombiningUpBow
 
--- | A pattern synonym for 'MusicalSymbolCombiningHarmonic', the name without the @Combining@ part, defined by @'\x1d1ac'@ (&#x2022;&#x1d1ac;).
+-- | A pattern synonym for 'MusicalSymbolCombiningHarmonic', the name without the @Combining@ part, defined by @'\\x1d1ac'@ (&#x2022;&#x1d1ac;).
 pattern MusicalSymbolHarmonic :: CombiningCharacter
 pattern MusicalSymbolHarmonic = MusicalSymbolCombiningHarmonic
 
--- | A pattern synonym for 'MusicalSymbolCombiningSnapPizzicato', the name without the @Combining@ part, defined by @'\x1d1ad'@ (&#x2022;&#x1d1ad;).
+-- | A pattern synonym for 'MusicalSymbolCombiningSnapPizzicato', the name without the @Combining@ part, defined by @'\\x1d1ad'@ (&#x2022;&#x1d1ad;).
 pattern MusicalSymbolSnapPizzicato :: CombiningCharacter
 pattern MusicalSymbolSnapPizzicato = MusicalSymbolCombiningSnapPizzicato
 
--- | A pattern synonym for 'CombiningGreekMusicalTriseme', the name without the @Combining@ part, defined by @'\x1d242'@ (&#x2022;&#x1d242;).
+-- | A pattern synonym for 'CombiningGreekMusicalTriseme', the name without the @Combining@ part, defined by @'\\x1d242'@ (&#x2022;&#x1d242;).
 pattern GreekMusicalTriseme :: CombiningCharacter
 pattern GreekMusicalTriseme = CombiningGreekMusicalTriseme
 
--- | A pattern synonym for 'CombiningGreekMusicalTetraseme', the name without the @Combining@ part, defined by @'\x1d243'@ (&#x2022;&#x1d243;).
+-- | A pattern synonym for 'CombiningGreekMusicalTetraseme', the name without the @Combining@ part, defined by @'\\x1d243'@ (&#x2022;&#x1d243;).
 pattern GreekMusicalTetraseme :: CombiningCharacter
 pattern GreekMusicalTetraseme = CombiningGreekMusicalTetraseme
 
--- | A pattern synonym for 'CombiningGreekMusicalPentaseme', the name without the @Combining@ part, defined by @'\x1d244'@ (&#x2022;&#x1d244;).
+-- | A pattern synonym for 'CombiningGreekMusicalPentaseme', the name without the @Combining@ part, defined by @'\\x1d244'@ (&#x2022;&#x1d244;).
 pattern GreekMusicalPentaseme :: CombiningCharacter
 pattern GreekMusicalPentaseme = CombiningGreekMusicalPentaseme
 
--- | A pattern synonym for 'CombiningGlagoliticLetterAzu', the name without the @Combining@ part, defined by @'\x1e000'@ (&#x2022;&#x1e000;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterAzu', the name without the @Combining@ part, defined by @'\\x1e000'@ (&#x2022;&#x1e000;).
 pattern GlagoliticLetterAzu :: CombiningCharacter
 pattern GlagoliticLetterAzu = CombiningGlagoliticLetterAzu
 
--- | A pattern synonym for 'CombiningGlagoliticLetterBuky', the name without the @Combining@ part, defined by @'\x1e001'@ (&#x2022;&#x1e001;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterBuky', the name without the @Combining@ part, defined by @'\\x1e001'@ (&#x2022;&#x1e001;).
 pattern GlagoliticLetterBuky :: CombiningCharacter
 pattern GlagoliticLetterBuky = CombiningGlagoliticLetterBuky
 
--- | A pattern synonym for 'CombiningGlagoliticLetterVede', the name without the @Combining@ part, defined by @'\x1e002'@ (&#x2022;&#x1e002;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterVede', the name without the @Combining@ part, defined by @'\\x1e002'@ (&#x2022;&#x1e002;).
 pattern GlagoliticLetterVede :: CombiningCharacter
 pattern GlagoliticLetterVede = CombiningGlagoliticLetterVede
 
--- | A pattern synonym for 'CombiningGlagoliticLetterGlagoli', the name without the @Combining@ part, defined by @'\x1e003'@ (&#x2022;&#x1e003;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterGlagoli', the name without the @Combining@ part, defined by @'\\x1e003'@ (&#x2022;&#x1e003;).
 pattern GlagoliticLetterGlagoli :: CombiningCharacter
 pattern GlagoliticLetterGlagoli = CombiningGlagoliticLetterGlagoli
 
--- | A pattern synonym for 'CombiningGlagoliticLetterDobro', the name without the @Combining@ part, defined by @'\x1e004'@ (&#x2022;&#x1e004;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterDobro', the name without the @Combining@ part, defined by @'\\x1e004'@ (&#x2022;&#x1e004;).
 pattern GlagoliticLetterDobro :: CombiningCharacter
 pattern GlagoliticLetterDobro = CombiningGlagoliticLetterDobro
 
--- | A pattern synonym for 'CombiningGlagoliticLetterYestu', the name without the @Combining@ part, defined by @'\x1e005'@ (&#x2022;&#x1e005;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterYestu', the name without the @Combining@ part, defined by @'\\x1e005'@ (&#x2022;&#x1e005;).
 pattern GlagoliticLetterYestu :: CombiningCharacter
 pattern GlagoliticLetterYestu = CombiningGlagoliticLetterYestu
 
--- | A pattern synonym for 'CombiningGlagoliticLetterZhivete', the name without the @Combining@ part, defined by @'\x1e006'@ (&#x2022;&#x1e006;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterZhivete', the name without the @Combining@ part, defined by @'\\x1e006'@ (&#x2022;&#x1e006;).
 pattern GlagoliticLetterZhivete :: CombiningCharacter
 pattern GlagoliticLetterZhivete = CombiningGlagoliticLetterZhivete
 
--- | A pattern synonym for 'CombiningGlagoliticLetterZemlja', the name without the @Combining@ part, defined by @'\x1e008'@ (&#x2022;&#x1e008;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterZemlja', the name without the @Combining@ part, defined by @'\\x1e008'@ (&#x2022;&#x1e008;).
 pattern GlagoliticLetterZemlja :: CombiningCharacter
 pattern GlagoliticLetterZemlja = CombiningGlagoliticLetterZemlja
 
--- | A pattern synonym for 'CombiningGlagoliticLetterIzhe', the name without the @Combining@ part, defined by @'\x1e009'@ (&#x2022;&#x1e009;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterIzhe', the name without the @Combining@ part, defined by @'\\x1e009'@ (&#x2022;&#x1e009;).
 pattern GlagoliticLetterIzhe :: CombiningCharacter
 pattern GlagoliticLetterIzhe = CombiningGlagoliticLetterIzhe
 
--- | A pattern synonym for 'CombiningGlagoliticLetterInitialIzhe', the name without the @Combining@ part, defined by @'\x1e00a'@ (&#x2022;&#x1e00a;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterInitialIzhe', the name without the @Combining@ part, defined by @'\\x1e00a'@ (&#x2022;&#x1e00a;).
 pattern GlagoliticLetterInitialIzhe :: CombiningCharacter
 pattern GlagoliticLetterInitialIzhe = CombiningGlagoliticLetterInitialIzhe
 
--- | A pattern synonym for 'CombiningGlagoliticLetterI', the name without the @Combining@ part, defined by @'\x1e00b'@ (&#x2022;&#x1e00b;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterI', the name without the @Combining@ part, defined by @'\\x1e00b'@ (&#x2022;&#x1e00b;).
 pattern GlagoliticLetterI :: CombiningCharacter
 pattern GlagoliticLetterI = CombiningGlagoliticLetterI
 
--- | A pattern synonym for 'CombiningGlagoliticLetterDjervi', the name without the @Combining@ part, defined by @'\x1e00c'@ (&#x2022;&#x1e00c;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterDjervi', the name without the @Combining@ part, defined by @'\\x1e00c'@ (&#x2022;&#x1e00c;).
 pattern GlagoliticLetterDjervi :: CombiningCharacter
 pattern GlagoliticLetterDjervi = CombiningGlagoliticLetterDjervi
 
--- | A pattern synonym for 'CombiningGlagoliticLetterKako', the name without the @Combining@ part, defined by @'\x1e00d'@ (&#x2022;&#x1e00d;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterKako', the name without the @Combining@ part, defined by @'\\x1e00d'@ (&#x2022;&#x1e00d;).
 pattern GlagoliticLetterKako :: CombiningCharacter
 pattern GlagoliticLetterKako = CombiningGlagoliticLetterKako
 
--- | A pattern synonym for 'CombiningGlagoliticLetterLjudije', the name without the @Combining@ part, defined by @'\x1e00e'@ (&#x2022;&#x1e00e;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterLjudije', the name without the @Combining@ part, defined by @'\\x1e00e'@ (&#x2022;&#x1e00e;).
 pattern GlagoliticLetterLjudije :: CombiningCharacter
 pattern GlagoliticLetterLjudije = CombiningGlagoliticLetterLjudije
 
--- | A pattern synonym for 'CombiningGlagoliticLetterMyslite', the name without the @Combining@ part, defined by @'\x1e00f'@ (&#x2022;&#x1e00f;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterMyslite', the name without the @Combining@ part, defined by @'\\x1e00f'@ (&#x2022;&#x1e00f;).
 pattern GlagoliticLetterMyslite :: CombiningCharacter
 pattern GlagoliticLetterMyslite = CombiningGlagoliticLetterMyslite
 
--- | A pattern synonym for 'CombiningGlagoliticLetterNashi', the name without the @Combining@ part, defined by @'\x1e010'@ (&#x2022;&#x1e010;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterNashi', the name without the @Combining@ part, defined by @'\\x1e010'@ (&#x2022;&#x1e010;).
 pattern GlagoliticLetterNashi :: CombiningCharacter
 pattern GlagoliticLetterNashi = CombiningGlagoliticLetterNashi
 
--- | A pattern synonym for 'CombiningGlagoliticLetterOnu', the name without the @Combining@ part, defined by @'\x1e011'@ (&#x2022;&#x1e011;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterOnu', the name without the @Combining@ part, defined by @'\\x1e011'@ (&#x2022;&#x1e011;).
 pattern GlagoliticLetterOnu :: CombiningCharacter
 pattern GlagoliticLetterOnu = CombiningGlagoliticLetterOnu
 
--- | A pattern synonym for 'CombiningGlagoliticLetterPokoji', the name without the @Combining@ part, defined by @'\x1e012'@ (&#x2022;&#x1e012;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterPokoji', the name without the @Combining@ part, defined by @'\\x1e012'@ (&#x2022;&#x1e012;).
 pattern GlagoliticLetterPokoji :: CombiningCharacter
 pattern GlagoliticLetterPokoji = CombiningGlagoliticLetterPokoji
 
--- | A pattern synonym for 'CombiningGlagoliticLetterRitsi', the name without the @Combining@ part, defined by @'\x1e013'@ (&#x2022;&#x1e013;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterRitsi', the name without the @Combining@ part, defined by @'\\x1e013'@ (&#x2022;&#x1e013;).
 pattern GlagoliticLetterRitsi :: CombiningCharacter
 pattern GlagoliticLetterRitsi = CombiningGlagoliticLetterRitsi
 
--- | A pattern synonym for 'CombiningGlagoliticLetterSlovo', the name without the @Combining@ part, defined by @'\x1e014'@ (&#x2022;&#x1e014;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterSlovo', the name without the @Combining@ part, defined by @'\\x1e014'@ (&#x2022;&#x1e014;).
 pattern GlagoliticLetterSlovo :: CombiningCharacter
 pattern GlagoliticLetterSlovo = CombiningGlagoliticLetterSlovo
 
--- | A pattern synonym for 'CombiningGlagoliticLetterTvrido', the name without the @Combining@ part, defined by @'\x1e015'@ (&#x2022;&#x1e015;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterTvrido', the name without the @Combining@ part, defined by @'\\x1e015'@ (&#x2022;&#x1e015;).
 pattern GlagoliticLetterTvrido :: CombiningCharacter
 pattern GlagoliticLetterTvrido = CombiningGlagoliticLetterTvrido
 
--- | A pattern synonym for 'CombiningGlagoliticLetterUku', the name without the @Combining@ part, defined by @'\x1e016'@ (&#x2022;&#x1e016;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterUku', the name without the @Combining@ part, defined by @'\\x1e016'@ (&#x2022;&#x1e016;).
 pattern GlagoliticLetterUku :: CombiningCharacter
 pattern GlagoliticLetterUku = CombiningGlagoliticLetterUku
 
--- | A pattern synonym for 'CombiningGlagoliticLetterFritu', the name without the @Combining@ part, defined by @'\x1e017'@ (&#x2022;&#x1e017;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterFritu', the name without the @Combining@ part, defined by @'\\x1e017'@ (&#x2022;&#x1e017;).
 pattern GlagoliticLetterFritu :: CombiningCharacter
 pattern GlagoliticLetterFritu = CombiningGlagoliticLetterFritu
 
--- | A pattern synonym for 'CombiningGlagoliticLetterHeru', the name without the @Combining@ part, defined by @'\x1e018'@ (&#x2022;&#x1e018;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterHeru', the name without the @Combining@ part, defined by @'\\x1e018'@ (&#x2022;&#x1e018;).
 pattern GlagoliticLetterHeru :: CombiningCharacter
 pattern GlagoliticLetterHeru = CombiningGlagoliticLetterHeru
 
--- | A pattern synonym for 'CombiningGlagoliticLetterShta', the name without the @Combining@ part, defined by @'\x1e01b'@ (&#x2022;&#x1e01b;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterShta', the name without the @Combining@ part, defined by @'\\x1e01b'@ (&#x2022;&#x1e01b;).
 pattern GlagoliticLetterShta :: CombiningCharacter
 pattern GlagoliticLetterShta = CombiningGlagoliticLetterShta
 
--- | A pattern synonym for 'CombiningGlagoliticLetterTsi', the name without the @Combining@ part, defined by @'\x1e01c'@ (&#x2022;&#x1e01c;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterTsi', the name without the @Combining@ part, defined by @'\\x1e01c'@ (&#x2022;&#x1e01c;).
 pattern GlagoliticLetterTsi :: CombiningCharacter
 pattern GlagoliticLetterTsi = CombiningGlagoliticLetterTsi
 
--- | A pattern synonym for 'CombiningGlagoliticLetterChrivi', the name without the @Combining@ part, defined by @'\x1e01d'@ (&#x2022;&#x1e01d;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterChrivi', the name without the @Combining@ part, defined by @'\\x1e01d'@ (&#x2022;&#x1e01d;).
 pattern GlagoliticLetterChrivi :: CombiningCharacter
 pattern GlagoliticLetterChrivi = CombiningGlagoliticLetterChrivi
 
--- | A pattern synonym for 'CombiningGlagoliticLetterSha', the name without the @Combining@ part, defined by @'\x1e01e'@ (&#x2022;&#x1e01e;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterSha', the name without the @Combining@ part, defined by @'\\x1e01e'@ (&#x2022;&#x1e01e;).
 pattern GlagoliticLetterSha :: CombiningCharacter
 pattern GlagoliticLetterSha = CombiningGlagoliticLetterSha
 
--- | A pattern synonym for 'CombiningGlagoliticLetterYeru', the name without the @Combining@ part, defined by @'\x1e01f'@ (&#x2022;&#x1e01f;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterYeru', the name without the @Combining@ part, defined by @'\\x1e01f'@ (&#x2022;&#x1e01f;).
 pattern GlagoliticLetterYeru :: CombiningCharacter
 pattern GlagoliticLetterYeru = CombiningGlagoliticLetterYeru
 
--- | A pattern synonym for 'CombiningGlagoliticLetterYeri', the name without the @Combining@ part, defined by @'\x1e020'@ (&#x2022;&#x1e020;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterYeri', the name without the @Combining@ part, defined by @'\\x1e020'@ (&#x2022;&#x1e020;).
 pattern GlagoliticLetterYeri :: CombiningCharacter
 pattern GlagoliticLetterYeri = CombiningGlagoliticLetterYeri
 
--- | A pattern synonym for 'CombiningGlagoliticLetterYati', the name without the @Combining@ part, defined by @'\x1e021'@ (&#x2022;&#x1e021;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterYati', the name without the @Combining@ part, defined by @'\\x1e021'@ (&#x2022;&#x1e021;).
 pattern GlagoliticLetterYati :: CombiningCharacter
 pattern GlagoliticLetterYati = CombiningGlagoliticLetterYati
 
--- | A pattern synonym for 'CombiningGlagoliticLetterYu', the name without the @Combining@ part, defined by @'\x1e023'@ (&#x2022;&#x1e023;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterYu', the name without the @Combining@ part, defined by @'\\x1e023'@ (&#x2022;&#x1e023;).
 pattern GlagoliticLetterYu :: CombiningCharacter
 pattern GlagoliticLetterYu = CombiningGlagoliticLetterYu
 
--- | A pattern synonym for 'CombiningGlagoliticLetterSmallYus', the name without the @Combining@ part, defined by @'\x1e024'@ (&#x2022;&#x1e024;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterSmallYus', the name without the @Combining@ part, defined by @'\\x1e024'@ (&#x2022;&#x1e024;).
 pattern GlagoliticLetterSmallYus :: CombiningCharacter
 pattern GlagoliticLetterSmallYus = CombiningGlagoliticLetterSmallYus
 
--- | A pattern synonym for 'CombiningGlagoliticLetterYo', the name without the @Combining@ part, defined by @'\x1e026'@ (&#x2022;&#x1e026;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterYo', the name without the @Combining@ part, defined by @'\\x1e026'@ (&#x2022;&#x1e026;).
 pattern GlagoliticLetterYo :: CombiningCharacter
 pattern GlagoliticLetterYo = CombiningGlagoliticLetterYo
 
--- | A pattern synonym for 'CombiningGlagoliticLetterIotatedSmallYus', the name without the @Combining@ part, defined by @'\x1e027'@ (&#x2022;&#x1e027;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterIotatedSmallYus', the name without the @Combining@ part, defined by @'\\x1e027'@ (&#x2022;&#x1e027;).
 pattern GlagoliticLetterIotatedSmallYus :: CombiningCharacter
 pattern GlagoliticLetterIotatedSmallYus = CombiningGlagoliticLetterIotatedSmallYus
 
--- | A pattern synonym for 'CombiningGlagoliticLetterBigYus', the name without the @Combining@ part, defined by @'\x1e028'@ (&#x2022;&#x1e028;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterBigYus', the name without the @Combining@ part, defined by @'\\x1e028'@ (&#x2022;&#x1e028;).
 pattern GlagoliticLetterBigYus :: CombiningCharacter
 pattern GlagoliticLetterBigYus = CombiningGlagoliticLetterBigYus
 
--- | A pattern synonym for 'CombiningGlagoliticLetterIotatedBigYus', the name without the @Combining@ part, defined by @'\x1e029'@ (&#x2022;&#x1e029;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterIotatedBigYus', the name without the @Combining@ part, defined by @'\\x1e029'@ (&#x2022;&#x1e029;).
 pattern GlagoliticLetterIotatedBigYus :: CombiningCharacter
 pattern GlagoliticLetterIotatedBigYus = CombiningGlagoliticLetterIotatedBigYus
 
--- | A pattern synonym for 'CombiningGlagoliticLetterFita', the name without the @Combining@ part, defined by @'\x1e02a'@ (&#x2022;&#x1e02a;).
+-- | A pattern synonym for 'CombiningGlagoliticLetterFita', the name without the @Combining@ part, defined by @'\\x1e02a'@ (&#x2022;&#x1e02a;).
 pattern GlagoliticLetterFita :: CombiningCharacter
 pattern GlagoliticLetterFita = CombiningGlagoliticLetterFita
 
--- | A pattern synonym for 'MendeKikakuiCombiningNumberTeens', the name without the @Combining@ part, defined by @'\x1e8d0'@ (&#x2022;&#x1e8d0;).
+-- | A pattern synonym for 'MendeKikakuiCombiningNumberTeens', the name without the @Combining@ part, defined by @'\\x1e8d0'@ (&#x2022;&#x1e8d0;).
 pattern MendeKikakuiNumberTeens :: CombiningCharacter
 pattern MendeKikakuiNumberTeens = MendeKikakuiCombiningNumberTeens
 
--- | A pattern synonym for 'MendeKikakuiCombiningNumberTens', the name without the @Combining@ part, defined by @'\x1e8d1'@ (&#x2022;&#x1e8d1;).
+-- | A pattern synonym for 'MendeKikakuiCombiningNumberTens', the name without the @Combining@ part, defined by @'\\x1e8d1'@ (&#x2022;&#x1e8d1;).
 pattern MendeKikakuiNumberTens :: CombiningCharacter
 pattern MendeKikakuiNumberTens = MendeKikakuiCombiningNumberTens
 
--- | A pattern synonym for 'MendeKikakuiCombiningNumberHundreds', the name without the @Combining@ part, defined by @'\x1e8d2'@ (&#x2022;&#x1e8d2;).
+-- | A pattern synonym for 'MendeKikakuiCombiningNumberHundreds', the name without the @Combining@ part, defined by @'\\x1e8d2'@ (&#x2022;&#x1e8d2;).
 pattern MendeKikakuiNumberHundreds :: CombiningCharacter
 pattern MendeKikakuiNumberHundreds = MendeKikakuiCombiningNumberHundreds
 
--- | A pattern synonym for 'MendeKikakuiCombiningNumberThousands', the name without the @Combining@ part, defined by @'\x1e8d3'@ (&#x2022;&#x1e8d3;).
+-- | A pattern synonym for 'MendeKikakuiCombiningNumberThousands', the name without the @Combining@ part, defined by @'\\x1e8d3'@ (&#x2022;&#x1e8d3;).
 pattern MendeKikakuiNumberThousands :: CombiningCharacter
 pattern MendeKikakuiNumberThousands = MendeKikakuiCombiningNumberThousands
 
--- | A pattern synonym for 'MendeKikakuiCombiningNumberTenThousands', the name without the @Combining@ part, defined by @'\x1e8d4'@ (&#x2022;&#x1e8d4;).
+-- | A pattern synonym for 'MendeKikakuiCombiningNumberTenThousands', the name without the @Combining@ part, defined by @'\\x1e8d4'@ (&#x2022;&#x1e8d4;).
 pattern MendeKikakuiNumberTenThousands :: CombiningCharacter
 pattern MendeKikakuiNumberTenThousands = MendeKikakuiCombiningNumberTenThousands
 
--- | A pattern synonym for 'MendeKikakuiCombiningNumberHundredThousands', the name without the @Combining@ part, defined by @'\x1e8d5'@ (&#x2022;&#x1e8d5;).
+-- | A pattern synonym for 'MendeKikakuiCombiningNumberHundredThousands', the name without the @Combining@ part, defined by @'\\x1e8d5'@ (&#x2022;&#x1e8d5;).
 pattern MendeKikakuiNumberHundredThousands :: CombiningCharacter
 pattern MendeKikakuiNumberHundredThousands = MendeKikakuiCombiningNumberHundredThousands
 
--- | A pattern synonym for 'MendeKikakuiCombiningNumberMillions', the name without the @Combining@ part, defined by @'\x1e8d6'@ (&#x2022;&#x1e8d6;).
+-- | A pattern synonym for 'MendeKikakuiCombiningNumberMillions', the name without the @Combining@ part, defined by @'\\x1e8d6'@ (&#x2022;&#x1e8d6;).
 pattern MendeKikakuiNumberMillions :: CombiningCharacter
 pattern MendeKikakuiNumberMillions = MendeKikakuiCombiningNumberMillions
+
+instance Arbitrary CombiningCharacter where
+    arbitrary = arbitraryBoundedEnum
+    
+instance Arbitrary CombiningSequence where
+    arbitrary = CombiningSequence <$> ((:|) <$> arbitrary <*> arbitrary)
