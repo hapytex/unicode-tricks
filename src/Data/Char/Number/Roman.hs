@@ -2,7 +2,7 @@
 
 {-|
 Module      : Data.Char.Number.Roman
-Description : A module to print Roman numerals both in uppercase and lowercase.
+Description : A module to print Roman numerals both in upper case and lower case.
 Maintainer  : hapytexeu+gh@gmail.com
 Stability   : experimental
 Portability : POSIX
@@ -10,7 +10,7 @@ Portability : POSIX
 This module aims to convert Roman numerals to a String of unicode characters that
 represent Roman numerals.
 
-One can convert numbers to Roman numerals in uppercase and lowercase, and in 'Additive' and 'Subtractive' style.
+One can convert numbers to Roman numerals in upper case and lower case, and in 'Additive' and 'Subtractive' style.
 -}
 
 module Data.Char.Number.Roman (
@@ -130,14 +130,14 @@ _romanLiteral :: Int -> RomanLiteral -> Char
 _romanLiteral = (chr .) . (. fromEnum) . (.|.)
 
 -- | Convert the given 'RomanLiteral' object to a unicode character in
--- /uppercase/.
+-- /upper case/.
 romanLiteral
   :: RomanLiteral -- ^ The given 'RomanLiteral' to convert.
   -> Char -- ^ A unicode character that represents the given 'RomanLiteral'.
 romanLiteral = _romanLiteral 0x2160
 
 -- | Convert the given 'RomanLiteral' object to a unicode character in
--- /lowercase/.
+-- /lower case/.
 romanLiteral'
   :: RomanLiteral -- ^ The given 'RomanLiteral' to convert.
   -> Char -- ^ A unicode character that represents the given 'RomanLiteral'.
