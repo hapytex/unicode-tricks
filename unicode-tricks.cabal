@@ -44,7 +44,6 @@ library
                      -Wincomplete-record-updates
                      -Wincomplete-uni-patterns
                      -Wredundant-constraints
-                     -XSafe
 
 test-suite             utricks
   type:                exitcode-stdio-1.0
