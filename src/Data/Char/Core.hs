@@ -25,7 +25,7 @@ module Data.Char.Core (
   , ItalicType(NoItalic, Italic), splitItalicType
   , FontStyle(SansSerif, Serif), splitFontStyle
     -- * Character range checks
-  , isAsciiAlphaNum, isAsciiAlpha
+  , isAsciiAlphaNum, isAsciiAlpha, isACharacter, isNotACharacter, isReserved
     -- * Ways to display numbers
   , PlusStyle(WithoutPlus, WithPlus), splitPlusStyle
     -- * Functions to implement a number system
@@ -34,6 +34,7 @@ module Data.Char.Core (
   , chr, isAlpha, isAlphaNum, isAscii, ord
   ) where
 
+import Data.Bits((.&.))
 import Data.Char(chr, isAlpha, isAlphaNum, isAscii, ord)
 import Data.Default(Default(def))
 import Data.Text(Text, cons, singleton, snoc)
@@ -254,6 +255,67 @@ positionalNumberSystem10 :: Integral i
   -> i -- ^ The given number to convert.
   -> Text -- ^ A 'Text' object that denotes the given number with the given /positional number system/.
 positionalNumberSystem10 = positionalNumberSystem 10
+
+-- | Check if the given character is a /reserved character/. This is denoted in
+-- the Unicode documentation with @\<reserved\>@.
+isReserved
+  :: Char  -- ^ The given 'Char'acter to check.
+  -> Bool  -- ^ 'True' if the given 'Char'acter is reserved; 'False' otherwise.
+isReserved '\x9e4' = True
+isReserved '\x9e5' = True
+isReserved '\xa64' = True
+isReserved '\xa65' = True
+isReserved '\xae4' = True
+isReserved '\xae5' = True
+isReserved '\xb64' = True
+isReserved '\xb65' = True
+isReserved '\xbe4' = True
+isReserved '\xbe5' = True
+isReserved '\xc64' = True
+isReserved '\xc65' = True
+isReserved '\xce4' = True
+isReserved '\xce5' = True
+isReserved '\xd64' = True
+isReserved '\xd65' = True
+isReserved '\x2072' = True
+isReserved '\x2073' = True
+isReserved '\x1d4a0' = True
+isReserved '\x1d4a1' = True
+isReserved '\x1d4a3' = True
+isReserved '\x1d4a4' = True
+isReserved '\x1d4a7' = True
+isReserved '\x1d4a8' = True
+isReserved '\x1d50b' = True
+isReserved '\x1d50c' = True
+isReserved '\x1d455' = True
+isReserved '\x1d49d' = True
+isReserved '\x1d4ad' = True
+isReserved '\x1d4ba' = True
+isReserved '\x1d4bc' = True
+isReserved '\x1d4c4' = True
+isReserved '\x1d506' = True
+isReserved '\x1d515' = True
+isReserved '\x1d51d' = True
+isReserved '\x1d53a' = True
+isReserved '\x1d53f' = True
+isReserved '\x1d545' = True
+isReserved '\x1d551' = True
+isReserved c = '\x1d547' <= c && c <= '\x1d549'
+
+-- | Check if the given character is a character according to the Unicode
+-- specifications. Codepoints that are not a character are denoted in the
+-- Unicode documentation with @\<not a character\>@.
+isACharacter
+  :: Char  -- ^ The given 'Char'acter to check.
+  -> Bool  -- ^ 'True' if the given 'Char'acter is a character (according to the Unicode specifications); 'False' otherwise.
+isACharacter c = ord c .&. 0xfffe /= 0xfffe && ('\xfdd0' > c || c > '\xfdef')
+
+-- | Check if the given character is not a character according to the Unicode
+-- specifications. The Unicode documentation denotes these with @\<not a character\>@.
+isNotACharacter
+  :: Char  -- ^ The given 'Char'acter to check.
+  -> Bool  -- ^ 'True' if the given 'Char'acter is not a character (according to the Unicode specifications); 'False' otherwise.
+isNotACharacter c = ord c .&. 0xfffe == 0xfffe || '\xfdd0' <= c && c <= '\xfdef'
 
 instance Arbitrary LetterCase where
     arbitrary = arbitraryBoundedEnum
