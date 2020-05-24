@@ -1,5 +1,5 @@
 name:                unicode-tricks
-version:             0.7.0.0
+version:             0.8.0.0
 synopsis: Functions to work with unicode blocks more convenient.
 description:
   A package that makes rendering of frames, blocks, subscript and superscript
@@ -44,7 +44,6 @@ library
                      -Wincomplete-record-updates
                      -Wincomplete-uni-patterns
                      -Wredundant-constraints
-                     -XSafe
 
 test-suite             utricks
   type:                exitcode-stdio-1.0
