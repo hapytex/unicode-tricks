@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, PatternSynonyms, Safe #-}
+{-# LANGUAGE FlexibleInstances, FunctionalDependencies, PatternSynonyms, Safe #-}
 
 {-|
 Module      : Data.Char.Combining
@@ -21,7 +21,7 @@ The module contains a set of pattern synonyms to make working with the 'Combinin
 
 module Data.Char.Combining (
     -- * Combining characters
-    CombiningCharacter(..)
+    CombiningCharacter(..), CombiningChar
     -- * A set of combining characters
   , CombiningSequence(..)
     -- * Conversions from and to 'CombiningCharacter'
@@ -992,6 +992,9 @@ data CombiningCharacter
   | AdlamNukta  -- ^ The combining character @ADLAM NUKTA@ from the Unicode standard, defined by @'\\x1e94a'@ (&#x2022;&#x1e94a;).
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
+-- | A type synonym to make working with 'CombiningCharacter' more convenient.
+type CombiningChar = CombiningCharacter
+
 instance IsString CombiningCharacter where
     fromString [x] = combiningCharacter' x
     fromString _ = error "The given string should contain exactly one codepoint"
@@ -1006,6 +1009,9 @@ instance IsString CombiningSequence where
     fromString (c:cs)
         | Just y <- traverse combiningCharacter (c :| cs) = CombiningSequence y
     fromString _ = error "The given string should contain at least one character, and all should be combining codepoints."
+
+instance IsString [CombiningCharacter] where
+    fromString = map combiningCharacter'
 
 -- | A typeclass used to apply a 'CombiningCharacter' or a 'CombiningSequence'
 -- to a 'Char', and return a 'Text' object.
@@ -1023,8 +1029,14 @@ instance ApplyCombine CombiningCharacter CombiningCharacter CombiningSequence wh
 instance ApplyCombine CombiningCharacter CombiningSequence CombiningSequence where
     (*^) c (CombiningSequence cs) = CombiningSequence (c <| cs)
 
+instance ApplyCombine CombiningCharacter [CombiningCharacter] [CombiningCharacter] where
+    (*^) = (:)
+
 instance ApplyCombine Char CombiningCharacter Text where
     (*^) c c2 = cons c (singleton (combiningToUnicode c2))
+
+instance ApplyCombine Char [CombiningCharacter] Text where
+    (*^) c = pack . (c:) . map combiningToUnicode
 
 instance ApplyCombine Char CombiningSequence Text where
     (*^) c (CombiningSequence cs) = cons c (pack (map combiningToUnicode (toList cs)))
