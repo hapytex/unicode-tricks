@@ -141,6 +141,8 @@ import Data.List.NonEmpty(NonEmpty((:|)), (<|), toList)
 import Data.String(IsString(fromString))
 import Data.Text(Text, cons, pack, singleton)
 
+import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
+
 infixr 8 *^
 
 -- | The list of possible combining characters. In the documentation of the
@@ -4610,3 +4612,9 @@ pattern MendeKikakuiNumberHundredThousands = MendeKikakuiCombiningNumberHundredT
 -- | A pattern synonym for 'MendeKikakuiCombiningNumberMillions', the name without the @Combining@ part, defined by @'\\x1e8d6'@ (&#x2022;&#x1e8d6;).
 pattern MendeKikakuiNumberMillions :: CombiningCharacter
 pattern MendeKikakuiNumberMillions = MendeKikakuiCombiningNumberMillions
+
+instance Arbitrary CombiningCharacter where
+    arbitrary = arbitraryBoundedEnum
+    
+instance Arbitrary CombiningSequence where
+    arbitrary = CombiningSequence <$> ((:|) <$> arbitrary <*> arbitrary)

@@ -44,16 +44,20 @@ library
                      -Wincomplete-record-updates
                      -Wincomplete-uni-patterns
                      -Wredundant-constraints
+                     -XSafe
 
 test-suite             utricks
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
   hs-source-dirs:      test
-  other-modules:       Data.Char.MathSpec
+  other-modules:
+      Data.Char.CombiningSpec
+    , Data.Char.MathSpec
   build-depends:
       base
     , unicode-tricks
     , hspec ==2.*
+    , QuickCheck >=2.13 && <2.14
   build-tool-depends: hspec-discover:hspec-discover == 2.*
   default-language:    Haskell2010
   default-extensions:  BlockArguments
