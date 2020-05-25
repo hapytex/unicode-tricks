@@ -40,6 +40,8 @@ library
     , QuickCheck >=2.13 && <2.14
     , text >=1.1 && <1.3
   default-language:    Haskell2010
+  default-extensions:
+      Safe
   ghc-options:       -Wall -Wcompat -Wcompat
                      -Wincomplete-record-updates
                      -Wincomplete-uni-patterns
@@ -51,6 +53,7 @@ test-suite             utricks
   hs-source-dirs:      test
   other-modules:
       Data.Char.CombiningSpec
+      Data.Char.CoreSpec
     , Data.Char.MathSpec
   build-depends:
       base
@@ -59,8 +62,9 @@ test-suite             utricks
     , QuickCheck >=2.13 && <2.14
   build-tool-depends: hspec-discover:hspec-discover == 2.*
   default-language:    Haskell2010
-  default-extensions:  BlockArguments
-                       OverloadedStrings
+  default-extensions:
+      BlockArguments
+    , OverloadedStrings
   ghc-options:       -Wall -Wcompat -Wcompat
                      -Wincomplete-record-updates
                      -Wincomplete-uni-patterns
