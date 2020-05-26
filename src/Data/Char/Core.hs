@@ -25,7 +25,7 @@ module Data.Char.Core (
   , ItalicType(NoItalic, Italic), splitItalicType
   , FontStyle(SansSerif, Serif), splitFontStyle
     -- * Character range checks
-  , isAsciiAlphaNum, isAsciiAlpha, isACharacter, isNotACharacter, isReserved
+  , isAsciiAlphaNum, isAsciiAlpha, isACharacter, isNotACharacter, isReserved, isNotReserved
     -- * Ways to display numbers
   , PlusStyle(WithoutPlus, WithPlus), splitPlusStyle
     -- * Functions to implement a number system
@@ -255,6 +255,13 @@ positionalNumberSystem10 :: Integral i
   -> i -- ^ The given number to convert.
   -> Text -- ^ A 'Text' object that denotes the given number with the given /positional number system/.
 positionalNumberSystem10 = positionalNumberSystem 10
+
+-- | Check if the given character is not a /reserved character/. This is denoted in
+-- the Unicode documentation with @\<reserved\>@.
+isNotReserved
+  :: Char  -- ^ The given 'Char'acter to check.
+  -> Bool  -- ^ 'True' if the given 'Char'acter is not reserved; 'False' otherwise.
+isNotReserved = not . isReserved
 
 -- | Check if the given character is a /reserved character/. This is denoted in
 -- the Unicode documentation with @\<reserved\>@.
