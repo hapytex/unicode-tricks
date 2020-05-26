@@ -1018,7 +1018,7 @@ instance IsString [CombiningCharacter] where
 
 -- | A typeclass used to apply a 'CombiningCharacter' or a 'CombiningSequence'
 -- to a 'Char', and return a 'Text' object.
-class ApplyCombine a b c | a b -> c where
+class ApplyCombine a b c | a b -> c, b c -> a where
     -- | Applies the given 'CombiningCharacter' or 'CombiningSequence' to the
     -- given character. The operator is right-to-left, to allow "stacking" of
     -- 'CombiningCharacter's for example:
