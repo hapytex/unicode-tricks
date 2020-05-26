@@ -25,13 +25,13 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary)
 data Row a = Row { 
     left :: a -- ^ The left part of a row of the block.
   , right :: a -- ^ The right part of the row of the block.
-  } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | A data type that determines the state of the four subparts of the block.
 data Block a = Block {
     upper :: Row a -- ^ The upper part of the block.
   , lower :: Row a -- ^ The lower part of the block.
-  } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 instance Applicative Row where
     pure x = Row x x

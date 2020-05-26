@@ -93,7 +93,7 @@ data Oriented a
   = Oriented {
     oobject :: a -- ^ The object that is oriented.
   , orientation :: Orientation -- ^ The oriented of the oriented object.
-  } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | Possible rotations of a unicode character if that character can be rotated
 -- over 0, 90, 180, and 270 degrees.

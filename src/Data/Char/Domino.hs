@@ -69,6 +69,10 @@ instance Arbitrary a => Arbitrary (Domino a) where
 instance Arbitrary1 Domino where
     liftArbitrary arb = frequency [(1, pure Back), (3, Domino <$> arb <*> arb)]
 
+instance Bounded a => Bounded (Domino a) where
+    minBound = Domino minBound minBound
+    maxBound = Back
+
 _domino :: Int -> ComplexDomino -> Char
 _domino n = go
     where go Back = chr n

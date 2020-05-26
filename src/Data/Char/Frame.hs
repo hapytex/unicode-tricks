@@ -35,18 +35,18 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary)
 data Horizontal a = Horizontal { 
     left :: a -- ^ The state of the left line of the frame.
   , right :: a -- ^ The state of the right line of the frame.
-  } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | A data type that determines the state of the /vertical/ lines of the frame
 -- ('up' and 'down').
 data Vertical a = Vertical {
     up :: a  -- ^ The state of the line in the up direction of the frame.
   , down :: a -- ^ The state of the line in the down direction of the frame.
-  } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | A data type that specifies the four lines that should (not) be drawn for
 -- the frame.
-data Parts a = Parts (Vertical a) (Horizontal a) deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+data Parts a = Parts (Vertical a) (Horizontal a) deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | The weights of the frame lines, these can be 'Empty', 'Light' or 'Heavy'.
 data Weight

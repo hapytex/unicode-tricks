@@ -32,7 +32,7 @@ data Braille6 a = Braille6 {
     top :: Row a -- ^ The state of the top row of the Braille character.
   , middle :: Row a -- ^ The state of the middle row of the Braille character.
   , bottom :: Row a -- ^ The state of the bottom row of the Braille character.
-  } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | A datastructure to render Braille patterns with eight dots cells.
 data Braille a = Braille {
@@ -40,7 +40,7 @@ data Braille a = Braille {
   , row2 :: Row a -- ^ The state of the second row of the Braille character.
   , row3 :: Row a -- ^ The state of the third row of the Braille character.
   , row4 :: Row a -- ^ The state of the bottom row of the Braille character.
-  } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | Convert a 'Braille6' value to a 'Braille' character, by putting in a given
 -- value at the two values at the bottom row.
