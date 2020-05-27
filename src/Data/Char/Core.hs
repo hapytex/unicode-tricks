@@ -27,7 +27,7 @@ module Data.Char.Core (
     -- * Character range checks
   , isAsciiAlphaNum, isAsciiAlpha, isACharacter, isNotACharacter, isReserved, isNotReserved
     -- * Map characters from and to 'Enum's
-  , mapFromEnum, mapToEnum, mapToEnumSafe, mapEnumTriple
+  , mapFromEnum, mapToEnum, mapToEnumSafe
     -- * Convert objects from and to Unicode 'Char'acters
   , UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeChar
     -- * Ways to display numbers
@@ -328,13 +328,6 @@ isNotACharacter
   :: Char  -- ^ The given 'Char'acter to check.
   -> Bool  -- ^ 'True' if the given 'Char'acter is not a character (according to the Unicode specifications); 'False' otherwise.
 isNotACharacter c = ord c .&. 0xfffe == 0xfffe || '\xfdd0' <= c && c <= '\xfdef'
-
--- | Generate a triple of functions for mapping functions that can be used in a
--- 'UnicodeCharacter' instance for a given /offset/ value.
-mapEnumTriple :: (Bounded a, Enum a)
-  => Int  -- ^ The given /offset/ value.
-  -> (a -> Char, Char -> Maybe a, Char -> a)  -- ^ A triple that contains the 'mapFromEnum', 'mapToEnumSafe' and 'mapToEnum' with the given offset value.
-mapEnumTriple o = (mapFromEnum o, mapToEnumSafe o, mapToEnum o)
 
 -- | Map the given 'Char' object to an object with a type that is an instance of
 -- 'Enum' with a given offset for the 'Char'acter range.
