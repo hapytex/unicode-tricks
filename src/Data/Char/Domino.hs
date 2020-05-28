@@ -105,8 +105,8 @@ fromDomino'
   :: Char  -- ^ The given 'Char'acter to convert to an 'Oriented' 'ComplexDomino' object.
   -> Oriented ComplexDomino  -- ^ The equivalent 'Oriented' 'ComplexDomino' object for the given 'Char'acter.
 fromDomino' = go . ord
-    where go n | n >= _offsetDominoVertical = go' _offsetDominoVertical n Horizontal
-               | otherwise = go' _offsetDominoHorizontal n Vertical
+    where go n | n >= _offsetDominoVertical = go' _offsetDominoVertical n Vertical
+               | otherwise = go' _offsetDominoHorizontal n Horizontal
           go' k = Oriented . _fromDomino . pred . subtract k
 
 -- | Convert the given 'Char'acter to an 'Oriented' 'ComplexDomino' object. If
