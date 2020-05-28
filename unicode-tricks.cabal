@@ -53,7 +53,8 @@ test-suite             utricks
   main-is:             Main.hs
   hs-source-dirs:      test
   other-modules:
-      Data.Char.CardSpec
+      Data.Char.BrailleSpec
+    , Data.Char.CardSpec
     , Data.Char.CombiningSpec
     , Data.Char.CoreTest
     , Data.Char.CoreSpec
