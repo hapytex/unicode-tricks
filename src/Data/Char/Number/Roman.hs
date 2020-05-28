@@ -27,23 +27,32 @@ module Data.Char.Number.Roman (
 
 import Data.Bits((.|.))
 import Data.Char(chr)
-import Data.Char.Core(LetterCase, Ligate, ligateF, splitLetterCase)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), LetterCase, Ligate, ligateF, mapFromEnum, mapToEnum, mapToEnumSafe, splitLetterCase)
 import Data.Default(Default(def))
 import Data.Text(Text, cons, empty)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
--- | The style to convert a number to a Roman numeral.
+-- | The style to convert a number to a Roman numeral. The 'UnicodeCharacter'
+-- instance maps on the uppercase Roman literals.
 data RomanStyle
   = Additive -- ^ The additive style converts four to ⅠⅠⅠⅠ.
   | Subtractive -- ^ The subtractive style converts four to ⅠⅤ.
   deriving (Bounded, Enum, Eq, Show, Read)
 
+instance Arbitrary RomanStyle where
+    arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary RomanLiteral where
+    arbitrary = arbitraryBoundedEnum
+
 instance Default RomanStyle where
     def = Subtractive
 
-instance Arbitrary RomanStyle where
-    arbitrary = arbitraryBoundedEnum
+instance UnicodeCharacter RomanLiteral where
+    toUnicodeChar = mapFromEnum _romanUppercaseOffset
+    fromUnicodeChar = mapToEnumSafe _romanUppercaseOffset
+    fromUnicodeChar' = mapToEnum _romanUppercaseOffset
 
 -- | Roman numerals for which a unicode character exists.
 data RomanLiteral
@@ -126,6 +135,12 @@ toLiterals s c k
               | n >= m = l <$> go (n-m) va
               | otherwise = go n vs
 
+_romanUppercaseOffset :: Int
+_romanUppercaseOffset = 0x2160
+
+_romanLowercaseOffset :: Int
+_romanLowercaseOffset = 0x2170
+
 _romanLiteral :: Int -> RomanLiteral -> Char
 _romanLiteral = (chr .) . (. fromEnum) . (.|.)
 
@@ -134,14 +149,14 @@ _romanLiteral = (chr .) . (. fromEnum) . (.|.)
 romanLiteral
   :: RomanLiteral -- ^ The given 'RomanLiteral' to convert.
   -> Char -- ^ A unicode character that represents the given 'RomanLiteral'.
-romanLiteral = _romanLiteral 0x2160
+romanLiteral = _romanLiteral _romanUppercaseOffset
 
 -- | Convert the given 'RomanLiteral' object to a unicode character in
 -- /lower case/.
 romanLiteral'
   :: RomanLiteral -- ^ The given 'RomanLiteral' to convert.
   -> Char -- ^ A unicode character that represents the given 'RomanLiteral'.
-romanLiteral' = _romanLiteral 0x2170
+romanLiteral' = _romanLiteral _romanLowercaseOffset
 
 _romanNumeral :: (RomanLiteral -> Char) -> [RomanLiteral] -> Text
 _romanNumeral = (`foldr` empty) . (cons .)

@@ -64,6 +64,7 @@ test-suite             utricks
     , Data.Char.EmojiSpec
     , Data.Char.FrameSpec
     , Data.Char.MathSpec
+    , Data.Char.Number.RomanSpec
   build-depends:
       base
     , unicode-tricks
