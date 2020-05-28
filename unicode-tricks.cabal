@@ -62,6 +62,7 @@ test-suite             utricks
     , Data.Char.DiceSpec
     , Data.Char.DominoSpec
     , Data.Char.EmojiSpec
+    , Data.Char.FrameSpec
     , Data.Char.MathSpec
   build-depends:
       base
