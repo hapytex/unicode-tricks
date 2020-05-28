@@ -369,13 +369,19 @@ class UnicodeCharacter a where
     toUnicodeChar
       :: a  -- ^ The given object to convert to a 'Char'acter.
       -> Char  -- ^ The equivalent Unicode 'Char'acter.
+
     -- | Convert the given 'Char'acter to an object wrapped in a 'Just' data
     -- constructor if that exists; 'Nothing' otherwise.
-    fromUnicodeChar :: Char -> Maybe a
+    fromUnicodeChar
+      :: Char  -- ^ The given 'Char'acter to convert to an element.
+      -> Maybe a -- ^ An element if the given 'Char'acter maps to an element wrapped in a 'Just'; 'Nothing' otherwise.
+
     -- | Convert the given 'Char'acter to an object. If the 'Char'acter does not
     -- map on an element, the behavior is /unspecified/, it can for example
     -- result in an error.
-    fromUnicodeChar' :: Char -> a
+    fromUnicodeChar'
+      :: Char  -- ^ The given 'Char'acter to convert to an element.
+      -> a  -- ^ The given element that is equivalent to the given 'Char'acter.
     fromUnicodeChar' = fromJust . fromUnicodeChar
     {-# MINIMAL toUnicodeChar, fromUnicodeChar #-}
 

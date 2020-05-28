@@ -141,6 +141,7 @@ module Data.Char.Combining (
   ,  pattern MendeKikakuiNumberThousands                   , pattern MendeKikakuiNumberTenThousands                , pattern MendeKikakuiNumberHundredThousands            , pattern MendeKikakuiNumberMillions
   ) where
 
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'))
 import Data.List.NonEmpty(NonEmpty((:|)), (<|), toList)
 import Data.String(IsString(fromString))
 import Data.Text(Text, cons, pack, singleton)
@@ -1025,6 +1026,7 @@ class ApplyCombine a b c | a b -> c, b c -> a where
     --
     --  > 'a' *^ CombiningGraveAccent *^ CombiningPlusSignBelow
     (*^) :: a -> b -> c
+
     -- | Applies the given 'CombiningCharacter' or 'CombiningSequence' to the
     -- given character, and use composition characters in case that is possible.
     -- The operator is right-to-left, to allow "stacking" of
@@ -6784,3 +6786,8 @@ instance Arbitrary CombiningCharacter where
     
 instance Arbitrary CombiningSequence where
     arbitrary = CombiningSequence <$> ((:|) <$> arbitrary <*> arbitrary)
+
+instance UnicodeCharacter CombiningCharacter where
+    toUnicodeChar = combiningToUnicode
+    fromUnicodeChar = combiningCharacter
+    fromUnicodeChar' = combiningCharacter'
