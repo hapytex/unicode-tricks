@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DeriveTraversable, FlexibleContexts, FlexibleInstances, Safe, ScopedTypeVariables #-}
+{-# LANGUAGE ConstraintKinds, DeriveTraversable, Safe, ScopedTypeVariables #-}
 
 {-|
 Module      : Data.Char.Core
@@ -437,10 +437,3 @@ instance UnicodeCharacter Char where
     toUnicodeChar = id
     fromUnicodeChar = Just
     fromUnicodeChar' = id
-
-instance UnicodeCharacter (Oriented a) => UnicodeCharacter a where
-    toUnicodeChar = toUnicodeChar . (`Oriented` Horizontal)
-    fromUnicodeChar = fromUnicodeChar >>= go
-        where go (Oriented x Horizontal) = Just x
-              go (Oriented _ Vertical) = Nothing
-    fromUnicodeChar' = oobject . fromUnicodeChar'
