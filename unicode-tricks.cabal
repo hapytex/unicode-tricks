@@ -54,6 +54,7 @@ test-suite             utricks
   hs-source-dirs:      test
   other-modules:
       Data.Char.BrailleSpec
+    , Data.Char.BlockSpec
     , Data.Char.CardSpec
     , Data.Char.CombiningSpec
     , Data.Char.CoreTest
