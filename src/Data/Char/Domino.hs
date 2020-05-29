@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, PatternSynonyms, Safe #-}
+{-# LANGUAGE DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe #-}
 
 {-|
 Module      : Data.Char.Domino
@@ -18,11 +18,16 @@ module Data.Char.Domino (
   , dominoH, dominoH'
   , dominoV, dominoV'
   , domino , domino'
+    -- * Convert from 'Char'acters
+  , fromDomino, fromDomino'
   ) where
 
-import Data.Char(chr)
-import Data.Char.Core(Orientation(Horizontal, Vertical), Oriented(Oriented))
+import Control.Monad((>=>))
+
+import Data.Char(chr, ord)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, Orientation(Horizontal, Vertical), Oriented(Oriented))
 import Data.Char.Dice(DieValue)
+import Data.Function(on)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1)
 import Test.QuickCheck.Gen(frequency)
@@ -69,6 +74,16 @@ instance Arbitrary a => Arbitrary (Domino a) where
 instance Arbitrary1 Domino where
     liftArbitrary arb = frequency [(1, pure Back), (3, Domino <$> arb <*> arb)]
 
+instance Bounded a => Bounded (Domino a) where
+    minBound = Domino minBound minBound
+    maxBound = Back
+
+_offsetDominoHorizontal :: Int
+_offsetDominoHorizontal = 0x1f030
+
+_offsetDominoVertical :: Int
+_offsetDominoVertical = 0x1f062
+
 _domino :: Int -> ComplexDomino -> Char
 _domino n = go
     where go Back = chr n
@@ -76,12 +91,45 @@ _domino n = go
           _val Nothing = 0
           _val (Just x) = 1 + fromEnum x
 
+_fromDomino :: Int -> ComplexDomino
+_fromDomino (-1) = Back
+_fromDomino n = on Domino go a b
+    where (a, b) = quotRem n 7
+          go 0 = Nothing
+          go k = Just (toEnum (k-1))
+
+-- | Convert the given 'Char'acter to an 'Oriented' 'ComplexDomino' object. If
+-- the given 'Char'acter is not a valid domino character, the result is
+-- unspecified.
+fromDomino'
+  :: Char  -- ^ The given 'Char'acter to convert to an 'Oriented' 'ComplexDomino' object.
+  -> Oriented ComplexDomino  -- ^ The equivalent 'Oriented' 'ComplexDomino' object for the given 'Char'acter.
+fromDomino' = go . ord
+    where go n | n >= _offsetDominoVertical = go' _offsetDominoVertical n Vertical
+               | otherwise = go' _offsetDominoHorizontal n Horizontal
+          go' k = Oriented . _fromDomino . pred . subtract k
+
+-- | Convert the given 'Char'acter to an 'Oriented' 'ComplexDomino' object. If
+-- the given 'Char'acter wrapped in a 'Just' data constructor if the 'Char'acter
+-- is a valid domino character; otherwise 'Nothing'.
+fromDomino
+  :: Char  -- ^ The given 'Char'acter to convert to an 'Oriented' 'ComplexDomino' object.
+  -> Maybe (Oriented ComplexDomino)  -- ^ The equivalent 'Oriented' 'ComplexDomino' object for the given 'Char'acter wrapped in a 'Just'; 'Nothing' if the character is not a domino character.
+fromDomino c
+    | c < '\x1f030' || c > '\x1f093' = Nothing
+    | otherwise = Just (fromDomino' c)
+
+toSimple :: Domino (Maybe a) -> Maybe (Domino a)
+toSimple Back = Just Back
+toSimple (Domino (Just a) (Just b)) = Just (Domino a b)
+toSimple _ = Nothing
+
 -- | Convert a 'ComplexDomino' value to a unicode character rendering the domino
 -- value /horizontally/.
 dominoH
   :: ComplexDomino -- ^ The 'ComplexDomino' object to render horizontally.
   -> Char -- ^ The unicode character that represents the given 'ComplexDomino' value in a horizontal manner.
-dominoH = _domino 0x1f030
+dominoH = _domino _offsetDominoHorizontal
 
 -- | Convert a 'SimpleDomino' value to a unicode character rendering the domino
 -- value /horizontally/.
@@ -95,7 +143,7 @@ dominoH' = dominoH . fmap Just
 dominoV
   :: ComplexDomino -- ^ The 'ComplexDomino' object to render vertically.
   -> Char -- ^ The unicode character that represents the given 'ComplexDomino' value in a vertical manner.
-dominoV = _domino 0x1f062
+dominoV = _domino _offsetDominoVertical
 
 -- | Convert a 'SimpleDomino' value to a unicode character rendering the domino
 -- value /vertically/.
@@ -118,3 +166,15 @@ domino'
   :: OrientedDomino DieValue -- ^ The 'OrientedDomino' to render.
   -> Char -- ^ The unicode characters that represents the 'OrientedDomino' value.
 domino' = domino . fmap (fmap Just)
+
+instance UnicodeCharacter (Oriented (Domino (Maybe DieValue))) where
+    toUnicodeChar = domino
+    fromUnicodeChar = fromDomino
+    fromUnicodeChar' = fromDomino'
+
+instance UnicodeCharacter (Oriented (Domino DieValue)) where
+    toUnicodeChar = domino'
+    fromUnicodeChar = fromDomino >=> traverse toSimple
+
+instance UnicodeText (Oriented (Domino (Maybe DieValue)))
+instance UnicodeText (Oriented (Domino DieValue))

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, Safe #-}
+{-# LANGUAGE DeriveTraversable, FlexibleInstances, Safe #-}
 
 {-|
 Module      : Data.Char.Block
@@ -16,7 +16,12 @@ module Data.Char.Block(
   , Block(Block, upper, lower)
     -- * A unicode character that is (partially) filled block.
   , filled
+    -- * Convert a 'Char'acter to a (partially) filled block.
+  , fromBlock, fromBlock'
   ) where
+
+import Data.Maybe(fromJust)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1)
 
@@ -25,13 +30,13 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary)
 data Row a = Row { 
     left :: a -- ^ The left part of a row of the block.
   , right :: a -- ^ The right part of the row of the block.
-  } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | A data type that determines the state of the four subparts of the block.
 data Block a = Block {
     upper :: Row a -- ^ The upper part of the block.
   , lower :: Row a -- ^ The lower part of the block.
-  } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 instance Applicative Row where
     pure x = Row x x
@@ -54,11 +59,40 @@ instance Arbitrary1 Block where
     liftArbitrary arb = Block <$> arb' <*> arb'
         where arb' = liftArbitrary arb
 
+-- | Convert the given 'Char'acter to a 'Block' of 'Bool's wrapped in a 'Just'
+-- if it exists; 'Nothing' otherwise.
+fromBlock
+  :: Char  -- ^ The given 'Char'acter to convert to a 'Block' of 'Bool's.
+  -> Maybe (Block Bool)  -- The equivalent 'Block' of 'Bool's wrapped in a 'Just' if such block exists; 'Nothing' otherwise.
+fromBlock ' ' = Just (Block (Row False False) (Row False False))
+fromBlock '\x2580' = Just (Block (Row True  True ) (Row False False))
+fromBlock '\x2584' = Just (Block (Row False False) (Row True  True ))
+fromBlock '\x2588' = Just (Block (Row True  True ) (Row True  True ))
+fromBlock '\x258c' = Just (Block (Row True  False) (Row True  False))
+fromBlock '\x2590' = Just (Block (Row False True ) (Row False True ))
+fromBlock '\x2596' = Just (Block (Row False False) (Row True  False))
+fromBlock '\x2597' = Just (Block (Row False False) (Row False True ))
+fromBlock '\x2598' = Just (Block (Row True  False) (Row False False))
+fromBlock '\x2599' = Just (Block (Row True  False) (Row True  True ))
+fromBlock '\x259a' = Just (Block (Row True  False) (Row False True ))
+fromBlock '\x259b' = Just (Block (Row True  True ) (Row True  False))
+fromBlock '\x259c' = Just (Block (Row True  True ) (Row False True ))
+fromBlock '\x259d' = Just (Block (Row False True ) (Row False False))
+fromBlock '\x259e' = Just (Block (Row False True ) (Row True  False))
+fromBlock '\x259f' = Just (Block (Row False True ) (Row True  True ))
+fromBlock _ = Nothing
+
+-- | Convert the given 'Char'acter to a 'Block' of 'Bool's if it exists; unspecified result otherwise.
+fromBlock'
+  :: Char  -- ^ The given 'Char'acter to convert to a 'Block' of 'Bool's.
+  -> Block Bool  -- ^ The equivalent 'Block' of 'Bool's.
+fromBlock' = fromJust . fromBlock
+
 -- | Convert the given 'Block' value to a block character in unicode.
 -- 'True' means that part is filled, and 'False' means the part is not filled.
 filled
-    :: Block Bool
-    -> Char
+    :: Block Bool  -- ^ The given 'Block' of 'Bool's to convert to a 'Char'acter.
+    -> Char  -- ^ The equivalent Unicode 'Char'acter for the given 'Block' of 'Bool's.
 filled (Block (Row False False) (Row False False)) = ' '
 filled (Block (Row True  True ) (Row False False)) = '\x2580'
 filled (Block (Row False False) (Row True  True )) = '\x2584'
@@ -75,3 +109,9 @@ filled (Block (Row True  True ) (Row False True )) = '\x259c'
 filled (Block (Row False True ) (Row False False)) = '\x259d'
 filled (Block (Row False True ) (Row True  False)) = '\x259e'
 filled (Block (Row False True ) (Row True  True )) = '\x259f'
+
+instance UnicodeCharacter (Block Bool) where
+    toUnicodeChar = filled
+    fromUnicodeChar = fromBlock
+
+instance UnicodeText (Block Bool)

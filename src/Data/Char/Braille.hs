@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, Safe #-}
+{-# LANGUAGE DeriveTraversable, FlexibleInstances, Safe #-}
 
 {-|
 Module      : Data.Char.Braille
@@ -15,15 +15,18 @@ module Data.Char.Braille(
     Braille6(Braille6, top, middle, bottom)
   , Braille(Braille, row1, row2, row3, row4)
     -- * Converting 'Braille6' to 'Braille'
-  , toBraille', toBraille
+  , toBraille, toBraille'
     -- * Rendering Braille characters.
   , braille6, braille
+    -- * Converting a character to 'Braille'
+  , fromBraille6, fromBraille6', fromBraille, fromBraille'
   ) where
 
-import Data.Bits((.|.), shiftL)
+import Data.Bits((.&.), (.|.), shiftL, shiftR, testBit)
 import Data.Bool(bool)
-import Data.Char(chr)
+import Data.Char(chr, ord)
 import Data.Char.Block(Row(Row))
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1)
 
@@ -32,7 +35,7 @@ data Braille6 a = Braille6 {
     top :: Row a -- ^ The state of the top row of the Braille character.
   , middle :: Row a -- ^ The state of the middle row of the Braille character.
   , bottom :: Row a -- ^ The state of the bottom row of the Braille character.
-  } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | A datastructure to render Braille patterns with eight dots cells.
 data Braille a = Braille {
@@ -40,7 +43,7 @@ data Braille a = Braille {
   , row2 :: Row a -- ^ The state of the second row of the Braille character.
   , row3 :: Row a -- ^ The state of the third row of the Braille character.
   , row4 :: Row a -- ^ The state of the bottom row of the Braille character.
-  } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | Convert a 'Braille6' value to a 'Braille' character, by putting in a given
 -- value at the two values at the bottom row.
@@ -56,6 +59,48 @@ toBraille
   :: Braille6 Bool -- ^ The given 'Braille6' value to convert.
   -> Braille Bool -- ^ A 'Braille' value that uses as bottom two times 'False'.
 toBraille = toBraille' False
+
+-- | Convert the given 'Char'acter to a 'Braille' object of 'Bool's. If the
+-- given character is not a /Braille/ character, the result is unspecified.
+fromBraille'
+  :: Char  -- ^ The given 'Char'acter to convert.
+  -> Braille Bool  -- ^ The corresponding 'Braille' object of 'Bool's.
+fromBraille' c = Braille (go 0x00) (go 0x01) (go 0x02) (Row (tB' 0x03) (tB' 0x04))
+    where b = ord c .&. 0xff
+          tB = testBit b
+          tB' = testBit (shiftR b 3)
+          go n = Row (tB n) (tB' n)
+
+-- | Convert the given 'Char'acter to a 'Braille6' object of 'Bool's. If the
+-- given character is not a /Braille/ character, or a /Braille/ character where
+-- the lowest row contains filled dots, then the result is unspecified.
+fromBraille6'
+  :: Char  -- ^ The given 'Char'acter to convert.
+  -> Braille6 Bool  -- ^ The corresponding 'Braille6' object of 'Bool's.
+fromBraille6' c = Braille6 (go 0x00) (go 0x01) (go 0x02)
+    where b = ord c .&. 0x3f
+          go n = Row (testBit b n) (testBit (shiftR b 3) n)
+
+-- | Convert the given 'Char'acter to a 'Braille' object of 'Bool's wrapped in
+-- a 'Just'. If the given character is not a /Braille/ character, 'Nothing' is
+-- returned.
+fromBraille
+  :: Char  -- ^ The given 'Char'acter to convert.
+  -> Maybe (Braille Bool)  -- ^ The equivalent 'Braille6' object of 'Bool's wrapped in a 'Just' if it exists; 'Nothing' otherwise.
+fromBraille c
+    | '\x2800' > c || c > '\x28ff' = Nothing
+    | otherwise = Just (fromBraille' c)
+
+-- | Convert the given 'Char'acter to a 'Braille6' object of 'Bool's wrapped in
+-- a 'Just'. If the given character is not a /Braille/ character, or a /Braille/
+-- character where the lowest row contains filled dots, 'Nothing' is returned.
+fromBraille6
+  :: Char  -- ^ The given 'Char'acter to convert.
+  -> Maybe (Braille6 Bool)  -- ^ The equivalent 'Braille6' object of 'Bool's wrapped in a 'Just' if it exists; 'Nothing' otherwise.
+fromBraille6 c
+    | '\x2800' > c || c > '\x283f' = Nothing
+    | otherwise = Just (fromBraille6' c)
+
 
 instance Arbitrary a => Arbitrary (Braille6 a) where
     arbitrary = arbitrary1
@@ -86,3 +131,16 @@ braille6 = braille . toBraille
 -- braille value.
 braille :: Braille Bool -> Char
 braille (Braille r1 r2 r3 r4) = chr (0x2800 .|. _rowValue r1 .|. shiftL (_rowValue r2) 1 .|. shiftL (_rowValue r3) 2 .|. shiftL (_rowValue' 2 r4) 6)
+
+instance UnicodeCharacter (Braille Bool) where
+    toUnicodeChar = braille
+    fromUnicodeChar = fromBraille
+    fromUnicodeChar' = fromBraille'
+
+instance UnicodeCharacter (Braille6 Bool) where
+    toUnicodeChar = braille6
+    fromUnicodeChar = fromBraille6
+    fromUnicodeChar' = fromBraille6'
+
+instance UnicodeText (Braille Bool)
+instance UnicodeText (Braille6 Bool)

@@ -3,6 +3,7 @@ module Data.Char.CoreSpec
   ) where
 
 import Data.Char.Core
+import Data.Char.CoreTest
 
 import Test.Hspec
 import Test.QuickCheck
@@ -21,3 +22,4 @@ spec = do
       \c -> isReserved c /= isNotReserved c
     it "No overlap with isAscii" $ property $
       \c -> not (isReserved c) || not (isAscii c)
+  testUnicodeCharacter (undefined :: Char)

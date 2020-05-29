@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, Safe #-}
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, DeriveTraversable, FlexibleInstances, Safe, ScopedTypeVariables #-}
 
 {-|
 Module      : Data.Char.Core
@@ -26,6 +26,11 @@ module Data.Char.Core (
   , FontStyle(SansSerif, Serif), splitFontStyle
     -- * Character range checks
   , isAsciiAlphaNum, isAsciiAlpha, isACharacter, isNotACharacter, isReserved, isNotReserved
+    -- * Map characters from and to 'Enum's
+  , mapFromEnum, mapToEnum, mapToEnumSafe
+    -- * Convert objects from and to Unicode 'Char'acters
+  , UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeChar
+  , UnicodeText(toUnicodeText, fromUnicodeText, fromUnicodeText')
     -- * Ways to display numbers
   , PlusStyle(WithoutPlus, WithPlus), splitPlusStyle
     -- * Functions to implement a number system
@@ -37,7 +42,8 @@ module Data.Char.Core (
 import Data.Bits((.&.))
 import Data.Char(chr, isAlpha, isAlphaNum, isAscii, ord)
 import Data.Default(Default(def))
-import Data.Text(Text, cons, singleton, snoc)
+import Data.Maybe(fromJust)
+import Data.Text(Text, cons, pack, singleton, snoc, unpack)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
 
@@ -88,7 +94,7 @@ data Oriented a
   = Oriented {
     oobject :: a -- ^ The object that is oriented.
   , orientation :: Orientation -- ^ The oriented of the oriented object.
-  } deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | Possible rotations of a unicode character if that character can be rotated
 -- over 0, 90, 180, and 270 degrees.
@@ -324,6 +330,90 @@ isNotACharacter
   -> Bool  -- ^ 'True' if the given 'Char'acter is not a character (according to the Unicode specifications); 'False' otherwise.
 isNotACharacter c = ord c .&. 0xfffe == 0xfffe || '\xfdd0' <= c && c <= '\xfdef'
 
+-- | Map the given 'Char' object to an object with a type that is an instance of
+-- 'Enum' with a given offset for the 'Char'acter range.
+mapToEnum :: Enum a
+  => Int  -- ^ The given /offset/ value.
+  -> Char -- ^ The 'Char'acter to map to an 'Enum' object.
+  -> a -- ^ The given 'Enum' object for the given 'Char'.
+mapToEnum o = toEnum . subtract o . ord
+
+-- | Map the given 'Char' object to an object with a type that is an instance of
+-- 'Enum'. It first checks if the mapping results in a value between the
+-- 'fromEnum' values for 'minBound' and 'maxBound'.
+mapToEnumSafe :: forall a . (Bounded a, Enum a)
+  => Int  -- ^ The given /offset/ value.
+  -> Char  -- ^ The given 'Char'acter to map to an 'Enum' object.
+  -> Maybe a  -- ^ The given 'Enum' object for the given 'Char'acter wrapped in a 'Just' if that exists; 'Nothing' otherwise.
+mapToEnumSafe o = go
+    where go c | e0 <= ei && ei <= en = Just (toEnum ei)
+               | otherwise = Nothing
+              where ei = ord c - o
+          e0 = fromEnum (minBound :: a)
+          en = fromEnum (maxBound :: a)
+
+-- | Map the given object with a type that is an instance of 'Enum' to a
+-- 'Char'acter with a given offset for the 'Char'acter value.
+mapFromEnum :: Enum a
+  => Int  -- ^ The given /offset/ value.
+  -> a  -- ^ The given 'Enum' value to convert to a 'Char'acter.
+  -> Char  -- ^ The character that corresponds to the given 'Enum' object.
+mapFromEnum o = chr. (o+) . fromEnum
+
+-- | An alias of the 'UnicodeCharacter' type class.
+type UnicodeChar = UnicodeCharacter
+
+-- | A class from which objects can be derived that map to and from a /single/
+-- unicode character.
+class UnicodeCharacter a where
+    -- | Convert the given object to a Unicode 'Char'acter.
+    toUnicodeChar
+      :: a  -- ^ The given object to convert to a 'Char'acter.
+      -> Char  -- ^ The equivalent Unicode 'Char'acter.
+
+    -- | Convert the given 'Char'acter to an object wrapped in a 'Just' data
+    -- constructor if that exists; 'Nothing' otherwise.
+    fromUnicodeChar
+      :: Char  -- ^ The given 'Char'acter to convert to an element.
+      -> Maybe a -- ^ An element if the given 'Char'acter maps to an element wrapped in a 'Just'; 'Nothing' otherwise.
+
+    -- | Convert the given 'Char'acter to an object. If the 'Char'acter does not
+    -- map on an element, the behavior is /unspecified/, it can for example
+    -- result in an error.
+    fromUnicodeChar'
+      :: Char  -- ^ The given 'Char'acter to convert to an element.
+      -> a  -- ^ The given element that is equivalent to the given 'Char'acter.
+    fromUnicodeChar' = fromJust . fromUnicodeChar
+    {-# MINIMAL toUnicodeChar, fromUnicodeChar #-}
+
+-- | A class from which boejcts can be derived that map to and from a /sequence/
+-- of unicode characters. 
+class UnicodeText a where
+    -- | Convert the given object to a 'Text' object.
+    toUnicodeText
+      :: a  -- ^ The given object to convert to a 'Text' object.
+      -> Text  -- ^ A 'Text' object that is the Unicode representation of the element.
+    default toUnicodeText :: UnicodeCharacter a => a -> Text
+    toUnicodeText = singleton . toUnicodeChar
+
+    -- | Convert the given 'Text' to an object wrapped in a 'Just' data
+    -- constructor if that exists; 'Nothing' otherwise.
+    fromUnicodeText
+      :: Text  -- ^ The given 'Text' to convert to an object.
+      -> Maybe a  -- ^ The equivalent object wrapped in a 'Just' data constructor if it exists; 'Nothing' otherwise.
+    default fromUnicodeText :: UnicodeCharacter a => Text -> Maybe a
+    fromUnicodeText t
+        | [c] <- unpack t = fromUnicodeChar c
+        | otherwise = Nothing
+    
+    -- | Convert the given 'Text' to an object. If the 'Text' does not map on
+    -- an element, the behavior is /unspecified/, it can for example result in
+    -- an error.
+    fromUnicodeText'
+      :: Text  -- ^ The given 'Text' to convert to an object.
+      -> a  -- ^ The given equivalent object. If there is no equivalent object, the behavior is unspecified.
+    fromUnicodeText' = fromJust . fromUnicodeText
+
 instance Arbitrary LetterCase where
     arbitrary = arbitraryBoundedEnum
 
@@ -371,3 +461,20 @@ instance Default ItalicType where
 
 instance Default FontStyle where
     def = Serif
+
+instance UnicodeCharacter Char where
+    toUnicodeChar = id
+    fromUnicodeChar = Just
+    fromUnicodeChar' = id
+
+instance UnicodeText [Char] where
+    toUnicodeText = pack
+    fromUnicodeText = Just . unpack
+    fromUnicodeText' = unpack
+
+instance UnicodeText Char
+
+instance UnicodeText Text where
+    toUnicodeText = id
+    fromUnicodeText = Just
+    fromUnicodeText' = id

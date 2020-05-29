@@ -21,6 +21,7 @@ Currently the package contains the following modules:
  - **`Data.Char.Combining`**: combine a character with a (sequence of) *combining* characters (diacritics, geometrical shapes, etc.);
  - **`Data.Char.Dice`**: a module to render die unicode characters;
  - **`Data.Char.Domino`**: a module to render domino unicode characters;
+ - **`Data.Char.Emoji`**: functions to render *emoji* characters (flags, objects, persons, etc.);
  - **`Data.Char.Frame`**: typesetting frame elements. Lines of the frames can be
    `Light` or `Heavy`, and there are additional options to use arcs for
    corners;

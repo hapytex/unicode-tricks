@@ -22,8 +22,12 @@ module Data.Char.Dice(
 
 import Data.Bits((.|.))
 import Data.Char(chr)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
+
+_dieOffset :: Int
+_dieOffset = 0x2680
 
 -- | A data type to store the values of a die.
 data DieValue
@@ -53,4 +57,11 @@ instance Arbitrary DieValue where
 die
   :: DieValue -- ^ The die value to convert.
   -> Char -- ^ A unicode character that represents a die with the given 'DieValue'.
-die = chr . (0x2680 .|.) . fromEnum
+die = chr . (_dieOffset .|.) . fromEnum
+
+instance UnicodeCharacter DieValue where
+    toUnicodeChar = mapFromEnum _dieOffset
+    fromUnicodeChar = mapToEnumSafe _dieOffset
+    fromUnicodeChar' = mapToEnum _dieOffset
+
+instance UnicodeText DieValue
