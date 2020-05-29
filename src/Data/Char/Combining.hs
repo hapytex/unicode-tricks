@@ -141,7 +141,7 @@ module Data.Char.Combining (
   ,  pattern MendeKikakuiNumberThousands                   , pattern MendeKikakuiNumberTenThousands                , pattern MendeKikakuiNumberHundredThousands            , pattern MendeKikakuiNumberMillions
   ) where
 
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'))
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
 import Data.List.NonEmpty(NonEmpty((:|)), (<|), toList)
 import Data.String(IsString(fromString))
 import Data.Text(Text, cons, pack, singleton)
@@ -6791,3 +6791,5 @@ instance UnicodeCharacter CombiningCharacter where
     toUnicodeChar = combiningToUnicode
     fromUnicodeChar = combiningCharacter
     fromUnicodeChar' = combiningCharacter'
+
+instance UnicodeText CombiningCharacter

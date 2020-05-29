@@ -29,7 +29,7 @@ module Data.Char.Frame(
   ) where
 
 import Data.Bool(bool)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'))
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
 import Data.Maybe(fromJust)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
@@ -458,3 +458,6 @@ instance UnicodeCharacter (Parts Bool) where
     toUnicodeChar = simple
     fromUnicodeChar = fromLight
     fromUnicodeChar' = fromLight'
+
+instance UnicodeText (Parts Weight)
+instance UnicodeText (Parts Bool)

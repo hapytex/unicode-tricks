@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DeriveTraversable, Safe, ScopedTypeVariables #-}
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, DeriveTraversable, FlexibleInstances, Safe, ScopedTypeVariables #-}
 
 {-|
 Module      : Data.Char.Core
@@ -30,6 +30,7 @@ module Data.Char.Core (
   , mapFromEnum, mapToEnum, mapToEnumSafe
     -- * Convert objects from and to Unicode 'Char'acters
   , UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeChar
+  , UnicodeText(toUnicodeText, fromUnicodeText, fromUnicodeText')
     -- * Ways to display numbers
   , PlusStyle(WithoutPlus, WithPlus), splitPlusStyle
     -- * Functions to implement a number system
@@ -42,7 +43,7 @@ import Data.Bits((.&.))
 import Data.Char(chr, isAlpha, isAlphaNum, isAscii, ord)
 import Data.Default(Default(def))
 import Data.Maybe(fromJust)
-import Data.Text(Text, cons, singleton, snoc)
+import Data.Text(Text, cons, pack, singleton, snoc, unpack)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
 
@@ -385,6 +386,35 @@ class UnicodeCharacter a where
     fromUnicodeChar' = fromJust . fromUnicodeChar
     {-# MINIMAL toUnicodeChar, fromUnicodeChar #-}
 
+-- | A class from which boejcts can be derived that map to and from a /sequence/
+-- of unicode characters. 
+class UnicodeText a where
+    -- | Convert the given object to a 'Text' object.
+    toUnicodeText
+      :: a  -- ^ The given object to convert to a 'Text' object.
+      -> Text  -- ^ A 'Text' object that is the Unicode representation of the element.
+    default toUnicodeText :: UnicodeCharacter a => a -> Text
+    toUnicodeText = singleton . toUnicodeChar
+
+    -- | Convert the given 'Text' to an object wrapped in a 'Just' data
+    -- constructor if that exists; 'Nothing' otherwise.
+    fromUnicodeText
+      :: Text  -- ^ The given 'Text' to convert to an object.
+      -> Maybe a  -- ^ The equivalent object wrapped in a 'Just' data constructor if it exists; 'Nothing' otherwise.
+    default fromUnicodeText :: UnicodeCharacter a => Text -> Maybe a
+    fromUnicodeText t
+        | [c] <- unpack t = fromUnicodeChar c
+        | otherwise = Nothing
+    
+    -- | Convert the given 'Text' to an object. If the 'Text' does not map on
+    -- an element, the behavior is /unspecified/, it can for example result in
+    -- an error.
+    fromUnicodeText'
+      :: Text  -- ^ The given 'Text' to convert to an object.
+      -> a  -- ^ The given equivalent object. If there is no equivalent object, the behavior is unspecified.
+    fromUnicodeText' = fromJust . fromUnicodeText
+    {-# MINIMAL toUnicodeText, fromUnicodeText #-}
+
 instance Arbitrary LetterCase where
     arbitrary = arbitraryBoundedEnum
 
@@ -437,3 +467,15 @@ instance UnicodeCharacter Char where
     toUnicodeChar = id
     fromUnicodeChar = Just
     fromUnicodeChar' = id
+
+instance UnicodeText [Char] where
+    toUnicodeText = pack
+    fromUnicodeText = Just . unpack
+    fromUnicodeText' = unpack
+
+instance UnicodeText Char
+
+instance UnicodeText Text where
+    toUnicodeText = id
+    fromUnicodeText = Just
+    fromUnicodeText' = id

@@ -52,7 +52,7 @@ module Data.Char.Emoji (
 
 import Prelude hiding (LT, GT)
 import Data.Char(toUpper)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Function(on)
 import Data.Text(Text, pack)
 
@@ -1563,3 +1563,6 @@ instance UnicodeCharacter Zodiac where
     toUnicodeChar = mapFromEnum _zodiacOffset
     fromUnicodeChar = mapToEnumSafe _zodiacOffset
     fromUnicodeChar' = mapToEnum _zodiacOffset
+
+instance UnicodeText SkinColorModifier
+instance UnicodeText Zodiac

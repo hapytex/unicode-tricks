@@ -25,7 +25,7 @@ module Data.Char.Domino (
 import Control.Monad((>=>))
 
 import Data.Char(chr, ord)
-import Data.Char.Core(Orientation(Horizontal, Vertical), Oriented(Oriented), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'))
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, Orientation(Horizontal, Vertical), Oriented(Oriented))
 import Data.Char.Dice(DieValue)
 import Data.Function(on)
 
@@ -175,3 +175,6 @@ instance UnicodeCharacter (Oriented (Domino (Maybe DieValue))) where
 instance UnicodeCharacter (Oriented (Domino DieValue)) where
     toUnicodeChar = domino'
     fromUnicodeChar = fromDomino >=> traverse toSimple
+
+instance UnicodeText (Oriented (Domino (Maybe DieValue)))
+instance UnicodeText (Oriented (Domino DieValue))

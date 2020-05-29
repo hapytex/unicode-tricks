@@ -22,7 +22,7 @@ module Data.Char.Dice(
 
 import Data.Bits((.|.))
 import Data.Char(chr)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
@@ -63,3 +63,5 @@ instance UnicodeCharacter DieValue where
     toUnicodeChar = mapFromEnum _dieOffset
     fromUnicodeChar = mapToEnumSafe _dieOffset
     fromUnicodeChar' = mapToEnum _dieOffset
+
+instance UnicodeText DieValue

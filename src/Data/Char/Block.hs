@@ -21,7 +21,7 @@ module Data.Char.Block(
   ) where
 
 import Data.Maybe(fromJust)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar))
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1)
 
@@ -113,3 +113,5 @@ filled (Block (Row False True ) (Row True  True )) = '\x259f'
 instance UnicodeCharacter (Block Bool) where
     toUnicodeChar = filled
     fromUnicodeChar = fromBlock
+
+instance UnicodeText (Block Bool)

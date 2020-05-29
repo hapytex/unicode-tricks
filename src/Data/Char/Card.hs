@@ -58,7 +58,7 @@ module Data.Char.Card (
 
 import Data.Bits(shiftL, (.|.))
 import Data.Char(chr)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 import Test.QuickCheck.Gen(oneof)
@@ -159,6 +159,8 @@ instance UnicodeCharacter CardSuit where
     toUnicodeChar = mapFromEnum _suitOffset
     fromUnicodeChar = mapToEnumSafe _suitOffset
     fromUnicodeChar' = mapToEnum _suitOffset
+
+instance UnicodeText CardSuit
 
 -- | The unicode character that represents the /back/ of the card.
 back :: Char

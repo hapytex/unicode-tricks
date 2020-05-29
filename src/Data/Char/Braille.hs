@@ -26,7 +26,7 @@ import Data.Bits((.&.), (.|.), shiftL, shiftR, testBit)
 import Data.Bool(bool)
 import Data.Char(chr, ord)
 import Data.Char.Block(Row(Row))
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'))
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1)
 
@@ -141,3 +141,6 @@ instance UnicodeCharacter (Braille6 Bool) where
     toUnicodeChar = braille6
     fromUnicodeChar = fromBraille6
     fromUnicodeChar' = fromBraille6'
+
+instance UnicodeText (Braille Bool)
+instance UnicodeText (Braille6 Bool)

@@ -27,7 +27,7 @@ module Data.Char.Number.Roman (
 
 import Data.Bits((.|.))
 import Data.Char(chr)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), LetterCase, Ligate, ligateF, mapFromEnum, mapToEnum, mapToEnumSafe, splitLetterCase)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, LetterCase, Ligate, ligateF, mapFromEnum, mapToEnum, mapToEnumSafe, splitLetterCase)
 import Data.Default(Default(def))
 import Data.Text(Text, cons, empty)
 
@@ -53,6 +53,8 @@ instance UnicodeCharacter RomanLiteral where
     toUnicodeChar = mapFromEnum _romanUppercaseOffset
     fromUnicodeChar = mapToEnumSafe _romanUppercaseOffset
     fromUnicodeChar' = mapToEnum _romanUppercaseOffset
+
+instance UnicodeText RomanLiteral
 
 -- | Roman numerals for which a unicode character exists.
 data RomanLiteral
