@@ -26,6 +26,7 @@ module Data.Char.Emoji (
 
 import Data.Char(toUpper)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Function(on)
 import Data.Text(Text, pack)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
@@ -200,9 +201,8 @@ iso3166Alpha2ToFlag
   -> Char  -- ^ The second 'Char'acter of the ISO3166 Alpha-2 code.
   -> Maybe Text  -- ^ A 'Text' object that consists of two characters, where the two characters form a flag emoji wrapped in a 'Just', if the given flag exists; 'Nothing' otherwise.
 iso3166Alpha2ToFlag ca cb
-  | validFlagEmoji (toUpper ca) (toUpper cb) = Just (iso3166Alpha2ToFlag' ca cb)
+  | validFlagEmoji ca cb = Just (iso3166Alpha2ToFlag' ca cb)
   | otherwise = Nothing
-
 
 -- | Check if for the given two 'Char'acters, a flag emoji exists. The two
 -- character combinations for which a flag exist are defined in the ISO3166-1
@@ -213,129 +213,131 @@ validFlagEmoji
   :: Char  -- ^ The first 'Char'acter of the ISO3166 Alpha-2 code.
   -> Char  -- ^ The second 'Char'acter of the ISO3166 Alpha-2 code.
   -> Bool  -- ^ 'True' if a flag emoji exists for the given characters; 'False' otherwise.
-validFlagEmoji 'A' 'I' = True
-validFlagEmoji 'A' 'O' = True
-validFlagEmoji 'A' 'Z' = True
-validFlagEmoji 'A' 'L' = True
-validFlagEmoji 'A' 'M' = True
-validFlagEmoji 'A' 'W' = True
-validFlagEmoji 'A' 'X' = True
-validFlagEmoji 'A' x = ('C' <= x && x <= 'G') || ('Q' <= x && x <= 'U')
-validFlagEmoji 'B' 'A' = True
-validFlagEmoji 'B' 'B' = True
-validFlagEmoji 'B' 'V' = True
-validFlagEmoji 'B' 'W' = True
-validFlagEmoji 'B' 'Y' = True
-validFlagEmoji 'B' 'Z' = True
-validFlagEmoji 'B' x = ('D' <= x && x <= 'J') || ('L' <= x && x <= 'O') || ('Q' <= x && x <= 'T')
-validFlagEmoji 'C' 'A' = True
-validFlagEmoji 'C' 'R' = True
-validFlagEmoji 'C' 'C' = True
-validFlagEmoji 'C' 'D' = True
-validFlagEmoji 'C' x = ('K' <= x && x <= 'P') || ('U' <= x && x <= 'Z') || ('F' <= x && x <= 'I')
-validFlagEmoji 'D' 'E' = True
-validFlagEmoji 'D' 'G' = True
-validFlagEmoji 'D' 'M' = True
-validFlagEmoji 'D' 'O' = True
-validFlagEmoji 'D' 'Z' = True
-validFlagEmoji 'D' 'J' = True
-validFlagEmoji 'D' 'K' = True
-validFlagEmoji 'E' 'A' = True
-validFlagEmoji 'E' 'C' = True
-validFlagEmoji 'E' 'E' = True
-validFlagEmoji 'E' 'G' = True
-validFlagEmoji 'E' 'H' = True
-validFlagEmoji 'E' x = 'R' <= x && x <= 'U'
-validFlagEmoji 'F' 'M' = True
-validFlagEmoji 'F' 'O' = True
-validFlagEmoji 'F' 'R' = True
-validFlagEmoji 'F' x = 'I' <= x && x <= 'K'
-validFlagEmoji 'G' 'W' = True
-validFlagEmoji 'G' 'Y' = True
-validFlagEmoji 'G' 'A' = True
-validFlagEmoji 'G' 'B' = True
-validFlagEmoji 'G' x = ('D' <= x && x <= 'I') || ('P' <= x && x <= 'U') || ('L' <= x && x <= 'N')
-validFlagEmoji 'H' 'K' = True
-validFlagEmoji 'H' 'R' = True
-validFlagEmoji 'H' 'M' = True
-validFlagEmoji 'H' 'N' = True
-validFlagEmoji 'H' 'T' = True
-validFlagEmoji 'H' 'U' = True
-validFlagEmoji 'I' x = ('L' <= x && x <= 'O') || ('Q' <= x && x <= 'T') || ('C' <= x && x <= 'E')
-validFlagEmoji 'J' 'E' = True
-validFlagEmoji 'J' 'M' = True
-validFlagEmoji 'J' 'O' = True
-validFlagEmoji 'J' 'P' = True
-validFlagEmoji 'K' 'E' = True
-validFlagEmoji 'K' 'P' = True
-validFlagEmoji 'K' 'R' = True
-validFlagEmoji 'K' 'W' = True
-validFlagEmoji 'K' 'M' = True
-validFlagEmoji 'K' 'N' = True
-validFlagEmoji 'K' 'Y' = True
-validFlagEmoji 'K' 'Z' = True
-validFlagEmoji 'K' x = 'G' <= x && x <= 'I'
-validFlagEmoji 'L' 'I' = True
-validFlagEmoji 'L' 'K' = True
-validFlagEmoji 'L' 'Y' = True
-validFlagEmoji 'L' x = ('R' <= x && x <= 'V') || ('A' <= x && x <= 'C')
-validFlagEmoji 'M' 'A' = True
-validFlagEmoji 'M' x = ('K' <= x && x <= 'Z') || ('C' <= x && x <= 'H')
-validFlagEmoji 'N' 'A' = True
-validFlagEmoji 'N' 'C' = True
-validFlagEmoji 'N' 'I' = True
-validFlagEmoji 'N' 'L' = True
-validFlagEmoji 'N' 'R' = True
-validFlagEmoji 'N' 'U' = True
-validFlagEmoji 'N' 'Z' = True
-validFlagEmoji 'N' 'O' = True
-validFlagEmoji 'N' 'P' = True
-validFlagEmoji 'N' x = 'E' <= x && x <= 'G'
-validFlagEmoji 'O' 'M' = True
-validFlagEmoji 'P' 'A' = True
-validFlagEmoji 'P' 'W' = True
-validFlagEmoji 'P' 'Y' = True
-validFlagEmoji 'P' x = ('E' <= x && x <= 'H') || ('K' <= x && x <= 'N') || ('R' <= x && x <= 'T')
-validFlagEmoji 'Q' 'A' = True
-validFlagEmoji 'R' 'E' = True
-validFlagEmoji 'R' 'O' = True
-validFlagEmoji 'R' 'S' = True
-validFlagEmoji 'R' 'U' = True
-validFlagEmoji 'R' 'W' = True
-validFlagEmoji 'S' 'V' = True
-validFlagEmoji 'S' x = ('G' <= x && x <= 'O') || ('A' <= x && x <= 'E') || ('R' <= x && x <= 'T') || ('X' <= x && x <= 'Z')
-validFlagEmoji 'T' 'A' = True
-validFlagEmoji 'T' 'R' = True
-validFlagEmoji 'T' 'T' = True
-validFlagEmoji 'T' 'Z' = True
-validFlagEmoji 'T' 'C' = True
-validFlagEmoji 'T' 'D' = True
-validFlagEmoji 'T' 'V' = True
-validFlagEmoji 'T' 'W' = True
-validFlagEmoji 'T' x = ('J' <= x && x <= 'O') || ('F' <= x && x <= 'H')
-validFlagEmoji 'U' 'A' = True
-validFlagEmoji 'U' 'G' = True
-validFlagEmoji 'U' 'S' = True
-validFlagEmoji 'U' 'M' = True
-validFlagEmoji 'U' 'N' = True
-validFlagEmoji 'U' 'Y' = True
-validFlagEmoji 'U' 'Z' = True
-validFlagEmoji 'V' 'A' = True
-validFlagEmoji 'V' 'C' = True
-validFlagEmoji 'V' 'E' = True
-validFlagEmoji 'V' 'G' = True
-validFlagEmoji 'V' 'I' = True
-validFlagEmoji 'V' 'N' = True
-validFlagEmoji 'V' 'U' = True
-validFlagEmoji 'W' 'F' = True
-validFlagEmoji 'W' 'S' = True
-validFlagEmoji 'X' 'K' = True
-validFlagEmoji 'Y' 'E' = True
-validFlagEmoji 'Y' 'T' = True
-validFlagEmoji 'Z' 'A' = True
-validFlagEmoji 'Z' 'M' = True
-validFlagEmoji 'Z' 'W' = True
-validFlagEmoji _ _ = False
+validFlagEmoji = on _validFlagEmoji toUpper
+
+_validFlagEmoji 'A' 'I' = True
+_validFlagEmoji 'A' 'O' = True
+_validFlagEmoji 'A' 'Z' = True
+_validFlagEmoji 'A' 'L' = True
+_validFlagEmoji 'A' 'M' = True
+_validFlagEmoji 'A' 'W' = True
+_validFlagEmoji 'A' 'X' = True
+_validFlagEmoji 'A' x = ('C' <= x && x <= 'G') || ('Q' <= x && x <= 'U')
+_validFlagEmoji 'B' 'A' = True
+_validFlagEmoji 'B' 'B' = True
+_validFlagEmoji 'B' 'V' = True
+_validFlagEmoji 'B' 'W' = True
+_validFlagEmoji 'B' 'Y' = True
+_validFlagEmoji 'B' 'Z' = True
+_validFlagEmoji 'B' x = ('D' <= x && x <= 'J') || ('L' <= x && x <= 'O') || ('Q' <= x && x <= 'T')
+_validFlagEmoji 'C' 'A' = True
+_validFlagEmoji 'C' 'R' = True
+_validFlagEmoji 'C' 'C' = True
+_validFlagEmoji 'C' 'D' = True
+_validFlagEmoji 'C' x = ('K' <= x && x <= 'P') || ('U' <= x && x <= 'Z') || ('F' <= x && x <= 'I')
+_validFlagEmoji 'D' 'E' = True
+_validFlagEmoji 'D' 'G' = True
+_validFlagEmoji 'D' 'M' = True
+_validFlagEmoji 'D' 'O' = True
+_validFlagEmoji 'D' 'Z' = True
+_validFlagEmoji 'D' 'J' = True
+_validFlagEmoji 'D' 'K' = True
+_validFlagEmoji 'E' 'A' = True
+_validFlagEmoji 'E' 'C' = True
+_validFlagEmoji 'E' 'E' = True
+_validFlagEmoji 'E' 'G' = True
+_validFlagEmoji 'E' 'H' = True
+_validFlagEmoji 'E' x = 'R' <= x && x <= 'U'
+_validFlagEmoji 'F' 'M' = True
+_validFlagEmoji 'F' 'O' = True
+_validFlagEmoji 'F' 'R' = True
+_validFlagEmoji 'F' x = 'I' <= x && x <= 'K'
+_validFlagEmoji 'G' 'W' = True
+_validFlagEmoji 'G' 'Y' = True
+_validFlagEmoji 'G' 'A' = True
+_validFlagEmoji 'G' 'B' = True
+_validFlagEmoji 'G' x = ('D' <= x && x <= 'I') || ('P' <= x && x <= 'U') || ('L' <= x && x <= 'N')
+_validFlagEmoji 'H' 'K' = True
+_validFlagEmoji 'H' 'R' = True
+_validFlagEmoji 'H' 'M' = True
+_validFlagEmoji 'H' 'N' = True
+_validFlagEmoji 'H' 'T' = True
+_validFlagEmoji 'H' 'U' = True
+_validFlagEmoji 'I' x = ('L' <= x && x <= 'O') || ('Q' <= x && x <= 'T') || ('C' <= x && x <= 'E')
+_validFlagEmoji 'J' 'E' = True
+_validFlagEmoji 'J' 'M' = True
+_validFlagEmoji 'J' 'O' = True
+_validFlagEmoji 'J' 'P' = True
+_validFlagEmoji 'K' 'E' = True
+_validFlagEmoji 'K' 'P' = True
+_validFlagEmoji 'K' 'R' = True
+_validFlagEmoji 'K' 'W' = True
+_validFlagEmoji 'K' 'M' = True
+_validFlagEmoji 'K' 'N' = True
+_validFlagEmoji 'K' 'Y' = True
+_validFlagEmoji 'K' 'Z' = True
+_validFlagEmoji 'K' x = 'G' <= x && x <= 'I'
+_validFlagEmoji 'L' 'I' = True
+_validFlagEmoji 'L' 'K' = True
+_validFlagEmoji 'L' 'Y' = True
+_validFlagEmoji 'L' x = ('R' <= x && x <= 'V') || ('A' <= x && x <= 'C')
+_validFlagEmoji 'M' 'A' = True
+_validFlagEmoji 'M' x = ('K' <= x && x <= 'Z') || ('C' <= x && x <= 'H')
+_validFlagEmoji 'N' 'A' = True
+_validFlagEmoji 'N' 'C' = True
+_validFlagEmoji 'N' 'I' = True
+_validFlagEmoji 'N' 'L' = True
+_validFlagEmoji 'N' 'R' = True
+_validFlagEmoji 'N' 'U' = True
+_validFlagEmoji 'N' 'Z' = True
+_validFlagEmoji 'N' 'O' = True
+_validFlagEmoji 'N' 'P' = True
+_validFlagEmoji 'N' x = 'E' <= x && x <= 'G'
+_validFlagEmoji 'O' 'M' = True
+_validFlagEmoji 'P' 'A' = True
+_validFlagEmoji 'P' 'W' = True
+_validFlagEmoji 'P' 'Y' = True
+_validFlagEmoji 'P' x = ('E' <= x && x <= 'H') || ('K' <= x && x <= 'N') || ('R' <= x && x <= 'T')
+_validFlagEmoji 'Q' 'A' = True
+_validFlagEmoji 'R' 'E' = True
+_validFlagEmoji 'R' 'O' = True
+_validFlagEmoji 'R' 'S' = True
+_validFlagEmoji 'R' 'U' = True
+_validFlagEmoji 'R' 'W' = True
+_validFlagEmoji 'S' 'V' = True
+_validFlagEmoji 'S' x = ('G' <= x && x <= 'O') || ('A' <= x && x <= 'E') || ('R' <= x && x <= 'T') || ('X' <= x && x <= 'Z')
+_validFlagEmoji 'T' 'A' = True
+_validFlagEmoji 'T' 'R' = True
+_validFlagEmoji 'T' 'T' = True
+_validFlagEmoji 'T' 'Z' = True
+_validFlagEmoji 'T' 'C' = True
+_validFlagEmoji 'T' 'D' = True
+_validFlagEmoji 'T' 'V' = True
+_validFlagEmoji 'T' 'W' = True
+_validFlagEmoji 'T' x = ('J' <= x && x <= 'O') || ('F' <= x && x <= 'H')
+_validFlagEmoji 'U' 'A' = True
+_validFlagEmoji 'U' 'G' = True
+_validFlagEmoji 'U' 'S' = True
+_validFlagEmoji 'U' 'M' = True
+_validFlagEmoji 'U' 'N' = True
+_validFlagEmoji 'U' 'Y' = True
+_validFlagEmoji 'U' 'Z' = True
+_validFlagEmoji 'V' 'A' = True
+_validFlagEmoji 'V' 'C' = True
+_validFlagEmoji 'V' 'E' = True
+_validFlagEmoji 'V' 'G' = True
+_validFlagEmoji 'V' 'I' = True
+_validFlagEmoji 'V' 'N' = True
+_validFlagEmoji 'V' 'U' = True
+_validFlagEmoji 'W' 'F' = True
+_validFlagEmoji 'W' 'S' = True
+_validFlagEmoji 'X' 'K' = True
+_validFlagEmoji 'Y' 'E' = True
+_validFlagEmoji 'Y' 'T' = True
+_validFlagEmoji 'Z' 'A' = True
+_validFlagEmoji 'Z' 'M' = True
+_validFlagEmoji 'Z' 'W' = True
+_validFlagEmoji _ _ = False
 
 instance Arbitrary SkinColorModifier where
     arbitrary = arbitraryBoundedEnum
