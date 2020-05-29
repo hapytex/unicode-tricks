@@ -12,7 +12,7 @@ Unicode defines 2182 emoji characters, this module aims to make working with emo
 
 module Data.Char.Emoji (
     -- * Flag emoji
-    iso3166Alpha2ToFlag', validFlagEmoji
+    iso3166Alpha2ToFlag, iso3166Alpha2ToFlag', validFlagEmoji
     -- * Zodiac emoji
   , Zodiac(Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
     -- * Skin color modifier
@@ -179,15 +179,30 @@ pattern Fish = Pisces
 
 -- | Convert the given two 'Char'acters of the ISO3166-1 Alpha-2 standard to an
 -- Emoji that renders the flag of the corresponding country or terroitory.
--- Deprecated regions, such as SU (Soviet Union) and YU (Yugoslavia). The
--- European Union (EU), Antarctica (AQ) and United Nations (UN) are included
--- as marcoregion flags. This function does not check if the two characters
--- map to a valid flag token.
+-- Deprecated regions, such as SU (Soviet Union) and YU (Yugoslavia) have no
+-- flag. The European Union (EU), Antarctica (AQ) and United Nations (UN)
+-- are included as marcoregion flags. This function does not check if the
+-- two characters map to a valid flag token.
 iso3166Alpha2ToFlag'
   :: Char  -- ^ The first 'Char'acter of the ISO3166 Alpha-2 code.
   -> Char  -- ^ The second 'Char'acter of the ISO3166 Alpha-2 code.
   -> Text  -- ^ A 'Text' object that consists of two characters, where the two characters form a flag emoji, if the given flag exists.
 iso3166Alpha2ToFlag' ca cb = pack (map (mapFromEnum 0x1f1a5 . toUpper) [ca, cb])
+
+-- | Convert the given two 'Char'acters of the ISO3166-1 Alpha-2 standard to an
+-- Emoji that renders the flag of the corresponding country or terroitory
+-- wrapped in a 'Just' data constructor. Deprecated regions, such as SU
+-- (Soviet Union) and YU (Yugoslavia) have no flag. The European Union (EU),
+-- Antarctica (AQ) and United Nations (UN) are included as marcoregion flags.
+-- If the flag does not exists, 'Nothing' is returned.
+iso3166Alpha2ToFlag
+  :: Char  -- ^ The first 'Char'acter of the ISO3166 Alpha-2 code.
+  -> Char  -- ^ The second 'Char'acter of the ISO3166 Alpha-2 code.
+  -> Maybe Text  -- ^ A 'Text' object that consists of two characters, where the two characters form a flag emoji wrapped in a 'Just', if the given flag exists; 'Nothing' otherwise.
+iso3166Alpha2ToFlag ca cb
+  | validFlagEmoji (toUpper ca) (toUpper cb) = Just (iso3166Alpha2ToFlag' ca cb)
+  | otherwise = Nothing
+
 
 -- | Check if for the given two 'Char'acters, a flag emoji exists. The two
 -- character combinations for which a flag exist are defined in the ISO3166-1
