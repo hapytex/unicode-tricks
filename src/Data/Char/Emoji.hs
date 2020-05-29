@@ -52,9 +52,9 @@ module Data.Char.Emoji (
 
 import Prelude hiding (LT, GT)
 import Data.Char(toUpper)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Function(on)
-import Data.Text(Text, pack)
+import Data.Text(Text, pack, unpack)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
@@ -1250,6 +1250,9 @@ pattern WaterBearer = Aquarius
 pattern Fish :: Zodiac
 pattern Fish = Pisces
 
+_flagCharOffset :: Int
+_flagCharOffset = 0x1f1a5
+
 -- | Convert the given two 'Char'acters of the ISO3166-1 Alpha-2 standard to an
 -- Emoji that renders the flag of the corresponding country or terroitory.
 -- Deprecated regions, such as SU (Soviet Union) and YU (Yugoslavia) have no
@@ -1260,7 +1263,7 @@ iso3166Alpha2ToFlag'
   :: Char  -- ^ The first 'Char'acter of the ISO3166 Alpha-2 code.
   -> Char  -- ^ The second 'Char'acter of the ISO3166 Alpha-2 code.
   -> Text  -- ^ A 'Text' object that consists of two characters, where the two characters form a flag emoji, if the given flag exists.
-iso3166Alpha2ToFlag' ca cb = pack (map (mapFromEnum 0x1f1a5 . toUpper) [ca, cb])
+iso3166Alpha2ToFlag' ca cb = pack (map (mapFromEnum _flagCharOffset . toUpper) [ca, cb])
 
 -- | Convert the given two 'Char'acters of the ISO3166-1 Alpha-2 standard to an
 -- Emoji that renders the flag of the corresponding country or terroitory
@@ -1275,6 +1278,15 @@ iso3166Alpha2ToFlag
 iso3166Alpha2ToFlag ca cb
   | validFlagEmoji ca cb = Just (iso3166Alpha2ToFlag' ca cb)
   | otherwise = Nothing
+
+
+-- | Convert the given 'Text' object to its equivalent 'Flag' object wrapped in
+-- a 'Just' data constructor if it exists; 'Nothing' otherwise.
+fromFlag :: Text -> Maybe Flag
+fromFlag t
+    | [a', b'] <- unpack t, Just a <- shft a', Just b <- shft b', _validFlagEmoji a b = Just (Flag a b)
+    | otherwise = Nothing
+    where  shft = mapToEnumSafe _flagCharOffset
 
 -- | Check if for the given two 'Char'acters, a flag emoji exists. The two
 -- character combinations for which a flag exist are defined in the ISO3166-1
@@ -1563,6 +1575,10 @@ instance UnicodeCharacter Zodiac where
     toUnicodeChar = mapFromEnum _zodiacOffset
     fromUnicodeChar = mapToEnumSafe _zodiacOffset
     fromUnicodeChar' = mapToEnum _zodiacOffset
+
+instance UnicodeText Flag where
+    toUnicodeText (Flag ca cb) = iso3166Alpha2ToFlag' ca cb
+    fromUnicodeText = fromFlag
 
 instance UnicodeText SkinColorModifier
 instance UnicodeText Zodiac

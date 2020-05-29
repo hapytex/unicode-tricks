@@ -413,7 +413,6 @@ class UnicodeText a where
       :: Text  -- ^ The given 'Text' to convert to an object.
       -> a  -- ^ The given equivalent object. If there is no equivalent object, the behavior is unspecified.
     fromUnicodeText' = fromJust . fromUnicodeText
-    {-# MINIMAL toUnicodeText, fromUnicodeText #-}
 
 instance Arbitrary LetterCase where
     arbitrary = arbitraryBoundedEnum
