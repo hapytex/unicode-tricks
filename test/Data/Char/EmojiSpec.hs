@@ -9,6 +9,11 @@ import Test.Hspec
 spec :: Spec
 spec = do
   testUnicodeCharacter (undefined :: SkinColorModifier)
+  testUnicodeCharacter (undefined :: MoonPhase)
   testUnicodeCharacter (undefined :: Zodiac)
   testUnicodeText (undefined :: SkinColorModifier)
   testUnicodeText (undefined :: Zodiac)
+  testUnicodeText (undefined :: MoonPhase)
+  testUnicodeText (undefined :: Gender)
+  testUnicodeText (undefined :: Flag)
+  testUnicodeText (undefined :: SubFlag)

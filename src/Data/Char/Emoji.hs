@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternSynonyms, Safe #-}
+{-# LANGUAGE PatternSynonyms, OverloadedStrings, Safe #-}
 
 {-|
 Module      : Data.Char.Emoji
@@ -11,15 +11,22 @@ Unicode defines 2182 emoji characters, this module aims to make working with emo
 -}
 
 module Data.Char.Emoji (
+    -- * Emoji suffix
+    emojiSuffix
     -- * Flag emoji
-    Flag, flag, flag', flagChars
+  , Flag, flag, flag', flagChars
   , iso3166Alpha2ToFlag, iso3166Alpha2ToFlag', validFlagEmoji
     -- * Subregional flag emoji
   , SubFlag
+    -- * Moon phase emoji
+  , MoonPhase(NewMoon, WaxingCrescent, FirstQuarter, WaxingGibbous, FullMoon, WaningGibbous, ThirdQuarter, WaningCrescent)
+    -- * Gender sign emoji
+  , Gender(Female, Male)
     -- * Zodiac emoji
   , Zodiac(Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
     -- * Skin color modifier
   , SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), fromFitzPatrick
+  , SkinEmojiType(..)
     -- * Pattern symbols for 'Flag's
   , pattern AC, pattern AD, pattern AE, pattern AF, pattern AG, pattern AI, pattern AL, pattern AM, pattern AO, pattern AQ, pattern AR
   , pattern AS, pattern AT, pattern AU, pattern AW, pattern AX, pattern AZ, pattern BA, pattern BB, pattern BD, pattern BE, pattern BF
@@ -69,11 +76,19 @@ import GHC.Enum(fromEnumError, toEnumError)
 import Test.QuickCheck(elements)
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
+-- | A 'Char'acter that is often used as a suffix to turn a character into an
+-- emoji.
+emojiSuffix :: Char
+emojiSuffix = '\xfe0f'
+
 _skinColorOffset :: Int
 _skinColorOffset = 0x1f3fb
 
 _zodiacOffset :: Int
 _zodiacOffset = 0x2648
+
+_moonPhaseOffset :: Int
+_moonPhaseOffset = 0x1f311
 
 -- | A data type that stores a (country) flag by the two characters of the ISO
 -- 3166 Alpa-2 standard. The data constructor is hidden to prevent making flags
@@ -1184,6 +1199,14 @@ instance Bounded SubFlag where
     minBound = ENG
     maxBound = WLS
 
+-- | A data type to specify the /sex/ of a person, animal, etc. used in an
+-- emoji. The 'Gender' items are an instance of 'UnicodeText' that maps to the
+-- /female/ and /male/ emoji.
+data Gender
+  = Female -- The female sign, dented by ♀️.
+  | Male  -- The male sign, denoted by ♂️.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
 -- | Some emoji deal with people. One can change the color of the skin with the
 -- 'SkinColorModifier'. For the skin color, the <https://en.wikipedia.org/wiki/Fitzpatrick_scale /Fitzpatrick scale/> is used.
 -- A numerical classification system for skin types.
@@ -1193,6 +1216,114 @@ data SkinColorModifier
   | Medium  -- ^ An emoji /modifier/ that applies /Fitzpatrick skin type/ four to the Emoji.
   | MediumDark  -- ^ An emoji /modifier/ that applies /Fitzpatrick skin type/ five to the Emoji.
   | Dark  -- ^ An emoji /modifier/ that applies /Fitzpatrick skin type/ six to the Emoji.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+data SkinEmojiType
+  = IndexPointingUp  -- ^ The /index pointing up/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonBouncingBall  -- ^ The /person bouncing ball/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | RaisedFist  -- ^ The /raised fist/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | RaisedHand  -- ^ The /raised hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | VictoryHand  -- ^ The /victory hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | WritingHand  -- ^ The /writing hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Snowboarder  -- ^ The /snowboarder/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonRunning  -- ^ The /person running/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonUrfing  -- ^ The /person surfing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | HorseRacing  -- ^ The /horse racing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonWimming  -- ^ The /person swimming/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonLiftingWeights  -- ^ The /person lifting weights/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonGolfing  -- ^ The /person golfing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Ear  -- ^ The /ear/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Nose  -- ^ The /nose/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | BackhandIndexPointingUp  -- ^ The /backhand index pointing up/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | BackhandIndexPointingDown  -- ^ The /backhand index pointing down/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | BackhandIndexPointingLeft  -- ^ The /backhand index pointing left/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | BackhandIndexPointingRight  -- ^ The /backhand index pointing right/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | OncomingFist  -- ^ The /oncoming fist/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | WavingHand  -- ^ The /waving hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | ThumbsUp  -- ^ The /thumbs up/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | ThumbsDown  -- ^ The /thumbs down/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | ClappingHands  -- ^ The /clapping hands/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | OpenHands  -- ^ The /open hands/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Boy  -- ^ The /boy/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Girl  -- ^ The /girl/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Man  -- ^ The /man/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Woman  -- ^ The /woman/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | WomanAndManHoldingHands  -- ^ The /woman and man holding hands/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | MenHoldingHands  -- ^ The /men holding hands/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | WomenHoldingHands  -- ^ The /women holding hands/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PoliceOfficer  -- ^ The /police officer/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonWithVeil  -- ^ The /person with veil/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Person  -- ^ The /person/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonWithKullcap  -- ^ The /person with skullcap/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonWearingTurban  -- ^ The /person wearing turban/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | OldMan  -- ^ The /old man/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | OldWoman  -- ^ The /old woman/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Baby  -- ^ The /baby/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | ConstructionWorker  -- ^ The /construction worker/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Princess  -- ^ The /princess/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | BabyAngel  -- ^ The /baby angel/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonTippingHand  -- ^ The /person tipping hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Guard  -- ^ The /guard/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | WomanDancing  -- ^ The /woman dancing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | NailPolish  -- ^ The /nail polish/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonGettingMassage  -- ^ The /person getting massage/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonGettingHaircut  -- ^ The /person getting haircut/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | FlexedBiceps  -- ^ The /flexed biceps/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonInUitLevitating  -- ^ The /person in suit levitating/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Detective  -- ^ The /detective/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | ManDancing  -- ^ The /man dancing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | HandWithFingersPlayed  -- ^ The /hand with fingers splayed/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | MiddleFinger  -- ^ The /middle finger/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | VulcanAlute  -- ^ The /vulcan salute/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonBowing  -- ^ The /person bowing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonRaisingHand  -- ^ The /person raising hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | RaisingHands  -- ^ The /raising hands/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonFrowning  -- ^ The /person frowning/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonPouting  -- ^ The /person pouting/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | FoldedHands  -- ^ The /folded hands/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonRowingBoat  -- ^ The /person rowing boat/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonBiking  -- ^ The /person biking/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonMountainBiking  -- ^ The /person mountain biking/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonWalking  -- ^ The /person walking/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonTakingBath  -- ^ The /person taking bath/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonInBed  -- ^ The /person in bed/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PinchedFingers  -- ^ The /pinched fingers/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PinchingHand  -- ^ The /pinching hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | SignOfTheHorns  -- ^ The /sign of the horns/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | CallMeHand  -- ^ The /call me hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | RaisedBackOfHand  -- ^ The /raised back of hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | CrossedFingers  -- ^ The /crossed fingers/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonFacepalming  -- ^ The /person facepalming/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PregnantWoman  -- ^ The /pregnant woman/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PalmsUpTogether  -- ^ The /palms up together/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Selfie  -- ^ The /selfie/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Prince  -- ^ The /prince/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonInTuxedo  -- ^ The /person in tuxedo/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonHrugging  -- ^ The /person shrugging/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonCartwheeling  -- ^ The /person cartwheeling/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonJuggling  -- ^ The /person juggling/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonPlayingWaterPolo  -- ^ The /person playing water polo/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonPlayingHandball  -- ^ The /person playing handball/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Ninja  -- ^ The /ninja/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Leg  -- ^ The /leg/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Foot  -- ^ The /foot/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Superhero  -- ^ The /superhero/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Supervillain  -- ^ The /supervillain/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | EarWithHearingAid  -- ^ The /ear with hearing aid/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonTanding  -- ^ The /person standing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonKneeling  -- ^ The /person kneeling/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | DeafPerson  -- ^ The /deaf person/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Child  -- ^ The /child/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | OlderPerson  -- ^ The /older person/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | WomanWithHeadscarf  -- ^ The /woman with headscarf/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonInTeamyRoom  -- ^ The /person in steamy room/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonClimbing  -- ^ The /person climbing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | PersonInLotusPosition  -- ^ The /person in lotus position/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Mage  -- ^ The /mage/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Fairy  -- ^ The /fairy/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Vampire  -- ^ The /vampire/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Merperson  -- ^ The /merperson/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
+  | Elf  -- ^ The /elf/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | A data type to deal with the /zodiac sign/ emoji. The data type lists the
@@ -1211,6 +1342,20 @@ data Zodiac
   | Capricorn  -- ^ The /capricorn/ zodiac sign, /sea-goat/ in English, is denoted as ♑.
   | Aquarius  -- ^ The /aquarius/ zodiac sign, /water-bearer/ in English, is denoted as ♒.
   | Pisces  -- ^ The /pices/ zodiac sign, /fish/ in English, is denoted as ♓.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+-- | A data type that defines the eight different moon phases, and is an
+-- instance of 'UnicodeCharacter' to convert these to the corresponding Unicode
+-- character.
+data MoonPhase
+  = NewMoon  -- ^ The /new moon/, the first phase of the moon represented by 🌑.
+  | WaxingCrescent  -- ^ The /waxing crescent/, the second phase of the moon represented by 🌒.
+  | FirstQuarter  -- ^ The /first quarter/, the third phase of the moon represented by 🌓.
+  | WaxingGibbous  -- ^ The /waxing gibbous/, the fourth phase of the moon represented by 🌔.
+  | FullMoon  -- ^ The /full moon/, the fifth phase of the moon represented by 🌕.
+  | WaningGibbous  -- ^ The /waning gibbous/, the sixth phase of the moon represented by 🌖.
+  | ThirdQuarter  -- ^ The /third quarter/, the seventh phase of the moon represented by 🌗.
+  | WaningCrescent  -- ^ The /waning crescent/, the eighth phase of the moon represented by 🌘.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | The 'SkinColorModifier' that corresponds to type one of the /Fitzpatrick
@@ -1637,7 +1782,13 @@ _validFlagEmoji _ _ = False
 instance Arbitrary SkinColorModifier where
     arbitrary = arbitraryBoundedEnum
 
+instance Arbitrary Gender where
+    arbitrary = arbitraryBoundedEnum
+
 instance Arbitrary Zodiac where
+    arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary MoonPhase where
     arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary Flag where
@@ -2210,6 +2361,11 @@ instance UnicodeCharacter Zodiac where
     fromUnicodeChar = mapToEnumSafe _zodiacOffset
     fromUnicodeChar' = mapToEnum _zodiacOffset
 
+instance UnicodeCharacter MoonPhase where
+    toUnicodeChar = mapFromEnum _moonPhaseOffset
+    fromUnicodeChar = mapToEnumSafe _moonPhaseOffset
+    fromUnicodeChar' = mapToEnum _moonPhaseOffset
+
 instance UnicodeText Flag where
     toUnicodeText (Flag ca cb) = iso3166Alpha2ToFlag' ca cb
     fromUnicodeText = fromFlag
@@ -2228,3 +2384,11 @@ instance UnicodeText SubFlag where
 
 instance UnicodeText SkinColorModifier
 instance UnicodeText Zodiac
+instance UnicodeText MoonPhase
+
+instance UnicodeText Gender where
+    toUnicodeText Male = "\x2640\xfe0f"
+    toUnicodeText Female = "\x2642\xfe0f"
+    fromUnicodeText "\x2640\xfe0f" = Just Male
+    fromUnicodeText "\x2642\xfe0f" = Just Female
+    fromUnicodeText _ = Nothing

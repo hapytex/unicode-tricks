@@ -16,6 +16,7 @@ module Data.Char.Core (
   , Rotate90(R0, R90, R180, R270)
     -- * Rotated objects
   , Oriented(Oriented, oobject, orientation)
+  , Rotated(Rotated, robject, rotation)
     -- * Letter case
   , LetterCase(UpperCase, LowerCase), splitLetterCase
     -- * Ligating
@@ -104,6 +105,13 @@ data Rotate90
   | R180 -- ^ Rotation over /180/ degrees.
   | R270 -- ^ Rotation over /270/ degrees.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+-- | A data type that specifies that an item has been given a rotation.
+data Rotated a
+  = Rotated {
+    robject :: a  -- ^ The object that is rotated.
+  , rotation :: Rotate90  -- ^ The rotation of the rotated object.
+  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | A data type that lists the possible emphasis of a font. This can be 'Bold'
 -- or 'NoBold' the 'Default' is 'NoBold'.
@@ -423,8 +431,14 @@ instance Arbitrary Orientation where
 instance Arbitrary a => Arbitrary (Oriented a) where
     arbitrary = arbitrary1
 
+instance Arbitrary a => Arbitrary (Rotated a) where
+    arbitrary = arbitrary1
+
 instance Arbitrary1 Oriented where
     liftArbitrary arb = Oriented <$> arb <*> arbitrary
+
+instance Arbitrary1 Rotated where
+    liftArbitrary arb = Rotated <$> arb <*> arbitrary
 
 instance Arbitrary PlusStyle where
     arbitrary = arbitraryBoundedEnum
