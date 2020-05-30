@@ -14,11 +14,13 @@ module Data.Char.Emoji (
     -- * Flag emoji
     Flag, flag, flag', flagChars
   , iso3166Alpha2ToFlag, iso3166Alpha2ToFlag', validFlagEmoji
+    -- * Subregional flag emoji
+  , SubFlag
     -- * Zodiac emoji
   , Zodiac(Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
     -- * Skin color modifier
   , SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), fromFitzPatrick
-    -- * Pattern symbols for Flags
+    -- * Pattern symbols for 'Flag's
   , pattern AC, pattern AD, pattern AE, pattern AF, pattern AG, pattern AI, pattern AL, pattern AM, pattern AO, pattern AQ, pattern AR
   , pattern AS, pattern AT, pattern AU, pattern AW, pattern AX, pattern AZ, pattern BA, pattern BB, pattern BD, pattern BE, pattern BF
   , pattern BG, pattern BH, pattern BI, pattern BJ, pattern BL, pattern BM, pattern BN, pattern BO, pattern BQ, pattern BR, pattern BS
@@ -43,6 +45,8 @@ module Data.Char.Emoji (
   , pattern TR, pattern TT, pattern TV, pattern TW, pattern TZ, pattern UA, pattern UG, pattern UM, pattern UN, pattern US, pattern UY
   , pattern UZ, pattern VA, pattern VC, pattern VE, pattern VG, pattern VI, pattern VN, pattern VU, pattern WF, pattern WS, pattern XK
   , pattern YE, pattern YT, pattern ZA, pattern ZM, pattern ZW
+    -- * Pattern synonyms for 'SubFlag's
+  , pattern ENG, pattern SCT, pattern WLS
     -- * Pattern synonyms for 'Zodiac' elements
   , pattern Ram, pattern Bull, pattern Twins, pattern Crab, pattern Lion, pattern Maiden, pattern Scales, pattern Scorpius, pattern Scorpion
   , pattern Centaur, pattern Archer, pattern Capricornus, pattern MountainGoat, pattern GoatHorned, pattern SeaGoat, pattern WaterBearer
@@ -52,7 +56,9 @@ module Data.Char.Emoji (
   ) where
 
 import Prelude hiding (LT, GT)
-import Data.Char(toUpper)
+
+import Data.Bits((.|.))
+import Data.Char(chr, ord, toUpper, toLower)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Function(on)
 import Data.Maybe(fromJust)
@@ -77,6 +83,13 @@ _zodiacOffset = 0x2648
 -- flag. Deprecated territories like the Soviet Union (SU) and Yugoslavia (YU)
 -- have no corresponding flag.
 data Flag = Flag Char Char deriving (Eq, Ord, Show)
+
+-- | A data type to store a subregion flag. This is specified by the /parent/
+-- flag, and three characters of the subregion. At the moment, the only three
+-- subregional flags are /England/ (eng), /Scotland/ (sct) and /Wales/ (wls),
+-- all beloning under the /United Kingdom/ flag (GB).
+-- The data constructor is made private to prevent making non-existing subflags.
+data SubFlag = SubFlag Flag Char Char Char deriving (Eq, Ord, Show)
 
 instance Bounded Flag where
     minBound = AC
@@ -1155,6 +1168,22 @@ pattern ZM = Flag 'Z' 'M'
 pattern ZW :: Flag
 pattern ZW = Flag 'Z' 'W'
 
+-- | The 'SubFlag' pattern use for /England/ denoted with /GB-ENG/ or /ENG/.
+pattern ENG :: SubFlag
+pattern ENG = SubFlag GB 'e' 'n' 'g'
+
+-- | The 'SubFlag' pattern use for /Scotland/ denoted with /GB-SCT/ or /SCT/.
+pattern SCT :: SubFlag
+pattern SCT = SubFlag GB 's' 'c' 't'
+
+-- | The 'SubFlag' pattern use for /Wales/ denoted with /GB-WLS/ or /WLS/.
+pattern WLS :: SubFlag
+pattern WLS = SubFlag GB 'w' 'l' 's'
+
+instance Bounded SubFlag where
+    minBound = ENG
+    maxBound = WLS
+
 -- | Some emoji deal with people. One can change the color of the skin with the
 -- 'SkinColorModifier'. For the skin color, the <https://en.wikipedia.org/wiki/Fitzpatrick_scale /Fitzpatrick scale/> is used.
 -- A numerical classification system for skin types.
@@ -1324,7 +1353,6 @@ iso3166Alpha2ToFlag
 iso3166Alpha2ToFlag ca cb
   | validFlagEmoji ca cb = Just (iso3166Alpha2ToFlag' ca cb)
   | otherwise = Nothing
-
 
 -- | Convert the given 'Text' object to its equivalent 'Flag' object wrapped in
 -- a 'Just' data constructor if it exists; 'Nothing' otherwise.
@@ -1634,6 +1662,9 @@ instance Arbitrary Flag where
       , UM, UN, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS
       , XK, YE, YT, ZA, ZM, ZW
       ]
+
+instance Arbitrary SubFlag where
+    arbitrary = elements [ENG, SCT, WLS]
 
 instance Enum Flag where
     fromEnum AC = 0
@@ -2157,6 +2188,18 @@ instance Enum Flag where
     enumFrom = (`enumFromTo` maxBound)
     enumFromThen x y = enumFromThenTo x y maxBound
 
+instance Enum SubFlag where
+    fromEnum ENG = 0
+    fromEnum SCT = 1
+    fromEnum WLS = 2
+    fromEnum s = fromEnumError "SubFlag" s
+    toEnum 0 = ENG
+    toEnum 1 = SCT
+    toEnum 2 = WLS
+    toEnum i = toEnumError "SubFlag" i (minBound :: SubFlag, maxBound)
+    enumFrom = (`enumFromTo` maxBound)
+    enumFromThen x y = enumFromThenTo x y maxBound
+
 instance UnicodeCharacter SkinColorModifier where
     toUnicodeChar = mapFromEnum _skinColorOffset
     fromUnicodeChar = mapToEnumSafe _skinColorOffset
@@ -2170,6 +2213,12 @@ instance UnicodeCharacter Zodiac where
 instance UnicodeText Flag where
     toUnicodeText (Flag ca cb) = iso3166Alpha2ToFlag' ca cb
     fromUnicodeText = fromFlag
+
+instance UnicodeText SubFlag where
+    toUnicodeText (SubFlag (Flag ca cb) cc cd ce) = pack ('\x1f3f4' : go' ca : go' cb : map go [cc, cd, ce, '\DEL'])
+        where go = chr . (0xe0000 .|.) . ord
+              go' = go . toLower
+    fromUnicodeText = const Nothing
 
 instance UnicodeText SkinColorModifier
 instance UnicodeText Zodiac
