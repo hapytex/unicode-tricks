@@ -7,4 +7,6 @@ import Data.Char.CoreTest
 import Test.Hspec
 
 spec :: Spec
-spec = testUnicodeCharacter (undefined :: Block Bool)
+spec = do
+    testUnicodeCharacter (undefined :: Block Bool)
+    testUnicodeText (undefined :: Block Bool)

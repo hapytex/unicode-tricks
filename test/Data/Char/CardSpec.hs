@@ -7,4 +7,6 @@ import Data.Char.CoreTest
 import Test.Hspec
 
 spec :: Spec
-spec = testUnicodeCharacter (undefined :: CardSuit)
+spec = do
+    testUnicodeCharacter (undefined :: CardSuit)
+    testUnicodeText (undefined :: CardSuit)

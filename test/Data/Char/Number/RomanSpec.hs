@@ -7,4 +7,6 @@ import Data.Char.CoreTest
 import Test.Hspec
 
 spec :: Spec
-spec = testUnicodeCharacter (undefined :: RomanLiteral)
+spec = do
+    testUnicodeCharacter (undefined :: RomanLiteral)
+    testUnicodeText (undefined :: RomanLiteral)

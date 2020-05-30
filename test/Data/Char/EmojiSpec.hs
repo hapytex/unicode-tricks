@@ -10,3 +10,5 @@ spec :: Spec
 spec = do
   testUnicodeCharacter (undefined :: SkinColorModifier)
   testUnicodeCharacter (undefined :: Zodiac)
+  testUnicodeText (undefined :: SkinColorModifier)
+  testUnicodeText (undefined :: Zodiac)

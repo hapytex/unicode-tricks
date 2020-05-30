@@ -2218,7 +2218,13 @@ instance UnicodeText SubFlag where
     toUnicodeText (SubFlag (Flag ca cb) cc cd ce) = pack ('\x1f3f4' : go' ca : go' cb : map go [cc, cd, ce, '\DEL'])
         where go = chr . (0xe0000 .|.) . ord
               go' = go . toLower
-    fromUnicodeText = const Nothing
+    fromUnicodeText t
+        | ['\x1f3f4', '\xe0067', '\xe0062', sa, sb, sc, '\xe007f'] <- unpack t = go sa sb sc
+        | otherwise = Nothing
+        where go '\xe0065' '\xe006e' '\xe0067' = Just ENG
+              go '\xe0073' '\xe0063' '\xe0074' = Just SCT
+              go '\xe0077' '\xe006c' '\xe0073' = Just WLS
+              go _ _ _ = Nothing
 
 instance UnicodeText SkinColorModifier
 instance UnicodeText Zodiac

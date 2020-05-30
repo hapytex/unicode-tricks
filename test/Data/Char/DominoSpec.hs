@@ -12,3 +12,5 @@ spec :: Spec
 spec = do
     testUnicodeCharacter (undefined :: Oriented (Domino (Maybe DieValue)))
     testUnicodeCharacter (undefined :: Oriented (Domino DieValue))
+    testUnicodeText (undefined :: Oriented (Domino (Maybe DieValue)))
+    testUnicodeText (undefined :: Oriented (Domino DieValue))

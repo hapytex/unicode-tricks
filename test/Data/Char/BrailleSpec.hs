@@ -10,3 +10,5 @@ spec :: Spec
 spec = do
     testUnicodeCharacter (undefined :: Braille Bool)
     testUnicodeCharacter (undefined :: Braille6 Bool)
+    testUnicodeText (undefined :: Braille Bool)
+    testUnicodeText (undefined :: Braille6 Bool)
