@@ -12,7 +12,7 @@ Unicode defines 2182 emoji characters, this module aims to make working with emo
 
 module Data.Char.Emoji (
     -- * Flag emoji
-    Flag
+    Flag, flag, flag', flagChars
   , iso3166Alpha2ToFlag, iso3166Alpha2ToFlag', validFlagEmoji
     -- * Zodiac emoji
   , Zodiac(Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
@@ -43,10 +43,11 @@ module Data.Char.Emoji (
   , pattern TR, pattern TT, pattern TV, pattern TW, pattern TZ, pattern UA, pattern UG, pattern UM, pattern UN, pattern US, pattern UY
   , pattern UZ, pattern VA, pattern VC, pattern VE, pattern VG, pattern VI, pattern VN, pattern VU, pattern WF, pattern WS, pattern XK
   , pattern YE, pattern YT, pattern ZA, pattern ZM, pattern ZW
-    -- * Pattern synonyms for emoji elements
+    -- * Pattern synonyms for 'Zodiac' elements
   , pattern Ram, pattern Bull, pattern Twins, pattern Crab, pattern Lion, pattern Maiden, pattern Scales, pattern Scorpius, pattern Scorpion
   , pattern Centaur, pattern Archer, pattern Capricornus, pattern MountainGoat, pattern GoatHorned, pattern SeaGoat, pattern WaterBearer
   , pattern Fish
+    -- * Pattern synonyms for the 'SkinColorModifier' elements
   , pattern FitzPatrickI, pattern FitzPatrickII, pattern FitzPatrickIII, pattern FitzPatrickIV, pattern FitzPatrickV, pattern FitzPatrickVI
   ) where
 
@@ -54,6 +55,7 @@ import Prelude hiding (LT, GT)
 import Data.Char(toUpper)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Function(on)
+import Data.Maybe(fromJust)
 import Data.Text(Text, pack, unpack)
 
 import GHC.Enum(fromEnumError, toEnumError)
@@ -79,6 +81,47 @@ data Flag = Flag Char Char deriving (Eq, Ord, Show)
 instance Bounded Flag where
     minBound = AC
     maxBound = ZW
+
+-- | Convert the given two characters that represent a flag according to the ISO
+-- 3166 Alpha-2 standard to a 'Flag' wrapped in a 'Just' data constructor, if
+-- that flag exists; 'Nothing' otherwise.
+-- One can pass characters in upper case (@A-Z@) and lower case (@a-z@). The
+-- flag will hold the upper case variant.
+-- The Emoji have flags for the countries defined by the ISO 3166 Alpha-2
+-- standard without deprecated regions like the Soviet Union (SU) and Yugoslavia
+-- (YU). Furthermore there are Emoji for the flags of Antarctica (AQ), the
+-- European Union (EU) and the United Nations (UN).
+flag
+  :: Char  -- ^ The first character of the ISO 3166 Alpha-2 standard.
+  -> Char  -- ^ The second character of the ISO 3166 Alpha-2 standard.
+  -> Maybe Flag  -- ^ A 'Flag' object wrapped in a 'Just' data constructor, given such flag exists; 'Nothing' otherwise.
+flag ca cb
+    | _validFlagEmoji a b = Just (Flag a b)
+    | otherwise = Nothing
+    where a = toUpper ca
+          b = toUpper cb
+
+-- | Convert the given two characters that represent a flag according to the ISO
+-- 3166 Alpha-2 standard to a 'Flag'. If the flag does not exists, then the
+-- result is unspecified.
+-- One can pass characters in upper case (@A-Z@) and lower case (@a-z@). The
+-- flag will hold the upper case variant.
+-- The Emoji have flags for the countries defined by the ISO 3166 Alpha-2
+-- standard without deprecated regions like the Soviet Union (SU) and Yugoslavia
+-- (YU). Furthermore there are Emoji for the flags of Antarctica (AQ), the
+-- European Union (EU) and the United Nations (UN).
+flag'
+  :: Char  -- ^ The first character of the ISO 3166 Alpha-2 standard.
+  -> Char  -- ^ The second character of the ISO 3166 Alpha-2 standard.
+  -> Flag  -- ^ The equivalent 'Flag' object.
+flag' ca = fromJust . flag ca
+
+-- | Obtain the two-characters that specify the given 'Flag'. These two
+-- characters are always upper case (@A-Z@).
+flagChars
+  :: Flag  -- ^ The given 'Flag' to convert to a 2-tuple of 'Char'acters.
+  -> (Char, Char)  -- ^ A 2-tuple that contains upper case 'Char'acters for the given 'Flag'.
+flagChars (Flag ca cb) = (ca, cb)
 
 -- | The 'Flag' pattern used for /Ascension Island/ denoted with /AC/.
 pattern AC :: Flag
