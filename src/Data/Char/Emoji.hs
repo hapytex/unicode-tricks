@@ -18,6 +18,8 @@ module Data.Char.Emoji (
   , iso3166Alpha2ToFlag, iso3166Alpha2ToFlag', validFlagEmoji
     -- * Subregional flag emoji
   , SubFlag
+    -- * Clock emoji
+  , Clock, hours, minutes30, clock, closestClock
     -- * Moon phase emoji
   , MoonPhase(NewMoon, WaxingCrescent, FirstQuarter, WaxingGibbous, FullMoon, WaningGibbous, ThirdQuarter, WaningCrescent)
     -- * Gender sign emoji
@@ -64,7 +66,8 @@ module Data.Char.Emoji (
 
 import Prelude hiding (LT, GT)
 
-import Data.Bits((.|.))
+import Data.Bits((.|.), shiftL, shiftR)
+import Data.Bool(bool)
 import Data.Char(chr, ord, toUpper, toLower)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Function(on)
@@ -73,7 +76,6 @@ import Data.Text(Text, pack, unpack)
 
 import GHC.Enum(fromEnumError, toEnumError)
 
-import Test.QuickCheck(elements)
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
 -- | A 'Char'acter that is often used as a suffix to turn a character into an
@@ -1199,7 +1201,53 @@ instance Bounded SubFlag where
     minBound = ENG
     maxBound = WLS
 
--- | A data type to specify the /sex/ of a person, animal, etc. used in an
+-- | A 'Clock' object that can be converted to a unicode character that displays
+-- a clock with the given time. The 'Clock' has an 'hours' field that contains
+-- the given hours between 0 and 12, and a 'minutes30' field that if 'True',
+-- means that the clock is half past that hour.
+data Clock = Clock { 
+    hours :: Int
+  , minutes30 :: Bool
+  } deriving (Eq, Ord, Show)
+
+instance Bounded Clock where
+    minBound = Clock 0 True
+    maxBound = Clock 12 False
+
+instance Enum Clock where
+    fromEnum (Clock h m30) = pred (shiftL h 1 .|. bool 0 1 m30)
+    toEnum hm30
+        | hm30 < 0 || hm30 > 23 = toEnumError "Clock" hm30 (minBound :: Clock, maxBound)
+        | otherwise = Clock (shiftR hm30' 1) (odd hm30')
+        where hm30' = succ hm30
+    enumFrom = (`enumFromTo` maxBound)
+    enumFromThen x y = enumFromThenTo x y maxBound
+
+-- | Generate the 'Clock' object that is the closest to the given hours and
+-- minutes.
+closestClock
+  :: Int  -- ^ The number of hours.
+  -> Int -- ^ The number of minutes, must be between 0 and 60.
+  -> Clock  -- ^ The clock object that is the closest to the given hours and minutes.
+closestClock h m
+    | m < 15 = clock h False
+    | m < 45 = clock h True
+    | otherwise = clock (h+1) False
+
+-- | Construct a 'Clock' object with the given number of hours, and a 'Bool'ean
+-- that indicates if it is half past that hour.
+-- The function will ensure that the hours are between 0 and 12 (both inclusive).
+-- For half past 12, we use half past 0, for 12 hours, we use simply 12.
+clock
+  :: Int  -- ^ The given hour of the clock, can be any value, but will be set between 1 and 12.
+  -> Bool  -- ^ A 'Bool'ean that indicates if it is half past that hour, so 'True' means we add 30 minutes.
+  -> Clock  -- ^ A clock object that represents the time that is passed through an hour and .
+clock h b
+    | b && h' == 12 = Clock 0 True
+    | otherwise = Clock h' b
+    where h' = mod (h-1) 12 + 1
+
+-- | A data type to specify the /gender/ of a person, animal, etc. used in an
 -- emoji. The 'Gender' items are an instance of 'UnicodeText' that maps to the
 -- /female/ and /male/ emoji.
 data Gender
@@ -1788,34 +1836,17 @@ instance Arbitrary Gender where
 instance Arbitrary Zodiac where
     arbitrary = arbitraryBoundedEnum
 
+instance Arbitrary Clock where
+    arbitrary = arbitraryBoundedEnum
+
 instance Arbitrary MoonPhase where
     arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary Flag where
-    arbitrary = elements [
-        AC, AD, AE, AF, AG, AI, AL, AM, AO, AQ, AR, AS, AT, AU
-      , AW, AX, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM
-      , BN, BO, BQ, BR, BS, BT, BV, BW, BY, BZ, CA, CC, CD, CF
-      , CG, CH, CI, CK, CL, CM, CN, CO, CP, CR, CU, CV, CW, CX
-      , CY, CZ, DE, DG, DJ, DK, DM, DO, DZ, EA, EC, EE, EG, EH
-      , ER, ES, ET, EU, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE
-      , GF, GG, GH, GI, GL, GM, GN, GP, GQ, GR, GS, GT, GU, GW
-      , GY, HK, HM, HN, HR, HT, HU, IC, ID, IE, IL, IM, IN, IO
-      , IQ, IR, IS, IT, JE, JM, JO, JP, KE, KG, KH, KI, KM, KN
-      , KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU
-      , LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO
-      , MP, MQ, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE
-      , NF, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG
-      , PH, PK, PL, PM, PN, PR, PS, PT, PW, PY, QA, RE, RO, RS
-      , RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SJ, SK, SL, SM
-      , SN, SO, SR, SS, ST, SV, SX, SY, SZ, TA, TC, TD, TF, TG
-      , TH, TJ, TK, TL, TM, TN, TO, TR, TT, TV, TW, TZ, UA, UG
-      , UM, UN, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS
-      , XK, YE, YT, ZA, ZM, ZW
-      ]
+    arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary SubFlag where
-    arbitrary = elements [ENG, SCT, WLS]
+    arbitrary = arbitraryBoundedEnum
 
 instance Enum Flag where
     fromEnum AC = 0
@@ -2366,6 +2397,15 @@ instance UnicodeCharacter MoonPhase where
     fromUnicodeChar = mapToEnumSafe _moonPhaseOffset
     fromUnicodeChar' = mapToEnum _moonPhaseOffset
 
+instance UnicodeCharacter Clock where
+    toUnicodeChar (Clock h False) = chr (0x1f54f + h)
+    toUnicodeChar (Clock h True) = chr (0x1f55c + mod (h-1) 12)
+    fromUnicodeChar c
+        | c < '\x1f550' = Nothing
+        | c < '\x1f55c' = Just (Clock (ord c - 0x1f54f) False)
+        | c < '\x1f568' = Just (Clock (mod (ord c - 0x1f55b) 12) True)
+        | otherwise = Nothing
+
 instance UnicodeText Flag where
     toUnicodeText (Flag ca cb) = iso3166Alpha2ToFlag' ca cb
     fromUnicodeText = fromFlag
@@ -2385,6 +2425,7 @@ instance UnicodeText SubFlag where
 instance UnicodeText SkinColorModifier
 instance UnicodeText Zodiac
 instance UnicodeText MoonPhase
+instance UnicodeText Clock
 
 instance UnicodeText Gender where
     toUnicodeText Male = "\x2640\xfe0f"
