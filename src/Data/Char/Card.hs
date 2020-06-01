@@ -68,71 +68,71 @@ _suitOffset = 0x2660
 
 -- | A data type for the card suits
 data CardSuit
-  = Spades -- ^ The /spades/ card suit.
-  | Hearts -- ^ The /hearts/ card suit.
-  | Diamonds -- ^ The /diamonds/ card suit.
-  | Clubs -- ^ The /clubs/ card suit.
+  = Spades  -- ^ The /spades/ card suit.
+  | Hearts  -- ^ The /hearts/ card suit.
+  | Diamonds  -- ^ The /diamonds/ card suit.
+  | Clubs  -- ^ The /clubs/ card suit.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | A data type for the rank of the card.
 data CardRank
-  = Ace -- ^ The /ace/ card rank.
-  | R2 -- ^ Card rank 2.
-  | R3 -- ^ Card rank 3.
-  | R4 -- ^ Card rank 4.
-  | R5 -- ^ Card rank 5.
-  | R6 -- ^ Card rank 6.
-  | R7 -- ^ Card rank 7.
-  | R8 -- ^ Card rank 8.
-  | R9 -- ^ Card rank 9.
-  | R10 -- ^ Card rank 10.
-  | Jack -- ^ The /jack/ card rank.
-  | Knight -- ^ The /knight/ card rank.
-  | Queen -- ^ The /queen/ card rank.
-  | King -- ^ The /king/ card rank.
+  = Ace  -- ^ The /ace/ card rank.
+  | R2  -- ^ Card rank 2.
+  | R3  -- ^ Card rank 3.
+  | R4  -- ^ Card rank 4.
+  | R5  -- ^ Card rank 5.
+  | R6  -- ^ Card rank 6.
+  | R7  -- ^ Card rank 7.
+  | R8  -- ^ Card rank 8.
+  | R9  -- ^ Card rank 9.
+  | R10  -- ^ Card rank 10.
+  | Jack  -- ^ The /jack/ card rank.
+  | Knight  -- ^ The /knight/ card rank.
+  | Queen  -- ^ The /queen/ card rank.
+  | King  -- ^ The /king/ card rank.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | A data type to represent the three colors for which there are jokers:
 -- /red/, /black/ and /white/.
 data JokerColor
-  = Red -- ^ The /red/ joker.
-  | Black -- ^ The /black/ joker.
-  | White -- ^ The /white/ joker.
+  = Red  -- ^ The /red/ joker.
+  | Black  -- ^ The /black/ joker.
+  | White  -- ^ The /white/ joker.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | A data type for the trump cards, often used for /tarot/.
 data Trump
-  = Fool -- ^ The /fool/ trump card, this tarot card is normally not numbered.
-  | Trump1 -- ^ Tarot card /I/.
-  | Trump2 -- ^ Tarot card /II/.
-  | Trump3 -- ^ Tarot card /III/.
-  | Trump4 -- ^ Tarot card /IV/.
-  | Trump5 -- ^ Tarot card /V/.
-  | Trump6 -- ^ Tarot card /VI/.
-  | Trump7 -- ^ Tarot card /VII/.
-  | Trump8 -- ^ Tarot card /VIII/.
-  | Trump9 -- ^ Tarot card /IX/.
-  | Trump10 -- ^ Tarot card /X/.
-  | Trump11 -- ^ Tarot card /XI/.
-  | Trump12 -- ^ Tarot card /XII/.
-  | Trump13 -- ^ Tarot card /XIII/.
-  | Trump14 -- ^ Tarot card /XIV/.
-  | Trump15 -- ^ Tarot card /XV/.
-  | Trump16 -- ^ Tarot card /XVI/.
-  | Trump17 -- ^ Tarot card /XVII/.
-  | Trump18 -- ^ Tarot card /XVIII/.
-  | Trump19 -- ^ Tarot card /XIX/.
-  | Trump20 -- ^ Tarot card /XX/.
-  | Trump21 -- ^ Tarot card /XXI/.
+  = Fool  -- ^ The /fool/ trump card, this tarot card is normally not numbered.
+  | Trump1  -- ^ Tarot card /I/.
+  | Trump2  -- ^ Tarot card /II/.
+  | Trump3  -- ^ Tarot card /III/.
+  | Trump4  -- ^ Tarot card /IV/.
+  | Trump5  -- ^ Tarot card /V/.
+  | Trump6  -- ^ Tarot card /VI/.
+  | Trump7  -- ^ Tarot card /VII/.
+  | Trump8  -- ^ Tarot card /VIII/.
+  | Trump9  -- ^ Tarot card /IX/.
+  | Trump10  -- ^ Tarot card /X/.
+  | Trump11  -- ^ Tarot card /XI/.
+  | Trump12  -- ^ Tarot card /XII/.
+  | Trump13  -- ^ Tarot card /XIII/.
+  | Trump14  -- ^ Tarot card /XIV/.
+  | Trump15  -- ^ Tarot card /XV/.
+  | Trump16  -- ^ Tarot card /XVI/.
+  | Trump17  -- ^ Tarot card /XVII/.
+  | Trump18  -- ^ Tarot card /XVIII/.
+  | Trump19  -- ^ Tarot card /XIX/.
+  | Trump20  -- ^ Tarot card /XX/.
+  | Trump21  -- ^ Tarot card /XXI/.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | A data type that represents the possible types of cards for which there is
 -- a Unicode characters. This is the back of a card, a card with a suit and
 -- rank, three /jokers/, and the 21 /trump/ cards and the /fool/.
 data Card
-  = Back -- ^ The back of the card.
-  | Card CardSuit CardRank -- ^ A card that is a combination of a 'CardSuit' and a 'CardRank'. There are 56 possibilities.
-  | Joker JokerColor -- ^ Three possible 'JokerColor' cards.
+  = Back  -- ^ The back of the card.
+  | Card CardSuit CardRank  -- ^ A card that is a combination of a 'CardSuit' and a 'CardRank'. There are 56 possibilities.
+  | Joker JokerColor  -- ^ Three possible 'JokerColor' cards.
   | Trump Trump -- The 21 't:Trump' cards (together with the 'Fool', which is usually not numbered).
   deriving (Eq, Ord, Read, Show)
 
@@ -169,22 +169,22 @@ back = '\x1f0a0'
 -- | Convert the given 'CardSuit' and 'CardRank' to the equivalent unicode
 -- character for this card.
 card'
-  :: CardSuit -- ^ The given 'CardSuit' for the card.
-  -> CardRank -- ^ The given 'CardRank' for the card.
-  -> Char -- ^ The corresponding unicode character with the given suit and rank.
+  :: CardSuit  -- ^ The given 'CardSuit' for the card.
+  -> CardRank  -- ^ The given 'CardRank' for the card.
+  -> Char  -- ^ The corresponding unicode character with the given suit and rank.
 card' s r = chr (shiftL (fromEnum s) 4 + fromEnum r + 0x1f0a1)
 
 -- | Convert the given 'JokerColor' to the unicode character which represents
 -- this joker color.
 joker
-  :: JokerColor -- ^ The given 'JokerColor' to convert to a unicode character.
-  -> Char -- ^ The unicode character that represents the joker with the given color.
+  :: JokerColor  -- ^ The given 'JokerColor' to convert to a unicode character.
+  -> Char  -- ^ The unicode character that represents the joker with the given color.
 joker c = chr (shiftL (fromEnum c) 4 + 0x1f0bf)
 
 -- | Convert the given 't:Trump' value to the unicode equivalent.
 trump
-  :: Trump -- ^ The given 't:Trump' value to convert to a unicode character.
-  -> Char -- ^ The unicode character that represents the given 't:Trump' playing card.
+  :: Trump  -- ^ The given 't:Trump' value to convert to a unicode character.
+  -> Char  -- ^ The unicode character that represents the given 't:Trump' playing card.
 trump t = chr (0x1f0e0 .|. fromEnum t)
 
 -- | Convert the given 'Card' object to its unicode equivalent.

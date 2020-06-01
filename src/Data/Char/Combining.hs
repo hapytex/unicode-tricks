@@ -1060,8 +1060,8 @@ instance ApplyCombine Char CombiningSequence Text where
 -- | Convert the given 'CombiningCharacter' to a 'Char' in Unicode, this
 -- codepoints need a preceding codepoint to be applied to.
 combiningToUnicode
-  :: CombiningCharacter -- ^ The given 'CombiningCharacter' to convert to a Unicode codepoint.
-  -> Char -- ^ A Unicode 'Char'acter that is the codepoint of the given 'CombiningCharacter'. The
+  :: CombiningCharacter  -- ^ The given 'CombiningCharacter' to convert to a Unicode codepoint.
+  -> Char  -- ^ A Unicode 'Char'acter that is the codepoint of the given 'CombiningCharacter'. The
 combiningToUnicode CombiningGraveAccent = '\x0300'
 combiningToUnicode CombiningAcuteAccent = '\x0301'
 combiningToUnicode CombiningCircumflexAccent = '\x0302'
@@ -1904,8 +1904,8 @@ combiningToUnicode AdlamNukta = '\x1e94a'
 
 -- | Checks if the given 'Char' is a combining character.
 isCombiningCharacter
-  :: Char -- ^ The given 'Char'acter to check.
-  -> Bool -- ^ 'True' if the given 'Char'acter is a combining character; 'False' otherwise.
+  :: Char  -- ^ The given 'Char'acter to check.
+  -> Bool  -- ^ 'True' if the given 'Char'acter is a combining character; 'False' otherwise.
 isCombiningCharacter '\x5bf' = True
 isCombiningCharacter '\x5c7' = True
 isCombiningCharacter '\x670' = True
@@ -2096,7 +2096,7 @@ isCombiningCharacter c
 -- given 'Char' is not a /combining/ character, an error is produced.
 combiningCharacter'
   :: Char  -- ^ The given 'Char' to convert.
-  -> CombiningCharacter -- ^ The corresponding 'CombiningCharacter' if such character exists.
+  -> CombiningCharacter  -- ^ The corresponding 'CombiningCharacter' if such character exists.
 combiningCharacter' c
     | Just y <- combiningCharacter c = y
     | otherwise = error ("The given character " ++ show c ++ "is a not a CombiningCharacter.")
@@ -2957,8 +2957,8 @@ combiningCharacter _ = Nothing
 -- 2-tuple with that character as first item, and an empty list of
 -- 'CombiningCharacter's.
 decomposeCombiningSequence
-  :: Char -- ^ The 'Char'acter to decompose.
-  -> (Char, [CombiningCharacter]) -- ^ A 2-tuple with the "root" 'Char'acter and the list of 'CombiningCharacter's that are applied to it.
+  :: Char  -- ^ The 'Char'acter to decompose.
+  -> (Char, [CombiningCharacter])  -- ^ A 2-tuple with the "root" 'Char'acter and the list of 'CombiningCharacter's that are applied to it.
 decomposeCombiningSequence c
     | Just (c', cc) <- decomposeCombining c = (cc:) <$> decomposeCombiningSequence c'
     | otherwise = (c, [])
@@ -2968,7 +2968,7 @@ decomposeCombiningSequence c
 -- 'CombiningCharacter' itself, then this is returned.
 stripCombiningSequence
   :: Char  -- ^ The 'Char'acter that should be stripped from its applied 'CombiningCharacter's.
-  -> Char -- ^ The "root" 'Char'acter that is the given 'Char'acter stripped from the applied 'CombiningCharacter's.
+  -> Char  -- ^ The "root" 'Char'acter that is the given 'Char'acter stripped from the applied 'CombiningCharacter's.
 stripCombiningSequence c
     | Just (c', _) <- decomposeCombining c = stripCombiningSequence c'
     | otherwise = c

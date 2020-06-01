@@ -29,11 +29,11 @@ import Data.Default(def)
 import Data.Text(Text)
 
 -- | The character used to denote 10: @ↀ@.
-char10 :: Char -- ^ A character used in duodecimal numbers to denote 10.
+char10 :: Char  -- ^ A character used in duodecimal numbers to denote 10.
 char10 = '\x2180'
 
 -- | The character used to denote 11: @ↁ@.
-char11 :: Char -- ^ A character used in duodecimal numbers to denote 11.
+char11 :: Char  -- ^ A character used in duodecimal numbers to denote 11.
 char11 = '\x2181'
 
 _duodecimalDigit :: Int -> Char
@@ -44,8 +44,8 @@ _duodecimalDigit n
 -- | Convert the given 'Integral' number to its unicode character. In case the
 -- value is less than @0@, or greater than @11@, the behavior is unspecified.
 duodecimalDigit' :: Integral i
-  => i -- ^ The given number to convert.
-  -> Char -- ^ A unicode character that represents this digit.
+  => i  -- ^ The given number to convert.
+  -> Char  -- ^ A unicode character that represents this digit.
 duodecimalDigit' = _duodecimalDigit . fromIntegral
 
 -- | Convert the given 'Integral' number to its unicode character wrapped in a
@@ -60,14 +60,14 @@ duodecimalDigit n
 -- a sequence of duodecimal digits that represent that number. The given
 -- 'PlusStyle' specifies if the number is prefixed with @+@ if it is positive.
 duodecimalNumber :: Integral i
-  => PlusStyle -- ^ The given 'PlusStyle' to use.
-  -> i -- ^ The given number to convert.
-  -> Text -- ^ A string of unicode characters representing the value in duodecimal notation.
+  => PlusStyle  -- ^ The given 'PlusStyle' to use.
+  -> i  -- ^ The given number to convert.
+  -> Text  -- ^ A string of unicode characters representing the value in duodecimal notation.
 duodecimalNumber = positionalNumberSystem 12 _duodecimalDigit '+' '-'
 
 -- | Convert the given 'Integral' number to a 'Text' object that contains
 -- sequence of duodecimal digits that represent that number.
 duodecimalNumber' :: Integral i
-  => i -- ^ The given number to convert.
-  -> Text -- ^ A string of unicode characters representing the value in duodecimal notation.
+  => i  -- ^ The given number to convert.
+  -> Text  -- ^ A string of unicode characters representing the value in duodecimal notation.
 duodecimalNumber' = duodecimalNumber def

@@ -64,10 +64,10 @@ data LetterCase
 
 -- | Pick one of the two values based on the 'LetterCase' value.
 splitLetterCase
-  :: a -- ^ The value to return in case of 'UpperCase'.
-  -> a -- ^ The value to return in case of 'LowerCase'.
-  -> LetterCase -- ^ The given /letter case/.
-  -> a -- ^ One of the two given values, depending on the 'LetterCase' value.
+  :: a  -- ^ The value to return in case of 'UpperCase'.
+  -> a  -- ^ The value to return in case of 'LowerCase'.
+  -> LetterCase  -- ^ The given /letter case/.
+  -> a  -- ^ One of the two given values, depending on the 'LetterCase' value.
 splitLetterCase x y = go
     where go UpperCase = x
           go LowerCase = y
@@ -75,16 +75,16 @@ splitLetterCase x y = go
 -- | Specify whether we write a positive number /with/ or /without/ a plus sign.
 -- the 'Default' is 'WithoutPlus'.
 data PlusStyle
-  = WithoutPlus -- ^ Write positive numbers /without/ using a plus sign.
-  | WithPlus -- ^ Write positive numbers /with/ a plus sign.
+  = WithoutPlus  -- ^ Write positive numbers /without/ using a plus sign.
+  | WithPlus  -- ^ Write positive numbers /with/ a plus sign.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | Pick one of the two values based on the 't:PlusStyle' value.
 splitPlusStyle
-  :: a -- ^ The value to return in case of 'WithoutPlus'.
-  -> a -- ^ The value to return in case of 'WithPlus'.
-  -> PlusStyle -- ^ The plus style.
-  -> a -- ^ One of the two given values, based on the 't:PlusStyle' value.
+  :: a  -- ^ The value to return in case of 'WithoutPlus'.
+  -> a  -- ^ The value to return in case of 'WithPlus'.
+  -> PlusStyle  -- ^ The plus style.
+  -> a  -- ^ One of the two given values, based on the 't:PlusStyle' value.
 splitPlusStyle x y = go
   where go WithoutPlus = x
         go WithPlus = y
@@ -92,24 +92,24 @@ splitPlusStyle x y = go
 -- | The possible orientations of a unicode character, these can be
 -- /horizontal/, or /vertical/.
 data Orientation
-  = Horizontal -- ^ /Horizontal/ orientation.
-  | Vertical -- ^ /Vertical/ orientation.
+  = Horizontal  -- ^ /Horizontal/ orientation.
+  | Vertical  -- ^ /Vertical/ orientation.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | A data type that specifies that an item has been given an orientation.
 data Oriented a
   = Oriented {
-    oobject :: a -- ^ The object that is oriented.
-  , orientation :: Orientation -- ^ The oriented of the oriented object.
+    oobject :: a  -- ^ The object that is oriented.
+  , orientation :: Orientation  -- ^ The oriented of the oriented object.
   } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | Possible rotations of a unicode character if that character can be rotated
 -- over 0, 90, 180, and 270 degrees.
 data Rotate90
-  = R0 -- ^ No rotation.
-  | R90 -- ^ Rotation over /90/ degrees.
-  | R180 -- ^ Rotation over /180/ degrees.
-  | R270 -- ^ Rotation over /270/ degrees.
+  = R0  -- ^ No rotation.
+  | R90  -- ^ Rotation over /90/ degrees.
+  | R180  -- ^ Rotation over /180/ degrees.
+  | R270  -- ^ Rotation over /270/ degrees.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | A data type that specifies that an item has been given a rotation.
@@ -122,16 +122,16 @@ data Rotated a
 -- | A data type that lists the possible emphasis of a font. This can be 'Bold'
 -- or 'NoBold' the 'Default' is 'NoBold'.
 data Emphasis
-  = NoBold -- ^ The characters are not stressed with boldface.
-  | Bold -- ^ The characters are stressed in boldface.
+  = NoBold  -- ^ The characters are not stressed with boldface.
+  | Bold  -- ^ The characters are stressed in boldface.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | Pick one of the two values based on the 't:Emphasis' value.
 splitEmphasis
-  :: a -- ^ The value to return in case of 'NoBold'.
-  -> a -- ^ The value to return in case of 'Bold'.
-  -> Emphasis -- ^ The emphasis type.
-  -> a -- ^ One of the two given values, based on the 't:Emphasis' value.
+  :: a  -- ^ The value to return in case of 'NoBold'.
+  -> a  -- ^ The value to return in case of 'Bold'.
+  -> Emphasis  -- ^ The emphasis type.
+  -> a  -- ^ One of the two given values, based on the 't:Emphasis' value.
 splitEmphasis x y = go
   where go NoBold = x
         go Bold = y
@@ -139,16 +139,16 @@ splitEmphasis x y = go
 -- | A data type that can be used to specify if an /italic/ character is used.
 -- The 'Default' is 'NoItalic'.
 data ItalicType
-  = NoItalic -- ^ No italic characters are used.
-  | Italic -- ^ Italic characters are used.
+  = NoItalic  -- ^ No italic characters are used.
+  | Italic  -- ^ Italic characters are used.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | Pick one of the two values based on the 't:ItalicType' value.
 splitItalicType
-  :: a -- ^ The value to return in case of 'NoItalic'.
-  -> a -- ^ The value to return in case of 'Italic'.
-  -> ItalicType -- ^ The italic type.
-  -> a -- ^ One of the two given values, based on the 't:ItalicType' value.
+  :: a  -- ^ The value to return in case of 'NoItalic'.
+  -> a  -- ^ The value to return in case of 'Italic'.
+  -> ItalicType  -- ^ The italic type.
+  -> a  -- ^ One of the two given values, based on the 't:ItalicType' value.
 splitItalicType x y = go
   where go NoItalic = x
         go Italic = y
@@ -156,16 +156,16 @@ splitItalicType x y = go
 -- | A data type that specifies if the font is with /serifs/ or not. The
 -- 'Defaul;t' is 'Serif'.
 data FontStyle
-  = SansSerif -- ^ The character is a character rendered /without/ serifs.
-  | Serif -- ^ The character is a character rendered /with/ serifs.
+  = SansSerif  -- ^ The character is a character rendered /without/ serifs.
+  | Serif  -- ^ The character is a character rendered /with/ serifs.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | Pick one of the two values based on the 't:FontStyle' value.
 splitFontStyle
-  :: a -- ^ The value to return in case of 'SansSerif'.
-  -> a -- ^ The value to return in case of 'Serif'.
-  -> FontStyle -- ^ The font style.
-  -> a -- ^ One of the two given values, based on the 't:FontStyle' value.
+  :: a  -- ^ The value to return in case of 'SansSerif'.
+  -> a  -- ^ The value to return in case of 'Serif'.
+  -> FontStyle  -- ^ The font style.
+  -> a  -- ^ One of the two given values, based on the 't:FontStyle' value.
 splitFontStyle x y = go
   where go SansSerif = x
         go Serif = y
@@ -174,16 +174,16 @@ splitFontStyle x y = go
 -- characters that are normally written in two (or more) characters
 -- are combined in one character. For example @Ⅲ@ instead of @ⅠⅠⅠ@.
 data Ligate
-  = Ligate -- ^ A ligate operation is performed on the characters, the 'def' for 't:Ligate'.
-  | NoLigate -- ^ No ligate operation is performed on the charaters.
+  = Ligate  -- ^ A ligate operation is performed on the characters, the 'def' for 't:Ligate'.
+  | NoLigate  -- ^ No ligate operation is performed on the charaters.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | Pick one of the two values based on the value for 't:Ligate'.
 splitLigate
-  :: a -- ^ The value to return in case of 'v:Ligate'.
-  -> a -- ^ The value to return in case of 'NoLigate'.
-  -> Ligate -- ^ The ligation style.
-  -> a -- ^ One of the two given values, based on the 't:Ligate' value.
+  :: a  -- ^ The value to return in case of 'v:Ligate'.
+  -> a  -- ^ The value to return in case of 'NoLigate'.
+  -> Ligate  -- ^ The ligation style.
+  -> a  -- ^ One of the two given values, based on the 't:Ligate' value.
 splitLigate x y = go
     where go Ligate = x
           go NoLigate = y
@@ -214,12 +214,12 @@ isAsciiAlphaNum x = isAscii x && isAlphaNum x
 -- | Calculate for a given plus and minus sign a 'Text' object for the given
 -- number in the given 'PlusStyle'.
 withSign :: Integral i
-  => (i -> Text) -- ^ The function that maps the absolute value of the number to a 'Text' object that is appended to the sign.
-  -> Char -- ^ The /plus/ sign to use.
-  -> Char -- ^ The /minus/ sign to use.
-  -> PlusStyle -- ^ The given 'PlusStyle' to use.
-  -> i -- ^ The given 'Integral' number to render.
-  -> Text -- ^ A 'Text' object that represents the given number, with the given sign numbers in the given 'PlusStyle'.
+  => (i -> Text)  -- ^ The function that maps the absolute value of the number to a 'Text' object that is appended to the sign.
+  -> Char  -- ^ The /plus/ sign to use.
+  -> Char  -- ^ The /minus/ sign to use.
+  -> PlusStyle  -- ^ The given 'PlusStyle' to use.
+  -> i  -- ^ The given 'Integral' number to render.
+  -> Text  -- ^ A 'Text' object that represents the given number, with the given sign numbers in the given 'PlusStyle'.
 withSign f cp cn ps n | n < 0 = cons cn (f (-n))
                       | WithPlus <- ps = cons cp (f n)
                       | otherwise = f n
@@ -233,13 +233,13 @@ withSign f cp cn ps n | n < 0 = cons cn (f (-n))
 -- implemented.
 signValueSystem :: Integral i
   => i  -- ^ The given /radix/ to use.
-  -> (Int -> Int -> Text) -- ^ A function that maps the /value/ and the /weight/ to a 'Text' object.
-  -> Text -- ^ The given 'Text' used to represent /zero/.
-  -> Char -- ^ The given 'Char' used to denote /plus/.
-  -> Char -- ^ The given 'Char' used to denote /minus/.
-  -> PlusStyle -- ^ The given 'PlusStyle' to use.
-  -> i -- ^ The given number to convert.
-  -> Text -- ^ A 'Text' object that denotes the given number with the given /sign-value system/.
+  -> (Int -> Int -> Text)  -- ^ A function that maps the /value/ and the /weight/ to a 'Text' object.
+  -> Text  -- ^ The given 'Text' used to represent /zero/.
+  -> Char  -- ^ The given 'Char' used to denote /plus/.
+  -> Char  -- ^ The given 'Char' used to denote /minus/.
+  -> PlusStyle  -- ^ The given 'PlusStyle' to use.
+  -> i  -- ^ The given number to convert.
+  -> Text  -- ^ A 'Text' object that denotes the given number with the given /sign-value system/.
 signValueSystem radix fi zero = withSign (f 0)
     where f 0 0 = zero
           f i n | n < radix = fi' n i
@@ -252,13 +252,13 @@ signValueSystem radix fi zero = withSign (f 0)
 -- maps a value to a 'Char', and a 'Char' for /plus/ and /minus/.
 -- The function then construct a 'Text' object for a given 'PlusStyle' and a given number.
 positionalNumberSystem :: Integral i
-  => i -- ^ The given radix to use.
-  -> (Int -> Char) -- ^ A function that maps the value of a /digit/ to the corresponding 'Char'.
-  -> Char -- ^ The given character used to denote /plus/.
-  -> Char -- ^ The given character used to denote /minus/.
-  -> PlusStyle -- ^ The given 'PlusStyle' to use.
-  -> i -- ^ The given number to convert.
-  -> Text -- ^ A 'Text' object that denotes the given number with the given /positional number system/.
+  => i  -- ^ The given radix to use.
+  -> (Int -> Char)  -- ^ A function that maps the value of a /digit/ to the corresponding 'Char'.
+  -> Char  -- ^ The given character used to denote /plus/.
+  -> Char  -- ^ The given character used to denote /minus/.
+  -> PlusStyle  -- ^ The given 'PlusStyle' to use.
+  -> i  -- ^ The given number to convert.
+  -> Text  -- ^ A 'Text' object that denotes the given number with the given /positional number system/.
 positionalNumberSystem radix fi = withSign f
     where f n | n < radix = singleton (fi' n)
               | otherwise = snoc (f q) (fi' r)
@@ -268,12 +268,12 @@ positionalNumberSystem radix fi = withSign f
 -- | A function to make it more convenient to implement a /positional number
 -- system/ with /radix/ 10.
 positionalNumberSystem10 :: Integral i
-  => (Int -> Char) -- ^ A function that maps the value of a /digit/ to the corresponding 'Char'.
-  -> Char -- ^ The given character used to denote /plus/.
-  -> Char -- ^ The given character used to denote /minus/.
-  -> PlusStyle -- ^ The given 'PlusStyle' to use.
-  -> i -- ^ The given number to convert.
-  -> Text -- ^ A 'Text' object that denotes the given number with the given /positional number system/.
+  => (Int -> Char)  -- ^ A function that maps the value of a /digit/ to the corresponding 'Char'.
+  -> Char  -- ^ The given character used to denote /plus/.
+  -> Char  -- ^ The given character used to denote /minus/.
+  -> PlusStyle  -- ^ The given 'PlusStyle' to use.
+  -> i  -- ^ The given number to convert.
+  -> Text  -- ^ A 'Text' object that denotes the given number with the given /positional number system/.
 positionalNumberSystem10 = positionalNumberSystem 10
 
 -- | Check if the given character is not a /reserved character/. This is denoted in
@@ -348,8 +348,8 @@ isNotACharacter c = ord c .&. 0xfffe == 0xfffe || '\xfdd0' <= c && c <= '\xfdef'
 -- 'Enum' with a given offset for the 'Char'acter range.
 mapToEnum :: Enum a
   => Int  -- ^ The given /offset/ value.
-  -> Char -- ^ The 'Char'acter to map to an 'Enum' object.
-  -> a -- ^ The given 'Enum' object for the given 'Char'.
+  -> Char  -- ^ The 'Char'acter to map to an 'Enum' object.
+  -> a  -- ^ The given 'Enum' object for the given 'Char'.
 mapToEnum o = toEnum . subtract o . ord
 
 -- | Map the given 'Char' object to an object with a type that is an instance of
@@ -389,7 +389,7 @@ class UnicodeCharacter a where
     -- constructor if that exists; 'Nothing' otherwise.
     fromUnicodeChar
       :: Char  -- ^ The given 'Char'acter to convert to an element.
-      -> Maybe a -- ^ An element if the given 'Char'acter maps to an element wrapped in a 'Just'; 'Nothing' otherwise.
+      -> Maybe a  -- ^ An element if the given 'Char'acter maps to an element wrapped in a 'Just'; 'Nothing' otherwise.
 
     -- | Convert the given 'Char'acter to an object. If the 'Char'acter does not
     -- map on an element, the behavior is /unspecified/, it can for example

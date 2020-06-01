@@ -1273,7 +1273,7 @@ instance Enum Clock where
 -- minutes.
 closestClock
   :: Int  -- ^ The number of hours.
-  -> Int -- ^ The number of minutes, must be between 0 and 60.
+  -> Int  -- ^ The number of minutes, must be between 0 and 60.
   -> Clock  -- ^ The clock object that is the closest to the given hours and minutes.
 closestClock h m
     | m < 15 = clock h False
