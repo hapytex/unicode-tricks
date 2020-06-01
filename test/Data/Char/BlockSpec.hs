@@ -8,5 +8,5 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter (undefined :: Block Bool)
-    testUnicodeText (undefined :: Block Bool)
+    testUnicodeCharacter "Block Bool" (undefined :: Block Bool)
+    testUnicodeText "Block Bool" (undefined :: Block Bool)

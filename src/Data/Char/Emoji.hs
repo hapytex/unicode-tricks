@@ -12,7 +12,7 @@ Unicode defines 2182 emoji characters, this module aims to make working with emo
 
 module Data.Char.Emoji (
     -- * Emoji suffix
-    emojiSuffix
+    pattern EmojiSuffix
     -- * Flag emoji
   , Flag, flag, flag', flagChars
   , iso3166Alpha2ToFlag, iso3166Alpha2ToFlag', validFlagEmoji
@@ -20,6 +20,8 @@ module Data.Char.Emoji (
   , SubFlag
     -- * Clock emoji
   , Clock, hours, minutes30, clock, closestClock
+    -- * Blood type emoji
+  , BloodType(O, B, A, AB)
     -- * Moon phase emoji
   , MoonPhase(NewMoon, WaxingCrescent, FirstQuarter, WaxingGibbous, FullMoon, WaningGibbous, ThirdQuarter, WaningCrescent)
     -- * Gender sign emoji
@@ -28,7 +30,6 @@ module Data.Char.Emoji (
   , Zodiac(Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
     -- * Skin color modifier
   , SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), fromFitzPatrick
-  , SkinEmojiType(..)
     -- * Pattern symbols for 'Flag's
   , pattern AC, pattern AD, pattern AE, pattern AF, pattern AG, pattern AI, pattern AL, pattern AM, pattern AO, pattern AQ, pattern AR
   , pattern AS, pattern AT, pattern AU, pattern AW, pattern AX, pattern AZ, pattern BA, pattern BB, pattern BD, pattern BE, pattern BF
@@ -66,10 +67,11 @@ module Data.Char.Emoji (
 
 import Prelude hiding (LT, GT)
 
-import Data.Bits((.|.), shiftL, shiftR)
+import Data.Bits(Bits((.&.), (.|.), bit, bitSize, bitSizeMaybe, complement, isSigned, popCount, rotate, shift, shiftL, shiftR, testBit, xor))
 import Data.Bool(bool)
 import Data.Char(chr, ord, toUpper, toLower)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Enclosed(regionalIndicatorUppercase')
 import Data.Function(on)
 import Data.Maybe(fromJust)
 import Data.Text(Text, pack, unpack)
@@ -80,8 +82,8 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
 -- | A 'Char'acter that is often used as a suffix to turn a character into an
 -- emoji.
-emojiSuffix :: Char
-emojiSuffix = '\xfe0f'
+pattern EmojiSuffix :: Char
+pattern EmojiSuffix = '\xfe0f'
 
 _skinColorOffset :: Int
 _skinColorOffset = 0x1f3fb
@@ -1206,9 +1208,53 @@ instance Bounded SubFlag where
 -- the given hours between 0 and 12, and a 'minutes30' field that if 'True',
 -- means that the clock is half past that hour.
 data Clock = Clock { 
-    hours :: Int
-  , minutes30 :: Bool
+    hours :: Int  -- ^ The number of hours on the given clock. Is between 0 and 12. For 0, the 'minutes30' is 'True'; and for 12, the 'minutes30' is 'False'.
+  , minutes30 :: Bool  -- ^ Is 'True' if it is half past the given hour on the 'Clock'.
   } deriving (Eq, Ord, Show)
+
+-- | A 'BloodType' object used to convert to its unicode equivalent. The
+-- 'BloodType' is also seen as a 2-bit value with the leftmost bit representing
+-- the presence of /A antigens/ and the rightmost the presence of /B antigens/.
+data BloodType
+  = O  -- ^ The /O blood type/, with no presence of A and B antigens.
+  | B  -- ^ The /B blood type/, with presence of the B antigen.
+  | A  -- ^ The /A blood type/, with presence of the A antigen.
+  | AB  -- ^ The /AB blood type/, with presence of the A and B antigens.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+_overEnumMask :: Enum a => Int -> (Int -> Int) -> a -> a
+_overEnumMask m f = toEnum . (m .&.) . f . fromEnum
+
+_overEnum2 :: Enum a => (Int -> Int -> Int) -> a -> a -> a
+_overEnum2 f x y = toEnum (on f fromEnum x y)
+
+_overEnumMask2 :: Enum a => Int -> (Int -> Int -> Int) -> a -> a -> a
+_overEnumMask2 m f x y = toEnum (m .&. (on f fromEnum x y))
+
+instance Bits BloodType where
+    (.&.) = _overEnum2 (.&.)
+    (.|.) = _overEnum2 (.|.)
+    xor = _overEnumMask2 0x03 xor
+    complement O = AB
+    complement A = B
+    complement B = A
+    complement AB = O
+    shift abo n = _overEnumMask 0x03 (`shift` n) abo
+    rotate = flip (go . (0x01 .&.))
+        where go 1 A = B
+              go 1 B = B
+              go _ x = x
+    bitSize = const 2
+    bitSizeMaybe = const (Just 2)
+    isSigned = const False
+    testBit = testBit . fromEnum
+    bit 0 = B
+    bit 1 = A
+    bit _ = O
+    popCount O = 0
+    popCount A = 1
+    popCount B = 1
+    popCount AB = 2
 
 instance Bounded Clock where
     minBound = Clock 0 True
@@ -1264,114 +1310,6 @@ data SkinColorModifier
   | Medium  -- ^ An emoji /modifier/ that applies /Fitzpatrick skin type/ four to the Emoji.
   | MediumDark  -- ^ An emoji /modifier/ that applies /Fitzpatrick skin type/ five to the Emoji.
   | Dark  -- ^ An emoji /modifier/ that applies /Fitzpatrick skin type/ six to the Emoji.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
-
-data SkinEmojiType
-  = IndexPointingUp  -- ^ The /index pointing up/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonBouncingBall  -- ^ The /person bouncing ball/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | RaisedFist  -- ^ The /raised fist/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | RaisedHand  -- ^ The /raised hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | VictoryHand  -- ^ The /victory hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | WritingHand  -- ^ The /writing hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Snowboarder  -- ^ The /snowboarder/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonRunning  -- ^ The /person running/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonUrfing  -- ^ The /person surfing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | HorseRacing  -- ^ The /horse racing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonWimming  -- ^ The /person swimming/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonLiftingWeights  -- ^ The /person lifting weights/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonGolfing  -- ^ The /person golfing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Ear  -- ^ The /ear/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Nose  -- ^ The /nose/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | BackhandIndexPointingUp  -- ^ The /backhand index pointing up/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | BackhandIndexPointingDown  -- ^ The /backhand index pointing down/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | BackhandIndexPointingLeft  -- ^ The /backhand index pointing left/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | BackhandIndexPointingRight  -- ^ The /backhand index pointing right/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | OncomingFist  -- ^ The /oncoming fist/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | WavingHand  -- ^ The /waving hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | ThumbsUp  -- ^ The /thumbs up/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | ThumbsDown  -- ^ The /thumbs down/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | ClappingHands  -- ^ The /clapping hands/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | OpenHands  -- ^ The /open hands/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Boy  -- ^ The /boy/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Girl  -- ^ The /girl/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Man  -- ^ The /man/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Woman  -- ^ The /woman/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | WomanAndManHoldingHands  -- ^ The /woman and man holding hands/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | MenHoldingHands  -- ^ The /men holding hands/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | WomenHoldingHands  -- ^ The /women holding hands/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PoliceOfficer  -- ^ The /police officer/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonWithVeil  -- ^ The /person with veil/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Person  -- ^ The /person/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonWithKullcap  -- ^ The /person with skullcap/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonWearingTurban  -- ^ The /person wearing turban/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | OldMan  -- ^ The /old man/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | OldWoman  -- ^ The /old woman/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Baby  -- ^ The /baby/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | ConstructionWorker  -- ^ The /construction worker/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Princess  -- ^ The /princess/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | BabyAngel  -- ^ The /baby angel/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonTippingHand  -- ^ The /person tipping hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Guard  -- ^ The /guard/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | WomanDancing  -- ^ The /woman dancing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | NailPolish  -- ^ The /nail polish/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonGettingMassage  -- ^ The /person getting massage/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonGettingHaircut  -- ^ The /person getting haircut/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | FlexedBiceps  -- ^ The /flexed biceps/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonInUitLevitating  -- ^ The /person in suit levitating/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Detective  -- ^ The /detective/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | ManDancing  -- ^ The /man dancing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | HandWithFingersPlayed  -- ^ The /hand with fingers splayed/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | MiddleFinger  -- ^ The /middle finger/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | VulcanAlute  -- ^ The /vulcan salute/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonBowing  -- ^ The /person bowing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonRaisingHand  -- ^ The /person raising hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | RaisingHands  -- ^ The /raising hands/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonFrowning  -- ^ The /person frowning/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonPouting  -- ^ The /person pouting/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | FoldedHands  -- ^ The /folded hands/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonRowingBoat  -- ^ The /person rowing boat/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonBiking  -- ^ The /person biking/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonMountainBiking  -- ^ The /person mountain biking/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonWalking  -- ^ The /person walking/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonTakingBath  -- ^ The /person taking bath/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonInBed  -- ^ The /person in bed/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PinchedFingers  -- ^ The /pinched fingers/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PinchingHand  -- ^ The /pinching hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | SignOfTheHorns  -- ^ The /sign of the horns/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | CallMeHand  -- ^ The /call me hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | RaisedBackOfHand  -- ^ The /raised back of hand/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | CrossedFingers  -- ^ The /crossed fingers/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonFacepalming  -- ^ The /person facepalming/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PregnantWoman  -- ^ The /pregnant woman/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PalmsUpTogether  -- ^ The /palms up together/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Selfie  -- ^ The /selfie/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Prince  -- ^ The /prince/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonInTuxedo  -- ^ The /person in tuxedo/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonHrugging  -- ^ The /person shrugging/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonCartwheeling  -- ^ The /person cartwheeling/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonJuggling  -- ^ The /person juggling/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonPlayingWaterPolo  -- ^ The /person playing water polo/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonPlayingHandball  -- ^ The /person playing handball/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Ninja  -- ^ The /ninja/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Leg  -- ^ The /leg/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Foot  -- ^ The /foot/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Superhero  -- ^ The /superhero/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Supervillain  -- ^ The /supervillain/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | EarWithHearingAid  -- ^ The /ear with hearing aid/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonTanding  -- ^ The /person standing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonKneeling  -- ^ The /person kneeling/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | DeafPerson  -- ^ The /deaf person/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Child  -- ^ The /child/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | OlderPerson  -- ^ The /older person/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | WomanWithHeadscarf  -- ^ The /woman with headscarf/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonInTeamyRoom  -- ^ The /person in steamy room/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonClimbing  -- ^ The /person climbing/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | PersonInLotusPosition  -- ^ The /person in lotus position/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Mage  -- ^ The /mage/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Fairy  -- ^ The /fairy/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Vampire  -- ^ The /vampire/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Merperson  -- ^ The /merperson/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
-  | Elf  -- ^ The /elf/ emoji, an emoji for which a 'SkinColorModifier' should be applied.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | A data type to deal with the /zodiac sign/ emoji. The data type lists the
@@ -1531,7 +1469,7 @@ iso3166Alpha2ToFlag'
   :: Char  -- ^ The first 'Char'acter of the ISO3166 Alpha-2 code.
   -> Char  -- ^ The second 'Char'acter of the ISO3166 Alpha-2 code.
   -> Text  -- ^ A 'Text' object that consists of two characters, where the two characters form a flag emoji, if the given flag exists.
-iso3166Alpha2ToFlag' ca cb = pack (map (mapFromEnum _flagCharOffset . toUpper) [ca, cb])
+iso3166Alpha2ToFlag' ca cb = pack (map (regionalIndicatorUppercase' . toUpper) [ca, cb])
 
 -- | Convert the given two 'Char'acters of the ISO3166-1 Alpha-2 standard to an
 -- Emoji that renders the flag of the corresponding country or terroitory
@@ -1553,7 +1491,7 @@ fromFlag :: Text -> Maybe Flag
 fromFlag t
     | [a', b'] <- unpack t, Just a <- shft a', Just b <- shft b', _validFlagEmoji a b = Just (Flag a b)
     | otherwise = Nothing
-    where  shft = mapToEnumSafe _flagCharOffset
+    where shft = mapToEnumSafe _flagCharOffset
 
 -- | Check if for the given two 'Char'acters, a flag emoji exists. The two
 -- character combinations for which a flag exist are defined in the ISO3166-1
@@ -1846,6 +1784,9 @@ instance Arbitrary Flag where
     arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary SubFlag where
+    arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary BloodType where
     arbitrary = arbitraryBoundedEnum
 
 instance Enum Flag where
@@ -2433,3 +2374,17 @@ instance UnicodeText Gender where
     fromUnicodeText "\x2640\xfe0f" = Just Male
     fromUnicodeText "\x2642\xfe0f" = Just Female
     fromUnicodeText _ = Nothing
+
+instance UnicodeText BloodType where
+    toUnicodeText AB = "\x1f18e"
+    toUnicodeText A = "\x1f170\xfe0f"
+    toUnicodeText B = "\x1f171\xfe0f"
+    toUnicodeText O = "\x1f17e\xfe0f"
+    fromUnicodeText "\x1f18e" = Just AB
+    fromUnicodeText t
+        | [c, EmojiSuffix] <- unpack t = go c
+        | otherwise = Nothing
+        where go '\x1f170' = Just A
+              go '\x1f171' = Just B
+              go '\x1f17e' = Just O
+              go _ = Nothing

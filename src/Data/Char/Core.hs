@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, DeriveTraversable, FlexibleInstances, Safe, ScopedTypeVariables #-}
+{-# LANGUAGE BangPatterns, ConstraintKinds, DefaultSignatures, DeriveTraversable, FlexibleInstances, Safe, ScopedTypeVariables #-}
 
 {-|
 Module      : Data.Char.Core
@@ -29,6 +29,12 @@ module Data.Char.Core (
   , isAsciiAlphaNum, isAsciiAlpha, isACharacter, isNotACharacter, isReserved, isNotReserved
     -- * Map characters from and to 'Enum's
   , mapFromEnum, mapToEnum, mapToEnumSafe
+  , liftNumberFrom,     liftNumberFrom'
+  , liftNumber,         liftNumber'
+  , liftDigit,          liftDigit'
+  , liftUppercase,      liftUppercase'
+  , liftLowercase,      liftLowercase'
+  , liftUpperLowercase, liftUpperLowercase'
     -- * Convert objects from and to Unicode 'Char'acters
   , UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeChar
   , UnicodeText(toUnicodeText, fromUnicodeText, fromUnicodeText')
@@ -421,6 +427,131 @@ class UnicodeText a where
       :: Text  -- ^ The given 'Text' to convert to an object.
       -> a  -- ^ The given equivalent object. If there is no equivalent object, the behavior is unspecified.
     fromUnicodeText' = fromJust . fromUnicodeText
+
+-- | Construct a function that maps digits to the character with the given value
+-- for the offset.
+liftNumberFrom
+  :: Int  -- ^ The given offset value.
+  -> Int  -- ^ The maximum value that can be mapped.
+  -> Int  -- ^ The given Unicode value used for the offset.
+  -> Int  -- ^ The given number to convert, must be between the offset and the maximum.
+  -> Maybe Char  -- ^ The corresponding 'Char'acter wrapped in a 'Just' if the number is between the offset and the maximum; 'Nothing' otherwise.
+liftNumberFrom o m d = go
+    where go n | n >= o && n <= m = Just (chr (d' + n))
+               | otherwise = Nothing
+          !d' = d - o
+
+-- | Construct a function that maps digits to the character with the given value
+-- for the offset.
+liftNumberFrom'
+  :: Int  -- ^ The given offset value.
+  -> Int  -- ^ The given Unicode value used for the offset.
+  -> Int  -- ^ The given number to convert to a corresponding 'Char'acter.
+  -> Char  -- ^ The corresponding 'Char'acter for the given mapping function.
+liftNumberFrom' o d = chr . (d' +)
+    where !d' = d - o
+
+-- | Construct a function that maps digits to the character with the given value
+-- for @0@.
+liftNumber
+  :: Int  -- ^ The maximum value that can be mapped.
+  -> Int  -- ^ The given Unicode value used for @0@.
+  -> Int  -- ^ The given digit to convert to a number between 0 and the maximum.
+  -> Maybe Char  -- ^ The corresponding 'Char'acter wrapped in a 'Just' if the number is between @0@ and @9@; 'Nothing' otherwise.
+liftNumber = liftNumberFrom 0
+
+-- | Construct a function that maps digits to characters with the given value
+-- for @0@.
+liftNumber'
+  :: Int  -- ^ The  given Unicode value used for @0@.
+  -> Int  -- ^ The given digit to convert.
+  -> Char  -- ^ The corresponding 'Char'acter, for numbers outside the @0-9@ range, the result is unspecified.
+liftNumber' = liftDigit'
+
+-- | Construct a function that maps digits to the character with the given value
+-- for @0@.
+liftDigit
+  :: Int  -- ^ The given Unicode value used for @0@.
+  -> Int  -- ^ The given digit to convert to a number between 0 and 9.
+  -> Maybe Char  -- ^ The corresponding 'Char'acter wrapped in a 'Just' if the number is between @0@ and @9@; 'Nothing' otherwise.
+liftDigit = liftNumber 9
+
+-- | Construct a function that maps digits to characters with the given value
+-- for @0@.
+liftDigit'
+  :: Int  -- ^ The  given Unicode value used for @0@.
+  -> Int  -- ^ The given digit to convert, must be between @0@ and @9@.
+  -> Char  -- ^ The corresponding 'Char'acter, for numbers outside the @0-9@ range, the result is unspecified.
+liftDigit' d = chr . (d+)
+
+-- | Construct a function that maps upper case alphabetic characters with the
+-- given value for @A@.
+liftUppercase
+  :: Int  -- ^ The given Unicode value for @A@.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The corresponding character wrapped in a 'Just' if the given character is in the @A-Z@ range; 'Nothing' otherwise.
+liftUppercase d = go
+    where go c | 'A' <= c && c <= 'Z' = Just (chr (d' + ord c))
+               | otherwise = Nothing
+          !d' = d - 65
+
+-- | Construct a function that maps upper case alphabetic characters with the
+-- given value for @A@.
+liftUppercase'
+  :: Int  -- ^ The given Unicode value for @A@.
+  -> Char  -- ^ The given upper case alphabetic value to convert.
+  -> Char  -- ^ The corresponding character, if the given value is outside the @A-Z@ range, the result is unspecified.
+liftUppercase' d = chr . (d' +) . ord
+    where !d' = d - 65
+
+-- | Construct a function that maps lower case alphabetic characters with the
+-- given value for @a@.
+liftLowercase
+  :: Int  -- ^ The given Unicode value for @a@.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The corresponding character wrapped in a 'Just' if the given character is in the @a-z@ range; 'Nothing' otherwise.
+liftLowercase d = go
+    where go c | 'a' <= c && c <= 'z' = Just (chr (d' + ord c))
+               | otherwise = Nothing
+          !d' = d - 97
+
+-- | Construct a function that maps lower case alphabetic characters with the
+-- given value for @a@.
+liftLowercase'
+  :: Int  -- ^ The given Unicode value for @a@.
+  -> Char  -- ^ The given upper case alphabetic value to convert.
+  -> Char  -- ^ The corresponding character, if the given value is outside the @a-z@ range, the result is unspecified.
+liftLowercase' d = chr . (d' +) . ord
+    where !d' = d - 97
+
+-- | Construct a function that maps lower case alphabetic characters with the
+-- given values for @A@ and @a@.
+liftUpperLowercase
+  :: Int  -- ^ The given Unicode value for @A@.
+  -> Int  -- ^ The given Unicode value for @a@.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The corresponding character wrapped in a 'Just' if the given character is in the @A-Z,a-z@ range; 'Nothing' otherwise.
+liftUpperLowercase du dl = go
+    where go c | 'a' <= c && c <= 'z' = Just (chr (dl' + c'))
+               | 'A' <= c && c <= 'Z' = Just (chr (du' + c'))
+               | otherwise = Nothing
+               where c' = ord c
+          !du' = du - 65
+          !dl' = dl - 97
+
+-- | Construct a function that maps lower case alphabetic characters with the
+-- given values for @A@ and @a@.
+liftUpperLowercase'
+  :: Int  -- ^ The given Unicode value for @A@.
+  -> Int  -- ^ The given Unicode value for @a@.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The corresponding character if the given character is in the @A-Z,a-z@ range; unspecified otherwise.
+liftUpperLowercase' du dl = go
+    where go c | 'A' <= c && c <= 'Z' = chr (du' + c')
+               | otherwise = chr (dl' + c')
+               where c' = ord c
+          du' = du - 65
+          dl' = dl - 97
 
 instance Arbitrary LetterCase where
     arbitrary = arbitraryBoundedEnum

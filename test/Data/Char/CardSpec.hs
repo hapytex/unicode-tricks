@@ -8,5 +8,5 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter (undefined :: CardSuit)
-    testUnicodeText (undefined :: CardSuit)
+    testUnicodeCharacter "CardSuit" (undefined :: CardSuit)
+    testUnicodeText "CardSuit" (undefined :: CardSuit)

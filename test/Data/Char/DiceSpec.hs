@@ -8,5 +8,5 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter (undefined :: DieValue)
-    testUnicodeText (undefined :: DieValue)
+    testUnicodeCharacter "DieValue" (undefined :: DieValue)
+    testUnicodeText "DieValue" (undefined :: DieValue)

@@ -22,6 +22,7 @@ Currently the package contains the following modules:
  - **`Data.Char.Dice`**: a module to render die unicode characters;
  - **`Data.Char.Domino`**: a module to render domino unicode characters;
  - **`Data.Char.Emoji`**: functions to render *emoji* characters (flags, objects, persons, etc.);
+ - **`Data.Char.Enclosed`**: functions to convert alphanumerical characters to characters where these are enclosed by circles, squares, parenthesis, etc.;
  - **`Data.Char.Frame`**: typesetting frame elements. Lines of the frames can be
    `Light` or `Heavy`, and there are additional options to use arcs for
    corners;
@@ -46,3 +47,7 @@ repository*](https://github.com/hapytex/unicode-tricks).
 You can contact the package maintainer by sending a mail to
 [`hapytexeu+gh@gmail.com`](mailto:hapytexeu+gh@gmail.com).
 
+Contributors:
+
+ - [`@wismill`](https://github.com/wismill) found a bug and added tests for the
+   `Data.Char.Math` module.

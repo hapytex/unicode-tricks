@@ -29,6 +29,7 @@ library
     , Data.Char.Dice
     , Data.Char.Domino
     , Data.Char.Emoji
+    , Data.Char.Enclosed
     , Data.Char.Frame
     , Data.Char.Math
     , Data.Char.Number.Duodecimal
