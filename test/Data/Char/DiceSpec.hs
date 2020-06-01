@@ -7,4 +7,6 @@ import Data.Char.CoreTest
 import Test.Hspec
 
 spec :: Spec
-spec = testUnicodeCharacter (undefined :: DieValue)
+spec = do
+    testUnicodeCharacter "DieValue" (undefined :: DieValue)
+    testUnicodeText "DieValue" (undefined :: DieValue)

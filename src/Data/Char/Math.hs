@@ -111,24 +111,24 @@ _withCondition p f = go
 -- /bold/ and no /italics/. This maps characters to itself for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 serifNoBoldNoItalic'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted with serifs, not in bold and not in italics.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted with serifs, not in bold and not in italics.
 serifNoBoldNoItalic' = id
 
 -- | Convert the given character to a mathematical symbol with serifs, with no
 -- /bold/, and no /italics/ wrapped in a 'Just'. If the character is outside the
 -- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 serifNoBoldNoItalic
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 serifNoBoldNoItalic = _withCondition isAsciiAlpha serifNoBoldNoItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, with no
 -- /bold/ and in /italics/. This maps characters an equivalent serif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 serifNoBoldItalic'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted with serifs, not in bold and in italics.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted with serifs, not in bold and in italics.
 serifNoBoldItalic' 'h' = '\x210e'
 serifNoBoldItalic' c = _baseUpperLower 0x1d3ed c
 
@@ -136,326 +136,326 @@ serifNoBoldItalic' c = _baseUpperLower 0x1d3ed c
 -- /bold/, and in /italics/ wrapped in a 'Just'. If the character is outside the
 -- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 serifNoBoldItalic
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 serifNoBoldItalic = _withCondition isAsciiAlpha serifNoBoldItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, in /bold/
 -- not in /italics/. This maps characters an equivalent serif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 serifBoldNoItalic'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted with serifs, in bold and not in italics.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted with serifs, in bold and not in italics.
 serifBoldNoItalic' = _baseUpperLower 0x1d3b9
 
 -- | Convert the given character to a mathematical symbol with serifs, in
 -- /bold/, and no /italics/ wrapped in a 'Just'. If the character is outside the
 -- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 serifBoldNoItalic
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 serifBoldNoItalic = _withCondition isAsciiAlpha serifBoldNoItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, with in
 -- /bold/ and in /italics/. This maps characters an equivalent serif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 serifBoldItalic'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted with serifs, in bold and in italics.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted with serifs, in bold and in italics.
 serifBoldItalic' = _baseUpperLower 0x1d421
 
 -- | Convert the given character to a mathematical symbol with serifs, in
 -- /bold/, and in /italics/ wrapped in a 'Just'. If the character is outside the
 -- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 serifBoldItalic
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 serifBoldItalic = _withCondition isAsciiAlpha serifBoldItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, in /bold/
 -- and in a /italics/ type. This maps characters an equivalent serif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 serifBold'
-  :: ItalicType -- ^ The given 'ItalicType' to use.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted with serifs, in bold and depending on the given 'ItalicType' in italics or not.
+  :: ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted with serifs, in bold and depending on the given 'ItalicType' in italics or not.
 serifBold' = splitItalicType serifBoldNoItalic' serifBoldItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, in /bold/
 -- with the given /italics/ type wrapped in a 'Just'. If the character is outside the
 -- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 serifBold
-  :: ItalicType -- ^ The given 'ItalicType' to use.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 serifBold = splitItalicType serifBoldNoItalic serifBoldItalic
 
 -- | Convert the given character to a mathematical symbol with serifs, not in /bold/
 -- and in a /italics/ type. This maps characters an equivalent serif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 serifNoBold'
-  :: ItalicType -- ^ The given 'ItalicType' to use.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted with serifs, not in bold and depending on the given 'ItalicType' in italics or not.
+  :: ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted with serifs, not in bold and depending on the given 'ItalicType' in italics or not.
 serifNoBold' = splitItalicType serifNoBoldNoItalic' serifNoBoldItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, with no /bold/
 -- and in the given /italics/ type wrapped in a 'Just'. If the character is outside the
 -- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 serifNoBold
-  :: ItalicType -- ^ The given 'ItalicType' to use.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 serifNoBold = splitItalicType serifNoBoldNoItalic serifNoBoldItalic
 
 -- | Convert the given character to a mathematical symbol with serifs, with a
 -- given /emphasis/ and in italics. This maps characters an equivalent serif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 serifItalic'
-  :: Emphasis -- ^ The given 'Emphasis' to use.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted with serifs, depending on the given 'Emphasis' in bold or not, and in italics.
+  :: Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted with serifs, depending on the given 'Emphasis' in bold or not, and in italics.
 serifItalic' = splitEmphasis serifNoBoldItalic' serifBoldItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, in the
 -- given /emphasis/ and in /italics/ wrapped in a 'Just'. If the character
 -- is outside the @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 serifItalic
-  :: Emphasis -- ^ The given 'Emphasis' to use.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 serifItalic = splitEmphasis serifNoBoldItalic serifBoldItalic
 
 -- | Convert the given character to a mathematical symbol with serifs, with a
 -- given /emphasis/ and not in italics. This maps characters an equivalent serif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 serifNoItalic'
-  :: Emphasis -- ^ The given 'Emphasis' to use.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted with serifs, depending on the given 'Emphasis' in bold or not, and not in italics.
+  :: Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted with serifs, depending on the given 'Emphasis' in bold or not, and not in italics.
 serifNoItalic' = splitEmphasis serifNoBoldNoItalic' serifBoldNoItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, in the
 -- given /emphasis/ and not in /italics/ wrapped in a 'Just'. If the character
 -- is outside the @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 serifNoItalic
-  :: Emphasis -- ^ The given 'Emphasis' to use.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 serifNoItalic = splitEmphasis serifNoBoldNoItalic serifBoldNoItalic
 
 -- | Convert the given character to a mathematical symbol with serifs, with a
 -- given /emphasis/ and a given /italics/ style. This maps characters an equivalent serif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 serif'
-  :: ItalicType -- ^ The given 'ItalicType' to use.
-  -> Emphasis -- ^ The given 'Emphasis' to use.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted with serifs, depending on the given 'Emphasis' in bold or not, and depending on the given 'ItalicType' in italics or not.
+  :: ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted with serifs, depending on the given 'Emphasis' in bold or not, and depending on the given 'ItalicType' in italics or not.
 serif' = splitItalicType serifNoItalic' serifItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, in the
 -- given /emphasis/ and in the given /italics/ type wrapped in a 'Just'. If
 -- the character is outside the @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 serif
-  :: ItalicType -- ^ The given 'ItalicType' to use.
-  -> Emphasis -- ^ The given 'Emphasis' to use.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 serif = splitItalicType serifNoItalic serifItalic
 
 -- | Convert the given character to a mathematical symbol without serifs, with no
 -- /bold/ and no /italics/. This maps characters to itself for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 sansSerifNoBoldNoItalic'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted without serifs, not in bold and not in italics.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted without serifs, not in bold and not in italics.
 sansSerifNoBoldNoItalic' = _baseUpperLower 0x1d559
 
 -- | Convert the given character to a mathematical symbol without serifs, with no
 -- /bold/, and no /italics/ wrapped in a 'Just'. If the character is outside the
 -- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 sansSerifNoBoldNoItalic
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 sansSerifNoBoldNoItalic = _withCondition isAsciiAlpha sansSerifNoBoldNoItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, with no
 -- /bold/ and in /italics/. This maps characters an equivalent sansSerif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 sansSerifNoBoldItalic'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted without serifs, not in bold and in italics.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted without serifs, not in bold and in italics.
 sansSerifNoBoldItalic' = _baseUpperLower 0x1d5c1
 
 -- | Convert the given character to a mathematical symbol without serifs, with no
 -- /bold/, and in /italics/ wrapped in a 'Just'. If the character is outside the
 -- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 sansSerifNoBoldItalic
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 sansSerifNoBoldItalic = _withCondition isAsciiAlpha sansSerifNoBoldItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, in /bold/
 -- not in /italics/. This maps characters an equivalent sansSerif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 sansSerifBoldNoItalic'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted without serifs, in bold and not in italics.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted without serifs, in bold and not in italics.
 sansSerifBoldNoItalic' = _baseUpperLower 0x1d58d
 
 -- | Convert the given character to a mathematical symbol without serifs, in
 -- /bold/, and no /italics/ wrapped in a 'Just'. If the character is outside the
 -- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 sansSerifBoldNoItalic
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 sansSerifBoldNoItalic = _withCondition isAsciiAlpha sansSerifBoldNoItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, with in
 -- /bold/ and in /italics/. This maps characters an equivalent sansSerif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 sansSerifBoldItalic'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted without serifs, in bold and in italics.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted without serifs, in bold and in italics.
 sansSerifBoldItalic' = _baseUpperLower 0x1d5f5
 
 -- | Convert the given character to a mathematical symbol without serifs, in
 -- /bold/, and in /italics/ wrapped in a 'Just'. If the character is outside the
 -- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 sansSerifBoldItalic
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 sansSerifBoldItalic = _withCondition isAsciiAlpha sansSerifBoldItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, in /bold/
 -- and in a /italics/ type. This maps characters an equivalent sansSerif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 sansSerifBold'
-  :: ItalicType -- ^ The given 'ItalicType' to use.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted without serifs, in bold and depending on the given 'ItalicType' in italics or not.
+  :: ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted without serifs, in bold and depending on the given 'ItalicType' in italics or not.
 sansSerifBold' = splitItalicType sansSerifBoldNoItalic' sansSerifBoldItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, in /bold/
 -- with the given /italics/ type wrapped in a 'Just'. If the character is outside the
 -- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 sansSerifBold
-  :: ItalicType -- ^ The given 'ItalicType' to use.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 sansSerifBold = splitItalicType sansSerifBoldNoItalic sansSerifBoldItalic
 
 -- | Convert the given character to a mathematical symbol without serifs, not in /bold/
 -- and in a /italics/ type. This maps characters an equivalent sansSerif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 sansSerifNoBold'
-  :: ItalicType -- ^ The given 'ItalicType' to use.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted without serifs, not in bold and depending on the given 'ItalicType' in italics or not.
+  :: ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted without serifs, not in bold and depending on the given 'ItalicType' in italics or not.
 sansSerifNoBold' = splitItalicType sansSerifNoBoldNoItalic' sansSerifNoBoldItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, with no /bold/
 -- and in the given /italics/ type wrapped in a 'Just'. If the character is outside the
 -- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 sansSerifNoBold
-  :: ItalicType -- ^ The given 'ItalicType' to use.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 sansSerifNoBold = splitItalicType sansSerifNoBoldNoItalic sansSerifNoBoldItalic
 
 -- | Convert the given character to a mathematical symbol without serifs, with a
 -- given /emphasis/ and in italics. This maps characters an equivalent sansSerif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 sansSerifItalic'
-  :: Emphasis -- ^ The given 'Emphasis' to use.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted without serifs, depending on the given 'Emphasis' in bold or not, and in italics.
+  :: Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted without serifs, depending on the given 'Emphasis' in bold or not, and in italics.
 sansSerifItalic' = splitEmphasis sansSerifNoBoldItalic' sansSerifBoldItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, in the
 -- given /emphasis/ and in /italics/ wrapped in a 'Just'. If the character
 -- is outside the @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 sansSerifItalic
-  :: Emphasis -- ^ The given 'Emphasis' to use.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 sansSerifItalic = splitEmphasis sansSerifNoBoldItalic sansSerifBoldItalic
 
 -- | Convert the given character to a mathematical symbol without serifs, with a
 -- given /emphasis/ and not in italics. This maps characters an equivalent sansSerif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 sansSerifNoItalic'
-  :: Emphasis -- ^ The given 'Emphasis' to use.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted without serifs, depending on the given 'Emphasis' in bold or not, and not in italics.
+  :: Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted without serifs, depending on the given 'Emphasis' in bold or not, and not in italics.
 sansSerifNoItalic' = splitEmphasis sansSerifNoBoldNoItalic' sansSerifBoldNoItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, in the
 -- given /emphasis/ and not in /italics/ wrapped in a 'Just'. If the character
 -- is outside the @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 sansSerifNoItalic
-  :: Emphasis -- ^ The given 'Emphasis' to use.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 sansSerifNoItalic = splitEmphasis sansSerifNoBoldNoItalic sansSerifBoldNoItalic
 
 -- | Convert the given character to a mathematical symbol without serifs, with a
 -- given /emphasis/ and a given /italics/ style. This maps characters an equivalent sansSerif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 sansSerif'
-  :: ItalicType -- ^ The given 'ItalicType' to use.
-  -> Emphasis -- ^ The given 'Emphasis' to use.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted without serifs, depending on the given 'Emphasis' in bold or not, and depending on the given 'ItalicType' in italics or not.
+  :: ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted without serifs, depending on the given 'Emphasis' in bold or not, and depending on the given 'ItalicType' in italics or not.
 sansSerif' = splitItalicType sansSerifNoItalic' sansSerifItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, in the
 -- given /emphasis/ and in the given /italics/ type wrapped in a 'Just'. If
 -- the character is outside the @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 sansSerif
-  :: ItalicType -- ^ The given 'ItalicType' to use.
-  -> Emphasis -- ^ The given 'Emphasis' to use.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 sansSerif = splitItalicType sansSerifNoItalic sansSerifItalic
 
 -- | Convert the given character to a mathematical symbol with the given /font/ style, with a
 -- given /emphasis/ and a given /italics/ style. This maps characters an equivalent sansSerif symbol for the @A@-@Z@ and
 -- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
 mathAlpha'
-  :: FontStyle -- ^ The given 'FontStyle' to use.
-  -> ItalicType -- ^ The given 'ItalicType' to use.
-  -> Emphasis -- ^ The given 'Emphasis' to use.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted in the given 'FontStyle', depending on the given 'Emphasis' in bold or not, and depending on the given 'ItalicType' in italics or not.
+  :: FontStyle  -- ^ The given 'FontStyle' to use.
+  -> ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted in the given 'FontStyle', depending on the given 'Emphasis' in bold or not, and depending on the given 'ItalicType' in italics or not.
 mathAlpha' = splitFontStyle sansSerif' serif'
 
 -- | Convert the given character to a mathematical symbol with the given /font/
 -- style, in the given /emphasis/ and in the given /italics/ type wrapped in a 'Just'. If
 -- the character is outside the @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
 mathAlpha
-  :: FontStyle -- ^ The given 'FontStyle' to use.
-  -> ItalicType -- ^ The given 'ItalicType' to use.
-  -> Emphasis -- ^ The given 'Emphasis' to use.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+  :: FontStyle  -- ^ The given 'FontStyle' to use.
+  -> ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 mathAlpha = splitFontStyle sansSerif serif
 
 -- | Convert the given digit character (@0@-@9@) to its corresponding character
 -- in a non-bold serif style. The result for characters outside this range is
 -- unspecified.
 digitSerifRegular'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The corresponding symbol in serifs not in bold, unspecified outside the the range.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The corresponding symbol in serifs not in bold, unspecified outside the the range.
 digitSerifRegular' = id
 
 -- | Convert the given digit character (@0@-@9@) to its corresponding character
 -- in a non-bold serif style wrapped in a 'Just' data constructor. For
 -- characters outside this range, 'Nothing' is returned.
 digitSerifRegular
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The corresponding symbol in serifs not in bold wrapped in a 'Just',
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in serifs not in bold wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 digitSerifRegular = _withCondition isDigit digitSerifRegular'
 
@@ -463,16 +463,16 @@ digitSerifRegular = _withCondition isDigit digitSerifRegular'
 -- in a bold serif style. The result for characters outside this range is
 -- unspecified.
 digitSerifBold'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The corresponding symbol in serifs in bold, unspecified outside the the range.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The corresponding symbol in serifs in bold, unspecified outside the the range.
 digitSerifBold' = _shiftC 0x1d79e
 
 -- | Convert the given digit character (@0@-@9@) to its corresponding character
 -- in a bold serif style wrapped in a 'Just' data constructor. For
 -- characters outside this range, 'Nothing' is returned.
 digitSerifBold
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The corresponding symbol in serifs in bold wrapped in a 'Just',
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in serifs in bold wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 digitSerifBold = _withCondition isDigit digitSerifBold'
 
@@ -480,18 +480,18 @@ digitSerifBold = _withCondition isDigit digitSerifBold'
 -- with a given 'Emphasis' in serif style. The result for characters outside this
 -- range is unspecified.
 digitSerif'
-  :: Emphasis -- ^ The given /emphasis/ style.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The corresponding symbol in serifs for the given /emphasis/ style, unspecified outside the the range.
+  :: Emphasis  -- ^ The given /emphasis/ style.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The corresponding symbol in serifs for the given /emphasis/ style, unspecified outside the the range.
 digitSerif' = splitEmphasis digitSerifRegular' digitSerifBold'
 
 -- | Convert the given digit character (@0@-@9@) to its corresponding character
 -- with the given 'Emphasis' in serif style wrapped in a 'Just' data constructor.
 -- For characters outside this range, 'Nothing' is returned.
 digitSerif
-  :: Emphasis -- ^ The given /emphasis/ style.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The corresponding symbol in serifs for the given /emphasis/ style wrapped in a 'Just',
+  :: Emphasis  -- ^ The given /emphasis/ style.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in serifs for the given /emphasis/ style wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 digitSerif = splitEmphasis digitSerifRegular digitSerifBold
 
@@ -499,16 +499,16 @@ digitSerif = splitEmphasis digitSerifRegular digitSerifBold
 -- in a non-bold sans-serif style. The result for characters outside this range is
 -- unspecified.
 digitSansSerifRegular'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The corresponding symbol in sans-serifs not in bold, unspecified outside the the range.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The corresponding symbol in sans-serifs not in bold, unspecified outside the the range.
 digitSansSerifRegular' = _shiftC 0x1d7b2
 
 -- | Convert the given digit character (@0@-@9@) to its corresponding character
 -- in a non-bold sans-serif style wrapped in a 'Just' data constructor. For
 -- characters outside this range, 'Nothing' is returned.
 digitSansSerifRegular
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The corresponding symbol in sans-serifs not in bold wrapped in a 'Just',
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in sans-serifs not in bold wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 digitSansSerifRegular = _withCondition isDigit digitSansSerifRegular'
 
@@ -516,16 +516,16 @@ digitSansSerifRegular = _withCondition isDigit digitSansSerifRegular'
 -- in a bold sans-serif style. The result for characters outside this range is
 -- unspecified.
 digitSansSerifBold'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The corresponding symbol in sans-serifs in bold, unspecified outside the the range.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The corresponding symbol in sans-serifs in bold, unspecified outside the the range.
 digitSansSerifBold' = _shiftC 0x1d7bc
 
 -- | Convert the given digit character (@0@-@9@) to its corresponding character
 -- in a bold sans-serif style wrapped in a 'Just' data constructor. For
 -- characters outside this range, 'Nothing' is returned.
 digitSansSerifBold
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The corresponding symbol in sans-serifs in bold wrapped in a 'Just',
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in sans-serifs in bold wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 digitSansSerifBold = _withCondition isDigit digitSansSerifBold'
 
@@ -533,18 +533,18 @@ digitSansSerifBold = _withCondition isDigit digitSansSerifBold'
 -- with a given 'Emphasis' in sans-serif style. The result for characters outside this
 -- range is unspecified.
 digitSansSerif'
-  :: Emphasis -- ^ The given /emphasis/ style.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The corresponding symbol in sans-serifs for the given /emphasis/ style, unspecified outside the the range.
+  :: Emphasis  -- ^ The given /emphasis/ style.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The corresponding symbol in sans-serifs for the given /emphasis/ style, unspecified outside the the range.
 digitSansSerif' = splitEmphasis digitSansSerifRegular' digitSansSerifBold'
 
 -- | Convert the given digit character (@0@-@9@) to its corresponding character
 -- with the given 'Emphasis' in sans-serif style wrapped in a 'Just' data constructor.
 -- For characters outside this range, 'Nothing' is returned.
 digitSansSerif
-  :: Emphasis -- ^ The given /emphasis/ style.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The corresponding symbol in sans-serifs for the given /emphasis/ style wrapped in a 'Just',
+  :: Emphasis  -- ^ The given /emphasis/ style.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in sans-serifs for the given /emphasis/ style wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 digitSansSerif = splitEmphasis digitSansSerifRegular digitSansSerifBold
 
@@ -553,20 +553,20 @@ digitSansSerif = splitEmphasis digitSansSerifRegular digitSansSerifBold
 -- with a given 'Emphasis' in the given /font/ style. The result for characters outside this
 -- range is unspecified.
 digit'
-  :: FontStyle -- ^ The given /font/ style.
-  -> Emphasis -- ^ The given /emphasis/ style.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The corresponding symbol in the given /font/ style for the given /emphasis/ style, unspecified outside the the range.
+  :: FontStyle  -- ^ The given /font/ style.
+  -> Emphasis  -- ^ The given /emphasis/ style.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The corresponding symbol in the given /font/ style for the given /emphasis/ style, unspecified outside the the range.
 digit' = splitFontStyle digitSansSerif' digitSerif'
 
 -- | Convert the given digit character (@0@-@9@) to its corresponding character
 -- with the given 'Emphasis' in the given /font/ style wrapped in a 'Just' data constructor.
 -- For characters outside this range, 'Nothing' is returned.
 digit
-  :: FontStyle -- ^ The given /font/ style.
-  -> Emphasis -- ^ The given /emphasis/ style.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The corresponding symbol in serifs for the given /emphasis/ style wrapped in a 'Just',
+  :: FontStyle  -- ^ The given /font/ style.
+  -> Emphasis  -- ^ The given /emphasis/ style.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in serifs for the given /emphasis/ style wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 digit = splitFontStyle digitSansSerif digitSerif
 
@@ -575,16 +575,16 @@ digit = splitFontStyle digitSansSerif digitSerif
 -- in a non-bold serif style. The result for numbers outside this range is
 -- unspecified.
 intToDigitSerifRegular'
-  :: Int -- ^ The given number to convert.
-  -> Char -- ^ The corresponding symbol in serifs not in bold, unspecified outside the the range.
+  :: Int  -- ^ The given number to convert.
+  -> Char  -- ^ The corresponding symbol in serifs not in bold, unspecified outside the the range.
 intToDigitSerifRegular' = digitSerifRegular' . intToDigit
 
 -- | Convert the given number (@0@-@9@) to its corresponding character
 -- in a non-bold serif style wrapped in a 'Just' data constructor. For
 -- numbers outside this range, 'Nothing' is returned.
 intToDigitSerifRegular
-  :: Int -- ^ The given number to convert.
-  -> Maybe Char -- ^ The corresponding symbol in serifs not in bold wrapped in a 'Just',
+  :: Int  -- ^ The given number to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in serifs not in bold wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 intToDigitSerifRegular = _withCondition _isValidInt intToDigitSerifRegular'
 
@@ -592,16 +592,16 @@ intToDigitSerifRegular = _withCondition _isValidInt intToDigitSerifRegular'
 -- in a bold serif style. The result for numbers outside this range is
 -- unspecified.
 intToDigitSerifBold'
-  :: Int -- ^ The given number to convert.
-  -> Char -- ^ The corresponding symbol in serifs in bold, unspecified outside the the range.
+  :: Int  -- ^ The given number to convert.
+  -> Char  -- ^ The corresponding symbol in serifs in bold, unspecified outside the the range.
 intToDigitSerifBold' = digitSerifBold' . intToDigit
 
 -- | Convert the given number (@0@-@9@) to its corresponding character
 -- in a bold serif style wrapped in a 'Just' data constructor. For
 -- numbers outside this range, 'Nothing' is returned.
 intToDigitSerifBold
-  :: Int -- ^ The given number to convert.
-  -> Maybe Char -- ^ The corresponding symbol in serifs in bold wrapped in a 'Just',
+  :: Int  -- ^ The given number to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in serifs in bold wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 intToDigitSerifBold = _withCondition _isValidInt intToDigitSerifBold'
 
@@ -609,18 +609,18 @@ intToDigitSerifBold = _withCondition _isValidInt intToDigitSerifBold'
 -- with a given 'Emphasis' in serif style. The result for numbers outside this
 -- range is unspecified.
 intToDigitSerif'
-  :: Emphasis -- ^ The given /emphasis/ style.
-  -> Int -- ^ The given number to convert.
-  -> Char -- ^ The corresponding symbol in serifs in the given /emphasis/ style, unspecified outside the the range.
+  :: Emphasis  -- ^ The given /emphasis/ style.
+  -> Int  -- ^ The given number to convert.
+  -> Char  -- ^ The corresponding symbol in serifs in the given /emphasis/ style, unspecified outside the the range.
 intToDigitSerif' = splitEmphasis intToDigitSerifRegular' intToDigitSerifBold'
 
 -- | Convert the given number (@0@-@9@) to its corresponding character
 -- with the given 'Emphasis' in serif style wrapped in a 'Just' data constructor.
 -- For numbers outside this range, 'Nothing' is returned.
 intToDigitSerif
-  :: Emphasis -- ^ The given /emphasis/ style.
-  -> Int -- ^ The given number to convert
-  -> Maybe Char -- ^ The corresponding symbol in serifs in the given /emphasis/ style wrapped in a 'Just',
+  :: Emphasis  -- ^ The given /emphasis/ style.
+  -> Int  -- ^ The given number to convert
+  -> Maybe Char  -- ^ The corresponding symbol in serifs in the given /emphasis/ style wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 intToDigitSerif = splitEmphasis intToDigitSerifRegular intToDigitSerifBold
 
@@ -628,16 +628,16 @@ intToDigitSerif = splitEmphasis intToDigitSerifRegular intToDigitSerifBold
 -- in a non-bold sans-serif style. The result for numbers outside this range is
 -- unspecified.
 intToDigitSansSerifRegular'
-  :: Int -- ^ The given number to convert.
-  -> Char -- ^ The corresponding symbol in sans-serifs not in bold, unspecified outside the the range.
+  :: Int  -- ^ The given number to convert.
+  -> Char  -- ^ The corresponding symbol in sans-serifs not in bold, unspecified outside the the range.
 intToDigitSansSerifRegular' = digitSansSerifRegular' . intToDigit
 
 -- | Convert the given number (@0@-@9@) to its corresponding character
 -- in a non-bold sans-serif style wrapped in a 'Just' data constructor. For
 -- numbers outside this range, 'Nothing' is returned.
 intToDigitSansSerifRegular
-  :: Int -- ^ The given number to convert.
-  -> Maybe Char -- ^ The corresponding symbol in sans-serifs not in bold wrapped in a 'Just',
+  :: Int  -- ^ The given number to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in sans-serifs not in bold wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 intToDigitSansSerifRegular = _withCondition _isValidInt intToDigitSansSerifRegular'
 
@@ -645,16 +645,16 @@ intToDigitSansSerifRegular = _withCondition _isValidInt intToDigitSansSerifRegul
 -- in a bold sans-serif style. The result for numbers outside this range is
 -- unspecified.
 intToDigitSansSerifBold'
-  :: Int -- ^ The given number to convert.
-  -> Char -- ^ The corresponding symbol in sans-serifs in bold, unspecified outside the the range.
+  :: Int  -- ^ The given number to convert.
+  -> Char  -- ^ The corresponding symbol in sans-serifs in bold, unspecified outside the the range.
 intToDigitSansSerifBold' = digitSansSerifBold' . intToDigit
 
 -- | Convert the given number (@0@-@9@) to its corresponding character
 -- in a bold sans-serif style wrapped in a 'Just' data constructor. For
 -- numbers outside this range, 'Nothing' is returned.
 intToDigitSansSerifBold
-  :: Int -- ^ The given number to convert.
-  -> Maybe Char -- ^ The corresponding symbol in sans-serifs in bold wrapped in a 'Just',
+  :: Int  -- ^ The given number to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in sans-serifs in bold wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 intToDigitSansSerifBold = _withCondition _isValidInt intToDigitSansSerifBold'
 
@@ -662,18 +662,18 @@ intToDigitSansSerifBold = _withCondition _isValidInt intToDigitSansSerifBold'
 -- with a given 'Emphasis' in sans-serif style. The result for numbers outside this
 -- range is unspecified.
 intToDigitSansSerif'
-  :: Emphasis -- ^ The given /emphasis/ style.
-  -> Int -- ^ The given number to convert.
-  -> Char -- ^ The corresponding symbol in sans-serifs in the given /emphasis/ style, unspecified outside the the range.
+  :: Emphasis  -- ^ The given /emphasis/ style.
+  -> Int  -- ^ The given number to convert.
+  -> Char  -- ^ The corresponding symbol in sans-serifs in the given /emphasis/ style, unspecified outside the the range.
 intToDigitSansSerif' = splitEmphasis intToDigitSansSerifRegular' intToDigitSansSerifBold'
 
 -- | Convert the given number (@0@-@9@) to its corresponding character
 -- with the given 'Emphasis' in sans-serif style wrapped in a 'Just' data constructor.
 -- For numbers outside this range, 'Nothing' is returned.
 intToDigitSansSerif
-  :: Emphasis -- ^ The given /emphasis/ style.
-  -> Int -- ^ The given number to convert
-  -> Maybe Char -- ^ The corresponding symbol in sans-serifs in the given /emphasis/ style wrapped in a 'Just',
+  :: Emphasis  -- ^ The given /emphasis/ style.
+  -> Int  -- ^ The given number to convert
+  -> Maybe Char  -- ^ The corresponding symbol in sans-serifs in the given /emphasis/ style wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 intToDigitSansSerif = splitEmphasis intToDigitSansSerifRegular intToDigitSansSerifBold
 
@@ -681,84 +681,84 @@ intToDigitSansSerif = splitEmphasis intToDigitSansSerifRegular intToDigitSansSer
 -- with a given 'Emphasis' in the given 'FontStyle'. The result for numbers outside this
 -- range is unspecified.
 intToDigitChar'
-  :: FontStyle -- ^ The given /font/ style.
-  -> Emphasis -- ^ The given /emphasis/ style.
-  -> Int -- ^ The given number to convert.
-  -> Char -- ^ The corresponding symbol in sans-serifs in the given /font/ style the given /emphasis/ style, unspecified outside the the range.
+  :: FontStyle  -- ^ The given /font/ style.
+  -> Emphasis  -- ^ The given /emphasis/ style.
+  -> Int  -- ^ The given number to convert.
+  -> Char  -- ^ The corresponding symbol in sans-serifs in the given /font/ style the given /emphasis/ style, unspecified outside the the range.
 intToDigitChar' = splitFontStyle intToDigitSansSerif' intToDigitSerif'
 
 -- | Convert the given number (@0@-@9@) to its corresponding character
 -- with the given 'Emphasis' in the given 'FontStyle' wrapped in a 'Just' data constructor.
 -- For numbers outside this range, 'Nothing' is returned.
 intToDigitChar
-  :: FontStyle -- ^ The given /font/ style.
-  -> Emphasis -- ^ The given /emphasis/ style.
-  -> Int -- ^ The given number to convert.
-  -> Maybe Char -- ^ The corresponding symbol in the given /font/ style in the given /emphasis/ style wrapped in a 'Just',
+  :: FontStyle  -- ^ The given /font/ style.
+  -> Emphasis  -- ^ The given /emphasis/ style.
+  -> Int  -- ^ The given number to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in the given /font/ style in the given /emphasis/ style wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 intToDigitChar = splitFontStyle intToDigitSansSerif intToDigitSerif
 
 -- | Convert the given number (@0@-@9@) to its corresponding character in
 -- /monospace/ style. Unspecified result for numbers outside this range.
 intToDigitMonospace'
-  :: Int -- ^ The given number to convert.
-  -> Char -- ^ The corresponding character in monspace style. Unspecified outside the digit range.
+  :: Int  -- ^ The given number to convert.
+  -> Char  -- ^ The corresponding character in monspace style. Unspecified outside the digit range.
 intToDigitMonospace' = digitMonospace' . intToDigit
 
 -- | Convert the given number (@0@-@9@) to its corresponding character
 -- in /monospace/ style wrapped in a 'Just' data constructor. For
 -- numbers outside this range, 'Nothing' is returned.
 intToDigitMonospace
-  :: Int -- ^ The given number to convert.
-  -> Maybe Char -- ^ The corresponding symbol in /monospace/ style wrapped in a 'Just',
+  :: Int  -- ^ The given number to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in /monospace/ style wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 intToDigitMonospace = _withCondition _isValidInt intToDigitMonospace'
 
 -- | Convert the given number (@0@-@9@) to its corresponding character in
 -- /double-struck/ style. Unspecified result for numbers outside this range.
 intToDigitDoubleStruck'
-  :: Int -- ^ The given number to convert.
-  -> Char -- ^ The corresponding character in double-struck style. Unspecified outside the digit range.
+  :: Int  -- ^ The given number to convert.
+  -> Char  -- ^ The corresponding character in double-struck style. Unspecified outside the digit range.
 intToDigitDoubleStruck' = digitDoubleStruck' . intToDigit
 
 -- | Convert the given number (@0@-@9@) to its corresponding character
 -- in /double-struck/ style wrapped in a 'Just' data constructor. For
 -- numbers outside this range, 'Nothing' is returned.
 intToDigitDoubleStruck
-  :: Int -- ^ The given number to convert.
-  -> Maybe Char -- ^ The corresponding symbol in /monospace/ style wrapped in a 'Just',
+  :: Int  -- ^ The given number to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in /monospace/ style wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 intToDigitDoubleStruck = _withCondition _isValidInt intToDigitDoubleStruck'
 
 -- | Converts the given digit (@0@-@9@) charcters to its equivalent in
 -- /monospace/ style. Unspecified result for characters outside the range.
 digitMonospace'
-  :: Char -- ^ The given digit character to convert.
-  -> Char -- ^ The corresponding character in monspace style. Unspecified outside the digit range.
+  :: Char  -- ^ The given digit character to convert.
+  -> Char  -- ^ The corresponding character in monspace style. Unspecified outside the digit range.
 digitMonospace' = monospace'
 
 -- | Converts the given digit (@0@-@9@) charcters to its equivalent in
 -- /monospace/ style wrapped in a 'Just' data constructor. 'Nothing'
 -- for characters outside the range.
 digitMonospace
-  :: Char -- ^ The given digit character to convert.
-  -> Maybe Char -- ^ The corresponding symbol in monospace style wrapped in a 'Just',
+  :: Char  -- ^ The given digit character to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in monospace style wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 digitMonospace = _withCondition isDigit digitMonospace'
 
 -- | Converts the given digit (@0@-@9@) charcters to its equivalent in
 -- /double-struck/ style. Unspecified result for characters outside the range.
 digitDoubleStruck'
-  :: Char -- ^ The given digit character to convert.
-  -> Char -- ^ The corresponding character in double-struck style. Unspecified outside the digit range.
+  :: Char  -- ^ The given digit character to convert.
+  -> Char  -- ^ The corresponding character in double-struck style. Unspecified outside the digit range.
 digitDoubleStruck' = doubleStruck'
 
 -- | Converts the given digit (@0@-@9@) charcters to its equivalent in
 -- /double-struck/ style wrapped in a 'Just' data constructor. 'Nothing'
 -- for characters outside the range.
 digitDoubleStruck
-  :: Char -- ^ The given digit character to convert.
-  -> Maybe Char -- ^ The corresponding symbol in double-struck style wrapped in a 'Just',
+  :: Char  -- ^ The given digit character to convert.
+  -> Maybe Char  -- ^ The corresponding symbol in double-struck style wrapped in a 'Just',
                 -- 'Nothing' if the character is outside the range.
 digitDoubleStruck = _withCondition isDigit digitDoubleStruck'
 
@@ -766,24 +766,24 @@ digitDoubleStruck = _withCondition isDigit digitDoubleStruck'
 -- and numerical range (@A@-@Z@, @a@-@z@, and @0@-@9@). For characters outside
 -- the range, the result is unspecified.
 monospace'
-  :: Char -- ^ The given character to convert to a /monospace/ symbol.
-  -> Char -- ^ The equivalent monospace symbol for the given character.
+  :: Char  -- ^ The given character to convert to a /monospace/ symbol.
+  -> Char  -- ^ The equivalent monospace symbol for the given character.
 monospace' = _baseUpperLowerNum 0x1d7c6 0x1d629
 
 -- | Convert the given character to its /monospace/ equivalent for the alphabet
 -- and numerical range (@A@-@Z@, @a@-@z@, and @0@-@9@) wrapped in a 'Just' data
 -- constructor. For characters outside the range, 'Nothing' is returned.
 monospace
-  :: Char -- ^ The given character to convert to a /monspace/ symbol.
-  -> Maybe Char -- ^ The equivalent monospace character wrapped in a 'Just' data constructor, 'Nothing' if outside the alphanumerical range.
+  :: Char  -- ^ The given character to convert to a /monspace/ symbol.
+  -> Maybe Char  -- ^ The equivalent monospace character wrapped in a 'Just' data constructor, 'Nothing' if outside the alphanumerical range.
 monospace = _withCondition isAsciiAlphaNum monospace'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
 -- symbol is /not/ written in boldface. If the symbol is outside the alphabet
 -- range (@A@-@Z@, and @a-z@), the returned character is unspecified.
 scriptRegular'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted in calligraphy, not in bold.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted in calligraphy, not in bold.
 scriptRegular' 'B' = '\x212c'
 scriptRegular' 'E' = '\x2130'
 scriptRegular' 'F' = '\x2131'
@@ -802,8 +802,8 @@ scriptRegular' c = _baseUpperLower 0x1d455 c
 -- boldface. If the symbol is outside the alphabet range (@A@-@Z@, and @a-z@),
 -- 'Nothing' is returned.
 scriptRegular
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The calligraphy symbol for the given character wrapped
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
                 -- in a 'Just' data constructor, 'Nothing' if there is no
                 -- equivalent /calligraphy/ character.
 scriptRegular = _withCondition isAsciiAlpha scriptRegular'
@@ -812,8 +812,8 @@ scriptRegular = _withCondition isAsciiAlpha scriptRegular'
 -- symbol is written in boldface. If the symbol is outside the alphabet
 -- range (@A@-@Z@, and @a-z@), the returned character is unspecified.
 scriptBold'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted in calligraphy, and in bold.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted in calligraphy, and in bold.
 scriptBold' = _baseUpperLower 0x1d489
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
@@ -821,8 +821,8 @@ scriptBold' = _baseUpperLower 0x1d489
 -- boldface. If the symbol is outside the alphabet range (@A@-@Z@, and @a-z@),
 -- 'Nothing' is returned.
 scriptBold
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The calligraphy symbol for the given character wrapped
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
                 -- in a 'Just' data constructor, 'Nothing' if there is no
                 -- equivalent /calligraphy/ character.
 scriptBold = _withCondition isAsciiAlpha scriptBold'
@@ -831,9 +831,9 @@ scriptBold = _withCondition isAsciiAlpha scriptBold'
 -- symbol is written in the given 'Emphasis' style. If the symbol is outside the
 -- alphabet range (@A@-@Z@, and @a-z@), the returned character is unspecified.
 script'
-  :: Emphasis -- ^ The given 'Emphasis' style to use.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted in calligraphy, and depending on the 'Emphasis' in bold or not.
+  :: Emphasis  -- ^ The given 'Emphasis' style to use.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted in calligraphy, and depending on the 'Emphasis' in bold or not.
 script' = splitEmphasis scriptRegular' scriptBold'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
@@ -841,9 +841,9 @@ script' = splitEmphasis scriptRegular' scriptBold'
 -- the given 'Emphasis' style. If the symbol is outside the
 -- alphabet range (@A@-@Z@, and @a-z@), 'Nothing' is returned.
 script
-  :: Emphasis -- ^ The given 'Emphasis' style to use.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The calligraphy symbol for the given character wrapped
+  :: Emphasis  -- ^ The given 'Emphasis' style to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
                 -- in a 'Just' data constructor, 'Nothing' if there is no
                 -- equivalent /calligraphy/ character.
 script = splitEmphasis scriptRegular scriptBold
@@ -853,8 +853,8 @@ script = splitEmphasis scriptRegular scriptBold
 -- range (@A@-@Z@, and @a-z@), the returned character is unspecified.
 -- This is an alias of 'scriptRegular''.
 calligraphyRegular'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted in calligraphy, not in bold.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted in calligraphy, not in bold.
 calligraphyRegular' = scriptRegular'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
@@ -862,8 +862,8 @@ calligraphyRegular' = scriptRegular'
 -- boldface. If the symbol is outside the alphabet range (@A@-@Z@, and @a-z@),
 -- 'Nothing' is returned. This is an alias of 'scriptRegular'.
 calligraphyRegular
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The calligraphy symbol for the given character wrapped
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
                 -- in a 'Just' data constructor, 'Nothing' if there is no
                 -- equivalent /calligraphy/ character.
 calligraphyRegular = scriptRegular
@@ -873,8 +873,8 @@ calligraphyRegular = scriptRegular
 -- range (@A@-@Z@, and @a-z@), the returned character is unspecified. This is an
 -- alias of 'scriptBold''.
 calligraphyBold'
-  :: Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted in calligraphy, and in bold.
+  :: Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted in calligraphy, and in bold.
 calligraphyBold' = scriptBold'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
@@ -882,8 +882,8 @@ calligraphyBold' = scriptBold'
 -- boldface. If the symbol is outside the alphabet range (@A@-@Z@, and @a-z@),
 -- 'Nothing' is returned. This is an alias of 'scriptBold'.
 calligraphyBold
-  :: Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The calligraphy symbol for the given character wrapped
+  :: Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
                 -- in a 'Just' data constructor, 'Nothing' if there is no
                 -- equivalent /calligraphy/ character.
 calligraphyBold = scriptBold
@@ -893,9 +893,9 @@ calligraphyBold = scriptBold
 -- alphabet range (@A@-@Z@, and @a-z@), the returned character is unspecified.
 -- This is an alias of 'script''.
 calligraphy'
-  :: Emphasis -- ^ The given 'Emphasis' style to use.
-  -> Char -- ^ The given character to convert.
-  -> Char -- ^ The equivalent character that is formatted in calligraphy, and depending on the 'Emphasis' in bold or not.
+  :: Emphasis  -- ^ The given 'Emphasis' style to use.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted in calligraphy, and depending on the 'Emphasis' in bold or not.
 calligraphy' = script'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
@@ -904,9 +904,9 @@ calligraphy' = script'
 -- alphabet range (@A@-@Z@, and @a-z@), 'Nothing' is returned.
 -- This is an alias of 'script'.
 calligraphy
-  :: Emphasis -- ^ The given 'Emphasis' style to use.
-  -> Char -- ^ The given character to convert.
-  -> Maybe Char -- ^ The calligraphy symbol for the given character wrapped
+  :: Emphasis  -- ^ The given 'Emphasis' style to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
                 -- in a 'Just' data constructor, 'Nothing' if there is no
                 -- equivalent /calligraphy/ character.
 calligraphy = script
@@ -917,7 +917,7 @@ calligraphy = script
 -- behaviour is unspecified.
 doubleStruck'
   :: Char  -- ^ The character to convert to a /double struck/ symbol.
-  -> Char -- ^ The double struck symbol for the given character. If the character
+  -> Char  -- ^ The double struck symbol for the given character. If the character
           -- is not an ASCII alphanumerical character, the result is
           -- unspecified.
 doubleStruck' 'C' = '\x2102'
@@ -934,8 +934,8 @@ doubleStruck' c = _baseUpperLowerNum 0x1d7a8 0x1d4f1 c
 -- the numerical characters (@0@-@9@). The symbols are wrapped in the 'Just'
 -- data constructor. For characters outside the range, 'Nothing' is returned.
 doubleStruck
-  :: Char -- ^ The character to convert to a /double struck/ symbol.
-  -> Maybe Char -- ^ The double struck symbol for the given character wrapped
+  :: Char  -- ^ The character to convert to a /double struck/ symbol.
+  -> Maybe Char  -- ^ The double struck symbol for the given character wrapped
                 -- in a 'Just' data constructor, 'Nothing' if there is no
                 -- equivalent /double stuck/ character.
 doubleStruck = _withCondition isAsciiAlphaNum doubleStruck'
@@ -945,8 +945,8 @@ doubleStruck = _withCondition isAsciiAlphaNum doubleStruck'
 -- (@A@-@Z@, and @a@-@z@). In case the character is not in this range, it is
 -- unspecified what will be returned.
 frakturRegular'
-  :: Char -- ^ The character to convert to a regular /fraktur/ symbol.
-  -> Char -- ^ The equivalent /fraktur/ charater for the given character.
+  :: Char  -- ^ The character to convert to a regular /fraktur/ symbol.
+  -> Char  -- ^ The equivalent /fraktur/ charater for the given character.
 frakturRegular' 'C' = '\x212d'
 frakturRegular' 'H' = '\x210c'
 frakturRegular' 'I' = '\x2111'
@@ -960,8 +960,8 @@ frakturRegular' c = _baseUpperLower 0x1d4bd c
 -- In case a character outside the range is passed to the function, 'Nothing' is
 -- returned.
 frakturRegular
-  :: Char -- ^ The character to convert to a regular /fraktur/ symbol.
-  -> Maybe Char -- ^ The fraktur symbol for the given character wrapped
+  :: Char  -- ^ The character to convert to a regular /fraktur/ symbol.
+  -> Maybe Char  -- ^ The fraktur symbol for the given character wrapped
                 -- in a 'Just' data constructor, 'Nothing' if there is no
                 -- equivalent /fraktur/ character.
 frakturRegular = _withCondition isAsciiAlpha frakturRegular'
@@ -971,8 +971,8 @@ frakturRegular = _withCondition isAsciiAlpha frakturRegular'
 -- (@A@-@Z@, and @a@-@z@). In case the character is not in this range, it is
 -- unspecified what will be returned.
 frakturBold'
-  :: Char -- ^ The character to convert to a bold /fraktur/ symbol.
-  -> Char -- ^ The equivalent /fraktur/ charater for the given character.
+  :: Char  -- ^ The character to convert to a bold /fraktur/ symbol.
+  -> Char  -- ^ The equivalent /fraktur/ charater for the given character.
 frakturBold' = _baseUpperLower 0x1d525
 
 -- | Obtain the fraktur symbol for the given character in a /bold/.
@@ -981,8 +981,8 @@ frakturBold' = _baseUpperLower 0x1d525
 -- In case a character outside the range is passed to the function, 'Nothing' is
 -- returned.
 frakturBold
-  :: Char -- ^ The character to convert to a bold /fraktur/ symbol.
-  -> Maybe Char -- ^ The fraktur symbol for the given character wrapped
+  :: Char  -- ^ The character to convert to a bold /fraktur/ symbol.
+  -> Maybe Char  -- ^ The fraktur symbol for the given character wrapped
                 -- in a 'Just' data constructor, 'Nothing' if there is no
                 -- equivalent /fraktur/ character.
 frakturBold = _withCondition isAsciiAlpha frakturBold'
@@ -992,9 +992,9 @@ frakturBold = _withCondition isAsciiAlpha frakturBold'
 -- (@A@-@Z@, and @a@-@z@). In case the character is not in this range, it is
 -- unspecified what will be returned.
 fraktur'
-  :: Emphasis -- ^ The given emphasis style to use.
-  -> Char -- ^ The character to convert to a /fraktur/ symbol in the given emphasis style.
-  -> Char -- ^ The equivalent /fraktur/ charater for the given character.
+  :: Emphasis  -- ^ The given emphasis style to use.
+  -> Char  -- ^ The character to convert to a /fraktur/ symbol in the given emphasis style.
+  -> Char  -- ^ The equivalent /fraktur/ charater for the given character.
 fraktur' = splitEmphasis frakturRegular' frakturBold'
 
 -- | Obtain the fraktur symbol for the given character in the given emphais
@@ -1003,9 +1003,9 @@ fraktur' = splitEmphasis frakturRegular' frakturBold'
 -- In case a character outside the range is passed to the function, 'Nothing' is
 -- returned.
 fraktur
-  :: Emphasis -- ^ The given emphasis style to use.
-  -> Char -- ^ The character to convert to a /fraktur/ symbol with the given emphasis style.
-  -> Maybe Char -- ^ The fraktur symbol for the given character wrapped
+  :: Emphasis  -- ^ The given emphasis style to use.
+  -> Char  -- ^ The character to convert to a /fraktur/ symbol with the given emphasis style.
+  -> Maybe Char  -- ^ The fraktur symbol for the given character wrapped
                 -- in a 'Just' data constructor, 'Nothing' if there is no
                 -- equivalent /fraktur/ character.
 fraktur = splitEmphasis frakturRegular frakturBold

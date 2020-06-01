@@ -36,8 +36,8 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 -- | The style to convert a number to a Roman numeral. The 'UnicodeCharacter'
 -- instance maps on the uppercase Roman literals.
 data RomanStyle
-  = Additive -- ^ The additive style converts four to ⅠⅠⅠⅠ.
-  | Subtractive -- ^ The subtractive style converts four to ⅠⅤ.
+  = Additive  -- ^ The additive style converts four to ⅠⅠⅠⅠ.
+  | Subtractive  -- ^ The subtractive style converts four to ⅠⅤ.
   deriving (Bounded, Enum, Eq, Show, Read)
 
 instance Arbitrary RomanStyle where
@@ -58,22 +58,22 @@ instance UnicodeText RomanLiteral
 
 -- | Roman numerals for which a unicode character exists.
 data RomanLiteral
-  = I -- ^ The unicode character for the Roman numeral /one/: Ⅰ.
-  | II -- ^ The unicode character for the Roman numeral /two/: Ⅱ.
-  | III -- ^ The unicode character for the Roman numeral /three/: Ⅲ.
-  | IV -- ^ The unicode character for the Roman numeral /four/: Ⅳ.
-  | V -- ^ The unicode character for the Roman numeral /five/: Ⅴ.
-  | VI -- ^ The unicode character for the Roman numeral /six/: Ⅵ.
-  | VII -- ^ The unicode character for the Roman numeral /seven/: Ⅶ.
-  | VIII -- ^ The unicode character for the Roman numeral /eight/: Ⅷ.
-  | IX -- ^ The unicode character for the Roman numeral /nine/: Ⅸ.
-  | X -- ^ The unicode character for the Roman numeral /ten/: Ⅹ.
-  | XI -- ^ The unicode character for the Roman numeral /eleven/: Ⅺ.
-  | XII -- ^ The unicode character for the Roman numeral /twelve/: Ⅻ.
-  | L -- ^ The unicode character for the Roman numeral /fifty/: Ⅼ.
-  | C -- ^ The unicode character for the Roman numeral /hundred/: Ⅽ.
-  | D -- ^ The unicode character for the Roman numeral /five hundred/: Ⅾ.
-  | M -- ^ The unicode character for the Roman numeral /thousand/: Ⅿ.
+  = I  -- ^ The unicode character for the Roman numeral /one/: Ⅰ.
+  | II  -- ^ The unicode character for the Roman numeral /two/: Ⅱ.
+  | III  -- ^ The unicode character for the Roman numeral /three/: Ⅲ.
+  | IV  -- ^ The unicode character for the Roman numeral /four/: Ⅳ.
+  | V  -- ^ The unicode character for the Roman numeral /five/: Ⅴ.
+  | VI  -- ^ The unicode character for the Roman numeral /six/: Ⅵ.
+  | VII  -- ^ The unicode character for the Roman numeral /seven/: Ⅶ.
+  | VIII  -- ^ The unicode character for the Roman numeral /eight/: Ⅷ.
+  | IX  -- ^ The unicode character for the Roman numeral /nine/: Ⅸ.
+  | X  -- ^ The unicode character for the Roman numeral /ten/: Ⅹ.
+  | XI  -- ^ The unicode character for the Roman numeral /eleven/: Ⅺ.
+  | XII  -- ^ The unicode character for the Roman numeral /twelve/: Ⅻ.
+  | L  -- ^ The unicode character for the Roman numeral /fifty/: Ⅼ.
+  | C  -- ^ The unicode character for the Roman numeral /hundred/: Ⅽ.
+  | D  -- ^ The unicode character for the Roman numeral /five hundred/: Ⅾ.
+  | M  -- ^ The unicode character for the Roman numeral /thousand/: Ⅿ.
   deriving (Bounded, Enum, Eq, Show, Read)
 
 _literals :: Integral i => RomanStyle -> [(i, [RomanLiteral] -> [RomanLiteral])]
@@ -123,10 +123,10 @@ _ligate (r:rs) = go r rs
 -- to a sequence of 'RomanLiteral's, given the number can be represented
 -- with Roman numerals (is strictly larger than zero).
 toLiterals :: Integral i
-  => RomanStyle -- ^ Specifies if the Numeral is 'Additive' or 'Subtractive' style.
-  -> Ligate -- ^ Specifies if characters like @ⅠⅤ@ are joined to @Ⅳ@.
-  -> i -- ^ The given number to convert.
-  -> Maybe [RomanLiteral] -- ^ A list of 'RomanLiteral's if the given number can be specified
+  => RomanStyle  -- ^ Specifies if the Numeral is 'Additive' or 'Subtractive' style.
+  -> Ligate  -- ^ Specifies if characters like @ⅠⅤ@ are joined to @Ⅳ@.
+  -> i  -- ^ The given number to convert.
+  -> Maybe [RomanLiteral]  -- ^ A list of 'RomanLiteral's if the given number can be specified
                           -- with Roman numerals, 'Nothing' otherwise.
 toLiterals s c k
     | k > 0 = ligateF _ligate c (go k (_literals s))
@@ -149,15 +149,15 @@ _romanLiteral = (chr .) . (. fromEnum) . (.|.)
 -- | Convert the given 'RomanLiteral' object to a unicode character in
 -- /upper case/.
 romanLiteral
-  :: RomanLiteral -- ^ The given 'RomanLiteral' to convert.
-  -> Char -- ^ A unicode character that represents the given 'RomanLiteral'.
+  :: RomanLiteral  -- ^ The given 'RomanLiteral' to convert.
+  -> Char  -- ^ A unicode character that represents the given 'RomanLiteral'.
 romanLiteral = _romanLiteral _romanUppercaseOffset
 
 -- | Convert the given 'RomanLiteral' object to a unicode character in
 -- /lower case/.
 romanLiteral'
-  :: RomanLiteral -- ^ The given 'RomanLiteral' to convert.
-  -> Char -- ^ A unicode character that represents the given 'RomanLiteral'.
+  :: RomanLiteral  -- ^ The given 'RomanLiteral' to convert.
+  -> Char  -- ^ A unicode character that represents the given 'RomanLiteral'.
 romanLiteral' = _romanLiteral _romanLowercaseOffset
 
 _romanNumeral :: (RomanLiteral -> Char) -> [RomanLiteral] -> Text
@@ -167,8 +167,8 @@ _romanNumeral = (`foldr` empty) . (cons .)
 -- contains a sequence of corresponding Unicode characters which are Roman
 -- numberals in /upper case/.
 romanNumeral
-  :: [RomanLiteral] -- ^ The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.
-  -> Text -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.
+  :: [RomanLiteral]  -- ^ The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.
+  -> Text  -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.
 romanNumeral = _romanNumeral romanLiteral
 
 
@@ -176,17 +176,17 @@ romanNumeral = _romanNumeral romanLiteral
 -- contains a sequence of corresponding Unicode characters which are Roman
 -- numberals in /lower case/.
 romanNumeral'
-  :: [RomanLiteral] -- ^ The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.
-  -> Text -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.
+  :: [RomanLiteral]  -- ^ The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.
+  -> Text  -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.
 romanNumeral' = _romanNumeral romanLiteral'
 
 -- | Convert a sequence of 'RomanLiteral' objects to a 'Text' object that
 -- contains a sequence of corresponding Unicode characters which are Roman
 -- numberals in /upper case/ or /lower case/ depending on the 'LetterCase' value.
 romanNumeralCase
-  :: LetterCase -- ^ The given 'LetterCase' to apply.
-  -> [RomanLiteral] -- ^ The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.
-  -> Text -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.
+  :: LetterCase  -- ^ The given 'LetterCase' to apply.
+  -> [RomanLiteral]  -- ^ The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.
+  -> Text  -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.
 romanNumeralCase = splitLetterCase romanNumeral romanNumeral'
 
 _romanNumber :: Integral i => ([RomanLiteral] -> a) -> RomanStyle -> Ligate -> i -> Maybe a
@@ -196,10 +196,10 @@ _romanNumber f r c = fmap f . toLiterals r c
 -- given the number, given it can be represented. 'Nothing' in case it can not
 -- be represented. The number is written in Roman numerals in /upper case/.
 romanNumber :: Integral i
-  => RomanStyle -- ^ Specifies if the Numeral is 'Additive' or 'Subtractive' style.
-  -> Ligate -- ^ Specifies if characters like @ⅠⅤ@ are joined to @Ⅳ@.
-  -> i -- ^ The given number to convert.
-  -> Maybe Text -- ^ A 'Text' if the given number can be specified with Roman
+  => RomanStyle  -- ^ Specifies if the Numeral is 'Additive' or 'Subtractive' style.
+  -> Ligate  -- ^ Specifies if characters like @ⅠⅤ@ are joined to @Ⅳ@.
+  -> i  -- ^ The given number to convert.
+  -> Maybe Text  -- ^ A 'Text' if the given number can be specified with Roman
                 -- numerals wrapped in a 'Just', 'Nothing' otherwise.
 romanNumber = _romanNumber romanNumeral
 
@@ -207,10 +207,10 @@ romanNumber = _romanNumber romanNumeral
 -- given the number, given it can be represented. 'Nothing' in case it can not
 -- be represented. The number is written in Roman numerals in /lower case/.
 romanNumber' :: Integral i
-  => RomanStyle -- ^ Specifies if the Numeral is 'Additive' or 'Subtractive' style.
-  -> Ligate -- ^ Specifies if characters like @ⅠⅤ@ are joined to @Ⅳ@.
-  -> i -- ^ The given number to convert.
-  -> Maybe Text -- ^ A 'Text' if the given number can be specified with Roman
+  => RomanStyle  -- ^ Specifies if the Numeral is 'Additive' or 'Subtractive' style.
+  -> Ligate  -- ^ Specifies if characters like @ⅠⅤ@ are joined to @Ⅳ@.
+  -> i  -- ^ The given number to convert.
+  -> Maybe Text  -- ^ A 'Text' if the given number can be specified with Roman
                 -- numerals wrapped in a 'Just', 'Nothing' otherwise.
 romanNumber' = _romanNumber romanNumeral'
 

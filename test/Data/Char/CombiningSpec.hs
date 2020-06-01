@@ -19,4 +19,5 @@ spec = do
   describe "combiningCharacter" $
     it "combiningCharacter and combiningToUnicode are each others inverse" $ property $
       \c -> combiningCharacter (combiningToUnicode c) == Just c
-  testUnicodeCharacter (undefined :: CombiningCharacter)
+  testUnicodeCharacter "CombiningCharacter" (undefined :: CombiningCharacter)
+  testUnicodeText "CombiningCharacter" (undefined :: CombiningCharacter)

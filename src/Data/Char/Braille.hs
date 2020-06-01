@@ -32,32 +32,32 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary)
 
 -- | A datastructure to render Braille patterns with six dots cells.
 data Braille6 a = Braille6 {
-    top :: Row a -- ^ The state of the top row of the Braille character.
-  , middle :: Row a -- ^ The state of the middle row of the Braille character.
-  , bottom :: Row a -- ^ The state of the bottom row of the Braille character.
+    top :: Row a  -- ^ The state of the top row of the Braille character.
+  , middle :: Row a  -- ^ The state of the middle row of the Braille character.
+  , bottom :: Row a  -- ^ The state of the bottom row of the Braille character.
   } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | A datastructure to render Braille patterns with eight dots cells.
 data Braille a = Braille {
-    row1 :: Row a -- ^ The state of the top row of the Braille character.
-  , row2 :: Row a -- ^ The state of the second row of the Braille character.
-  , row3 :: Row a -- ^ The state of the third row of the Braille character.
-  , row4 :: Row a -- ^ The state of the bottom row of the Braille character.
+    row1 :: Row a  -- ^ The state of the top row of the Braille character.
+  , row2 :: Row a  -- ^ The state of the second row of the Braille character.
+  , row3 :: Row a  -- ^ The state of the third row of the Braille character.
+  , row4 :: Row a  -- ^ The state of the bottom row of the Braille character.
   } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
 
 -- | Convert a 'Braille6' value to a 'Braille' character, by putting in a given
 -- value at the two values at the bottom row.
 toBraille'
-  :: a -- ^ The value to put in the cells of the bottom row.
-  -> Braille6 a -- ^ The given 'Braille6' value to convert.
-  -> Braille a -- ^ A 'Braille' value that uses as bottom two values given as first parameter.
+  :: a  -- ^ The value to put in the cells of the bottom row.
+  -> Braille6 a  -- ^ The given 'Braille6' value to convert.
+  -> Braille a  -- ^ A 'Braille' value that uses as bottom two values given as first parameter.
 toBraille' d (Braille6 r0 r1 r2) = Braille r0 r1 r2 (Row d d)
 
 -- | Convert a 'Braille6' value to a 'Braille6' character by setting the bottom
 -- row with two 'False' values.
 toBraille
-  :: Braille6 Bool -- ^ The given 'Braille6' value to convert.
-  -> Braille Bool -- ^ A 'Braille' value that uses as bottom two times 'False'.
+  :: Braille6 Bool  -- ^ The given 'Braille6' value to convert.
+  -> Braille Bool  -- ^ A 'Braille' value that uses as bottom two times 'False'.
 toBraille = toBraille' False
 
 -- | Convert the given 'Char'acter to a 'Braille' object of 'Bool's. If the

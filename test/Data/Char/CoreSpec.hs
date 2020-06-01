@@ -22,4 +22,6 @@ spec = do
       \c -> isReserved c /= isNotReserved c
     it "No overlap with isAscii" $ property $
       \c -> not (isReserved c) || not (isAscii c)
-  testUnicodeCharacter (undefined :: Char)
+  testUnicodeCharacter "Char" (undefined :: Char)
+  testUnicodeText "Char" (undefined :: Char)
+  testUnicodeText "[Char]" (undefined :: String)

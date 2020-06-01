@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternSynonyms, Safe #-}
+{-# LANGUAGE PatternSynonyms, OverloadedStrings, Safe #-}
 
 {-|
 Module      : Data.Char.Emoji
@@ -11,14 +11,26 @@ Unicode defines 2182 emoji characters, this module aims to make working with emo
 -}
 
 module Data.Char.Emoji (
+    -- * Emoji suffix
+    pattern EmojiSuffix
     -- * Flag emoji
-    Flag
+  , Flag, flag, flag', flagChars
   , iso3166Alpha2ToFlag, iso3166Alpha2ToFlag', validFlagEmoji
+    -- * Subregional flag emoji
+  , SubFlag
+    -- * Clock emoji
+  , Clock, hours, minutes30, clock, closestClock
+    -- * Blood type emoji
+  , BloodType(O, B, A, AB)
+    -- * Moon phase emoji
+  , MoonPhase(NewMoon, WaxingCrescent, FirstQuarter, WaxingGibbous, FullMoon, WaningGibbous, ThirdQuarter, WaningCrescent)
+    -- * Gender sign emoji
+  , Gender(Female, Male)
     -- * Zodiac emoji
   , Zodiac(Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
     -- * Skin color modifier
   , SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), fromFitzPatrick
-    -- * Pattern symbols for Flags
+    -- * Pattern symbols for 'Flag's
   , pattern AC, pattern AD, pattern AE, pattern AF, pattern AG, pattern AI, pattern AL, pattern AM, pattern AO, pattern AQ, pattern AR
   , pattern AS, pattern AT, pattern AU, pattern AW, pattern AX, pattern AZ, pattern BA, pattern BB, pattern BD, pattern BE, pattern BF
   , pattern BG, pattern BH, pattern BI, pattern BJ, pattern BL, pattern BM, pattern BN, pattern BO, pattern BQ, pattern BR, pattern BS
@@ -43,29 +55,44 @@ module Data.Char.Emoji (
   , pattern TR, pattern TT, pattern TV, pattern TW, pattern TZ, pattern UA, pattern UG, pattern UM, pattern UN, pattern US, pattern UY
   , pattern UZ, pattern VA, pattern VC, pattern VE, pattern VG, pattern VI, pattern VN, pattern VU, pattern WF, pattern WS, pattern XK
   , pattern YE, pattern YT, pattern ZA, pattern ZM, pattern ZW
-    -- * Pattern synonyms for emoji elements
+    -- * Pattern synonyms for 'SubFlag's
+  , pattern ENG, pattern SCT, pattern WLS
+    -- * Pattern synonyms for 'Zodiac' elements
   , pattern Ram, pattern Bull, pattern Twins, pattern Crab, pattern Lion, pattern Maiden, pattern Scales, pattern Scorpius, pattern Scorpion
   , pattern Centaur, pattern Archer, pattern Capricornus, pattern MountainGoat, pattern GoatHorned, pattern SeaGoat, pattern WaterBearer
   , pattern Fish
+    -- * Pattern synonyms for the 'SkinColorModifier' elements
   , pattern FitzPatrickI, pattern FitzPatrickII, pattern FitzPatrickIII, pattern FitzPatrickIV, pattern FitzPatrickV, pattern FitzPatrickVI
   ) where
 
 import Prelude hiding (LT, GT)
-import Data.Char(toUpper)
+
+import Data.Bits(Bits((.&.), (.|.), bit, bitSize, bitSizeMaybe, complement, isSigned, popCount, rotate, shift, shiftL, shiftR, testBit, xor))
+import Data.Bool(bool)
+import Data.Char(chr, ord, toUpper, toLower)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Enclosed(regionalIndicatorUppercase')
 import Data.Function(on)
+import Data.Maybe(fromJust)
 import Data.Text(Text, pack, unpack)
 
 import GHC.Enum(fromEnumError, toEnumError)
 
-import Test.QuickCheck(elements)
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
+
+-- | A 'Char'acter that is often used as a suffix to turn a character into an
+-- emoji.
+pattern EmojiSuffix :: Char
+pattern EmojiSuffix = '\xfe0f'
 
 _skinColorOffset :: Int
 _skinColorOffset = 0x1f3fb
 
 _zodiacOffset :: Int
 _zodiacOffset = 0x2648
+
+_moonPhaseOffset :: Int
+_moonPhaseOffset = 0x1f311
 
 -- | A data type that stores a (country) flag by the two characters of the ISO
 -- 3166 Alpa-2 standard. The data constructor is hidden to prevent making flags
@@ -76,9 +103,57 @@ _zodiacOffset = 0x2648
 -- have no corresponding flag.
 data Flag = Flag Char Char deriving (Eq, Ord, Show)
 
+-- | A data type to store a subregion flag. This is specified by the /parent/
+-- flag, and three characters of the subregion. At the moment, the only three
+-- subregional flags are /England/ (eng), /Scotland/ (sct) and /Wales/ (wls),
+-- all beloning under the /United Kingdom/ flag (GB).
+-- The data constructor is made private to prevent making non-existing subflags.
+data SubFlag = SubFlag Flag Char Char Char deriving (Eq, Ord, Show)
+
 instance Bounded Flag where
     minBound = AC
     maxBound = ZW
+
+-- | Convert the given two characters that represent a flag according to the ISO
+-- 3166 Alpha-2 standard to a 'Flag' wrapped in a 'Just' data constructor, if
+-- that flag exists; 'Nothing' otherwise.
+-- One can pass characters in upper case (@A-Z@) and lower case (@a-z@). The
+-- flag will hold the upper case variant.
+-- The Emoji have flags for the countries defined by the ISO 3166 Alpha-2
+-- standard without deprecated regions like the Soviet Union (SU) and Yugoslavia
+-- (YU). Furthermore there are Emoji for the flags of Antarctica (AQ), the
+-- European Union (EU) and the United Nations (UN).
+flag
+  :: Char  -- ^ The first character of the ISO 3166 Alpha-2 standard.
+  -> Char  -- ^ The second character of the ISO 3166 Alpha-2 standard.
+  -> Maybe Flag  -- ^ A 'Flag' object wrapped in a 'Just' data constructor, given such flag exists; 'Nothing' otherwise.
+flag ca cb
+    | _validFlagEmoji a b = Just (Flag a b)
+    | otherwise = Nothing
+    where a = toUpper ca
+          b = toUpper cb
+
+-- | Convert the given two characters that represent a flag according to the ISO
+-- 3166 Alpha-2 standard to a 'Flag'. If the flag does not exists, then the
+-- result is unspecified.
+-- One can pass characters in upper case (@A-Z@) and lower case (@a-z@). The
+-- flag will hold the upper case variant.
+-- The Emoji have flags for the countries defined by the ISO 3166 Alpha-2
+-- standard without deprecated regions like the Soviet Union (SU) and Yugoslavia
+-- (YU). Furthermore there are Emoji for the flags of Antarctica (AQ), the
+-- European Union (EU) and the United Nations (UN).
+flag'
+  :: Char  -- ^ The first character of the ISO 3166 Alpha-2 standard.
+  -> Char  -- ^ The second character of the ISO 3166 Alpha-2 standard.
+  -> Flag  -- ^ The equivalent 'Flag' object.
+flag' ca = fromJust . flag ca
+
+-- | Obtain the two-characters that specify the given 'Flag'. These two
+-- characters are always upper case (@A-Z@).
+flagChars
+  :: Flag  -- ^ The given 'Flag' to convert to a 2-tuple of 'Char'acters.
+  -> (Char, Char)  -- ^ A 2-tuple that contains upper case 'Char'acters for the given 'Flag'.
+flagChars (Flag ca cb) = (ca, cb)
 
 -- | The 'Flag' pattern used for /Ascension Island/ denoted with /AC/.
 pattern AC :: Flag
@@ -1112,6 +1187,120 @@ pattern ZM = Flag 'Z' 'M'
 pattern ZW :: Flag
 pattern ZW = Flag 'Z' 'W'
 
+-- | The 'SubFlag' pattern use for /England/ denoted with /GB-ENG/ or /ENG/.
+pattern ENG :: SubFlag
+pattern ENG = SubFlag GB 'e' 'n' 'g'
+
+-- | The 'SubFlag' pattern use for /Scotland/ denoted with /GB-SCT/ or /SCT/.
+pattern SCT :: SubFlag
+pattern SCT = SubFlag GB 's' 'c' 't'
+
+-- | The 'SubFlag' pattern use for /Wales/ denoted with /GB-WLS/ or /WLS/.
+pattern WLS :: SubFlag
+pattern WLS = SubFlag GB 'w' 'l' 's'
+
+instance Bounded SubFlag where
+    minBound = ENG
+    maxBound = WLS
+
+-- | A 'Clock' object that can be converted to a unicode character that displays
+-- a clock with the given time. The 'Clock' has an 'hours' field that contains
+-- the given hours between 0 and 12, and a 'minutes30' field that if 'True',
+-- means that the clock is half past that hour.
+data Clock = Clock { 
+    hours :: Int  -- ^ The number of hours on the given clock. Is between 0 and 12. For 0, the 'minutes30' is 'True'; and for 12, the 'minutes30' is 'False'.
+  , minutes30 :: Bool  -- ^ Is 'True' if it is half past the given hour on the 'Clock'.
+  } deriving (Eq, Ord, Show)
+
+-- | A 'BloodType' object used to convert to its unicode equivalent. The
+-- 'BloodType' is also seen as a 2-bit value with the leftmost bit representing
+-- the presence of /A antigens/ and the rightmost the presence of /B antigens/.
+data BloodType
+  = O  -- ^ The /O blood type/, with no presence of A and B antigens.
+  | B  -- ^ The /B blood type/, with presence of the B antigen.
+  | A  -- ^ The /A blood type/, with presence of the A antigen.
+  | AB  -- ^ The /AB blood type/, with presence of the A and B antigens.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+_overEnumMask :: Enum a => Int -> (Int -> Int) -> a -> a
+_overEnumMask m f = toEnum . (m .&.) . f . fromEnum
+
+_overEnum2 :: Enum a => (Int -> Int -> Int) -> a -> a -> a
+_overEnum2 f x y = toEnum (on f fromEnum x y)
+
+_overEnumMask2 :: Enum a => Int -> (Int -> Int -> Int) -> a -> a -> a
+_overEnumMask2 m f x y = toEnum (m .&. on f fromEnum x y)
+
+instance Bits BloodType where
+    (.&.) = _overEnum2 (.&.)
+    (.|.) = _overEnum2 (.|.)
+    xor = _overEnumMask2 0x03 xor
+    complement O = AB
+    complement A = B
+    complement B = A
+    complement AB = O
+    shift abo n = _overEnumMask 0x03 (`shift` n) abo
+    rotate = flip (go . (0x01 .&.))
+        where go 1 A = B
+              go 1 B = B
+              go _ x = x
+    bitSize = const 2
+    bitSizeMaybe = const (Just 2)
+    isSigned = const False
+    testBit = testBit . fromEnum
+    bit 0 = B
+    bit 1 = A
+    bit _ = O
+    popCount O = 0
+    popCount A = 1
+    popCount B = 1
+    popCount AB = 2
+
+instance Bounded Clock where
+    minBound = Clock 0 True
+    maxBound = Clock 12 False
+
+instance Enum Clock where
+    fromEnum (Clock h m30) = pred (shiftL h 1 .|. bool 0 1 m30)
+    toEnum hm30
+        | hm30 < 0 || hm30 > 23 = toEnumError "Clock" hm30 (minBound :: Clock, maxBound)
+        | otherwise = Clock (shiftR hm30' 1) (odd hm30')
+        where hm30' = succ hm30
+    enumFrom = (`enumFromTo` maxBound)
+    enumFromThen x y = enumFromThenTo x y maxBound
+
+-- | Generate the 'Clock' object that is the closest to the given hours and
+-- minutes.
+closestClock
+  :: Int  -- ^ The number of hours.
+  -> Int  -- ^ The number of minutes, must be between 0 and 60.
+  -> Clock  -- ^ The clock object that is the closest to the given hours and minutes.
+closestClock h m
+    | m < 15 = clock h False
+    | m < 45 = clock h True
+    | otherwise = clock (h+1) False
+
+-- | Construct a 'Clock' object with the given number of hours, and a 'Bool'ean
+-- that indicates if it is half past that hour.
+-- The function will ensure that the hours are between 0 and 12 (both inclusive).
+-- For half past 12, we use half past 0, for 12 hours, we use simply 12.
+clock
+  :: Int  -- ^ The given hour of the clock, can be any value, but will be set between 1 and 12.
+  -> Bool  -- ^ A 'Bool'ean that indicates if it is half past that hour, so 'True' means we add 30 minutes.
+  -> Clock  -- ^ A clock object that represents the time that is passed through an hour and .
+clock h b
+    | b && h' == 12 = Clock 0 True
+    | otherwise = Clock h' b
+    where h' = mod (h-1) 12 + 1
+
+-- | A data type to specify the /gender/ of a person, animal, etc. used in an
+-- emoji. The 'Gender' items are an instance of 'UnicodeText' that maps to the
+-- /female/ and /male/ emoji.
+data Gender
+  = Female -- The female sign, dented by ♀️.
+  | Male  -- The male sign, denoted by ♂️.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
 -- | Some emoji deal with people. One can change the color of the skin with the
 -- 'SkinColorModifier'. For the skin color, the <https://en.wikipedia.org/wiki/Fitzpatrick_scale /Fitzpatrick scale/> is used.
 -- A numerical classification system for skin types.
@@ -1139,6 +1328,20 @@ data Zodiac
   | Capricorn  -- ^ The /capricorn/ zodiac sign, /sea-goat/ in English, is denoted as ♑.
   | Aquarius  -- ^ The /aquarius/ zodiac sign, /water-bearer/ in English, is denoted as ♒.
   | Pisces  -- ^ The /pices/ zodiac sign, /fish/ in English, is denoted as ♓.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+-- | A data type that defines the eight different moon phases, and is an
+-- instance of 'UnicodeCharacter' to convert these to the corresponding Unicode
+-- character.
+data MoonPhase
+  = NewMoon  -- ^ The /new moon/, the first phase of the moon represented by 🌑.
+  | WaxingCrescent  -- ^ The /waxing crescent/, the second phase of the moon represented by 🌒.
+  | FirstQuarter  -- ^ The /first quarter/, the third phase of the moon represented by 🌓.
+  | WaxingGibbous  -- ^ The /waxing gibbous/, the fourth phase of the moon represented by 🌔.
+  | FullMoon  -- ^ The /full moon/, the fifth phase of the moon represented by 🌕.
+  | WaningGibbous  -- ^ The /waning gibbous/, the sixth phase of the moon represented by 🌖.
+  | ThirdQuarter  -- ^ The /third quarter/, the seventh phase of the moon represented by 🌗.
+  | WaningCrescent  -- ^ The /waning crescent/, the eighth phase of the moon represented by 🌘.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | The 'SkinColorModifier' that corresponds to type one of the /Fitzpatrick
@@ -1266,7 +1469,7 @@ iso3166Alpha2ToFlag'
   :: Char  -- ^ The first 'Char'acter of the ISO3166 Alpha-2 code.
   -> Char  -- ^ The second 'Char'acter of the ISO3166 Alpha-2 code.
   -> Text  -- ^ A 'Text' object that consists of two characters, where the two characters form a flag emoji, if the given flag exists.
-iso3166Alpha2ToFlag' ca cb = pack (map (mapFromEnum _flagCharOffset . toUpper) [ca, cb])
+iso3166Alpha2ToFlag' ca cb = pack (map (regionalIndicatorUppercase' . toUpper) [ca, cb])
 
 -- | Convert the given two 'Char'acters of the ISO3166-1 Alpha-2 standard to an
 -- Emoji that renders the flag of the corresponding country or terroitory
@@ -1282,14 +1485,13 @@ iso3166Alpha2ToFlag ca cb
   | validFlagEmoji ca cb = Just (iso3166Alpha2ToFlag' ca cb)
   | otherwise = Nothing
 
-
 -- | Convert the given 'Text' object to its equivalent 'Flag' object wrapped in
 -- a 'Just' data constructor if it exists; 'Nothing' otherwise.
 fromFlag :: Text -> Maybe Flag
 fromFlag t
     | [a', b'] <- unpack t, Just a <- shft a', Just b <- shft b', _validFlagEmoji a b = Just (Flag a b)
     | otherwise = Nothing
-    where  shft = mapToEnumSafe _flagCharOffset
+    where shft = mapToEnumSafe _flagCharOffset
 
 -- | Check if for the given two 'Char'acters, a flag emoji exists. The two
 -- character combinations for which a flag exist are defined in the ISO3166-1
@@ -1566,31 +1768,26 @@ _validFlagEmoji _ _ = False
 instance Arbitrary SkinColorModifier where
     arbitrary = arbitraryBoundedEnum
 
+instance Arbitrary Gender where
+    arbitrary = arbitraryBoundedEnum
+
 instance Arbitrary Zodiac where
     arbitrary = arbitraryBoundedEnum
 
+instance Arbitrary Clock where
+    arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary MoonPhase where
+    arbitrary = arbitraryBoundedEnum
+
 instance Arbitrary Flag where
-    arbitrary = elements [
-        AC, AD, AE, AF, AG, AI, AL, AM, AO, AQ, AR, AS, AT, AU
-      , AW, AX, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM
-      , BN, BO, BQ, BR, BS, BT, BV, BW, BY, BZ, CA, CC, CD, CF
-      , CG, CH, CI, CK, CL, CM, CN, CO, CP, CR, CU, CV, CW, CX
-      , CY, CZ, DE, DG, DJ, DK, DM, DO, DZ, EA, EC, EE, EG, EH
-      , ER, ES, ET, EU, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE
-      , GF, GG, GH, GI, GL, GM, GN, GP, GQ, GR, GS, GT, GU, GW
-      , GY, HK, HM, HN, HR, HT, HU, IC, ID, IE, IL, IM, IN, IO
-      , IQ, IR, IS, IT, JE, JM, JO, JP, KE, KG, KH, KI, KM, KN
-      , KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU
-      , LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO
-      , MP, MQ, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE
-      , NF, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG
-      , PH, PK, PL, PM, PN, PR, PS, PT, PW, PY, QA, RE, RO, RS
-      , RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SJ, SK, SL, SM
-      , SN, SO, SR, SS, ST, SV, SX, SY, SZ, TA, TC, TD, TF, TG
-      , TH, TJ, TK, TL, TM, TN, TO, TR, TT, TV, TW, TZ, UA, UG
-      , UM, UN, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS
-      , XK, YE, YT, ZA, ZM, ZW
-      ]
+    arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary SubFlag where
+    arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary BloodType where
+    arbitrary = arbitraryBoundedEnum
 
 instance Enum Flag where
     fromEnum AC = 0
@@ -2114,6 +2311,18 @@ instance Enum Flag where
     enumFrom = (`enumFromTo` maxBound)
     enumFromThen x y = enumFromThenTo x y maxBound
 
+instance Enum SubFlag where
+    fromEnum ENG = 0
+    fromEnum SCT = 1
+    fromEnum WLS = 2
+    fromEnum s = fromEnumError "SubFlag" s
+    toEnum 0 = ENG
+    toEnum 1 = SCT
+    toEnum 2 = WLS
+    toEnum i = toEnumError "SubFlag" i (minBound :: SubFlag, maxBound)
+    enumFrom = (`enumFromTo` maxBound)
+    enumFromThen x y = enumFromThenTo x y maxBound
+
 instance UnicodeCharacter SkinColorModifier where
     toUnicodeChar = mapFromEnum _skinColorOffset
     fromUnicodeChar = mapToEnumSafe _skinColorOffset
@@ -2124,9 +2333,58 @@ instance UnicodeCharacter Zodiac where
     fromUnicodeChar = mapToEnumSafe _zodiacOffset
     fromUnicodeChar' = mapToEnum _zodiacOffset
 
+instance UnicodeCharacter MoonPhase where
+    toUnicodeChar = mapFromEnum _moonPhaseOffset
+    fromUnicodeChar = mapToEnumSafe _moonPhaseOffset
+    fromUnicodeChar' = mapToEnum _moonPhaseOffset
+
+instance UnicodeCharacter Clock where
+    toUnicodeChar (Clock h False) = chr (0x1f54f + h)
+    toUnicodeChar (Clock h True) = chr (0x1f55c + mod (h-1) 12)
+    fromUnicodeChar c
+        | c < '\x1f550' = Nothing
+        | c < '\x1f55c' = Just (Clock (ord c - 0x1f54f) False)
+        | c < '\x1f568' = Just (Clock (mod (ord c - 0x1f55b) 12) True)
+        | otherwise = Nothing
+
 instance UnicodeText Flag where
     toUnicodeText (Flag ca cb) = iso3166Alpha2ToFlag' ca cb
     fromUnicodeText = fromFlag
 
+instance UnicodeText SubFlag where
+    toUnicodeText (SubFlag (Flag ca cb) cc cd ce) = pack ('\x1f3f4' : go' ca : go' cb : map go [cc, cd, ce, '\DEL'])
+        where go = chr . (0xe0000 .|.) . ord
+              go' = go . toLower
+    fromUnicodeText t
+        | ['\x1f3f4', '\xe0067', '\xe0062', sa, sb, sc, '\xe007f'] <- unpack t = go sa sb sc
+        | otherwise = Nothing
+        where go '\xe0065' '\xe006e' '\xe0067' = Just ENG
+              go '\xe0073' '\xe0063' '\xe0074' = Just SCT
+              go '\xe0077' '\xe006c' '\xe0073' = Just WLS
+              go _ _ _ = Nothing
+
 instance UnicodeText SkinColorModifier
 instance UnicodeText Zodiac
+instance UnicodeText MoonPhase
+instance UnicodeText Clock
+
+instance UnicodeText Gender where
+    toUnicodeText Male = "\x2640\xfe0f"
+    toUnicodeText Female = "\x2642\xfe0f"
+    fromUnicodeText "\x2640\xfe0f" = Just Male
+    fromUnicodeText "\x2642\xfe0f" = Just Female
+    fromUnicodeText _ = Nothing
+
+instance UnicodeText BloodType where
+    toUnicodeText AB = "\x1f18e"
+    toUnicodeText A = "\x1f170\xfe0f"
+    toUnicodeText B = "\x1f171\xfe0f"
+    toUnicodeText O = "\x1f17e\xfe0f"
+    fromUnicodeText "\x1f18e" = Just AB
+    fromUnicodeText t
+        | [c, EmojiSuffix] <- unpack t = go c
+        | otherwise = Nothing
+        where go '\x1f170' = Just A
+              go '\x1f171' = Just B
+              go '\x1f17e' = Just O
+              go _ = Nothing

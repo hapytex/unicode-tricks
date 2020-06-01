@@ -31,20 +31,20 @@ _dieOffset = 0x2680
 
 -- | A data type to store the values of a die.
 data DieValue
-  = I -- ^ A die with value /one/, represented with ⚀.
-  | II -- ^ A die with value /two/, represented with ⚁.
-  | III -- ^ A die with value /three/, represented with ⚂.
-  | IV -- ^ A die with value /four/, represented with ⚃.
-  | V -- ^ A die with value /five/, represented with ⚄.
-  | VI -- ^ A die with value /six/, represented with ⚅.
+  = I  -- ^ A die with value /one/, represented with ⚀.
+  | II  -- ^ A die with value /two/, represented with ⚁.
+  | III  -- ^ A die with value /three/, represented with ⚂.
+  | IV  -- ^ A die with value /four/, represented with ⚃.
+  | V  -- ^ A die with value /five/, represented with ⚄.
+  | VI  -- ^ A die with value /six/, represented with ⚅.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | Convert the given integral value to a 'DieValue' that represents the given
 -- number. If the number is less than one, or greater than six, 'Nothing' is
 -- returned.
 toDieValue :: Integral i
-  => i -- ^ The given integral value to convert to a 'DieValue'.
-  -> Maybe DieValue -- ^ A 'DieValue' wrapped in a 'Just' if the given integral value is greater than zero, and less than seven, otherwise 'Nothing'.
+  => i  -- ^ The given integral value to convert to a 'DieValue'.
+  -> Maybe DieValue  -- ^ A 'DieValue' wrapped in a 'Just' if the given integral value is greater than zero, and less than seven, otherwise 'Nothing'.
 toDieValue i
     | i > 0 && i <= 6 = Just (toEnum (fromIntegral i-1))
     | otherwise = Nothing
@@ -55,8 +55,8 @@ instance Arbitrary DieValue where
 -- | Convert the given 'DieValue' to a unicode character that represents a /die/
 -- with that value.
 die
-  :: DieValue -- ^ The die value to convert.
-  -> Char -- ^ A unicode character that represents a die with the given 'DieValue'.
+  :: DieValue  -- ^ The die value to convert.
+  -> Char  -- ^ A unicode character that represents a die with the given 'DieValue'.
 die = chr . (_dieOffset .|.) . fromEnum
 
 instance UnicodeCharacter DieValue where

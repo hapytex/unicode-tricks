@@ -35,10 +35,10 @@ import Test.QuickCheck.Gen(frequency)
 -- | A domino piece, which has two items. Depending on the orientation, the
 -- items are located at the /top/ and /bottom/; or /left/ and /right/.
 data Domino a
-  = Domino -- ^ The front side of the domino piece.
+  = Domino  -- ^ The front side of the domino piece.
   {
-    leftTop :: a -- ^ The part that is located at the /left/ side in case the piece is located /horizontally/, or at the /top/ in case the piece is located /vertically/.
-  , rightBottom :: a -- ^ The part that is located at the /right/ side in case the piece is located /horizontally/, or at the /bottom/ in case the piece is located /vertically/.
+    leftTop :: a  -- ^ The part that is located at the /left/ side in case the piece is located /horizontally/, or at the /top/ in case the piece is located /vertically/.
+  , rightBottom :: a  -- ^ The part that is located at the /right/ side in case the piece is located /horizontally/, or at the /bottom/ in case the piece is located /vertically/.
   }
   | Back  -- ^ The back side of the domino piece.
   deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
@@ -46,9 +46,9 @@ data Domino a
 -- | A pattern synonym that makes it more convenient to write expressions that
 -- look like domino's like for example @II :| IV@.
 pattern (:|)
-  :: a -- ^ The item that is located at the left, or the top.
-  -> a -- ^ The item that is located at the right, or the bottom.
-  -> Domino a -- ^ The domino that is constructed.
+  :: a  -- ^ The item that is located at the left, or the top.
+  -> a  -- ^ The item that is located at the right, or the bottom.
+  -> Domino a  -- ^ The domino that is constructed.
 pattern (:|) x y = Domino x y
 
 -- | A type alias that specifies that 'OrientedDomino' is an 'Oriented' type
@@ -127,44 +127,44 @@ toSimple _ = Nothing
 -- | Convert a 'ComplexDomino' value to a unicode character rendering the domino
 -- value /horizontally/.
 dominoH
-  :: ComplexDomino -- ^ The 'ComplexDomino' object to render horizontally.
-  -> Char -- ^ The unicode character that represents the given 'ComplexDomino' value in a horizontal manner.
+  :: ComplexDomino  -- ^ The 'ComplexDomino' object to render horizontally.
+  -> Char  -- ^ The unicode character that represents the given 'ComplexDomino' value in a horizontal manner.
 dominoH = _domino _offsetDominoHorizontal
 
 -- | Convert a 'SimpleDomino' value to a unicode character rendering the domino
 -- value /horizontally/.
 dominoH'
-  :: SimpleDomino -- ^ The 'SimpleDomino' object to render horizontally.
-  -> Char -- ^ The unicode character that represents the given 'SimpleDomino' value in a horizontal manner.
+  :: SimpleDomino  -- ^ The 'SimpleDomino' object to render horizontally.
+  -> Char  -- ^ The unicode character that represents the given 'SimpleDomino' value in a horizontal manner.
 dominoH' = dominoH . fmap Just
 
 -- | Convert a 'ComplexDomino' value to a unicode character rendering the domino
 -- value /vertically/.
 dominoV
-  :: ComplexDomino -- ^ The 'ComplexDomino' object to render vertically.
-  -> Char -- ^ The unicode character that represents the given 'ComplexDomino' value in a vertical manner.
+  :: ComplexDomino  -- ^ The 'ComplexDomino' object to render vertically.
+  -> Char  -- ^ The unicode character that represents the given 'ComplexDomino' value in a vertical manner.
 dominoV = _domino _offsetDominoVertical
 
 -- | Convert a 'SimpleDomino' value to a unicode character rendering the domino
 -- value /vertically/.
 dominoV'
-  :: SimpleDomino -- ^ The 'SimpleDomino' object to render vertically.
-  -> Char -- ^ The unicode character that represents the given 'SimpleDomino' value in vertical manner.
+  :: SimpleDomino  -- ^ The 'SimpleDomino' object to render vertically.
+  -> Char  -- ^ The unicode character that represents the given 'SimpleDomino' value in vertical manner.
 dominoV' = dominoV . fmap Just
 
 -- | Convert an 'OrientedDomino' to its unicode equivalent, where the sides of
 -- the domino can be empty.
 domino
-  :: OrientedDomino (Maybe DieValue) -- ^ The 'OrientedDomino' to render.
-  -> Char -- ^ The unicode characters that represents the 'OrientedDomino' value.
+  :: OrientedDomino (Maybe DieValue)  -- ^ The 'OrientedDomino' to render.
+  -> Char  -- ^ The unicode characters that represents the 'OrientedDomino' value.
 domino (Oriented d Horizontal) = dominoH d
 domino (Oriented d Vertical) = dominoV d
 
 -- | Convert an 'OrientedDomino' to its unicode equivalent, where the sides of
 -- the domino can /not/ be empty.
 domino'
-  :: OrientedDomino DieValue -- ^ The 'OrientedDomino' to render.
-  -> Char -- ^ The unicode characters that represents the 'OrientedDomino' value.
+  :: OrientedDomino DieValue  -- ^ The 'OrientedDomino' to render.
+  -> Char  -- ^ The unicode characters that represents the 'OrientedDomino' value.
 domino' = domino . fmap (fmap Just)
 
 instance UnicodeCharacter (Oriented (Domino (Maybe DieValue))) where
