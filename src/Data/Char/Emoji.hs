@@ -1229,7 +1229,7 @@ _overEnum2 :: Enum a => (Int -> Int -> Int) -> a -> a -> a
 _overEnum2 f x y = toEnum (on f fromEnum x y)
 
 _overEnumMask2 :: Enum a => Int -> (Int -> Int -> Int) -> a -> a -> a
-_overEnumMask2 m f x y = toEnum (m .&. (on f fromEnum x y))
+_overEnumMask2 m f x y = toEnum (m .&. on f fromEnum x y)
 
 instance Bits BloodType where
     (.&.) = _overEnum2 (.&.)

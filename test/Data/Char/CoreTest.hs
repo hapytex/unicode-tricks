@@ -19,7 +19,7 @@ testUnicodeText :: (Arbitrary a, Eq a, Show a, UnicodeText a) => String -> a -> 
 testUnicodeText name typ = describe ("instance UnicodeText " ++ instanceName name) $ it "equivalent over text" $ property (mapOverText typ)
 
 instanceName :: String -> String
-instanceName s | elem ' ' s = '(' : s ++ ")"
+instanceName s | ' ' `elem` s = '(' : s ++ ")"
                | otherwise = s
 
 mapOverChar :: (Eq a, UnicodeCharacter a) => a -> a -> Bool
