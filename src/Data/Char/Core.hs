@@ -26,7 +26,7 @@ module Data.Char.Core (
   , ItalicType(NoItalic, Italic), splitItalicType
   , FontStyle(SansSerif, Serif), splitFontStyle
     -- * Character range checks
-  , isAsciiAlphaNum, isAsciiAlpha, isACharacter, isNotACharacter, isReserved, isNotReserved
+  , isAsciiAlphaNum, isAsciiAlpha, isGreek, isACharacter, isNotACharacter, isReserved, isNotReserved
     -- * Map characters from and to 'Enum's
   , mapFromEnum, mapToEnum, mapToEnumSafe
   , liftNumberFrom,     liftNumberFrom'
@@ -210,6 +210,12 @@ isAsciiAlpha x = isAscii x && isAlpha x
 -- satisfy this predicate.
 isAsciiAlphaNum :: Char -> Bool
 isAsciiAlphaNum x = isAscii x && isAlphaNum x
+
+-- | Checks if a charcter is a basic /greek alphabetic/ character or a greek-like symbol. The characters
+-- @"ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ"@ satisfy this
+-- predicate.
+isGreek :: Char -> Bool
+isGreek = (`elem` "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ")
 
 -- | Calculate for a given plus and minus sign a 'Text' object for the given
 -- number in the given 'PlusStyle'.
@@ -401,7 +407,7 @@ class UnicodeCharacter a where
     {-# MINIMAL toUnicodeChar, fromUnicodeChar #-}
 
 -- | A class from which boejcts can be derived that map to and from a /sequence/
--- of unicode characters. 
+-- of unicode characters.
 class UnicodeText a where
     -- | Convert the given object to a 'Text' object.
     toUnicodeText
@@ -419,7 +425,7 @@ class UnicodeText a where
     fromUnicodeText t
         | [c] <- unpack t = fromUnicodeChar c
         | otherwise = Nothing
-    
+
     -- | Convert the given 'Text' to an object. If the 'Text' does not map on
     -- an element, the behavior is /unspecified/, it can for example result in
     -- an error.

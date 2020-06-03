@@ -39,10 +39,12 @@ library
     , Data.Char.Math.Monospace
     , Data.Char.Math.SansSerif
     , Data.Char.Math.SansSerif.Digit
+    , Data.Char.Math.SansSerif.Greek
     , Data.Char.Math.SansSerif.Latin
     , Data.Char.Math.Script
     , Data.Char.Math.Serif
     , Data.Char.Math.Serif.Digit
+    , Data.Char.Math.Serif.Greek
     , Data.Char.Math.Serif.Latin
     , Data.Char.Number.Duodecimal
     , Data.Char.Number.Egyptian

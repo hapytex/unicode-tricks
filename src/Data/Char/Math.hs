@@ -16,7 +16,7 @@ unicode block. See also the <https://en.wikipedia.org/wiki/Mathematical_Alphanum
 
 module Data.Char.Math (
     -- Mathematical alphabet symbols
-    mathAlpha, mathAlpha'
+    math, math'
     -- * Serif mathematical alphabet symbols
   , serif,               serif'
   , serifNoBold,         serifNoBold'
@@ -82,26 +82,33 @@ import Data.Char.Math.Script
 import Data.Char.Math.Serif
 
 -- | Convert the given character to a mathematical symbol with the given /font/ style, with a
--- given /emphasis/ and a given /italics/ style. This maps characters an equivalent sansSerif symbol for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
-mathAlpha'
+-- given /emphasis/ and a given /italics/ style. This maps characters an equivalent sans-serif symbol for:
+-- * ASCII latin letters: @A@-@Z@ and @a@-@z@ ranges;
+-- * greek-like symbols: @"ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ"@;
+-- * digit: @0-9@ range.
+-- For characters outside the range, the behavior is unspecified.
+math'
   :: FontStyle  -- ^ The given 'FontStyle' to use.
   -> ItalicType  -- ^ The given 'ItalicType' to use.
   -> Emphasis  -- ^ The given 'Emphasis' to use.
   -> Char  -- ^ The given character to convert.
   -> Char  -- ^ The equivalent character that is formatted in the given 'FontStyle', depending on the given 'Emphasis' in bold or not, and depending on the given 'ItalicType' in italics or not.
-mathAlpha' = splitFontStyle sansSerif' serif'
+math' = splitFontStyle sansSerif' serif'
 
 -- | Convert the given character to a mathematical symbol with the given /font/
--- style, in the given /emphasis/ and in the given /italics/ type wrapped in a 'Just'. If
--- the character is outside the @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
-mathAlpha
+-- style, in the given /emphasis/ and in the given /italics/ type wrapped in a 'Just'.
+-- The supported ranges are:
+-- * ASCII latin letters: @A@-@Z@ and @a@-@z@ ranges;
+-- * greek-like symbols: @"ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ"@;
+-- * digit: @0-9@ range.
+-- If the character is outside theses ranges, 'Nothing' is returned.
+math
   :: FontStyle  -- ^ The given 'FontStyle' to use.
   -> ItalicType  -- ^ The given 'ItalicType' to use.
   -> Emphasis  -- ^ The given 'Emphasis' to use.
   -> Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
-mathAlpha = splitFontStyle sansSerif serif
+math = splitFontStyle sansSerif serif
 
 
 -- | Convert the given digit character (@0@-@9@) to its corresponding character
