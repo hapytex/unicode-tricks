@@ -15,9 +15,9 @@ unicode block. See also the <https://en.wikipedia.org/wiki/Mathematical_Alphanum
 -}
 
 module Data.Char.Math (
-    -- Mathematical alphabet symbols
+    -- * Mathematical symbols
     math, math'
-    -- * Serif mathematical alphabet symbols
+    -- * Serif mathematical symbols
   , serif,               serif'
   , serifNoBold,         serifNoBold'
   , serifBold,           serifBold'
@@ -27,7 +27,7 @@ module Data.Char.Math (
   , serifBoldNoItalic,   serifBoldNoItalic'
   , serifNoBoldItalic,   serifNoBoldItalic'
   , serifBoldItalic,     serifBoldItalic'
-    -- * Sans-serif mathematical alphabet symbols
+    -- * Sans-serif mathematical symbols
   , sansSerif,               sansSerif'
   , sansSerifNoBold,         sansSerifNoBold'
   , sansSerifBold,           sansSerifBold'
@@ -37,6 +37,9 @@ module Data.Char.Math (
   , sansSerifBoldNoItalic,   sansSerifBoldNoItalic'
   , sansSerifNoBoldItalic,   sansSerifNoBoldItalic'
   , sansSerifBoldItalic,     sansSerifBoldItalic'
+    -- * Latin characters
+  , latin
+  , mathAlpha, mathAlpha'
     -- * Digit characters
     -- ** Char-based conversion
   , digit,                 digit'
@@ -73,7 +76,7 @@ module Data.Char.Math (
   , frakturBold,    frakturBold'
   ) where
 
-import Data.Char.Core (Emphasis, FontStyle, ItalicType, splitFontStyle)
+import Data.Char.Core (Emphasis, FontStyle, ItalicType, splitFontStyle, isAsciiAlpha)
 import Data.Char.Math.DoubleStruck
 import Data.Char.Math.Fraktur
 import Data.Char.Math.Monospace
@@ -110,6 +113,42 @@ math
   -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 math = splitFontStyle sansSerif serif
 
+{-# DEPRECATED mathAlpha' "Use `math'`" #-}
+-- | Convert the given character to a mathematical symbol with the given /font/ style, with a
+-- given /emphasis/ and a given /italics/ style. This maps characters an equivalent sansSerif symbol for the @A@-@Z@ and
+-- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+mathAlpha'
+  :: FontStyle  -- ^ The given 'FontStyle' to use.
+  -> ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Char  -- ^ The equivalent character that is formatted in the given 'FontStyle', depending on the given 'Emphasis' in bold or not, and depending on the given 'ItalicType' in italics or not.
+mathAlpha' = math'
+
+{-# DEPRECATED mathAlpha "Use `latin`" #-}
+-- | Convert the given character to a mathematical symbol with the given /font/
+-- style, in the given /emphasis/ and in the given /italics/ type wrapped in a 'Just'. If
+-- the character is outside the @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+mathAlpha
+  :: FontStyle  -- ^ The given 'FontStyle' to use.
+  -> ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+mathAlpha = latin
+
+-- | Convert the given character to a mathematical symbol with the given /font/
+-- style, in the given /emphasis/ and in the given /italics/ type wrapped in a 'Just'. If
+-- the character is outside the @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+latin
+  :: FontStyle  -- ^ The given 'FontStyle' to use.
+  -> ItalicType  -- ^ The given 'ItalicType' to use.
+  -> Emphasis  -- ^ The given 'Emphasis' to use.
+  -> Char  -- ^ The given character to convert.
+  -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
+latin f i e c
+  | isAsciiAlpha c = Just $ splitFontStyle sansSerif' serif' f i e c
+  | otherwise      = Nothing
 
 -- | Convert the given digit character (@0@-@9@) to its corresponding character
 -- with a given 'Emphasis' in the given /font/ style. The result for characters outside this

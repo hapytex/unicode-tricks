@@ -4,7 +4,7 @@ module Data.Char.MathSpec
 
 import Test.Hspec
 import Data.Char.Core
-import Data.Char.Math
+import Data.Char.Math hiding (latin)
 
 spec :: Spec
 spec = do
