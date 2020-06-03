@@ -60,8 +60,8 @@ _dispatchLatinGreekDigit'
     -> b
 _dispatchLatinGreekDigit' l g d c
   | isAsciiAlpha c = l c
-  | isGreek c      = g c
-  | otherwise      = d c
+  | isDigit c      = d c
+  | otherwise      = g c
 
 -- | Safe dispatch to a conversion function according to the character
 _dispatchLatinGreekDigit
