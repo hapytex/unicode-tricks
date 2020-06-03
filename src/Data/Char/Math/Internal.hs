@@ -22,7 +22,7 @@ module Data.Char.Math.Internal
   ) where
 
 import Data.Char (chr, isAsciiUpper, isDigit, ord)
-import Data.Char.Core(isAsciiAlpha, isGreek)
+import Data.Char.Core (isAsciiAlpha, isGreek)
 
 _shiftC :: Int -> Char -> Char
 _shiftC = (chr .) . (. ord) . (+)
@@ -53,25 +53,26 @@ _withCondition p f = go
 
 -- | Unsafe dispatch to a conversion function according to the character
 _dispatchLatinGreekDigit'
-    :: (Char -> b) -- ^ Latin
-    -> (Char -> b) -- ^ Greek
-    -> (Char -> b) -- ^ Digit
+    :: (Char -> Char) -- ^ Latin
+    -> (Char -> Char) -- ^ Greek
+    -> (Char -> Char) -- ^ Digit
     -> Char        -- ^ Character to transform
-    -> b
+    -> Char
 _dispatchLatinGreekDigit' l g d c
-  | isAsciiAlpha c = l c
   | isDigit c      = d c
-  | otherwise      = g c
+  | isAsciiAlpha c = l c
+  | isGreek c      = g c
+  | otherwise      = c -- Keep the character unchanged
 
 -- | Safe dispatch to a conversion function according to the character
 _dispatchLatinGreekDigit
-    :: (Char -> b) -- ^ Latin
-    -> (Char -> b) -- ^ Greek
-    -> (Char -> b) -- ^ Digit
+    :: (Char -> Char) -- ^ Latin
+    -> (Char -> Char) -- ^ Greek
+    -> (Char -> Char) -- ^ Digit
     -> Char        -- ^ Character to transform
-    -> Maybe b
+    -> Maybe Char
 _dispatchLatinGreekDigit l g d c
+  | isDigit c      = Just (d c)
   | isAsciiAlpha c = Just (l c)
   | isGreek c      = Just (g c)
-  | isDigit c      = Just (d c)
   | otherwise      = Nothing
