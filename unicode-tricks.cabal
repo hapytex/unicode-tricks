@@ -33,6 +33,13 @@ library
     , Data.Char.Egyptian
     , Data.Char.Frame
     , Data.Char.Math
+    , Data.Char.Math.DoubleStruck
+    , Data.Char.Math.Fraktur
+    , Data.Char.Math.Internal
+    , Data.Char.Math.Monospace
+    , Data.Char.Math.SansSerif
+    , Data.Char.Math.Script
+    , Data.Char.Math.Serif
     , Data.Char.Number.Duodecimal
     , Data.Char.Number.Egyptian
     , Data.Char.Number.Roman
