@@ -36,6 +36,7 @@ library
     , Data.Char.Number.Duodecimal
     , Data.Char.Number.Egyptian
     , Data.Char.Number.Roman
+    , Data.Char.Number.Segmented
     , Data.Char.Small
   build-depends:
       base >= 4.7 && < 5
