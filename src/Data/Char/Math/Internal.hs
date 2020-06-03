@@ -63,7 +63,6 @@ _dispatchLatinGreekDigit' l g d c
   | isGreek c      = g c
   | otherwise      = d c
 
-
 -- | Safe dispatch to a conversion function according to the character
 _dispatchLatinGreekDigit
     :: (Char -> b) -- ^ Latin

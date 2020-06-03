@@ -18,53 +18,67 @@ spec = do
           it "greek" do
             transform <$> greek `shouldBe` Just <$> greek
           it "0-9 (char)" do
-            transform <$> digits `shouldBe` (Nothing <$ digits)
+            transform <$> digits `shouldBe` Just <$> digits
         describe "Bold" do
           let transform = math Serif NoItalic Bold
           it "latin" do
             transform <$> latin `shouldBe` Just <$> "𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳"
+          it "greek" do
+            transform <$> greek `shouldBe` Just <$> "𝚨𝚩𝚪𝚫𝚬𝚭𝚮𝚯𝚰𝚱𝚲𝚳𝚴𝚵𝚶𝚷𝚸𝚺𝚻𝚼𝚽𝚾𝚿𝛀𝛁𝚹𝛂𝛃𝛄𝛅𝛆𝛇𝛈𝛉𝛊𝛋𝛌𝛍𝛎𝛏𝛐𝛑𝛒𝛓𝛔𝛕𝛖𝛗𝛘𝛙𝛚𝛛𝛜𝛝𝛞𝛟𝛠𝛡"
           it "0-9 (char)" do
-            transform <$> digits `shouldBe` (Nothing <$ digits)
+            transform <$> digits `shouldBe` Just <$> "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗"
       describe "Italic" do
         describe "NoBold" do
           let transform = math Serif Italic NoBold
           it "latin" do
             transform <$> latin `shouldBe` Just <$> "𝐴𝐵𝐶𝐷𝐸𝐹𝐺𝐻𝐼𝐽𝐾𝐿𝑀𝑁𝑂𝑃𝑄𝑅𝑆𝑇𝑈𝑉𝑊𝑋𝑌𝑍𝑎𝑏𝑐𝑑𝑒𝑓𝑔ℎ𝑖𝑗𝑘𝑙𝑚𝑛𝑜𝑝𝑞𝑟𝑠𝑡𝑢𝑣𝑤𝑥𝑦𝑧"
+          it "greek" do
+            transform <$> greek `shouldBe` Just <$> "𝛢𝛣𝛤𝛥𝛦𝛧𝛨𝛩𝛪𝛫𝛬𝛭𝛮𝛯𝛰𝛱𝛲𝛴𝛵𝛶𝛷𝛸𝛹𝛺𝛻𝛳𝛼𝛽𝛾𝛿𝜀𝜁𝜂𝜃𝜄𝜅𝜆𝜇𝜈𝜉𝜊𝜋𝜌𝜍𝜎𝜏𝜐𝜑𝜒𝜓𝜔𝜕𝜖𝜗𝜘𝜙𝜚𝜛"
           it "0-9 (char)" do
-            transform <$> digits `shouldBe` (Nothing <$ digits)
+            transform <$> digits `shouldBe` Just <$> digits
         describe "Bold" do
           let transform = math Serif Italic Bold
           it "latin" do
             transform <$> latin `shouldBe` Just <$> "𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛"
+          it "greek" do
+            transform <$> greek `shouldBe` Just <$> "𝜜𝜝𝜞𝜟𝜠𝜡𝜢𝜣𝜤𝜥𝜦𝜧𝜨𝜩𝜪𝜫𝜬𝜮𝜯𝜰𝜱𝜲𝜳𝜴𝜵𝜭𝜶𝜷𝜸𝜹𝜺𝜻𝜼𝜽𝜾𝜿𝝀𝝁𝝂𝝃𝝄𝝅𝝆𝝇𝝈𝝉𝝊𝝋𝝌𝝍𝝎𝝏𝝐𝝑𝝒𝝓𝝔𝝕"
           it "0-9 (char)" do
-            transform <$> digits `shouldBe` (Nothing <$ digits)
+            transform <$> digits `shouldBe` Just <$> "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗"
     describe "SansSerif" do
       describe "NoItalic" do
         describe "NoBold" do
           let transform = math SansSerif NoItalic NoBold
           it "latin" do
             transform <$> latin `shouldBe` Just <$> "𝖠𝖡𝖢𝖣𝖤𝖥𝖦𝖧𝖨𝖩𝖪𝖫𝖬𝖭𝖮𝖯𝖰𝖱𝖲𝖳𝖴𝖵𝖶𝖷𝖸𝖹𝖺𝖻𝖼𝖽𝖾𝖿𝗀𝗁𝗂𝗃𝗄𝗅𝗆𝗇𝗈𝗉𝗊𝗋𝗌𝗍𝗎𝗏𝗐𝗑𝗒𝗓"
+          it "greek" do
+            transform <$> greek `shouldBe` (Nothing <$ greek)
           it "0-9 (char)" do
-            transform <$> digits `shouldBe` (Nothing <$ digits)
+            transform <$> digits `shouldBe` Just <$> "𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫"
         describe "Bold" do
           let transform = math SansSerif NoItalic Bold
           it "latin" do
             transform <$> latin `shouldBe` Just <$> "𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇"
+          it "greek" do
+            transform <$> greek `shouldBe` Just <$> "𝝖𝝗𝝘𝝙𝝚𝝛𝝜𝝝𝝞𝝟𝝠𝝡𝝢𝝣𝝤𝝥𝝦𝝨𝝩𝝪𝝫𝝬𝝭𝝮𝝯𝝧𝝰𝝱𝝲𝝳𝝴𝝵𝝶𝝷𝝸𝝹𝝺𝝻𝝼𝝽𝝾𝝿𝞀𝞁𝞂𝞃𝞄𝞅𝞆𝞇𝞈𝞉𝞊𝞋𝞌𝞍𝞎𝞏"
           it "0-9 (char)" do
-            transform <$> digits `shouldBe` (Nothing <$ digits)
+            transform <$> digits `shouldBe` Just <$> "𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵"
       describe "Italic" do
         describe "NoBold" do
           let transform = math SansSerif Italic NoBold
           it "latin" do
             transform <$> latin `shouldBe` Just <$> "𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻"
+          it "greek" do
+            transform <$> greek `shouldBe` (Nothing <$ greek)
           it "0-9 (char)" do
-            transform <$> digits `shouldBe` (Nothing <$ digits)
+            transform <$> digits `shouldBe` Just <$> "𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫"
         describe "Bold" do
           let transform = math SansSerif Italic Bold
           it "latin" do
             transform <$> latin `shouldBe` Just <$> "𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯"
+          it "greek" do
+            transform <$> greek `shouldBe` Just <$> "𝞐𝞑𝞒𝞓𝞔𝞕𝞖𝞗𝞘𝞙𝞚𝞛𝞜𝞝𝞞𝞟𝞠𝞢𝞣𝞤𝞥𝞦𝞧𝞨𝞩𝞡𝞪𝞫𝞬𝞭𝞮𝞯𝞰𝞱𝞲𝞳𝞴𝞵𝞶𝞷𝞸𝞹𝞺𝞻𝞼𝞽𝞾𝞿𝟀𝟁𝟂𝟃𝟄𝟅𝟆𝟇𝟈𝟉"
           it "0-9 (char)" do
-            transform <$> digits `shouldBe` (Nothing <$ digits)
+            transform <$> digits `shouldBe` Just <$> "𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵"
   describe "digit" do
     describe "Serif" do
       describe "NoBold" do

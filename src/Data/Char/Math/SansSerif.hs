@@ -31,7 +31,8 @@ module Data.Char.Math.SansSerif
   ) where
 
 
-import Data.Char.Core (Emphasis, ItalicType, splitEmphasis, splitItalicType)
+import Data.Char (isDigit)
+import Data.Char.Core (Emphasis, ItalicType, isAsciiAlpha, splitEmphasis, splitItalicType)
 import Data.Char.Math.Internal (_dispatchLatinGreekDigit, _dispatchLatinGreekDigit')
 import Data.Char.Math.SansSerif.Digit
 import Data.Char.Math.SansSerif.Greek
@@ -144,7 +145,10 @@ sansSerifNoBoldNoItalic' = _dispatchLatinGreekDigit' latinSansSerifNoBoldNoItali
 sansSerifNoBoldNoItalic
   :: Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
-sansSerifNoBoldNoItalic = _dispatchLatinGreekDigit latinSansSerifNoBoldNoItalic' greekSansSerifNoBoldNoItalic' digitSansSerifRegular'
+sansSerifNoBoldNoItalic c
+  | isAsciiAlpha c = Just (latinSansSerifNoBoldNoItalic' c)
+  | isDigit c      = Just (digitSansSerifRegular' c)
+  | otherwise      = Nothing
 
 -- | Convert the given character to a mathematical symbol without serifs, with no
 -- /bold/ and in /italics/. This maps characters an equivalent sansSerif symbol for the @A@-@Z@ and
@@ -160,7 +164,10 @@ sansSerifNoBoldItalic' = _dispatchLatinGreekDigit' latinSansSerifNoBoldItalic' g
 sansSerifNoBoldItalic
   :: Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
-sansSerifNoBoldItalic = _dispatchLatinGreekDigit latinSansSerifNoBoldItalic' greekSansSerifNoBoldItalic' digitSansSerifRegular'
+sansSerifNoBoldItalic c
+  | isAsciiAlpha c = Just (latinSansSerifNoBoldItalic' c)
+  | isDigit c      = Just (digitSansSerifRegular' c)
+  | otherwise      = Nothing
 
 -- | Convert the given character to a mathematical symbol without serifs, in /bold/
 -- not in /italics/. This maps characters an equivalent sansSerif symbol for the @A@-@Z@ and
