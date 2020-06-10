@@ -7,11 +7,7 @@ Maintainer  : hapytexeu+gh@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-This module aims to make it more convenient to transform mathematical characters
-to their /double struck/, /fraktur/, /calligraphic/, etc. equivalent.
-
-Most of the characters are defined in the <https://www.unicode.org/charts/PDF/U1D400.pdf 1d400>
-unicode block.
+See "Data.Char.Math" for further documentation.
 -}
 
 module Data.Char.Math.Script
@@ -28,8 +24,8 @@ import Data.Char.Core(Emphasis, isAsciiAlpha, splitEmphasis)
 import Data.Char.Math.Internal
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
--- symbol is /not/ written in boldface. If the symbol is outside the alphabet
--- range (@A@-@Z@, and @a-z@), the returned character is unspecified.
+-- symbol is /not/ written in boldface.
+-- If the symbol is not supported (see: "Data.Char.Math#characters_ranges"), the returned character is unspecified.
 scriptRegular'
   :: Char  -- ^ The given character to convert.
   -> Char  -- ^ The equivalent character that is formatted in calligraphy, not in bold.
@@ -48,8 +44,8 @@ scriptRegular' c = _baseUpperLower 0x1d455 c
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
 -- wrapped in a 'Just' data constructor. This symbol is /not/ written in
--- boldface. If the symbol is outside the alphabet range (@A@-@Z@, and @a-z@),
--- 'Nothing' is returned.
+-- boldface.
+-- If the character is not supported (see: "Data.Char.Math#characters_ranges"), 'Nothing' is returned.
 scriptRegular
   :: Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
@@ -58,8 +54,8 @@ scriptRegular
 scriptRegular = _withCondition isAsciiAlpha scriptRegular'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
--- symbol is written in boldface. If the symbol is outside the alphabet
--- range (@A@-@Z@, and @a-z@), the returned character is unspecified.
+-- symbol is written in boldface.
+-- If the symbol is not supported (see: "Data.Char.Math#characters_ranges"), the returned character is unspecified.
 scriptBold'
   :: Char  -- ^ The given character to convert.
   -> Char  -- ^ The equivalent character that is formatted in calligraphy, and in bold.
@@ -67,8 +63,8 @@ scriptBold' = _baseUpperLower 0x1d489
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
 -- wrapped in a 'Just' data constructor. This symbol is written in
--- boldface. If the symbol is outside the alphabet range (@A@-@Z@, and @a-z@),
--- 'Nothing' is returned.
+-- boldface.
+-- If the character is not supported (see: "Data.Char.Math#characters_ranges"), 'Nothing' is returned.
 scriptBold
   :: Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
@@ -77,8 +73,8 @@ scriptBold
 scriptBold = _withCondition isAsciiAlpha scriptBold'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
--- symbol is written in the given 'Emphasis' style. If the symbol is outside the
--- alphabet range (@A@-@Z@, and @a-z@), the returned character is unspecified.
+-- symbol is written in the given 'Emphasis' style.
+-- If the symbol is not supported (see: "Data.Char.Math#characters_ranges"), the returned character is unspecified.
 script'
   :: Emphasis  -- ^ The given 'Emphasis' style to use.
   -> Char  -- ^ The given character to convert.
@@ -87,8 +83,8 @@ script' = splitEmphasis scriptRegular' scriptBold'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
 -- wrapped in a 'Just' data constructor. This symbol is /not/ written in
--- the given 'Emphasis' style. If the symbol is outside the
--- alphabet range (@A@-@Z@, and @a-z@), 'Nothing' is returned.
+-- the given 'Emphasis' style.
+-- If the character is not supported (see: "Data.Char.Math#characters_ranges"), 'Nothing' is returned.
 script
   :: Emphasis  -- ^ The given 'Emphasis' style to use.
   -> Char  -- ^ The given character to convert.
@@ -98,8 +94,8 @@ script
 script = splitEmphasis scriptRegular scriptBold
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
--- symbol is /not/ written in boldface. If the symbol is outside the alphabet
--- range (@A@-@Z@, and @a-z@), the returned character is unspecified.
+-- symbol is /not/ written in boldface.
+-- If the symbol is not supported (see: "Data.Char.Math#characters_ranges"), the returned character is unspecified.
 -- This is an alias of 'scriptRegular''.
 calligraphyRegular'
   :: Char  -- ^ The given character to convert.
@@ -108,8 +104,9 @@ calligraphyRegular' = scriptRegular'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
 -- wrapped in a 'Just' data constructor. This symbol is /not/ written in
--- boldface. If the symbol is outside the alphabet range (@A@-@Z@, and @a-z@),
--- 'Nothing' is returned. This is an alias of 'scriptRegular'.
+-- boldface.
+-- If the character is not supported (see: "Data.Char.Math#characters_ranges"), 'Nothing' is returned.
+-- This is an alias of 'scriptRegular'.
 calligraphyRegular
   :: Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
@@ -118,18 +115,18 @@ calligraphyRegular
 calligraphyRegular = scriptRegular
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
--- symbol is written in boldface. If the symbol is outside the alphabet
--- range (@A@-@Z@, and @a-z@), the returned character is unspecified. This is an
--- alias of 'scriptBold''.
+-- symbol is written in boldface.
+-- If the symbol is not supported (see: "Data.Char.Math#characters_ranges"), the returned character is unspecified.
+-- This is an alias of 'scriptBold''.
 calligraphyBold'
   :: Char  -- ^ The given character to convert.
   -> Char  -- ^ The equivalent character that is formatted in calligraphy, and in bold.
 calligraphyBold' = scriptBold'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
--- wrapped in a 'Just' data constructor. This symbol is written in
--- boldface. If the symbol is outside the alphabet range (@A@-@Z@, and @a-z@),
--- 'Nothing' is returned. This is an alias of 'scriptBold'.
+-- wrapped in a 'Just' data constructor. This symbol is written in boldface.
+-- If the character is not supported (see: "Data.Char.Math#characters_ranges"), 'Nothing' is returned.
+-- This is an alias of 'scriptBold'.
 calligraphyBold
   :: Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
@@ -138,8 +135,8 @@ calligraphyBold
 calligraphyBold = scriptBold
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
--- symbol is written in the given 'Emphasis' style. If the symbol is outside the
--- alphabet range (@A@-@Z@, and @a-z@), the returned character is unspecified.
+-- symbol is written in the given 'Emphasis' style.
+-- If the symbol is not supported (see: "Data.Char.Math#characters_ranges"), the returned character is unspecified.
 -- This is an alias of 'script''.
 calligraphy'
   :: Emphasis  -- ^ The given 'Emphasis' style to use.
@@ -149,8 +146,8 @@ calligraphy' = script'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
 -- wrapped in a 'Just' data constructor. This symbol is /not/ written in
--- the given 'Emphasis' style. If the symbol is outside the
--- alphabet range (@A@-@Z@, and @a-z@), 'Nothing' is returned.
+-- the given 'Emphasis' style.
+-- If the character is not supported (see: "Data.Char.Math#characters_ranges"), 'Nothing' is returned.
 -- This is an alias of 'script'.
 calligraphy
   :: Emphasis  -- ^ The given 'Emphasis' style to use.

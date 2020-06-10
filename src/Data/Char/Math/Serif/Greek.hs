@@ -6,6 +6,8 @@ Description : Serif mathematical alphanumeric symbols
 Maintainer  : hapytexeu+gh@gmail.com
 Stability   : experimental
 Portability : POSIX
+
+See "Data.Char.Math" for further documentation.
 -}
 
 module Data.Char.Math.Serif.Greek
@@ -26,8 +28,8 @@ import Data.Char.Math.Internal
 
 
 -- | Convert the given character to a mathematical symbol with serifs, in the
--- given /emphasis/ and in the given /italics/ type wrapped in a 'Just'. If
--- the character is not in @"ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ"@, 'Nothing' is returned.
+-- given /emphasis/ and in the given /italics/ type wrapped in a 'Just'. If the character
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSerif
   :: ItalicType  -- ^ The given 'ItalicType' to use.
   -> Emphasis  -- ^ The given 'Emphasis' to use.
@@ -37,7 +39,7 @@ greekSerif = splitItalicType greekSerifNoItalic greekSerifItalic
 
 -- | Convert the given character to a mathematical symbol with serifs, with a
 -- given /emphasis/ and a given /italics/ style. This maps characters an equivalent serif symbol
--- for the characters in @"ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ"@.
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
 -- For characters outside the range, the behavior is unspecified.
 greekSerif'
   :: ItalicType  -- ^ The given 'ItalicType' to use.
@@ -47,24 +49,24 @@ greekSerif'
 greekSerif' = splitItalicType greekSerifNoItalic' greekSerifItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, with no
--- /bold/ and no /italics/. This maps characters to itself for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- /bold/ and no /italics/. This maps characters to itself.
 greekSerifNoBoldNoItalic'
   :: Char  -- ^ The given character to convert.
   -> Char  -- ^ The equivalent character that is formatted with serifs, not in bold and not in italics.
 greekSerifNoBoldNoItalic' = id
 
 -- | Convert the given character to a mathematical symbol with serifs, with no
--- /bold/, and no /italics/ wrapped in a 'Just'. If the character is outside the
--- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- /bold/, and no /italics/ wrapped in a 'Just'. If the character
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSerifNoBoldNoItalic
   :: Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 greekSerifNoBoldNoItalic = _withCondition isGreek greekSerifNoBoldNoItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, with no
--- /bold/ and in /italics/. This maps characters an equivalent serif symbol for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- /bold/ and in /italics/. This maps characters an equivalent serif symbol
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
+-- For characters outside the range, the behavior is unspecified.
 greekSerifNoBoldItalic'
   :: Char  -- ^ The given character to convert.
   -> Char  -- ^ The equivalent character that is formatted with serifs, not in bold and in italics.
@@ -83,16 +85,17 @@ greekSerifNoBoldItalic' c
   | otherwise            = c
 
 -- | Convert the given character to a mathematical symbol with serifs, with no
--- /bold/, and in /italics/ wrapped in a 'Just'. If the character is outside the
--- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- /bold/, and in /italics/ wrapped in a 'Just'. If the character
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSerifNoBoldItalic
   :: Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 greekSerifNoBoldItalic = _withCondition isGreek greekSerifNoBoldItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, in /bold/
--- not in /italics/. This maps characters an equivalent serif symbol for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- not in /italics/. This maps characters an equivalent serif symbol
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
+-- For characters outside the range, the behavior is unspecified.
 greekSerifBoldNoItalic'
   :: Char  -- ^ The given character to convert.
   -> Char  -- ^ The equivalent character that is formatted with serifs, in bold and not in italics.
@@ -111,16 +114,17 @@ greekSerifBoldNoItalic' c
   | otherwise            = c
 
 -- | Convert the given character to a mathematical symbol with serifs, in
--- /bold/, and no /italics/ wrapped in a 'Just'. If the character is outside the
--- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- /bold/, and no /italics/ wrapped in a 'Just'. If the character
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSerifBoldNoItalic
   :: Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 greekSerifBoldNoItalic = _withCondition isGreek greekSerifBoldNoItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, with in
--- /bold/ and in /italics/. This maps characters an equivalent serif symbol for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- /bold/ and in /italics/. This maps characters an equivalent serif symbol
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
+-- For characters outside the range, the behavior is unspecified.
 greekSerifBoldItalic'
   :: Char  -- ^ The given character to convert.
   -> Char  -- ^ The equivalent character that is formatted with serifs, in bold and in italics.
@@ -139,16 +143,17 @@ greekSerifBoldItalic' c
   | otherwise            = c
 
 -- | Convert the given character to a mathematical symbol with serifs, in
--- /bold/, and in /italics/ wrapped in a 'Just'. If the character is outside the
--- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- /bold/, and in /italics/ wrapped in a 'Just'. If the character
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSerifBoldItalic
   :: Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 greekSerifBoldItalic = _withCondition isGreek greekSerifBoldItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, in /bold/
--- and in a /italics/ type. This maps characters an equivalent serif symbol for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- and in a /italics/ type. This maps characters an equivalent serif symbol
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
+-- For characters outside the range, the behavior is unspecified.
 greekSerifBold'
   :: ItalicType  -- ^ The given 'ItalicType' to use.
   -> Char  -- ^ The given character to convert.
@@ -156,8 +161,8 @@ greekSerifBold'
 greekSerifBold' = splitItalicType greekSerifBoldNoItalic' greekSerifBoldItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, in /bold/
--- with the given /italics/ type wrapped in a 'Just'. If the character is outside the
--- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- with the given /italics/ type wrapped in a 'Just'. If the character
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSerifBold
   :: ItalicType  -- ^ The given 'ItalicType' to use.
   -> Char  -- ^ The given character to convert.
@@ -165,8 +170,9 @@ greekSerifBold
 greekSerifBold = splitItalicType greekSerifBoldNoItalic greekSerifBoldItalic
 
 -- | Convert the given character to a mathematical symbol with serifs, not in /bold/
--- and in a /italics/ type. This maps characters an equivalent serif symbol for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- and in a /italics/ type. This maps characters an equivalent serif symbol
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
+-- For characters outside the range, the behavior is unspecified.
 greekSerifNoBold'
   :: ItalicType  -- ^ The given 'ItalicType' to use.
   -> Char  -- ^ The given character to convert.
@@ -174,8 +180,8 @@ greekSerifNoBold'
 greekSerifNoBold' = splitItalicType greekSerifNoBoldNoItalic' greekSerifNoBoldItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, with no /bold/
--- and in the given /italics/ type wrapped in a 'Just'. If the character is outside the
--- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- and in the given /italics/ type wrapped in a 'Just'. If the character
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSerifNoBold
   :: ItalicType  -- ^ The given 'ItalicType' to use.
   -> Char  -- ^ The given character to convert.
@@ -183,8 +189,9 @@ greekSerifNoBold
 greekSerifNoBold = splitItalicType greekSerifNoBoldNoItalic greekSerifNoBoldItalic
 
 -- | Convert the given character to a mathematical symbol with serifs, with a
--- given /emphasis/ and in italics. This maps characters an equivalent serif symbol for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- given /emphasis/ and in italics. This maps characters an equivalent serif symbol
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
+-- For characters outside the range, the behavior is unspecified.
 greekSerifItalic'
   :: Emphasis  -- ^ The given 'Emphasis' to use.
   -> Char  -- ^ The given character to convert.
@@ -193,7 +200,7 @@ greekSerifItalic' = splitEmphasis greekSerifNoBoldItalic' greekSerifBoldItalic'
 
 -- | Convert the given character to a mathematical symbol with serifs, in the
 -- given /emphasis/ and in /italics/ wrapped in a 'Just'. If the character
--- is outside the @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSerifItalic
   :: Emphasis  -- ^ The given 'Emphasis' to use.
   -> Char  -- ^ The given character to convert.
@@ -201,8 +208,9 @@ greekSerifItalic
 greekSerifItalic = splitEmphasis greekSerifNoBoldItalic greekSerifBoldItalic
 
 -- | Convert the given character to a mathematical symbol with serifs, with a
--- given /emphasis/ and not in italics. This maps characters an equivalent serif symbol for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- given /emphasis/ and not in italics. This maps characters an equivalent serif symbol
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
+-- For characters outside the range, the behavior is unspecified.
 greekSerifNoItalic'
   :: Emphasis  -- ^ The given 'Emphasis' to use.
   -> Char  -- ^ The given character to convert.
@@ -211,7 +219,7 @@ greekSerifNoItalic' = splitEmphasis greekSerifNoBoldNoItalic' greekSerifBoldNoIt
 
 -- | Convert the given character to a mathematical symbol with serifs, in the
 -- given /emphasis/ and not in /italics/ wrapped in a 'Just'. If the character
--- is outside the @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSerifNoItalic
   :: Emphasis  -- ^ The given 'Emphasis' to use.
   -> Char  -- ^ The given character to convert.

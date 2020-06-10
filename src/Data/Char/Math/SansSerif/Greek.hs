@@ -6,6 +6,8 @@ Description : Sans serif mathematical alphanumeric symbols
 Maintainer  : hapytexeu+gh@gmail.com
 Stability   : experimental
 Portability : POSIX
+
+See "Data.Char.Math" for further documentation.
 -}
 
 module Data.Char.Math.SansSerif.Greek
@@ -26,8 +28,8 @@ import Data.Char.Math.Internal
 
 
 -- | Convert the given character to a mathematical symbol without serifs, in the
--- given /emphasis/ and in the given /italics/ type wrapped in a 'Just'. If
--- the character is is not in @"ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ"@, 'Nothing' is returned.
+-- given /emphasis/ and in the given /italics/ type wrapped in a 'Just'. If the character
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSansSerif
   :: ItalicType  -- ^ The given 'ItalicType' to use.
   -> Emphasis  -- ^ The given 'Emphasis' to use.
@@ -37,7 +39,7 @@ greekSansSerif = splitItalicType greekSansSerifNoItalic greekSansSerifItalic
 
 -- | Convert the given character to a mathematical symbol without serifs, with a
 -- given /emphasis/ and a given /italics/ style. This maps characters an equivalent sans-serif symbol
--- for the characters in @"ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ"@.
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
 -- For characters outside the range, the behavior is unspecified.
 greekSansSerif'
   :: ItalicType  -- ^ The given 'ItalicType' to use.
@@ -47,8 +49,7 @@ greekSansSerif'
 greekSansSerif' = splitItalicType greekSansSerifNoItalic' greekSansSerifItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, with no
--- /bold/ and no /italics/. This maps characters to itself for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- /bold/ and no /italics/. This maps characters to itself.
 greekSansSerifNoBoldNoItalic'
   :: Char  -- ^ The given character to convert.
   -> Char  -- ^ The equivalent character that is formatted without serifs, not in bold and not in italics.
@@ -65,16 +66,17 @@ greekSansSerifNoBoldItalic'
 greekSansSerifNoBoldItalic' = greekSansSerifNoBoldNoItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, with no
--- /bold/, and in /italics/ wrapped in a 'Just'. If the character is outside the
--- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- /bold/, and in /italics/ wrapped in a 'Just'. If the character
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSansSerifNoBoldItalic
   :: Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 greekSansSerifNoBoldItalic = greekSansSerifNoBoldNoItalic
 
 -- | Convert the given character to a mathematical symbol without serifs, in /bold/
--- not in /italics/. This maps characters an equivalent sans-serif symbol for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- not in /italics/. This maps characters an equivalent sans-serif symbol
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
+-- For characters outside the range, the behavior is unspecified.
 greekSansSerifBoldNoItalic'
   :: Char  -- ^ The given character to convert.
   -> Char  -- ^ The equivalent character that is formatted without serifs, in bold and not in italics.
@@ -93,16 +95,17 @@ greekSansSerifBoldNoItalic' c
   | otherwise            = c
 
 -- | Convert the given character to a mathematical symbol without serifs, in
--- /bold/, and no /italics/ wrapped in a 'Just'. If the character is outside the
--- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- /bold/, and no /italics/ wrapped in a 'Just'. If the character
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSansSerifBoldNoItalic
   :: Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 greekSansSerifBoldNoItalic = _withCondition isGreek greekSansSerifBoldNoItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, with in
--- /bold/ and in /italics/. This maps characters an equivalent sans-serif symbol for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- /bold/ and in /italics/. This maps characters an equivalent sans-serif symbol
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
+-- For characters outside the range, the behavior is unspecified.
 greekSansSerifBoldItalic'
   :: Char  -- ^ The given character to convert.
   -> Char  -- ^ The equivalent character that is formatted without serifs, in bold and in italics.
@@ -121,16 +124,17 @@ greekSansSerifBoldItalic' c
   | otherwise            = c
 
 -- | Convert the given character to a mathematical symbol without serifs, in
--- /bold/, and in /italics/ wrapped in a 'Just'. If the character is outside the
--- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- /bold/, and in /italics/ wrapped in a 'Just'. If the character
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSansSerifBoldItalic
   :: Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 greekSansSerifBoldItalic = _withCondition isGreek greekSansSerifBoldItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, in /bold/
--- and in a /italics/ type. This maps characters an equivalent sans-serif symbol for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- and in a /italics/ type. This maps characters an equivalent sans-serif symbol
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
+-- For characters outside the range, the behavior is unspecified.
 greekSansSerifBold'
   :: ItalicType  -- ^ The given 'ItalicType' to use.
   -> Char  -- ^ The given character to convert.
@@ -138,8 +142,8 @@ greekSansSerifBold'
 greekSansSerifBold' = splitItalicType greekSansSerifBoldNoItalic' greekSansSerifBoldItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, in /bold/
--- with the given /italics/ type wrapped in a 'Just'. If the character is outside the
--- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- with the given /italics/ type wrapped in a 'Just'. If the character
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSansSerifBold
   :: ItalicType  -- ^ The given 'ItalicType' to use.
   -> Char  -- ^ The given character to convert.
@@ -147,8 +151,9 @@ greekSansSerifBold
 greekSansSerifBold = splitItalicType greekSansSerifBoldNoItalic greekSansSerifBoldItalic
 
 -- | Convert the given character to a mathematical symbol without serifs, not in /bold/
--- and in a /italics/ type. This maps characters an equivalent sans-serif symbol for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- and in a /italics/ type. This maps characters an equivalent sans-serif symbol
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
+-- For characters outside the range, the behavior is unspecified.
 greekSansSerifNoBold'
   :: ItalicType  -- ^ The given 'ItalicType' to use.
   -> Char  -- ^ The given character to convert.
@@ -156,8 +161,8 @@ greekSansSerifNoBold'
 greekSansSerifNoBold' = splitItalicType greekSansSerifNoBoldNoItalic' greekSansSerifNoBoldItalic'
 
 -- | Convert the given character to a mathematical symbol without serifs, with no /bold/
--- and in the given /italics/ type wrapped in a 'Just'. If the character is outside the
--- @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- and in the given /italics/ type wrapped in a 'Just'. If the character
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSansSerifNoBold
   :: ItalicType  -- ^ The given 'ItalicType' to use.
   -> Char  -- ^ The given character to convert.
@@ -165,8 +170,9 @@ greekSansSerifNoBold
 greekSansSerifNoBold = splitItalicType greekSansSerifNoBoldNoItalic greekSansSerifNoBoldItalic
 
 -- | Convert the given character to a mathematical symbol without serifs, with a
--- given /emphasis/ and in italics. This maps characters an equivalent sans-serif symbol for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- given /emphasis/ and in italics. This maps characters an equivalent sans-serif symbol
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
+-- For characters outside the range, the behavior is unspecified.
 greekSansSerifItalic'
   :: Emphasis  -- ^ The given 'Emphasis' to use.
   -> Char  -- ^ The given character to convert.
@@ -175,7 +181,7 @@ greekSansSerifItalic' = splitEmphasis greekSansSerifNoBoldItalic' greekSansSerif
 
 -- | Convert the given character to a mathematical symbol without serifs, in the
 -- given /emphasis/ and in /italics/ wrapped in a 'Just'. If the character
--- is outside the @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSansSerifItalic
   :: Emphasis  -- ^ The given 'Emphasis' to use.
   -> Char  -- ^ The given character to convert.
@@ -183,8 +189,9 @@ greekSansSerifItalic
 greekSansSerifItalic = splitEmphasis greekSansSerifNoBoldItalic greekSansSerifBoldItalic
 
 -- | Convert the given character to a mathematical symbol without serifs, with a
--- given /emphasis/ and not in italics. This maps characters an equivalent sans-serif symbol for the @A@-@Z@ and
--- @a@-@z@ range. For characters outside the range, the behavior is unspecified.
+-- given /emphasis/ and not in italics. This maps characters an equivalent sans-serif symbol
+-- for the characters in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@.
+-- For characters outside the range, the behavior is unspecified.
 greekSansSerifNoItalic'
   :: Emphasis  -- ^ The given 'Emphasis' to use.
   -> Char  -- ^ The given character to convert.
@@ -193,7 +200,7 @@ greekSansSerifNoItalic' = splitEmphasis greekSansSerifNoBoldNoItalic' greekSansS
 
 -- | Convert the given character to a mathematical symbol without serifs, in the
 -- given /emphasis/ and not in /italics/ wrapped in a 'Just'. If the character
--- is outside the @A@-@Z@ and @a@-@z@ range, 'Nothing' is returned.
+-- is not in @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@, 'Nothing' is returned.
 greekSansSerifNoItalic
   :: Emphasis  -- ^ The given 'Emphasis' to use.
   -> Char  -- ^ The given character to convert.
