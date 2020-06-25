@@ -211,11 +211,21 @@ isAsciiAlpha x = isAscii x && isAlpha x
 isAsciiAlphaNum :: Char -> Bool
 isAsciiAlphaNum x = isAscii x && isAlphaNum x
 
--- | Checks if a charcter is a basic /greek alphabetic/ character or a greek-like symbol. The characters
--- @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@ satisfy this
--- predicate.
+-- | Checks if a charcter is a basic /greek alphabetic/ character or a Greek-like symbol.
+-- The characters @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@ satisfy this predicate.
 isGreek :: Char -> Bool
-isGreek = (`elem` ("ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ" :: String))
+isGreek 'ϑ' = True -- U+03D1 GREEK THETA SYMBOL
+isGreek 'ϕ' = True -- U+03D5 GREEK PHI SYMBOL
+isGreek 'ϖ' = True -- U+03D6 GREEK PI SYMBOL
+isGreek 'ϰ' = True -- U+03F0 GREEK KAPPA SYMBOL
+isGreek 'ϱ' = True -- U+03F1 GREEK RHO SYMBOL
+isGreek 'ϴ' = True -- U+03F4 GREEK CAPITAL THETA SYMBOL
+isGreek 'ϵ' = True -- U+03F5 GREEK LUNATE EPSILON SYMBOL
+isGreek '∂' = True -- U+2202 PARTIAL DIFFERENTIAL
+isGreek '∇' = True -- U+2207 NABLA
+isGreek c
+  =  ('Α' <= c && c <= 'Ω' && c /= '\x03A2') -- U+0391 GREEK CAPITAL LETTER ALPHA, U+03A9 GREEK CAPITAL LETTER OMEGA
+  || ('α' <= c && c <= 'ω') -- U+03B1 GREEK SMALL LETTER ALPHA, U+03C9 GREEK SMALL LETTER OMEGA
 
 -- | Calculate for a given plus and minus sign a 'Text' object for the given
 -- number in the given 'PlusStyle'.
