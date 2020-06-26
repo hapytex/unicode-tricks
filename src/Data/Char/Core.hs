@@ -26,7 +26,7 @@ module Data.Char.Core (
   , ItalicType(NoItalic, Italic), splitItalicType
   , FontStyle(SansSerif, Serif), splitFontStyle
     -- * Character range checks
-  , isAsciiAlphaNum, isAsciiAlpha, isACharacter, isNotACharacter, isReserved, isNotReserved
+  , isAsciiAlphaNum, isAsciiAlpha, isGreek, isACharacter, isNotACharacter, isReserved, isNotReserved
     -- * Map characters from and to 'Enum's
   , mapFromEnum, mapToEnum, mapToEnumSafe
   , liftNumberFrom,     liftNumberFrom'
@@ -210,6 +210,22 @@ isAsciiAlpha x = isAscii x && isAlpha x
 -- satisfy this predicate.
 isAsciiAlphaNum :: Char -> Bool
 isAsciiAlphaNum x = isAscii x && isAlphaNum x
+
+-- | Checks if a charcter is a basic /greek alphabetic/ character or a Greek-like symbol.
+-- The characters @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@ satisfy this predicate.
+isGreek :: Char -> Bool
+isGreek 'ϑ' = True -- U+03D1 GREEK THETA SYMBOL
+isGreek 'ϕ' = True -- U+03D5 GREEK PHI SYMBOL
+isGreek 'ϖ' = True -- U+03D6 GREEK PI SYMBOL
+isGreek 'ϰ' = True -- U+03F0 GREEK KAPPA SYMBOL
+isGreek 'ϱ' = True -- U+03F1 GREEK RHO SYMBOL
+isGreek 'ϴ' = True -- U+03F4 GREEK CAPITAL THETA SYMBOL
+isGreek 'ϵ' = True -- U+03F5 GREEK LUNATE EPSILON SYMBOL
+isGreek '∂' = True -- U+2202 PARTIAL DIFFERENTIAL
+isGreek '∇' = True -- U+2207 NABLA
+isGreek c
+  =  ('Α' <= c && c <= 'Ω' && c /= '\x03A2') -- U+0391 GREEK CAPITAL LETTER ALPHA, U+03A9 GREEK CAPITAL LETTER OMEGA
+  || ('α' <= c && c <= 'ω') -- U+03B1 GREEK SMALL LETTER ALPHA, U+03C9 GREEK SMALL LETTER OMEGA
 
 -- | Calculate for a given plus and minus sign a 'Text' object for the given
 -- number in the given 'PlusStyle'.
@@ -401,7 +417,7 @@ class UnicodeCharacter a where
     {-# MINIMAL toUnicodeChar, fromUnicodeChar #-}
 
 -- | A class from which boejcts can be derived that map to and from a /sequence/
--- of unicode characters. 
+-- of unicode characters.
 class UnicodeText a where
     -- | Convert the given object to a 'Text' object.
     toUnicodeText
@@ -419,7 +435,7 @@ class UnicodeText a where
     fromUnicodeText t
         | [c] <- unpack t = fromUnicodeChar c
         | otherwise = Nothing
-    
+
     -- | Convert the given 'Text' to an object. If the 'Text' does not map on
     -- an element, the behavior is /unspecified/, it can for example result in
     -- an error.
