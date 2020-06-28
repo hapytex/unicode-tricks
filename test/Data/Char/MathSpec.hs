@@ -55,7 +55,7 @@ spec = do
           it "latin" do
             transform <$> latin `shouldBe` Just <$> "𝖠𝖡𝖢𝖣𝖤𝖥𝖦𝖧𝖨𝖩𝖪𝖫𝖬𝖭𝖮𝖯𝖰𝖱𝖲𝖳𝖴𝖵𝖶𝖷𝖸𝖹𝖺𝖻𝖼𝖽𝖾𝖿𝗀𝗁𝗂𝗃𝗄𝗅𝗆𝗇𝗈𝗉𝗊𝗋𝗌𝗍𝗎𝗏𝗐𝗑𝗒𝗓"
           nogreek transform
-          identicaldigits transform
+          checkdigits "𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫" transform
           unsupportedcheck transform
         describe "Bold" do
           let transform = math SansSerif NoItalic Bold
@@ -72,7 +72,7 @@ spec = do
           it "latin" do
             transform <$> latin `shouldBe` Just <$> "𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻"
           nogreek transform
-          identicaldigits transform
+          checkdigits "𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫" transform
           unsupportedcheck transform
         describe "Bold" do
           let transform = math SansSerif Italic Bold
@@ -136,28 +136,28 @@ spec = do
       let transform = script NoBold
       it "latin" do
         transform <$> latin `shouldBe` Just <$> "𝒜ℬ𝒞𝒟ℰℱ𝒢ℋℐ𝒥𝒦ℒℳ𝒩𝒪𝒫𝒬ℛ𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵𝒶𝒷𝒸𝒹ℯ𝒻ℊ𝒽𝒾𝒿𝓀𝓁𝓂𝓃ℴ𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏"
-      nogreekdigitsunsupported transform
+      nogreekDigitsUnsupported transform
     describe "Bold" do
       let transform = script Bold
       it "latin" do
         transform <$> latin `shouldBe` Just <$> "𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩𝓪𝓫𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃"
-      nogreekdigitsunsupported transform
+      nogreekDigitsUnsupported transform
   describe "fraktur" do
     describe "NoBold" do
       let transform = fraktur NoBold
       it "latin" do
         transform <$> latin `shouldBe` Just <$> "𝔄𝔅ℭ𝔇𝔈𝔉𝔊ℌℑ𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔ℜ𝔖𝔗𝔘𝔙𝔚𝔛𝔜ℨ𝔞𝔟𝔠𝔡𝔢𝔣𝔤𝔥𝔦𝔧𝔨𝔩𝔪𝔫𝔬𝔭𝔮𝔯𝔰𝔱𝔲𝔳𝔴𝔵𝔶𝔷"
-      nogreekdigitsunsupported transform
+      nogreekDigitsUnsupported transform
     describe "Bold" do
       let transform = fraktur Bold
       it "latin" do
         transform <$> latin `shouldBe` Just <$> "𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅𝖆𝖇𝖈𝖉𝖊𝖋𝖌𝖍𝖎𝖏𝖐𝖑𝖒𝖓𝖔𝖕𝖖𝖗𝖘𝖙𝖚𝖛𝖜𝖝𝖞𝖟"
-      nogreekdigitsunsupported transform
+      nogreekDigitsUnsupported transform
   describe "monospace" do
     it "latin" do
       monospace <$> latin `shouldBe` Just <$> "𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣"
     nogreek monospace
-    identicaldigits monospace
+    checkdigits "𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿" monospace
     it "0-9 (int)" do
       intToDigitMonospace <$> [0..9] `shouldBe` Just <$> "𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿"
     unsupportedcheck monospace
@@ -179,11 +179,20 @@ unsupported = [
   , 'ß', '𝑀'
   ]
 
-identical :: String -> String -> (Char -> Maybe Char) -> SpecWith (Arg Expectation)
-identical name vals transform = it name (transform <$> vals `shouldBe` Just <$> vals)
+checkVal :: String -> String -> [Maybe Char] -> (Char -> Maybe Char) -> SpecWith (Arg Expectation)
+checkVal name vals expect transform = it name (transform <$> vals `shouldBe` expect)
+
+checkVal_ :: String -> String -> String -> (Char -> Maybe Char) -> SpecWith (Arg Expectation)
+checkVal_ name vals expect = checkVal name vals (Just <$> expect)
+
+checkdigits :: String -> (Char -> Maybe Char) -> SpecWith (Arg Expectation)
+checkdigits = checkVal_ "0-9 (char)" digits
+
+checkValFunc :: (String -> [Maybe Char]) -> String -> String -> (Char -> Maybe Char) -> SpecWith (Arg Expectation)
+checkValFunc f name vals = checkVal name vals (f vals)
 
 notsupported :: String -> String -> (Char -> Maybe Char) -> SpecWith (Arg Expectation)
-notsupported name vals transform = it name (transform <$> vals `shouldBe` (Nothing <$ vals))
+notsupported = checkValFunc (Nothing <$)
 
 unsupportedcheck :: (Char -> Maybe Char) -> SpecWith (Arg Expectation)
 unsupportedcheck = notsupported "unsupported" unsupported
@@ -197,8 +206,5 @@ nolatin = notsupported "latin" latin
 nodigits :: (Char -> Maybe Char) -> SpecWith (Arg Expectation)
 nodigits = notsupported "0-9 (char)" digits
 
-identicaldigits :: (Char -> Maybe Char) -> SpecWith (Arg Expectation)
-identicaldigits = identical "0-9 (char)" digits
-
-nogreekdigitsunsupported :: (Char -> Maybe Char) -> SpecWith (Arg Expectation)
-nogreekdigitsunsupported transform = nogreek transform >> nodigits transform >> unsupportedcheck transform
+nogreekDigitsUnsupported :: (Char -> Maybe Char) -> SpecWith (Arg Expectation)
+nogreekDigitsUnsupported transform = nogreek transform >> nodigits transform >> unsupportedcheck transform
