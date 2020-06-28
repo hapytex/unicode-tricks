@@ -54,8 +54,8 @@ spec = do
           let transform = math SansSerif NoItalic NoBold
           it "latin" do
             transform <$> latin `shouldBe` Just <$> "𝖠𝖡𝖢𝖣𝖤𝖥𝖦𝖧𝖨𝖩𝖪𝖫𝖬𝖭𝖮𝖯𝖰𝖱𝖲𝖳𝖴𝖵𝖶𝖷𝖸𝖹𝖺𝖻𝖼𝖽𝖾𝖿𝗀𝗁𝗂𝗃𝗄𝗅𝗆𝗇𝗈𝗉𝗊𝗋𝗌𝗍𝗎𝗏𝗐𝗑𝗒𝗓"
-          identicaldigits transform
           nogreek transform
+          identicaldigits transform
           unsupportedcheck transform
         describe "Bold" do
           let transform = math SansSerif NoItalic Bold
@@ -157,6 +157,7 @@ spec = do
     it "latin" do
       monospace <$> latin `shouldBe` Just <$> "𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣"
     nogreek monospace
+    identicaldigits monospace
     it "0-9 (int)" do
       intToDigitMonospace <$> [0..9] `shouldBe` Just <$> "𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿"
     unsupportedcheck monospace
