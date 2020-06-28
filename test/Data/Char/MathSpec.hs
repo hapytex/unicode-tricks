@@ -54,9 +54,7 @@ spec = do
           let transform = math SansSerif NoItalic NoBold
           it "latin" do
             transform <$> latin `shouldBe` Just <$> "𝖠𝖡𝖢𝖣𝖤𝖥𝖦𝖧𝖨𝖩𝖪𝖫𝖬𝖭𝖮𝖯𝖰𝖱𝖲𝖳𝖴𝖵𝖶𝖷𝖸𝖹𝖺𝖻𝖼𝖽𝖾𝖿𝗀𝗁𝗂𝗃𝗄𝗅𝗆𝗇𝗈𝗉𝗊𝗋𝗌𝗍𝗎𝗏𝗐𝗑𝗒𝗓"
-          nogreek transform
-          checkdigits "𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫" transform
-          unsupportedcheck transform
+          nogreekDigitssansserifUnsupported transform
         describe "Bold" do
           let transform = math SansSerif NoItalic Bold
           it "latin" do
@@ -71,9 +69,7 @@ spec = do
           let transform = math SansSerif Italic NoBold
           it "latin" do
             transform <$> latin `shouldBe` Just <$> "𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻"
-          nogreek transform
-          checkdigits "𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫" transform
-          unsupportedcheck transform
+          nogreekDigitssansserifUnsupported transform
         describe "Bold" do
           let transform = math SansSerif Italic Bold
           it "latin" do
@@ -208,3 +204,6 @@ nodigits = notsupported "0-9 (char)" digits
 
 nogreekDigitsUnsupported :: (Char -> Maybe Char) -> SpecWith (Arg Expectation)
 nogreekDigitsUnsupported transform = nogreek transform >> nodigits transform >> unsupportedcheck transform
+
+nogreekDigitssansserifUnsupported :: (Char -> Maybe Char) -> SpecWith (Arg Expectation)
+nogreekDigitssansserifUnsupported transform = nogreek transform >> checkdigits "𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫" transform >> unsupportedcheck transform
