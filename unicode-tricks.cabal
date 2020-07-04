@@ -35,7 +35,6 @@ library
     , Data.Char.Math
     , Data.Char.Math.DoubleStruck
     , Data.Char.Math.Fraktur
-    , Data.Char.Math.Internal
     , Data.Char.Math.Monospace
     , Data.Char.Math.SansSerif
     , Data.Char.Math.SansSerif.Digit
@@ -51,6 +50,8 @@ library
     , Data.Char.Number.Roman
     , Data.Char.Number.Segmented
     , Data.Char.Small
+  other-modules:
+      Data.Char.Math.Internal
   build-depends:
       base >= 4.7 && < 5
     , data-default >= 0.2
