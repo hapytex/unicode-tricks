@@ -13,6 +13,10 @@ Unicode defines 2182 emoji characters, this module aims to make working with emo
 module Data.Char.Emoji (
     -- * Emoji suffix
     pattern EmojiSuffix
+    -- * Emoji basic colored shapes
+  , EmojiColoredShape(EmojiColoredShape)
+  , EmojiShape(Circle, Square, Heart)
+  , EmojiColor(Black, White, Red, Blue, Orange, Yellow, Green, Purple, Brown)
     -- * Flag emoji
   , Flag, flag, flag', flagChars
   , iso3166Alpha2ToFlag, iso3166Alpha2ToFlag', validFlagEmoji
@@ -22,10 +26,30 @@ module Data.Char.Emoji (
   , Clock, hours, minutes30, clock, closestClock
     -- * Blood type emoji
   , BloodType(O, B, A, AB)
+    -- * Food emoji
+  , Fruit(
+        Banana,    Blueberries, Cherries,   Coconut, Grapes, GreenApple, Kiwi,      Lemon
+      , Mango,     Melon,       Olive,      Peach,   Pear,   Pineapple,  RedApple,  Strawberry
+      , Tangerine, Tomato,      Watermelon
+    )
+  , Vegetable(
+        Advocado, BellPepper, Broccoli, Carrot, Chestnut, Cucumber, EarOfCorn, Eggplant, Garlic
+      , HotPepper, LeafyGreen
+  )
+    -- * Animals and Nature emoji
+  , Bird (
+        BabyChick,     Bird, Chicken, Dodo,    Dove,    Duck,    Eagle, Feather, Flamingo, FrontChick
+      , HatchingChick, Owl,  Parrot,  Peacock, Penguin, Rooster, Swan,  Turkey
+  )
+  , Plant (
+        Cactus,    DeciduousTree, EvergreenTree, FallenLeaf, FourLeafClover, Herb,        LeafFluttering
+      , MapleLeaf, PalmTree,      PottedPlant,   Seedling,   Shamrock,       SheafOfRice
+  )
     -- * Moon phase emoji
   , MoonPhase(NewMoon, WaxingCrescent, FirstQuarter, WaxingGibbous, FullMoon, WaningGibbous, ThirdQuarter, WaningCrescent)
     -- * Gender sign emoji
   , Gender(Female, Male)
+  , Trigender(Unisex, Gender)
     -- * Zodiac emoji
   , Zodiac(Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
     -- * Skin color modifier
@@ -70,15 +94,97 @@ import Prelude hiding (LT, GT)
 import Data.Bits(Bits((.&.), (.|.), bit, bitSize, bitSizeMaybe, complement, isSigned, popCount, rotate, shift, shiftL, shiftR, testBit, xor))
 import Data.Bool(bool)
 import Data.Char(chr, ord, toUpper, toLower)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), boundedEnumFromThen, mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Char.Enclosed(regionalIndicatorUppercase')
 import Data.Function(on)
+import Data.List(intersperse)
 import Data.Maybe(fromJust)
-import Data.Text(Text, pack, unpack)
+import Data.Text(Text, pack, singleton, uncons, unpack)
 
 import GHC.Enum(fromEnumError, toEnumError)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
+import Test.QuickCheck.Gen(frequency)
+
+-- | The basic emoji shapes that exist for all 'EmojiColor' values.
+data EmojiShape
+  = Circle  -- ^ A circle shape.
+  | Square -- ^ A square shape.
+  | Heart -- ^ A heart shape.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+instance Arbitrary EmojiShape where
+    arbitrary = arbitraryBoundedEnum
+
+-- | The basic emoji color for which emoji in all 'EmojiShape' values exist.
+data EmojiColor
+  = Black  -- ^ The color /black/.
+  | White  -- ^ The color /white/.
+  | Red  -- ^ The color /red/.
+  | Blue  -- ^ The color /blue/.
+  | Orange  -- ^ The color /orange/.
+  | Yellow  -- ^ The color /yellow/.
+  | Green  -- ^ The color /green/.
+  | Purple  -- ^ The color /purple/.
+  | Brown  -- ^ The color /brown/.
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+instance Arbitrary EmojiColor where
+    arbitrary = arbitraryBoundedEnum
+
+-- | A basic emoji colored shaped. For all combinations
+-- of 'EmojiColor' and 'EmojiShape', an emoji exists.
+data EmojiColoredShape
+  = EmojiColoredShape EmojiShape EmojiColor
+  deriving (Bounded, Eq, Ord, Read, Show)
+
+instance Enum EmojiColoredShape where
+    fromEnum (EmojiColoredShape s c) = 9 * fromEnum s + fromEnum c
+    toEnum n = EmojiColoredShape (toEnum q) (toEnum r)
+        where (q, r) = quotRem n 9
+
+instance Arbitrary EmojiColoredShape where
+    arbitrary = EmojiColoredShape <$> arbitrary <*> arbitrary
+
+instance UnicodeText EmojiColoredShape where
+    toUnicodeText (EmojiColoredShape s c) = go s c
+        where go Circle Black = "\x26ab"
+              go Circle White = "\x26aa"
+              go Circle Red = "\x1f534"
+              go Circle Blue = "\x1f535"
+              go Square Black = "\x2b1b"
+              go Square White = "\x2b1c"
+              go Heart Black = "\x1f5a4"
+              go Heart White = "\x1f90d"
+              go Heart Red = "\x2764\xfe0f"
+              go Heart Blue = "\x1f499"
+              go Heart Orange = "\x1f9e1"
+              go Heart Yellow = "\x1f49b"
+              go Heart Green = "\x1f49a"
+              go Heart Purple = "\x1f49c"
+              go Heart Brown = "\x1f90e"
+              go s c = singleton (toEnum (7 * fromEnum s + fromEnum c + 0x1f7dc))
+    fromUnicodeText t = case t of
+        "\x26ab" -> Just (EmojiColoredShape Circle Black)
+        "\x26aa" -> Just (EmojiColoredShape Circle White)
+        "\x1f534" -> Just (EmojiColoredShape Circle Red)
+        "\x1f535" -> Just (EmojiColoredShape Circle Blue)
+        "\x2b1b" -> Just (EmojiColoredShape Square Black)
+        "\x2b1c" -> Just (EmojiColoredShape Square White)
+        "\x1f5a4" -> Just (EmojiColoredShape Heart Black)
+        "\x1f90d" -> Just (EmojiColoredShape Heart White)
+        "\x2764\xfe0f" -> Just (EmojiColoredShape Heart Red)
+        "\x1f499" -> Just (EmojiColoredShape Heart Blue)
+        "\x1f9e1" -> Just (EmojiColoredShape Heart Orange)
+        "\x1f49b" -> Just (EmojiColoredShape Heart Yellow)
+        "\x1f49a" -> Just (EmojiColoredShape Heart Green)
+        "\x1f49c" -> Just (EmojiColoredShape Heart Purple)
+        "\x1f90e" -> Just (EmojiColoredShape Heart Brown)
+        _ -> case uncons t of
+            Just (c, "") | n >= 2 && n <= 13 -> Just (EmojiColoredShape (toEnum q) (toEnum (r+2)))
+                where n = fromEnum c - 0x1f7de
+                      (q, r) = quotRem n 7
+            _ -> Nothing
 
 -- | A 'Char'acter that is often used as a suffix to turn a character into an
 -- emoji.
@@ -1207,7 +1313,7 @@ instance Bounded SubFlag where
 -- a clock with the given time. The 'Clock' has an 'hours' field that contains
 -- the given hours between 0 and 12, and a 'minutes30' field that if 'True',
 -- means that the clock is half past that hour.
-data Clock = Clock { 
+data Clock = Clock {
     hours :: Int  -- ^ The number of hours on the given clock. Is between 0 and 12. For 0, the 'minutes30' is 'True'; and for 12, the 'minutes30' is 'False'.
   , minutes30 :: Bool  -- ^ Is 'True' if it is half past the given hour on the 'Clock'.
   } deriving (Eq, Ord, Show)
@@ -1221,6 +1327,244 @@ data BloodType
   | A  -- ^ The /A blood type/, with presence of the A antigen.
   | AB  -- ^ The /AB blood type/, with presence of the A and B antigens.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+data Fruit
+  = Banana
+  | Blueberries
+  | Cherries
+  | Coconut
+  | Grapes
+  | GreenApple
+  | Kiwi
+  | Lemon
+  | Mango
+  | Melon
+  | Olive
+  | Peach
+  | Pear
+  | Pineapple
+  | RedApple
+  | Strawberry
+  | Tangerine
+  | Tomato
+  | Watermelon
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+instance Arbitrary Fruit where
+    arbitrary = arbitraryBoundedEnum
+
+instance UnicodeCharacter Fruit where
+    toUnicodeChar Banana =      '\x1f34c'
+    toUnicodeChar Blueberries = '\x1fad0'
+    toUnicodeChar Cherries =    '\x1f352'
+    toUnicodeChar Coconut =     '\x1f965'
+    toUnicodeChar Grapes =      '\x1f347'
+    toUnicodeChar GreenApple =  '\x1f34f'
+    toUnicodeChar Kiwi =        '\x1f95d'
+    toUnicodeChar Lemon =       '\x1f34b'
+    toUnicodeChar Mango =       '\x1f96d'
+    toUnicodeChar Melon =       '\x1f348'
+    toUnicodeChar Olive =       '\x1fad2'
+    toUnicodeChar Peach =       '\x1f351'
+    toUnicodeChar Pear =        '\x1f350'
+    toUnicodeChar Pineapple =   '\x1f34d'
+    toUnicodeChar RedApple =    '\x1f34e'
+    toUnicodeChar Strawberry =  '\x1f353'
+    toUnicodeChar Tangerine =   '\x1f34a'
+    toUnicodeChar Tomato =      '\x1f345'
+    toUnicodeChar Watermelon =  '\x1f349'
+    fromUnicodeChar '\x1f34c' = Just Banana
+    fromUnicodeChar '\x1fad0' = Just Blueberries
+    fromUnicodeChar '\x1f352' = Just Cherries
+    fromUnicodeChar '\x1f965' = Just Coconut
+    fromUnicodeChar '\x1f347' = Just Grapes
+    fromUnicodeChar '\x1f34f' = Just GreenApple
+    fromUnicodeChar '\x1f95d' = Just Kiwi
+    fromUnicodeChar '\x1f34b' = Just Lemon
+    fromUnicodeChar '\x1f96d' = Just Mango
+    fromUnicodeChar '\x1f348' = Just Melon
+    fromUnicodeChar '\x1fad2' = Just Olive
+    fromUnicodeChar '\x1f351' = Just Peach
+    fromUnicodeChar '\x1f350' = Just Pear
+    fromUnicodeChar '\x1f34d' = Just Pineapple
+    fromUnicodeChar '\x1f34e' = Just RedApple
+    fromUnicodeChar '\x1f353' = Just Strawberry
+    fromUnicodeChar '\x1f34a' = Just Tangerine
+    fromUnicodeChar '\x1f345' = Just Tomato
+    fromUnicodeChar '\x1f349' = Just Watermelon
+    fromUnicodeChar _ = Nothing
+
+instance UnicodeText Fruit
+
+data Vegetable
+  = Advocado
+  | BellPepper
+  | Broccoli
+  | Carrot
+  | Chestnut
+  | Cucumber
+  | EarOfCorn
+  | Eggplant
+  | Garlic
+  | HotPepper
+  | LeafyGreen
+  | Mushroom
+  | Onion
+  | Peanuts
+  | Potato
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+instance Arbitrary Vegetable where
+    arbitrary = arbitraryBoundedEnum
+
+instance UnicodeCharacter Vegetable where
+    toUnicodeChar Advocado =   '\x1f951'
+    toUnicodeChar BellPepper = '\x1fad1'
+    toUnicodeChar Broccoli =   '\x1f966'
+    toUnicodeChar Carrot =     '\x1f955'
+    toUnicodeChar Chestnut =   '\x1f330'
+    toUnicodeChar Cucumber =   '\x1f952'
+    toUnicodeChar EarOfCorn =  '\x1f33d'
+    toUnicodeChar Eggplant =   '\x1f346'
+    toUnicodeChar Garlic =     '\x1f9c4'
+    toUnicodeChar HotPepper =  '\x1f336'
+    toUnicodeChar LeafyGreen = '\x1f96c'
+    toUnicodeChar Mushroom =   '\x1f344'
+    toUnicodeChar Onion =      '\x1f9c5'
+    toUnicodeChar Peanuts =    '\x1f95c'
+    toUnicodeChar Potato =     '\x1f954'
+    fromUnicodeChar '\x1f951' = Just Advocado
+    fromUnicodeChar '\x1fad1' = Just BellPepper
+    fromUnicodeChar '\x1f966' = Just Broccoli
+    fromUnicodeChar '\x1f955' = Just Carrot
+    fromUnicodeChar '\x1f330' = Just Chestnut
+    fromUnicodeChar '\x1f952' = Just Cucumber
+    fromUnicodeChar '\x1f33d' = Just EarOfCorn
+    fromUnicodeChar '\x1f346' = Just Eggplant
+    fromUnicodeChar '\x1f9c4' = Just Garlic
+    fromUnicodeChar '\x1f336' = Just HotPepper
+    fromUnicodeChar '\x1f96c' = Just LeafyGreen
+    fromUnicodeChar '\x1f344' = Just Mushroom
+    fromUnicodeChar '\x1f9c5' = Just Onion
+    fromUnicodeChar '\x1f95c' = Just Peanuts
+    fromUnicodeChar '\x1f954' = Just Potato
+    fromUnicodeChar _ = Nothing
+
+instance UnicodeText Vegetable
+
+data Bird
+  = BabyChick
+  | Bird
+  | Chicken
+  | Dodo
+  | Dove
+  | Duck
+  | Eagle
+  | Feather
+  | Flamingo
+  | FrontChick
+  | HatchingChick
+  | Owl
+  | Parrot
+  | Peacock
+  | Penguin
+  | Rooster
+  | Swan
+  | Turkey
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+instance Arbitrary Bird where
+    arbitrary = arbitraryBoundedEnum
+
+instance UnicodeCharacter Bird where
+    toUnicodeChar BabyChick = '\x1f424'
+    toUnicodeChar Bird = '\x1f426'
+    toUnicodeChar Chicken = '\x1f414'
+    toUnicodeChar Dodo = '\x1f9a4'
+    toUnicodeChar Dove = '\x1f54a'
+    toUnicodeChar Duck = '\x1f986'
+    toUnicodeChar Eagle = '\x1f985'
+    toUnicodeChar Feather = '\x1fab6'
+    toUnicodeChar Flamingo = '\x1f9a9'
+    toUnicodeChar FrontChick = '\x1f425'
+    toUnicodeChar HatchingChick = '\x1f423'
+    toUnicodeChar Owl = '\x1f989'
+    toUnicodeChar Parrot = '\x1f99c'
+    toUnicodeChar Peacock = '\x1f99a'
+    toUnicodeChar Penguin = '\x1f427'
+    toUnicodeChar Rooster = '\x1f413'
+    toUnicodeChar Swan = '\x1f9a2'
+    toUnicodeChar Turkey = '\x1f983'
+    fromUnicodeChar '\x1f424' = Just BabyChick
+    fromUnicodeChar '\x1f426' = Just Bird
+    fromUnicodeChar '\x1f414' = Just Chicken
+    fromUnicodeChar '\x1f9a4' = Just Dodo
+    fromUnicodeChar '\x1f54a' = Just Dove
+    fromUnicodeChar '\x1f986' = Just Duck
+    fromUnicodeChar '\x1f985' = Just Eagle
+    fromUnicodeChar '\x1fab6' = Just Feather
+    fromUnicodeChar '\x1f9a9' = Just Flamingo
+    fromUnicodeChar '\x1f425' = Just FrontChick
+    fromUnicodeChar '\x1f423' = Just HatchingChick
+    fromUnicodeChar '\x1f989' = Just Owl
+    fromUnicodeChar '\x1f99c' = Just Parrot
+    fromUnicodeChar '\x1f99a' = Just Peacock
+    fromUnicodeChar '\x1f427' = Just Penguin
+    fromUnicodeChar '\x1f413' = Just Rooster
+    fromUnicodeChar '\x1f9a2' = Just Swan
+    fromUnicodeChar '\x1f983' = Just Turkey
+    fromUnicodeChar _ = Nothing
+
+instance UnicodeText Bird
+
+data Plant
+  = Cactus
+  | DeciduousTree
+  | EvergreenTree
+  | FallenLeaf
+  | FourLeafClover
+  | Herb
+  | LeafFluttering
+  | MapleLeaf
+  | PalmTree
+  | PottedPlant
+  | Seedling
+  | Shamrock
+  | SheafOfRice
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+instance Arbitrary Plant where
+    arbitrary = arbitraryBoundedEnum
+
+instance UnicodeText Plant where
+    toUnicodeText Cactus         = "\x1f335"
+    toUnicodeText DeciduousTree  = "\x1f333"
+    toUnicodeText EvergreenTree  = "\x1f332"
+    toUnicodeText FallenLeaf     = "\x1f342"
+    toUnicodeText FourLeafClover = "\x1f340"
+    toUnicodeText Herb           = "\x1f33f"
+    toUnicodeText LeafFluttering = "\x1f343"
+    toUnicodeText MapleLeaf      = "\x1f341"
+    toUnicodeText PalmTree       = "\x1f334"
+    toUnicodeText PottedPlant    = "\x1fab4"
+    toUnicodeText Seedling       = "\x1f331"
+    toUnicodeText Shamrock       = "\x2618\xfe0f"
+    toUnicodeText SheafOfRice    = "\x1f33e"
+    fromUnicodeText "\x1f335" = Just Cactus
+    fromUnicodeText "\x1f333" = Just DeciduousTree
+    fromUnicodeText "\x1f332" = Just EvergreenTree
+    fromUnicodeText "\x1f342" = Just FallenLeaf
+    fromUnicodeText "\x1f340" = Just FourLeafClover
+    fromUnicodeText "\x1f33f" = Just Herb
+    fromUnicodeText "\x1f343" = Just LeafFluttering
+    fromUnicodeText "\x1f341" = Just MapleLeaf
+    fromUnicodeText "\x1f334" = Just PalmTree
+    fromUnicodeText "\x1fab4" = Just PottedPlant
+    fromUnicodeText "\x1f331" = Just Seedling
+    fromUnicodeText "\x2618\xfe0f" = Just Shamrock
+    fromUnicodeText "\x1f33e" = Just SheafOfRice
+    fromUnicodeText _ = Nothing
+
 
 _overEnumMask :: Enum a => Int -> (Int -> Int) -> a -> a
 _overEnumMask m f = toEnum . (m .&.) . f . fromEnum
@@ -1267,7 +1611,7 @@ instance Enum Clock where
         | otherwise = Clock (shiftR hm30' 1) (odd hm30')
         where hm30' = succ hm30
     enumFrom = (`enumFromTo` maxBound)
-    enumFromThen x y = enumFromThenTo x y maxBound
+    enumFromThen = boundedEnumFromThen
 
 -- | Generate the 'Clock' object that is the closest to the given hours and
 -- minutes.
@@ -1297,9 +1641,80 @@ clock h b
 -- emoji. The 'Gender' items are an instance of 'UnicodeText' that maps to the
 -- /female/ and /male/ emoji.
 data Gender
-  = Female -- The female sign, dented by ♀️.
-  | Male  -- The male sign, denoted by ♂️.
+  = Male  -- The male sign, denoted by ♂️.
+  | Female -- The female sign, dented by ♀️.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+data FamilyPart
+  = OneOf Gender
+  | TwoOf Gender
+  | MixOf
+  deriving (Eq, Ord, Read, Show)
+
+instance Bounded FamilyPart where
+    minBound = OneOf minBound
+    maxBound = MixOf
+
+instance Arbitrary FamilyPart where
+    arbitrary = frequency [(2, OneOf <$> arbitrary), (2, TwoOf <$> arbitrary), (1, pure MixOf)]
+
+data Family = Family
+  {
+    parents :: FamilyPart
+  , children :: FamilyPart
+  } deriving (Eq, Ord, Read, Show)
+
+instance Arbitrary Family where
+    arbitrary = Family <$> arbitrary <*> arbitrary
+
+instance UnicodeText Family where
+    toUnicodeText (Family ps cs) = pack (intersperse '\x200d' (generation '\x1f468' ps (generation '\x1f466' cs [])))
+        where generation o (OneOf g) xs = (person (ord o) g : xs)
+              generation o (TwoOf g) xs = let i = person (ord o) g in (i : i : xs)
+              generation o MixOf xs = (o : succ o : xs)
+              person o = chr . (o+) . fromEnum
+    fromUnicodeText = undefined
+
+data Trigender
+  = Unisex
+  | Gender Gender
+  deriving (Eq, Ord, Read, Show)
+
+instance Bounded Trigender where
+    minBound = Unisex
+    maxBound = Gender maxBound
+
+instance Enum Trigender where
+    toEnum 0 = Unisex
+    toEnum n = Gender (toEnum (n-1))
+    fromEnum Unisex = 0
+    fromEnum (Gender g) = 1 + fromEnum g
+    succ Unisex = Gender minBound
+    succ (Gender g) = Gender (succ g)
+    pred (Gender Female) = Unisex
+    pred (Gender g) = Gender (pred g)
+    pred Unisex = error "Unisex has no predecessor."
+    enumFromThen = boundedEnumFromThen
+    enumFrom Unisex = Unisex : enumFrom (Gender minBound)
+    enumFrom (Gender g) = map Gender [g ..]
+
+instance Arbitrary Trigender where
+    arbitrary = arbitraryBoundedEnum
+
+data Activity
+  = Climbing
+  | Dancing
+  | GettingHaircut
+  | GettingMassage
+  | InManualWheelchair
+  | InMotorizedWheelchair
+  | InSteamyRoom
+  | Kneeling
+  | Running
+  | Standing
+  | Walking
+  | WithWhiteCane
+  | WithBunnyEars
 
 -- | Some emoji deal with people. One can change the color of the skin with the
 -- 'SkinColorModifier'. For the skin color, the <https://en.wikipedia.org/wiki/Fitzpatrick_scale /Fitzpatrick scale/> is used.
@@ -2309,7 +2724,7 @@ instance Enum Flag where
     toEnum 257 = ZW
     toEnum i = toEnumError "Flag" i (minBound :: Flag, maxBound)
     enumFrom = (`enumFromTo` maxBound)
-    enumFromThen x y = enumFromThenTo x y maxBound
+    enumFromThen = boundedEnumFromThen
 
 instance Enum SubFlag where
     fromEnum ENG = 0
@@ -2321,7 +2736,7 @@ instance Enum SubFlag where
     toEnum 2 = WLS
     toEnum i = toEnumError "SubFlag" i (minBound :: SubFlag, maxBound)
     enumFrom = (`enumFromTo` maxBound)
-    enumFromThen x y = enumFromThenTo x y maxBound
+    enumFromThen = boundedEnumFromThen
 
 instance UnicodeCharacter SkinColorModifier where
     toUnicodeChar = mapFromEnum _skinColorOffset

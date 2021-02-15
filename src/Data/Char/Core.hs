@@ -44,6 +44,8 @@ module Data.Char.Core (
   , withSign, signValueSystem, positionalNumberSystem, positionalNumberSystem10
     -- * Re-export of some functions of the 'Data.Char' module
   , chr, isAlpha, isAlphaNum, isAscii, ord
+    -- * Utils
+  , boundedEnumFromThen
   ) where
 
 import Data.Bits((.&.))
@@ -443,6 +445,19 @@ class UnicodeText a where
       :: Text  -- ^ The given 'Text' to convert to an object.
       -> a  -- ^ The given equivalent object. If there is no equivalent object, the behavior is unspecified.
     fromUnicodeText' = fromJust . fromUnicodeText
+
+-- | An implementation of 'enumFromThen' in terms of 'enumFromThenTo' and the
+-- bounds. This function first checks if the range in ascending or descending
+-- and uses the 'maxBound' or 'minBound' respectively. If the two elements are
+-- the same, that elements is repeated forever.
+boundedEnumFromThen :: (Bounded a, Enum a, Ord a)
+  => a  -- ^ The first item to yield.
+  -> a  -- ^ The second item to yield.
+  -> [a]  -- ^ A list that contains the first two elements until the 'maxBound' or 'minBound'.
+boundedEnumFromThen x y
+    | x < y = enumFromThenTo x y maxBound
+    | x > y = enumFromThenTo x y minBound
+    | otherwise = repeat x  -- x == y repeats the element
 
 -- | Construct a function that maps digits to the character with the given value
 -- for the offset.

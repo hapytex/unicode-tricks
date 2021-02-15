@@ -1,5 +1,4 @@
 # Haskell
-*.zip
 dist
 dist-*
 cabal-dev
@@ -57,3 +56,15 @@ __pycache__/**
 *.adx
 *.and
 *.tex
+
+# Media files
+*.gif
+*.jpeg
+*.jpg
+*.mp4
+*.png
+*.svg
+
+# Archives
+*.zip
+*.7z
