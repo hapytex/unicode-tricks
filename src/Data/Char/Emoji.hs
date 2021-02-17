@@ -1669,9 +1669,9 @@ instance Arbitrary Family where
 
 instance UnicodeText Family where
     toUnicodeText (Family ps cs) = pack (intersperse '\x200d' (generation '\x1f468' ps (generation '\x1f466' cs [])))
-        where generation o (OneOf g) xs = (person (ord o) g : xs)
+        where generation o (OneOf g) xs = person (ord o) g : xs
               generation o (TwoOf g) xs = let i = person (ord o) g in (i : i : xs)
-              generation o MixOf xs = (o : succ o : xs)
+              generation o MixOf xs = o : succ o : xs
               person o = chr . (o+) . fromEnum
     fromUnicodeText = undefined
 
