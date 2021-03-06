@@ -55,11 +55,16 @@ greekSansSerifNoBoldNoItalic'
   -> Char  -- ^ The equivalent character that is formatted without serifs, not in bold and not in italics.
 greekSansSerifNoBoldNoItalic' = id
 
+-- | Convert the given character to a mathematical symbol without serifs, with no
+-- /bold/ and no /italics/. This maps characters to itself wrapped in a 'Just';
+-- 'Nothing' if that character does not exists.
 greekSansSerifNoBoldNoItalic
   :: Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.
 greekSansSerifNoBoldNoItalic = const Nothing
 
+-- | Convert the given character to a mathematical symbol without serifs, with no
+-- /bold/ and no /italics/. This maps characters to itself.
 greekSansSerifNoBoldItalic'
   :: Char  -- ^ The given character to convert.
   -> Char  -- ^ The equivalent character that is formatted without serifs, not in bold and in italics.
