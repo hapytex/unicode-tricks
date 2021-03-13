@@ -20,7 +20,8 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:
-      Data.Char.Block
+      Data.Char.BallotBox
+    , Data.Char.Block
     , Data.Char.Braille
     , Data.Char.Card
     , Data.Char.Chess
@@ -70,7 +71,8 @@ test-suite             utricks
   main-is:             Main.hs
   hs-source-dirs:      test
   other-modules:
-      Data.Char.BrailleSpec
+      Data.Char.BallotBoxSpec
+    , Data.Char.BrailleSpec
     , Data.Char.BlockSpec
     , Data.Char.CardSpec
     , Data.Char.CombiningSpec
