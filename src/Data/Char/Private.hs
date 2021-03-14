@@ -1,3 +1,16 @@
+{-# LANGUAGE Safe #-}
+
+{-|
+Module      : Data.Char.Private
+Description : Determine if characters belong to the /private use area/.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Unicode has a <https://www.unicode.org/charts/PDF/UE000.pdf block> named /Private Use Area/ that can be used for all sorts of characters, and each font can decide to allocate
+certain characters for this block. In the submodules, popular usages are supoorted.
+-}
+
 module Data.Char.Private (
     -- * Character bounds
     privateStart, privateStop, isPrivateChar
