@@ -28,7 +28,9 @@ Currently the package contains the following modules:
  - **`Data.Char.Number.Duodecimal`**: a module to work with [duodecimal numbers](https://en.wikipedia.org/wiki/Duodecimal);
  - **`Data.Char.Number.Egyptian`**: a module to render [ancient Egyptian numerals](https://en.wikipedia.org/wiki/Egyptian_numerals);
  - **`Data.Char.Number.Roman`**: a module to render [Roman numerals](https://en.wikipedia.org/wiki/Roman_numerals);
- - **`Data.Char.Number.Segmented`**: a module to render numbers on a [seven-segment display](https://en.wikipedia.org/wiki/Seven-segment_display); and
+ - **`Data.Char.Number.Segmented`**: a module to render numbers on a [seven-segment display](https://en.wikipedia.org/wiki/Seven-segment_display);
+ - **`Data.Char.Private`**: characters belonging to the *private usage area*;
+ - **`Data.Char.Private.Klingon`**: Klingon script characters; and
  - **`Data.Char.Small`**: making use of subscript and superscript in unicode, and for example formatting `Ratio` objects.
 
 ## `unicode-tricks` is *safe* Haskell

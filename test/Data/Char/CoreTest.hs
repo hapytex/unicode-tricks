@@ -14,6 +14,7 @@ testUnicodeCharacter name typ = describe ("instance UnicodeCharacter " ++ instan
     it "equivalent over character" $ property (mapOverChar typ)
     it "equivalent over item" $ property (mapOverItem typ)
     it "equivalent from valid chars over item" (mapValidItem typ)
+    it "fromUnicodeChar and fromUnicodeChar' are equivalent" (equivalentFromChar typ)
 
 testUnicodeText :: (Arbitrary a, Eq a, Show a, UnicodeText a) => String -> a -> SpecWith ()
 testUnicodeText name typ = describe ("instance UnicodeText " ++ instanceName name) $ it "equivalent over text" $ property (mapOverText typ)
@@ -30,11 +31,22 @@ mapOverItem t c = go (typeMapping t c)
     where go Nothing = True
           go (Just x) = c == toUnicodeChar (x `asTypeOf` t)
 
+equivalentMapping :: (Eq a, UnicodeCharacter a) => a -> Char -> Bool
+equivalentMapping t c = go (typeMapping t c)
+    where go Nothing = True
+          go (Just x) = x == typeMapping' (x `asTypeOf` t) c
+
 typeMapping :: UnicodeCharacter a => a -> Char -> Maybe a
 typeMapping _ = fromUnicodeChar
 
+typeMapping' :: UnicodeCharacter a => a -> Char -> a
+typeMapping' _ = fromUnicodeChar'
+
 mapValidItem :: UnicodeCharacter a => a -> Property
 mapValidItem t = forAll (suchThat (arbitrary :: Gen Char) (isJust . typeMapping t)) (mapOverItem t :: Char -> Bool)
+
+equivalentFromChar :: Eq a => UnicodeCharacter a => a -> Property
+equivalentFromChar t = forAll (suchThat (arbitrary :: Gen Char) (isJust . typeMapping t)) (equivalentMapping t :: Char -> Bool)
 
 mapOverText :: (Eq a, UnicodeText a) => a -> a -> Bool
 mapOverText _ c = Just c == fromUnicodeText (toUnicodeText c)
