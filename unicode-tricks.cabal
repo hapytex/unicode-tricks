@@ -50,6 +50,8 @@ library
     , Data.Char.Number.Egyptian
     , Data.Char.Number.Roman
     , Data.Char.Number.Segmented
+    , Data.Char.Private
+    , Data.Char.Private.Klingon
     , Data.Char.Small
   other-modules:
       Data.Char.Math.Internal
