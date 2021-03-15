@@ -25,6 +25,7 @@ library
     , Data.Char.Braille
     , Data.Char.Card
     , Data.Char.Chess
+    , Data.Char.Control
     , Data.Char.Core
     , Data.Char.Combining
     , Data.Char.Dice
