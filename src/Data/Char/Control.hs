@@ -8,20 +8,36 @@ Stability   : experimental
 Portability : POSIX
 
 Unicode has a <https://www.unicode.org/charts/PDF/U2400.pdf block> named /Control Pictures/ that visualizes control characters such as NULL, SUB, LF, DEL, etc.
-This module aims to make it more convenient to convert the control characters to their visualization and vice versa.
+This module aims to make it more convenient to convert the control characters to their visualization and vice versa. Only ASCII control characters and
+the space are supported.
 -}
 
 module Data.Char.Control (
     -- * Conversion to control pictures
     controlPicture, controlPicture'
-    -- * Conversion from control pictures
+    -- * Conversion from control picturesa
   , fromControlPicture, fromControlPicture'
+    -- * Check if a 'Char' is a control 'Char'
+  , isAsciiControl, isControl, hasControlVisualization
     -- * Alternative characters
   , blankSymbol, openBox, newLine, alternativeDelete, alternativeSubstitute
   ) where
 
 import Data.Bits((.&.), (.|.))
-import Data.Char(chr, ord)
+import Data.Char(chr, ord, isControl)
+
+-- | Check if the given 'Char' is a control character in the ASCII range.
+isAsciiControl
+  :: Char  -- ^ The given 'Char' to check.
+  -> Bool  -- ^ 'True' if the given 'Char' is a control character in the ASCII range; otherwise 'False'.
+isAsciiControl c = c <= '\x7f' && isControl c
+
+-- | Check if for the given 'Char' there is a visualization.
+hasControlVisualization
+  :: Char  -- ^ The given 'Char' to check.
+  -> Bool  -- ^ 'True' if the given control character can be visualized; 'False' otherwise.
+hasControlVisualization ' ' = True
+hasControlVisualization c = isAsciiControl c
 
 -- | Another symbol used to denote a /space/ that works with @␢@. The 'controlPicture' function uses @␠@.
 blankSymbol
