@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Data.Char.Private.KlingonSpec
   ( spec
   ) where
@@ -8,5 +10,5 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter "Klingon" (undefined :: Klingon)
-    testUnicodeText "Klingon" (undefined :: Klingon)
+    testUnicodeCharacter @ Klingon
+    testUnicodeText @ Klingon

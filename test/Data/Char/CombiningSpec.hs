@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Data.Char.CombiningSpec
   ( spec
   ) where
@@ -19,5 +21,5 @@ spec = do
   describe "combiningCharacter" $
     it "combiningCharacter and combiningToUnicode are each others inverse" $ property $
       \c -> combiningCharacter (combiningToUnicode c) == Just c
-  testUnicodeCharacter "CombiningCharacter" (undefined :: CombiningCharacter)
-  testUnicodeText "CombiningCharacter" (undefined :: CombiningCharacter)
+  testUnicodeCharacter @ CombiningCharacter
+  testUnicodeText @ CombiningCharacter

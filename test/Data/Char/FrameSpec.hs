@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Data.Char.FrameSpec
   ( spec
   ) where
@@ -8,7 +10,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter "Parts Weight" (undefined :: Parts Weight)
-    testUnicodeCharacter "Parts Bool" (undefined :: Parts Bool)
-    testUnicodeText "Parts Weight" (undefined :: Parts Weight)
-    testUnicodeText "Parts Bool" (undefined :: Parts Bool)
+    testUnicodeCharacter @ (Parts Weight)
+    testUnicodeCharacter @ (Parts Bool)
+    testUnicodeText @ (Parts Weight)
+    testUnicodeText @ (Parts Bool)

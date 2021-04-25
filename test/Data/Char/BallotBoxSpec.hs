@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Data.Char.BallotBoxSpec
   ( spec
   ) where
@@ -8,5 +10,5 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter "BallotBox" (undefined :: BallotBox)
-    testUnicodeText "BallotBox" (undefined :: BallotBox)
+    testUnicodeCharacter @ BallotBox
+    testUnicodeText @ BallotBox

@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Data.Char.BrailleSpec
   ( spec
   ) where
@@ -8,7 +10,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter "Braille Bool" (undefined :: Braille Bool)
-    testUnicodeCharacter "Braille6 Bool" (undefined :: Braille6 Bool)
-    testUnicodeText "Braille Bool" (undefined :: Braille Bool)
-    testUnicodeText "Braille6 Bool" (undefined :: Braille6 Bool)
+    testUnicodeCharacter @ (Braille Bool)
+    testUnicodeCharacter @ (Braille6 Bool)
+    testUnicodeText @ (Braille Bool)
+    testUnicodeText @ (Braille6 Bool)

@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Data.Char.BlockSpec
   ( spec
   ) where
@@ -8,5 +10,5 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter "Block Bool" (undefined :: Block Bool)
-    testUnicodeText "Block Bool" (undefined :: Block Bool)
+    testUnicodeCharacter @ (Block Bool)
+    testUnicodeText @ (Block Bool)

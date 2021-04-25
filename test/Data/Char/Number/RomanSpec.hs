@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Data.Char.Number.RomanSpec
   ( spec
   ) where
@@ -8,5 +10,5 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter "RomanLiteral" (undefined :: RomanLiteral)
-    testUnicodeText "RomanLiteral" (undefined :: RomanLiteral)
+    testUnicodeCharacter @ RomanLiteral
+    testUnicodeText @ RomanLiteral
