@@ -45,6 +45,8 @@ jobs:
     steps:
     - name: checkout code
       uses: actions/checkout@v2.3.1
+      with:
+        directory src
     - name: look for todos
       uses: hapytex/github-actions/actions/hlint@master
 
