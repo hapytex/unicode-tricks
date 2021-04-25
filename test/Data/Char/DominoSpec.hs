@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Data.Char.DominoSpec
   ( spec
   ) where
@@ -10,7 +12,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter (undefined :: Oriented (Domino (Maybe DieValue)))
-    testUnicodeCharacter (undefined :: Oriented (Domino DieValue))
-    testUnicodeText (undefined :: Oriented (Domino (Maybe DieValue)))
-    testUnicodeText (undefined :: Oriented (Domino DieValue))
+    testUnicodeCharacter @ (Oriented (Domino (Maybe DieValue)))
+    testUnicodeCharacter @ (Oriented (Domino DieValue))
+    testUnicodeText @ (Oriented (Domino (Maybe DieValue)))
+    testUnicodeText @ (Oriented (Domino DieValue))

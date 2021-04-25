@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Data.Char.CoreSpec
   ( spec
   ) where
@@ -22,6 +24,6 @@ spec = do
       \c -> isReserved c /= isNotReserved c
     it "No overlap with isAscii" $ property $
       \c -> not (isReserved c) || not (isAscii c)
-  testUnicodeCharacter (undefined :: Char)
-  testUnicodeText (undefined :: Char)
-  testUnicodeText (undefined :: String)
+  testUnicodeCharacter @ Char
+  testUnicodeText @ Char
+  testUnicodeText @ String
