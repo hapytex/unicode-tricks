@@ -8,5 +8,5 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter "Klingon" (undefined :: Klingon)
-    testUnicodeText "Klingon" (undefined :: Klingon)
+    testUnicodeCharacter (undefined :: Klingon)
+    testUnicodeText (undefined :: Klingon)

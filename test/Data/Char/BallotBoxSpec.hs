@@ -8,5 +8,5 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter "BallotBox" (undefined :: BallotBox)
-    testUnicodeText "BallotBox" (undefined :: BallotBox)
+    testUnicodeCharacter (undefined :: BallotBox)
+    testUnicodeText (undefined :: BallotBox)

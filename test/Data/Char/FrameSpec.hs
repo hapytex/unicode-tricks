@@ -8,7 +8,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter "Parts Weight" (undefined :: Parts Weight)
-    testUnicodeCharacter "Parts Bool" (undefined :: Parts Bool)
-    testUnicodeText "Parts Weight" (undefined :: Parts Weight)
-    testUnicodeText "Parts Bool" (undefined :: Parts Bool)
+    testUnicodeCharacter (undefined :: Parts Weight)
+    testUnicodeCharacter (undefined :: Parts Bool)
+    testUnicodeText (undefined :: Parts Weight)
+    testUnicodeText (undefined :: Parts Bool)

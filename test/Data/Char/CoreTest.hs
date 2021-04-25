@@ -5,19 +5,20 @@ module Data.Char.CoreTest (
 
 import Data.Char.Core
 import Data.Maybe(isJust)
+import Data.Typeable(Typeable, typeOf)
 
 import Test.Hspec
 import Test.QuickCheck
 
-testUnicodeCharacter :: (Arbitrary a, Eq a, Show a, UnicodeCharacter a) => String -> a -> SpecWith ()
-testUnicodeCharacter name typ = describe ("instance UnicodeCharacter " ++ instanceName name) $ do
+testUnicodeCharacter :: (Arbitrary a, Eq a, Show a, Typeable a, UnicodeCharacter a) => a -> SpecWith ()
+testUnicodeCharacter typ = describe ("instance UnicodeCharacter " ++ instanceName (show (typeOf typ))) $ do
     it "equivalent over character" $ property (mapOverChar typ)
     it "equivalent over item" $ property (mapOverItem typ)
     it "equivalent from valid chars over item" (mapValidItem typ)
     it "fromUnicodeChar and fromUnicodeChar' are equivalent" (equivalentFromChar typ)
 
-testUnicodeText :: (Arbitrary a, Eq a, Show a, UnicodeText a) => String -> a -> SpecWith ()
-testUnicodeText name typ = describe ("instance UnicodeText " ++ instanceName name) $ it "equivalent over text" $ property (mapOverText typ)
+testUnicodeText :: (Arbitrary a, Eq a, Show a, Typeable a, UnicodeText a) => a -> SpecWith ()
+testUnicodeText typ = describe ("instance UnicodeText " ++ instanceName (show (typeOf typ))) $ it "equivalent over text" $ property (mapOverText typ)
 
 instanceName :: String -> String
 instanceName s | ' ' `elem` s = '(' : s ++ ")"
