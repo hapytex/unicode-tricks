@@ -23,6 +23,7 @@ library
       Data.Char.BallotBox
     , Data.Char.Block
     , Data.Char.Braille
+    , Data.Char.Brackets
     , Data.Char.Card
     , Data.Char.Chess
     , Data.Char.Control
