@@ -12,15 +12,18 @@ import Data.Typeable(Typeable, typeOf)
 import Test.Hspec
 import Test.QuickCheck
 
+instanceText :: String -> String
+instanceText cls = "\ESC[1;34minstance\ESC[0m \ESC[1m" ++ cls ++ "\ESC[0m "
+
 testUnicodeCharacter :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeCharacter a) => SpecWith ()
-testUnicodeCharacter = describe ("\ESC[1;34minstance\ESC[0m UnicodeCharacter " ++ instanceName (show (typeOf (undefined :: a)))) $ do
+testUnicodeCharacter = describe (instanceText "UnicodeCharacter" ++ instanceName (show (typeOf (undefined :: a)))) $ do
     it "equivalent over character" $ property (mapOverChar @ a)
     it "equivalent over item" $ property (mapOverItem @ a)
     it "equivalent from valid chars over item" (mapValidItem @ a)
     it "fromUnicodeChar and fromUnicodeChar' are equivalent" (equivalentFromChar @ a)
 
 testUnicodeText :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeText a) => SpecWith ()
-testUnicodeText = describe ("\ESC[1;34minstance\ESC[0m UnicodeText " ++ instanceName (show (typeOf (undefined :: a)))) $ it "equivalent over text" $ property (mapOverText @ a)
+testUnicodeText = describe (instanceText "UnicodeText " ++ instanceName (show (typeOf (undefined :: a)))) $ it "equivalent over text" $ property (mapOverText @ a)
 
 instanceName :: String -> String
 instanceName s | ' ' `elem` s = '(' : s ++ ")"
