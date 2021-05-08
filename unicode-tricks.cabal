@@ -56,7 +56,8 @@ library
     , Data.Char.Private.Klingon
     , Data.Char.Small
   other-modules:
-      Data.Char.Math.Internal
+      Data.Char.Internal
+    , Data.Char.Math.Internal
   build-depends:
       base >= 4.7 && < 5
     , data-default >= 0.2
