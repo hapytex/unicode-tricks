@@ -14,6 +14,7 @@ Currently the package contains the following modules:
  - **`Data.Char.Core`**: a module that defines common data structures;
  - **`Data.Char.BallotBox`**: rendering boxes that are empty, with a checkmark, or a cross;
  - **`Data.Char.Block`**: rendering a 2-by-2 block by a matrix of `Bool`s;
+ - **`Data.Char.Brackets`**: determine if a character is a bracket, and find the corresponding bracket;
  - **`Data.Char.Braille`**: a module to render Braille characters with six or eight dot cells;
  - **`Data.Char.Card`**: a module to work with playing cards;
  - **`Data.Char.Chess`**: a module to render chess pieces (and some variants) in unicode;
