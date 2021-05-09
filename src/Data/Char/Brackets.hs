@@ -187,6 +187,3 @@ getOppositeChar'
   :: Char  -- ^ The given 'Char' for which we want to determine the opposite bracket.
   -> Char  -- ^ The opposite bracket if the given 'Char' is a /bracket/; otherwise the given 'Char'.
 getOppositeChar' = fromMaybe <*> getOppositeChar
-
--- checkValidBrackets :: Text -> Bool
--- checkValidBrackets = const True  -- TODO
