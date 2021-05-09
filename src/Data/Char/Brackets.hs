@@ -1,5 +1,23 @@
 {-# LANGUAGE Safe #-}
 
+{-|
+Module      : Data.Char.Brackets
+Description : Determine and manipulate bracket characters.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Unicode considers 60 characters to be brackets: brackets are organized in /pairs/: each opening bracket has a corresponding closing bracket and vice versa.
+
+The following characters are considered brackets where the first character is closed by the last character, the second by the last but one, etc.:
+
+@
+([{&#3898;&#3900;&#5787;&#8261;&#8317;&#8333;&#8968;&#8970;&#9001;&#10088;&#10090;&#10092;&#10094;&#10096;&#10098;&#10100;&#10181;&#10214;&#10216;&#10218;&#10220;&#10222;&#10627;&#10629;&#10631;&#10633;&#10635;&#10637;&#10639;&#10641;&#10643;&#10645;&#10647;&#10712;&#10714;&#10748;&#11810;&#11812;&#11814;&#11816;&#12296;&#12298;&#12300;&#12302;&#12304;&#12308;&#12310;&#12312;&#12314;&#65113;&#65115;&#65117;&#65288;&#65339;&#65371;&#65375;&#65378;&#65379;&#65376;&#65373;&#65341;&#65289;&#65118;&#65116;&#65114;&#12315;&#12313;&#12311;&#12309;&#12305;&#12303;&#12301;&#12299;&#12297;&#11817;&#11815;&#11813;&#11811;&#10749;&#10715;&#10713;&#10648;&#10646;&#10644;&#10642;&#10638;&#10640;&#10636;&#10634;&#10632;&#10630;&#10628;&#10223;&#10221;&#10219;&#10217;&#10215;&#10182;&#10101;&#10099;&#10097;&#10095;&#10093;&#10091;&#10089;&#9002;&#8971;&#8969;&#8334;&#8318;&#8262;&#5788;&#3901;&#3899;}])
+@
+
+-}
+
+
 module Data.Char.Brackets (
   -- * Listing and converting brackets
     bracketMaps, openBrackets, closeBrackets, toOpen, toClose
@@ -19,7 +37,7 @@ import Data.Tuple(swap)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
--- | A data type that determines the
+-- | A data type that is used to specify the /type/ of bracket.
 data BracketType
   = Open  -- ^ The bracket is used to "open" a context.
   | Close  -- ^ The bracket is used to "close" a context.
@@ -95,9 +113,11 @@ bracketMaps = [
   , ('\xff62', '\xff63')
   ]
 
+-- | A list of 'Char's that contains all opening brackets.
 openBrackets :: [Char]
 openBrackets = map fst bracketMaps
 
+-- | A list of 'Char's that contains all closing brackets.
 closeBrackets :: [Char]
 closeBrackets = map snd bracketMaps
 

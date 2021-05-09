@@ -49,17 +49,17 @@ openBox
   :: Char -- ^ Another character for /space/.
 openBox = '\x2423'
 
--- | Another symbol used to denote a /new line/ that works with @␤@. The 'ControlPicture' function uses @␊@.
+-- | Another symbol used to denote a /new line/ that works with @␤@. The control picture function uses @␊@.
 newLine
   :: Char -- ^ Another character for a /new line/.
 newLine = '\x2424'
 
--- | Another symbol used to denote a /delete/ character that works with @␥@. The 'ControlPicture' function uses @␡@.
+-- | Another symbol used to denote a /delete/ character that works with @␥@. The control picture function uses @␡@.
 alternativeDelete
   :: Char -- ^ Another character for /delete/.
 alternativeDelete = '\x2425'
 
--- | Another symbol used to denote a /substitute/ character that works with @␦@. The 'ControlPicture' function uses @␚@.
+-- | Another symbol used to denote a /substitute/ character that works with @␦@. The control picture function uses @␚@.
 alternativeSubstitute
   :: Char -- ^ Another character for /substitute/.
 alternativeSubstitute = '\x2426'
