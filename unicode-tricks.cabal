@@ -60,6 +60,7 @@ library
     , Data.Char.Math.Internal
   build-depends:
       base >= 4.7 && < 5
+    , containers >=0.4.2.1
     , data-default >= 0.2
     , QuickCheck >=2.13 && <2.14
     , text >=1.1 && <1.3

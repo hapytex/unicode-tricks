@@ -1,10 +1,36 @@
-module Data.Char.Brackets where
+{-# LANGUAGE Safe #-}
 
+module Data.Char.Brackets (
+  -- * Listing and converting brackets
+    bracketMaps, openBrackets, closeBrackets, toOpen, toClose
+  -- * Check the given bracket type
+  , BracketType(Open, Close), isBracket, bracketType, bracketType', isOpenBracket, isCloseBracket
+  -- * Determine the opposite bracket
+  , getOppositeChar, getOppositeChar'
+  ) where
+
+import Prelude hiding (lookup)
+
+import Control.Applicative((<|>))
+
+import Data.Map(Map, fromList, lookup, member)
+import Data.Maybe(fromMaybe)
+import Data.Tuple(swap)
+
+import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
+
+-- | A data type that determines the
 data BracketType
-  = Open
-  | Close
+  = Open  -- ^ The bracket is used to "open" a context.
+  | Close  -- ^ The bracket is used to "close" a context.
   deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
+instance Arbitrary BracketType where
+  arbitrary = arbitraryBoundedEnum
+
+-- | A list of 2-tuples where the first item
+-- of each tuple is the opening bracket, and the
+-- second item its closing counterpart.
 bracketMaps :: [(Char, Char)]
 bracketMaps = [
     ('(', ')')
@@ -68,3 +94,75 @@ bracketMaps = [
   , ('\xff5f', '\xff60')
   , ('\xff62', '\xff63')
   ]
+
+openBrackets :: [Char]
+openBrackets = map fst bracketMaps
+
+closeBrackets :: [Char]
+closeBrackets = map snd bracketMaps
+
+-- | A 'Map' that maps the given /open bracket/
+-- characters to the corresponding /close bracket/.
+toClose :: Map Char Char
+toClose = fromList bracketMaps
+
+-- | A 'Map' that maps the given /close bracket/
+-- characters to the corresponding /open bracket/.
+toOpen :: Map Char Char
+toOpen = fromList (map swap bracketMaps)
+
+-- | Check if the given 'Char' is a /bracket/ character.
+isBracket
+  :: Char -- ^ The given 'Char' to test.
+  -> Bool  -- ^ 'True' if the given 'Char' is an open bracket; 'False' otherwise.
+isBracket c = go toClose || go toOpen
+  where go = member c
+
+-- | Check if the given 'Char' is an /open bracket/.
+isOpenBracket
+  :: Char  -- ^ The given 'Char' to test.
+  -> Bool  -- ^ 'True' if the 'Char' is an /open bracket/; 'False' otherwise.
+isOpenBracket = (`member` toClose)
+
+-- | Check if the given 'Char' is a /close bracket/.
+isCloseBracket
+  :: Char  -- ^ The given 'Char' to test.
+  -> Bool  -- ^ 'True' if the 'Char' is an /close bracket/; 'False' otherwise.
+isCloseBracket = (`member` toOpen)
+
+-- | Check the 'BracketType' of the 'Char' wrapped in a 'Just' data construct;
+-- 'Nothing' if the given 'Char' is /not/ a /bracket/ character.
+bracketType :: Char -> Maybe BracketType
+bracketType c
+  | go toClose = Just Open
+  | go toOpen = Just Close
+  | otherwise = Nothing
+  where go = member c
+
+-- | Check the 'BracketType' of the 'Char'. For a 'Char' that is /not/ a /bracket/
+-- the behavior is unspecified.
+bracketType' :: Char -> BracketType
+bracketType' c
+  | member c toClose = Open
+  | otherwise = Close
+
+-- | Get the bracket character that is the /counterpart/
+-- of the given /bracket/ character wrapped in a 'Just' data
+-- constructor. If the given 'Char' is not a bracket, 'Nothing'
+-- is returned.
+getOppositeChar
+  :: Char  -- ^ The given 'Char' for which we want to determine the opposite bracket.
+  -> Maybe Char  -- ^ The opposite bracket wrapped in a 'Just' if the given 'Char' is a bracket character; 'Nothing' otherwise.
+getOppositeChar c = go toClose <|> go toOpen
+  where go = lookup c
+
+-- | Get the bracket character that is the /counterpart/
+-- of the given /bracket/ character. If the given 'Char'
+-- is not a bracket, the given 'Char' is returned.
+getOppositeChar'
+  :: Char  -- ^ The given 'Char' for which we want to determine the opposite bracket.
+  -> Char  -- ^ The opposite bracket if the given 'Char' is a /bracket/; otherwise the given 'Char'.
+getOppositeChar' = fromMaybe <*> getOppositeChar
+
+-- checkValidBrackets :: Text -> Bool
+-- checkValidBrackets = const True  -- TODO
