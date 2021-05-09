@@ -20,7 +20,7 @@ The following characters are considered brackets where the first character is cl
 
 module Data.Char.Brackets (
   -- * Listing and converting brackets
-    bracketMaps, openBrackets, closeBrackets, toOpen, toClose
+    bracketMaps, brackets, openBrackets, closeBrackets, toOpen, toClose
   -- * Check the given bracket type
   , BracketType(Open, Close), isBracket, bracketType, bracketType', isOpenBracket, isCloseBracket
   -- * Determine the opposite bracket
@@ -113,12 +113,16 @@ bracketMaps = [
   , ('\xff62', '\xff63')
   ]
 
+-- | The list of all brackets characters.
+brackets :: [Char]  -- ^ The list of all 'Char's that are brackets.
+brackets = [ci | ~(ca, cb) <- bracketMaps, ci <- [ca, cb]]
+
 -- | A list of 'Char's that contains all opening brackets.
-openBrackets :: [Char]
+openBrackets :: [Char]  -- ^ The list of all 'Char's that are opening brackets.
 openBrackets = map fst bracketMaps
 
 -- | A list of 'Char's that contains all closing brackets.
-closeBrackets :: [Char]
+closeBrackets :: [Char]  -- ^ The list of all 'Char's that are closing 'Brackets'
 closeBrackets = map snd bracketMaps
 
 -- | A 'Map' that maps the given /open bracket/

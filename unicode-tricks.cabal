@@ -79,6 +79,7 @@ test-suite             utricks
   other-modules:
       Data.Char.BallotBoxSpec
     , Data.Char.BrailleSpec
+    , Data.Char.BrailleSpec
     , Data.Char.BlockSpec
     , Data.Char.CardSpec
     , Data.Char.CombiningSpec
