@@ -64,7 +64,7 @@ jobs:
   linux6:
     name: Deploy documentation to GitHub pages
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
     steps:
     - uses: hapytex/github-actions/actions/setup-haskell@master
     - name: checkout code
@@ -72,6 +72,11 @@ jobs:
     - name: make Haddock documentation
       uses: hapytex/github-actions/actions/run-haddock@master
       id: haddock
+    - name: Add cname to the directory
+      uses: hapytex/github-actions/actions/add-cname-to-directory@master
+      with:
+        folder: "${{ steps.haddock.outputs.haddock-path }}"
+        cname: "unicode-tricks.django-antipatterns.com"
     - name: deploy the documentation on the GitHub pages
       uses: JamesIves/github-pages-deploy-action@4.0.0
       with:
