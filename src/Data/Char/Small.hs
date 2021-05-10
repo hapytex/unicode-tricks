@@ -1,4 +1,4 @@
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE CPP, Safe #-}
 
 {-|
 Module      : Data.Char.Small
@@ -29,6 +29,10 @@ import Data.Char(chr, isDigit, ord)
 import Data.Char.Core(PlusStyle(WithPlus, WithoutPlus), positionalNumberSystem10)
 import Data.Default(Default(def))
 import Data.Ratio(Ratio, denominator, numerator)
+#if __GLASGOW_HASKELL__ < 803
+import Data.Semigroup((<>))
+#endif
+
 import Data.Text(Text, cons, snoc, singleton)
 
 -- | Convert a set of characters to their superscript counterpart, given that

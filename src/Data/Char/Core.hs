@@ -1,4 +1,4 @@
-{-# LANGUAGE BangPatterns, ConstraintKinds, DefaultSignatures, DeriveTraversable, FlexibleInstances, Safe, ScopedTypeVariables #-}
+{-# LANGUAGE BangPatterns, CPP, ConstraintKinds, DefaultSignatures, DeriveTraversable, FlexibleInstances, Safe, ScopedTypeVariables #-}
 
 {-|
 Module      : Data.Char.Core
@@ -50,6 +50,9 @@ import Data.Bits((.&.))
 import Data.Char(chr, isAlpha, isAlphaNum, isAscii, ord)
 import Data.Default(Default(def))
 import Data.Maybe(fromJust)
+#if __GLASGOW_HASKELL__ < 803
+import Data.Semigroup((<>))
+#endif
 import Data.Text(Text, cons, pack, singleton, snoc, unpack)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
