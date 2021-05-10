@@ -96,5 +96,5 @@ jobs:
     - name: make Haddock documentation
       uses: hapytex/github-actions/actions/hackage-publish@master
       with:
-        HACKAGE_USERNAME: "${{ secrets.HACKAGE_USERNAME  }}"
+        HACKAGE_USERNAME: "${{ secrets.HACKAGE_USERNAME }}"
         HACKAGE_PASSWORD: "${{ secrets.HACKAGE_PASSWORD }}"
