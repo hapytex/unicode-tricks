@@ -73,12 +73,15 @@ instance Semigroup a => Semigroup (Parts a) where
 
 instance Monoid a => Monoid (Horizontal a) where
     mempty = Horizontal mempty mempty
+    mappend = (<>)
 
 instance Monoid a => Monoid (Vertical a) where
     mempty = Vertical mempty mempty
+    mappend = (<>)
 
 instance Monoid a => Monoid (Parts a) where
     mempty = Parts mempty mempty
+    mappend = (<>)
 
 instance Arbitrary Weight where
     arbitrary = arbitraryBoundedEnum
