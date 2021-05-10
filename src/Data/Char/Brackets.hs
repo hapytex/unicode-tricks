@@ -119,11 +119,11 @@ brackets :: [Char]  -- ^ The list of all 'Char's that are brackets.
 brackets = [ci | ~(ca, cb) <- bracketMaps, ci <- [ca, cb]]
 
 -- | A list of 'Char's that contains all opening brackets.
-openBrackets :: [Char]  -- ^ The list of all 'Char's that are opening brackets.
+openBrackets :: [Char]  -- ^ The list of all 'Char's that are /opening brackets/.
 openBrackets = map fst bracketMaps
 
 -- | A list of 'Char's that contains all closing brackets.
-closeBrackets :: [Char]  -- ^ The list of all 'Char's that are closing 'Brackets'
+closeBrackets :: [Char]  -- ^ The list of all 'Char's that are /closing brackets/.
 closeBrackets = map snd bracketMaps
 
 -- | A 'Map' that maps the given /open bracket/
