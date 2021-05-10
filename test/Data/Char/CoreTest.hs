@@ -23,7 +23,7 @@ testUnicodeCharacter = describe (instanceText "UnicodeCharacter" ++ instanceName
     it "fromUnicodeChar and fromUnicodeChar' are equivalent" (equivalentFromChar @ a)
 
 testUnicodeText :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeText a) => SpecWith ()
-testUnicodeText = describe (instanceText "UnicodeText " ++ instanceName (show (typeOf (undefined :: a)))) $ it "equivalent over text" $ property (mapOverText @ a)
+testUnicodeText = describe (instanceText "UnicodeText" ++ instanceName (show (typeOf (undefined :: a)))) $ it "equivalent over text" $ property (mapOverText @ a)
 
 instanceName :: String -> String
 instanceName s | ' ' `elem` s = '(' : s ++ ")"
