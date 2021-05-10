@@ -13,7 +13,7 @@ import Test.Hspec
 import Test.QuickCheck
 
 instanceText :: String -> String
-instanceText cls = "\ESC[1;34minstance\ESC[0m \ESC[1m" ++ cls ++ "\ESC[0m"
+instanceText cls = "\ESC[1;34minstance\ESC[0m \ESC[1m" ++ cls ++ "\ESC[0m "
 
 testUnicodeCharacter :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeCharacter a) => SpecWith ()
 testUnicodeCharacter = describe (instanceText "UnicodeCharacter" ++ instanceName (show (typeOf (undefined :: a)))) $ do
@@ -23,7 +23,7 @@ testUnicodeCharacter = describe (instanceText "UnicodeCharacter" ++ instanceName
     it "fromUnicodeChar and fromUnicodeChar' are equivalent" (equivalentFromChar @ a)
 
 testUnicodeText :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeText a) => SpecWith ()
-testUnicodeText = describe (instanceText "UnicodeText " ++ instanceName (show (typeOf (undefined :: a)))) $ it "equivalent over text" $ property (mapOverText @ a)
+testUnicodeText = describe (instanceText "UnicodeText" ++ instanceName (show (typeOf (undefined :: a)))) $ it "equivalent over text" $ property (mapOverText @ a)
 
 instanceName :: String -> String
 instanceName s | ' ' `elem` s = '(' : s ++ ")"
