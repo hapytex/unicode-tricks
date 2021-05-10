@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe #-}
+{-# LANGUAGE CPP, DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe #-}
 
 {-|
 Module      : Data.Char.Frame
@@ -31,12 +31,15 @@ module Data.Char.Frame(
 import Data.Bool(bool)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
 import Data.Maybe(fromJust)
+#if __GLASGOW_HASKELL__ < 803
+import Data.Semigroup(Semigroup((<>)))
+#endif
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
 
 -- | A data type that determines the state of the /horizontal/ lines of
 -- the frame ('left' and 'right').
-data Horizontal a = Horizontal { 
+data Horizontal a = Horizontal {
     left :: a  -- ^ The state of the left line of the frame.
   , right :: a  -- ^ The state of the right line of the frame.
   } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
@@ -68,14 +71,17 @@ instance Semigroup a => Semigroup (Vertical a) where
 instance Semigroup a => Semigroup (Parts a) where
     Parts a1 a2 <> Parts b1 b2 = Parts (a1 <> b1) (a2 <> b2)
 
-instance Monoid a => Monoid (Horizontal a) where
+instance (Monoid a, Semigroup a) => Monoid (Horizontal a) where
     mempty = Horizontal mempty mempty
+    mappend = (<>)
 
-instance Monoid a => Monoid (Vertical a) where
+instance (Monoid a, Semigroup a) => Monoid (Vertical a) where
     mempty = Vertical mempty mempty
+    mappend = (<>)
 
-instance Monoid a => Monoid (Parts a) where
+instance (Monoid a, Semigroup a) => Monoid (Parts a) where
     mempty = Parts mempty mempty
+    mappend = (<>)
 
 instance Arbitrary Weight where
     arbitrary = arbitraryBoundedEnum
