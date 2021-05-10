@@ -71,15 +71,15 @@ instance Semigroup a => Semigroup (Vertical a) where
 instance Semigroup a => Semigroup (Parts a) where
     Parts a1 a2 <> Parts b1 b2 = Parts (a1 <> b1) (a2 <> b2)
 
-instance Monoid a => Monoid (Horizontal a) where
+instance (Monoid a, Semigroup a) => Monoid (Horizontal a) where
     mempty = Horizontal mempty mempty
     mappend = (<>)
 
-instance Monoid a => Monoid (Vertical a) where
+instance (Monoid a, Semigroup a) => Monoid (Vertical a) where
     mempty = Vertical mempty mempty
     mappend = (<>)
 
-instance Monoid a => Monoid (Parts a) where
+instance (Monoid a, Semigroup a) => Monoid (Parts a) where
     mempty = Parts mempty mempty
     mappend = (<>)
 
