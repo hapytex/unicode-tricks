@@ -29,6 +29,7 @@ Currently the package contains the following modules:
  - **`Data.Char.Math.*`**: a set of modules to render mathematical symbols and text, for example in *Fraktur*, *Blackboard bold*, etc.
  - **`Data.Char.Number.Duodecimal`**: a module to work with [duodecimal numbers](https://en.wikipedia.org/wiki/Duodecimal);
  - **`Data.Char.Number.Egyptian`**: a module to render [ancient Egyptian numerals](https://en.wikipedia.org/wiki/Egyptian_numerals);
+ - **`Data.Char.Number.Mayan`**: a module to render [Mayan numerals](https://en.wikipedia.org/wiki/Maya_numerals);
  - **`Data.Char.Number.Roman`**: a module to render [Roman numerals](https://en.wikipedia.org/wiki/Roman_numerals);
  - **`Data.Char.Number.Segmented`**: a module to render numbers on a [seven-segment display](https://en.wikipedia.org/wiki/Seven-segment_display);
  - **`Data.Char.Private`**: characters belonging to the *private usage area*;

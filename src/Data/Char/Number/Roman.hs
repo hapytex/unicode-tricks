@@ -8,7 +8,7 @@ Stability   : experimental
 Portability : POSIX
 
 This module aims to convert Roman numerals to a String of unicode characters that
-represent Roman numerals.
+represent the corresponding Roman number.
 
 One can convert numbers to Roman numerals in upper case and lower case, and in 'Additive' and 'Subtractive' style.
 -}

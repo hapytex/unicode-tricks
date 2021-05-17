@@ -50,6 +50,7 @@ library
     , Data.Char.Math.Serif.Latin
     , Data.Char.Number.Duodecimal
     , Data.Char.Number.Egyptian
+    , Data.Char.Number.Mayan
     , Data.Char.Number.Roman
     , Data.Char.Number.Segmented
     , Data.Char.Private
@@ -91,6 +92,7 @@ test-suite             utricks
     , Data.Char.EmojiSpec
     , Data.Char.FrameSpec
     , Data.Char.MathSpec
+    , Data.Char.Number.MayanSpec
     , Data.Char.Number.RomanSpec
     , Data.Char.Private.KlingonSpec
   build-depends:
