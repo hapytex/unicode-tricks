@@ -9,14 +9,15 @@ Portability : POSIX
 
 Unicode uses a <https://www.unicode.org/charts/PDF/U1D2E0.pdf code block> for Mayan numerals. Mayan numerals are written top to bottom,
 so vertically. This module aims to make it more convenient to write Mayan numerals by offering
-functions to convert numbers into a 'Text' object for Mayan numbers.
+functions to convert numbers into a 'Text' object for Mayan numbers. Mayan numerals can /not/
+present /negative/ numbers.
 -}
 
 module Data.Char.Number.Mayan (
     -- * Define Mayan literals
     MayanLiteral(Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twelve, Thirteen, Fourteen, Fifteen, Sixteen, Seventeen, Eighteen, Nineteen)
     -- * Converting integers to Mayan numbers.
-  , toMayanVertical, toMayanVertical', toMayan, toMayan'
+  , toMayanVertical, toMayanVertical', toMayanVertical'', toMayan, toMayan', toMayan''
   ) where
 
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
@@ -62,28 +63,48 @@ instance UnicodeCharacter MayanLiteral where
 instance UnicodeText MayanLiteral
 
 -- | Convert the given 'Integral' number to a 'Text' object that writes the Mayan number to to bottom.
+-- This function will return a 'Nothing' in case the number is negative (since it can not be presented
+-- in Mayan).
 toMayanVertical :: Integral i
   => i -- ^ The given number to convert to a /vertical/ 'String' object.
-  -> Text  -- ^ A 'Text' that contains the Mayan number.
-toMayanVertical = pack . toMayanVertical'
+  -> Maybe Text  -- ^ A 'Text' that contains the Mayan number wrapped in a 'Just' if we can represent the number; 'Nothing' otherwise.
+toMayanVertical n
+  | n < 0 = Nothing
+  | otherwise = Just (toMayanVertical' n)
 
--- | Convert the given 'Integral' number to a 'String' object that writes the Mayan number to to bottom.
+-- | Convert the given 'Integral' number to a 'Text' object that writes the Mayan number to to bottom.
 toMayanVertical' :: Integral i
   => i -- ^ The given number to convert to a /vertical/ 'String' object.
+  -> Text  -- ^ A 'Text' that contains the Mayan number.
+toMayanVertical' = pack . toMayanVertical''
+
+-- | Convert the given 'Integral' number to a 'String' object that writes the Mayan number to to bottom.
+toMayanVertical'' :: Integral i
+  => i -- ^ The given number to convert to a /vertical/ 'String' object.
   -> String  -- ^ A 'String' that contains the Mayan number.
-toMayanVertical' = unlines . map pure . toMayan'
+toMayanVertical'' = unlines . map pure . toMayan''
 
 -- | Convert the given 'Integral' number to a 'Text' object that writes the Mayan number from left-to-right.
+-- The object is wrapped in a 'Just' data constructor. If the number is negative, and thus can not be
+-- represented, 'Nothing' is returned.
 toMayan :: Integral i
   => i -- ^ The given number to convert to a /horizontal/ 'String' object.
-  -> Text  -- ^ A 'Text' that contains the Mayan number.
-toMayan = pack . toMayan'
+  -> Maybe Text  -- ^ A 'Text' that contains the Mayan number wrapped in a 'Just' if we can represent the number; 'Nothing' otherwise.
+toMayan n
+  | n < 0 = Nothing
+  | otherwise = Just (toMayan' n)
 
--- | Convert the given 'Integral' number to a 'String' object that writes the Mayan number from left-to-right.
+-- | Convert the given 'Integral' number to a 'Text' object that writes the Mayan number from left-to-right.
 toMayan' :: Integral i
   => i -- ^ The given number to convert to a /horizontal/ 'String' object.
+  -> Text  -- ^ A 'Text' that contains the Mayan number.
+toMayan' = pack . toMayan''
+
+-- | Convert the given 'Integral' number to a 'String' object that writes the Mayan number from left-to-right.
+toMayan'' :: Integral i
+  => i -- ^ The given number to convert to a /horizontal/ 'String' object.
   -> String  -- ^ A 'String' that contains the Mayan number.
-toMayan' = go []
+toMayan'' = go []
   where go xs n | n <= 19 = ch n: xs
                 | otherwise = go (ch r:xs) q
           where ~(q, r) = n `quotRem` 20
