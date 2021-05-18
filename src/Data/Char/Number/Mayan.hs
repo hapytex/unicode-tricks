@@ -84,7 +84,7 @@ toMayan' :: Integral i
   => i -- ^ The given number to convert to a /horizontal/ 'String' object.
   -> String  -- ^ A 'String' that contains the Mayan number.
 toMayan' = go []
-  where go xs n | n <= 19 = (ch n: xs)
+  where go xs n | n <= 19 = ch n: xs
                 | otherwise = go (ch r:xs) q
           where ~(q, r) = n `quotRem` 20
                 ch = toUnicodeChar . toEnum @MayanLiteral . fromIntegral
