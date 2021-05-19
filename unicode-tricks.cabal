@@ -52,6 +52,7 @@ library
     , Data.Char.Number.Egyptian
     , Data.Char.Number.Roman
     , Data.Char.Number.Segmented
+    , Data.Char.Number.VulgarFraction
     , Data.Char.Private
     , Data.Char.Private.Klingon
     , Data.Char.Small
