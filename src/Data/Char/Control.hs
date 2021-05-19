@@ -14,7 +14,7 @@ the space are supported.
 
 module Data.Char.Control (
     -- * Conversion to control pictures
-    controlPicture, controlPicture'
+    controlPicture, controlPicture', convertToControlPictures
     -- * Conversion from control picturesa
   , fromControlPicture, fromControlPicture'
     -- * Check if a 'Char' is a control 'Char'
@@ -25,6 +25,8 @@ module Data.Char.Control (
 
 import Data.Bits((.&.), (.|.))
 import Data.Char(chr, ord, isControl)
+import Data.Maybe(fromMaybe)
+import Data.Text as T
 
 -- | Check if the given 'Char' is a control character in the ASCII range.
 isAsciiControl
@@ -106,3 +108,10 @@ fromControlPicture' '\x2424' = '\x0a'
 fromControlPicture' '\x2425' = '\x7f'
 fromControlPicture' '\x2426' = '\x1a'
 fromControlPicture' c = chr (0x7f .&. ord c)
+
+-- | Convert the given 'Text' to a 'Text' object where the control characters
+-- that have in Unicode a control picture block item.
+convertToControlPictures
+  :: Text  -- ^ The given 'Text' where we want to convert control characters to their control picture characters.
+  -> Text  -- ^ The corresponding 'Text' where the control characters are converted to their control picture characters.
+convertToControlPictures = T.map (fromMaybe <*> controlPicture)
