@@ -22,7 +22,7 @@ module Data.Char.Small (
   , asSub, asSub', asSubPlus
   , asSup, asSup', asSupPlus
   -- * Ratio formatting
-  , ratioToUnicode, ratioToUnicode'
+  , ratioToUnicode, ratioToUnicode', ratioPartsToUnicode, ratioPartsToUnicode'
   ) where
 
 import Data.Char(chr, isDigit, ord)
@@ -97,6 +97,30 @@ _prefixSignPlus cp cn f v
   | otherwise = c' cp v
   where c' = (. _value f) . cons
 
+-- | Converting the given numerator and denominator to a fraction
+-- where the numerator is written in superscript, and the denominator
+-- in subscript. If the denominator is negative, the item is rendered
+-- with a minus at the numerator part.
+ratioPartsToUnicode :: (Integral i, Integral j)
+  => PlusStyle -- ^ the given plus style that will be applied to the numerator.
+  -> i  -- ^ The given numerator.
+  -> j  -- ^ The given denominator.
+  -> Text  -- ^ A 'Text' object that presents the fraction with superscript and subscript.
+ratioPartsToUnicode ps num den
+  | den < 0 = ratioPartsToUnicode ps (-num) (-den)
+  | otherwise = asSup ps num <> cons '\x2044' (asSub' den)
+
+
+-- | Converting the given numerator and denominator to a fraction
+-- where the numerator is written in superscript, and the denominator
+-- in subscript. If the denominator is negative, the item is rendered
+-- with a minus at the numerator part.
+ratioPartsToUnicode' :: (Integral i, Integral j)
+  => i  -- ^ The given numerator.
+  -> j  -- ^ The given denominator.
+  -> Text  -- ^ A 'Text' object that presents the fraction with superscript and subscript.
+ratioPartsToUnicode' = ratioPartsToUnicode WithoutPlus
+
 -- | Convert the given 'Ratio' object to a sequence of characters with the
 -- numerator in superscript and the denominator in subscript. The given
 -- 'PlusStyle' is applied to the numerator.
@@ -104,7 +128,7 @@ ratioToUnicode :: Integral i
   => PlusStyle  -- ^ The given 'PlusStyle' to use.
   -> Ratio i  -- ^ The given 'Ratio' object to convert to a 'Text'.
   -> Text  -- ^ A 'Text' object that denotes the given 'Ratio' making use of superscript and subscript.
-ratioToUnicode ps dn = asSup ps (numerator dn) <> cons '\x2044' (asSub' (denominator dn))
+ratioToUnicode ps dn = ratioPartsToUnicode ps (numerator dn) (denominator dn)
 
 -- | Format a given 'Ratio' object to a 'Text' value that formats the ratio with
 -- superscript and subscript using the 'Default' 'PlusStyle'.
