@@ -29,6 +29,7 @@ library
     , Data.Char.Control
     , Data.Char.Core
     , Data.Char.Combining
+    , Data.Char.Currency
     , Data.Char.Dice
     , Data.Char.Domino
     , Data.Char.Emoji
@@ -88,6 +89,7 @@ test-suite             utricks
     , Data.Char.ControlSpec
     , Data.Char.CoreTest
     , Data.Char.CoreSpec
+    , Data.Char.CurrencySpec
     , Data.Char.DiceSpec
     , Data.Char.DominoSpec
     , Data.Char.EmojiSpec

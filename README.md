@@ -20,6 +20,7 @@ Currently the package contains the following modules:
  - **`Data.Char.Chess`**: a module to render chess pieces (and some variants) in unicode;
  - **`Data.Char.Control`**: a module that visualizes *control characters*;
  - **`Data.Char.Combining`**: combine a character with a (sequence of) *combining* characters (diacritics, geometrical shapes, etc.);
+ - **`Data.Char.Currency`**: translate currencies to Unicode characters and vice versa;
  - **`Data.Char.Dice`**: a module to render die unicode characters;
  - **`Data.Char.Domino`**: a module to render domino unicode characters;
  - **`Data.Char.Egyptian`**: a module that defines pattern synonyms for ancient Egyptian hieroglyphs;
