@@ -13,7 +13,17 @@ it more convenient to work with currency characters.
 
 module Data.Char.Currency (
     -- * Defining currencies
-    Currency(..)
+    Currency(
+                     Dollar,                Cent,               Pound,            Currency,                 Yen,         ArmenianDram,             Afghani
+      ,           NkoDorome,            NkoTaman,    BengaliRupeeMark,        BengaliRupee,    BengaliGandaMark,        GujaratiRupee,          TamilRupee
+      ,      ThaiSymbolBaht,     KhmerSymbolRiel,        EuroCurrency,               Colon,            Cruzeiro,          FrenchFranc,                Lira
+      ,                Mill,               Naira,              Peseta,               Rupee,                 Won,            NewSheqel,                Dong
+      ,                Euro,                 Kip,              Tugrik,             Drachma,         GermanPenny,                 Peso,             Guarani
+      ,             Austral,             Hryvnia,                Cedi,       LivreTournois,            Spesmilo,                Tenge,         IndianRupee
+      ,         TurkishLira,          NordicMark,               Manat,               Ruble,                Lari,              Bitcoin, NorthIndicRupeeMark
+      ,                Rial,         SmallDollar,     FullwidthDollar,       FullwidthCent,      FullwidthPound,         FullwidthYen,        FullwidthWon
+      ,          TamilKaacu,          TamilPanam,            TamilPon,       TamilVaraakan,          WanchoNgun,  IndicSiyaqRupeeMark
+    )
     -- * Currencies as 'Char' objects
   ,              dollar,                cent,               pound,            currency,                 yen,        armenianDram,             afghani,           nkoDorome
   ,            nkoTaman,    bengaliRupeeMark,        bengaliRupee,    bengaliGandaMark,       gujaratiRupee,          tamilRupee,      thaiSymbolBaht,     khmerSymbolRiel
@@ -28,6 +38,7 @@ module Data.Char.Currency (
   ) where
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
 
 -- | A datatype to present the currencies that have a unicode character.
 data Currency
@@ -97,6 +108,135 @@ data Currency
 
 instance Arbitrary Currency where
   arbitrary = arbitraryBoundedEnum
+
+instance UnicodeCharacter Currency where
+  toUnicodeChar Dollar = dollar
+  toUnicodeChar Cent = cent
+  toUnicodeChar Pound = pound
+  toUnicodeChar Currency = currency
+  toUnicodeChar Yen = yen
+  toUnicodeChar ArmenianDram = armenianDram
+  toUnicodeChar Afghani = afghani
+  toUnicodeChar NkoDorome = nkoDorome
+  toUnicodeChar NkoTaman = nkoTaman
+  toUnicodeChar BengaliRupeeMark = bengaliRupeeMark
+  toUnicodeChar BengaliRupee = bengaliRupee
+  toUnicodeChar BengaliGandaMark = bengaliGandaMark
+  toUnicodeChar GujaratiRupee = gujaratiRupee
+  toUnicodeChar TamilRupee = tamilRupee
+  toUnicodeChar ThaiSymbolBaht = thaiSymbolBaht
+  toUnicodeChar KhmerSymbolRiel = khmerSymbolRiel
+  toUnicodeChar EuroCurrency = euroCurrency
+  toUnicodeChar Colon = colon
+  toUnicodeChar Cruzeiro = cruzeiro
+  toUnicodeChar FrenchFranc = frenchFranc
+  toUnicodeChar Lira = lira
+  toUnicodeChar Mill = mill
+  toUnicodeChar Naira = naira
+  toUnicodeChar Peseta = peseta
+  toUnicodeChar Rupee = rupee
+  toUnicodeChar Won = won
+  toUnicodeChar NewSheqel = newSheqel
+  toUnicodeChar Dong = dong
+  toUnicodeChar Euro = euro
+  toUnicodeChar Kip = kip
+  toUnicodeChar Tugrik = tugrik
+  toUnicodeChar Drachma = drachma
+  toUnicodeChar GermanPenny = germanPenny
+  toUnicodeChar Peso = peso
+  toUnicodeChar Guarani = guarani
+  toUnicodeChar Austral = austral
+  toUnicodeChar Hryvnia = hryvnia
+  toUnicodeChar Cedi = cedi
+  toUnicodeChar LivreTournois = livreTournois
+  toUnicodeChar Spesmilo = spesmilo
+  toUnicodeChar Tenge = tenge
+  toUnicodeChar IndianRupee = indianRupee
+  toUnicodeChar TurkishLira = turkishLira
+  toUnicodeChar NordicMark = nordicMark
+  toUnicodeChar Manat = manat
+  toUnicodeChar Ruble = ruble
+  toUnicodeChar Lari = lari
+  toUnicodeChar Bitcoin = bitcoin
+  toUnicodeChar NorthIndicRupeeMark = northIndicRupeeMark
+  toUnicodeChar Rial = rial
+  toUnicodeChar SmallDollar = smallDollar
+  toUnicodeChar FullwidthDollar = fullwidthDollar
+  toUnicodeChar FullwidthCent = fullwidthCent
+  toUnicodeChar FullwidthPound = fullwidthPound
+  toUnicodeChar FullwidthYen = fullwidthYen
+  toUnicodeChar FullwidthWon = fullwidthWon
+  toUnicodeChar TamilKaacu = tamilKaacu
+  toUnicodeChar TamilPanam = tamilPanam
+  toUnicodeChar TamilPon = tamilPon
+  toUnicodeChar TamilVaraakan = tamilVaraakan
+  toUnicodeChar WanchoNgun = wanchoNgun
+  toUnicodeChar IndicSiyaqRupeeMark = indicSiyaqRupeeMark
+  fromUnicodeChar '\x24' = Just Dollar
+  fromUnicodeChar '\xa2' = Just Cent
+  fromUnicodeChar '\xa3' = Just Pound
+  fromUnicodeChar '\xa4' = Just Currency
+  fromUnicodeChar '\xa5' = Just Yen
+  fromUnicodeChar '\x58f' = Just ArmenianDram
+  fromUnicodeChar '\x60b' = Just Afghani
+  fromUnicodeChar '\x7fe' = Just NkoDorome
+  fromUnicodeChar '\x7ff' = Just NkoTaman
+  fromUnicodeChar '\x9f2' = Just BengaliRupeeMark
+  fromUnicodeChar '\x9f3' = Just BengaliRupee
+  fromUnicodeChar '\x9fb' = Just BengaliGandaMark
+  fromUnicodeChar '\xaf1' = Just GujaratiRupee
+  fromUnicodeChar '\xbf9' = Just TamilRupee
+  fromUnicodeChar '\xe3f' = Just ThaiSymbolBaht
+  fromUnicodeChar '\x17db' = Just KhmerSymbolRiel
+  fromUnicodeChar '\x20a0' = Just EuroCurrency
+  fromUnicodeChar '\x20a1' = Just Colon
+  fromUnicodeChar '\x20a2' = Just Cruzeiro
+  fromUnicodeChar '\x20a3' = Just FrenchFranc
+  fromUnicodeChar '\x20a4' = Just Lira
+  fromUnicodeChar '\x20a5' = Just Mill
+  fromUnicodeChar '\x20a6' = Just Naira
+  fromUnicodeChar '\x20a7' = Just Peseta
+  fromUnicodeChar '\x20a8' = Just Rupee
+  fromUnicodeChar '\x20a9' = Just Won
+  fromUnicodeChar '\x20aa' = Just NewSheqel
+  fromUnicodeChar '\x20ab' = Just Dong
+  fromUnicodeChar '\x20ac' = Just Euro
+  fromUnicodeChar '\x20ad' = Just Kip
+  fromUnicodeChar '\x20ae' = Just Tugrik
+  fromUnicodeChar '\x20af' = Just Drachma
+  fromUnicodeChar '\x20b0' = Just GermanPenny
+  fromUnicodeChar '\x20b1' = Just Peso
+  fromUnicodeChar '\x20b2' = Just Guarani
+  fromUnicodeChar '\x20b3' = Just Austral
+  fromUnicodeChar '\x20b4' = Just Hryvnia
+  fromUnicodeChar '\x20b5' = Just Cedi
+  fromUnicodeChar '\x20b6' = Just LivreTournois
+  fromUnicodeChar '\x20b7' = Just Spesmilo
+  fromUnicodeChar '\x20b8' = Just Tenge
+  fromUnicodeChar '\x20b9' = Just IndianRupee
+  fromUnicodeChar '\x20ba' = Just TurkishLira
+  fromUnicodeChar '\x20bb' = Just NordicMark
+  fromUnicodeChar '\x20bc' = Just Manat
+  fromUnicodeChar '\x20bd' = Just Ruble
+  fromUnicodeChar '\x20be' = Just Lari
+  fromUnicodeChar '\x20bf' = Just Bitcoin
+  fromUnicodeChar '\xa838' = Just NorthIndicRupeeMark
+  fromUnicodeChar '\xfdfc' = Just Rial
+  fromUnicodeChar '\xfe69' = Just SmallDollar
+  fromUnicodeChar '\xff04' = Just FullwidthDollar
+  fromUnicodeChar '\xffe0' = Just FullwidthCent
+  fromUnicodeChar '\xffe1' = Just FullwidthPound
+  fromUnicodeChar '\xffe5' = Just FullwidthYen
+  fromUnicodeChar '\xffe6' = Just FullwidthWon
+  fromUnicodeChar '\x11fdd' = Just TamilKaacu
+  fromUnicodeChar '\x11fde' = Just TamilPanam
+  fromUnicodeChar '\x11fdf' = Just TamilPon
+  fromUnicodeChar '\x11fe0' = Just TamilVaraakan
+  fromUnicodeChar '\x1e2ff' = Just WanchoNgun
+  fromUnicodeChar '\x1ecb0' = Just IndicSiyaqRupeeMark
+  fromUnicodeChar _ = Nothing
+
+instance UnicodeText Currency
 
 isCurrency
   :: Char

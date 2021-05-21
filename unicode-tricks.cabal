@@ -89,6 +89,7 @@ test-suite             utricks
     , Data.Char.ControlSpec
     , Data.Char.CoreTest
     , Data.Char.CoreSpec
+    , Data.Char.CurrencySpec
     , Data.Char.DiceSpec
     , Data.Char.DominoSpec
     , Data.Char.EmojiSpec
