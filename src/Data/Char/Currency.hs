@@ -238,9 +238,10 @@ instance UnicodeCharacter Currency where
 
 instance UnicodeText Currency
 
+-- | Check if the given 'Char'acter is a currency character.
 isCurrency
-  :: Char
-  -> Bool
+  :: Char  -- ^ The given character to test.
+  -> Bool  -- ^ 'True' if the given character is a currency character; 'False' otherwise.
 isCurrency x
   | '\x20a0' <= x && x <= '\x20bf' = True
   | '\xa2' <= x && x <= '\xa5' = True
