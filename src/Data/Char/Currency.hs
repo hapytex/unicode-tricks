@@ -242,13 +242,13 @@ isCurrency
   :: Char
   -> Bool
 isCurrency x
-  | ('\x20a0' <= x && x <= '\x20bf') = True
-  | ('\xa2' <= x && x <= '\xa5') = True
-  | ('\x11fdd' <= x && x <= '\x11fe0') = True
-  | ('\x7fe' <= x && x <= '\x7ff') = True
-  | ('\x9f2' <= x && x <= '\x9f3') = True
-  | ('\xffe0' <= x && x <= '\xffe1') = True
-  | ('\xffe5' <= x && x <= '\xffe6') = True
+  | '\x20a0' <= x && x <= '\x20bf' = True
+  | '\xa2' <= x && x <= '\xa5' = True
+  | '\x11fdd' <= x && x <= '\x11fe0' = True
+  | '\x7fe' <= x && x <= '\x7ff' = True
+  | '\x9f2' <= x && x <= '\x9f3' = True
+  | '\xffe0' <= x && x <= '\xffe1' = True
+  | '\xffe5' <= x && x <= '\xffe6' = True
 isCurrency '\x24' = True
 isCurrency '\x58f' = True
 isCurrency '\x60b' = True
