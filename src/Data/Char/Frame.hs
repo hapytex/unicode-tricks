@@ -31,6 +31,7 @@ module Data.Char.Frame(
 import Data.Bool(bool)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
 import Data.Data(Data)
+import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
 import Data.Hashable(Hashable)
 import Data.Hashable.Lifted(Hashable1)
 import Data.Maybe(fromJust)
@@ -49,9 +50,15 @@ data Horizontal a = Horizontal {
   , right :: a  -- ^ The state of the right line of the frame.
   } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
 
+instance Eq1 Horizontal where
+  liftEq cmp ~(Horizontal la ra) ~(Horizontal lb rb) = cmp la lb && cmp ra rb
+
 instance Hashable1 Horizontal
 
 instance Hashable a => Hashable (Horizontal a)
+
+instance Ord1 Horizontal where
+  liftCompare cmp ~(Horizontal la ra) ~(Horizontal lb rb) = cmp la lb <> cmp ra rb
 
 -- | A data type that determines the state of the /vertical/ lines of the frame
 -- ('up' and 'down').
@@ -60,17 +67,29 @@ data Vertical a = Vertical {
   , down :: a  -- ^ The state of the line in the down direction of the frame.
   } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
 
+instance Eq1 Vertical where
+  liftEq cmp ~(Vertical la ra) ~(Vertical lb rb) = cmp la lb && cmp ra rb
+
 instance Hashable1 Vertical
 
 instance Hashable a => Hashable (Vertical a)
+
+instance Ord1 Vertical where
+  liftCompare cmp ~(Vertical la ra) ~(Vertical lb rb) = cmp la lb <> cmp ra rb
 
 -- | A data type that specifies the four lines that should (not) be drawn for
 -- the frame.
 data Parts a = Parts (Vertical a) (Horizontal a) deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
 
+instance Eq1 Parts where
+  liftEq cmp ~(Parts la ra) ~(Parts lb rb) = liftEq cmp la lb && liftEq cmp ra rb
+
 instance Hashable1 Parts
 
 instance Hashable a => Hashable (Parts a)
+
+instance Ord1 Parts where
+  liftCompare cmp ~(Parts la ra) ~(Parts lb rb) = liftCompare cmp la lb <> liftCompare cmp ra rb
 
 -- | The weights of the frame lines, these can be 'Empty', 'Light' or 'Heavy'.
 data Weight

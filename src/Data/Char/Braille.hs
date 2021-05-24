@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, Safe #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, Safe #-}
 
 {-|
 Module      : Data.Char.Braille

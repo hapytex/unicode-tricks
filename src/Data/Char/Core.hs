@@ -50,6 +50,7 @@ import Data.Bits((.&.))
 import Data.Char(chr, isAlpha, isAlphaNum, isAscii, ord)
 import Data.Data(Data)
 import Data.Default(Default(def))
+import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
 import Data.Hashable(Hashable)
 import Data.Hashable.Lifted(Hashable1)
 import Data.Maybe(fromJust)
@@ -117,9 +118,15 @@ data Oriented a
   , orientation :: Orientation  -- ^ The oriented of the oriented object.
   } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
 
+instance Eq1 Oriented where
+  liftEq cmp ~(Oriented ba oa) ~(Oriented bb ob) = cmp ba bb && oa == ob
+
 instance Hashable1 Oriented
 
 instance Hashable a => Hashable (Oriented a)
+
+instance Ord1 Oriented where
+  liftCompare cmp ~(Oriented ba oa) ~(Oriented bb ob) = cmp ba bb <> compare oa ob
 
 -- | Possible rotations of a unicode character if that character can be rotated
 -- over 0, 90, 180, and 270 degrees.
@@ -139,9 +146,15 @@ data Rotated a
   , rotation :: Rotate90  -- ^ The rotation of the rotated object.
   } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
 
+instance Eq1 Rotated where
+  liftEq cmp ~(Rotated oa ra) ~(Rotated ob rb) = cmp oa ob && ra == rb
+
 instance Hashable1 Rotated
 
 instance Hashable a => Hashable (Rotated a)
+
+instance Ord1 Rotated where
+  liftCompare cmp ~(Rotated oa ra) ~(Rotated ob rb) = cmp oa ob <> compare ra rb
 
 -- | A data type that lists the possible emphasis of a font. This can be 'Bold'
 -- or 'NoBold' the 'Default' is 'NoBold'.
