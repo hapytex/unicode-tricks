@@ -27,5 +27,15 @@ spec = do
   testUnicodeCharacter @ Char
   testUnicodeText @ Char
   testUnicodeText @ String
-  testHashable @Char
-  testHashable @String
+  testHashable @ Char
+  testHashable @ String
+  testHashable @ LetterCase
+  testHashable @ PlusStyle
+  testHashable @ Orientation
+  testHashable @ (Oriented Bool)
+  testHashable @ Rotate90
+  testHashable @ (Rotated Bool)
+  testHashable @ Emphasis
+  testHashable @ ItalicType
+  testHashable @ FontStyle
+  testHashable @ Ligate

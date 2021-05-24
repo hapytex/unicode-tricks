@@ -16,3 +16,5 @@ spec = do
     testUnicodeText @ (Parts Bool)
     testHashable @ (Parts Weight)
     testHashable @ (Parts Bool)
+    testHashable @ (Horizontal Bool)
+    testHashable @ (Vertical Bool)
