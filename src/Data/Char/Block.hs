@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, Safe #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, Safe #-}
 
 {-|
 Module      : Data.Char.Block
@@ -22,9 +22,13 @@ module Data.Char.Block(
 
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
 import Data.Data(Data)
+import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
 import Data.Hashable(Hashable)
 import Data.Hashable.Lifted(Hashable1)
 import Data.Maybe(fromJust)
+#if __GLASGOW_HASKELL__ < 803
+import Data.Semigroup((<>))
+#endif
 
 import GHC.Generics(Generic, Generic1)
 
@@ -37,8 +41,15 @@ data Row a = Row {
   , right :: a  -- ^ The right part of the row of the block.
   } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
 
+instance Eq1 Row where
+  liftEq cmp ~(Row xa xb) ~(Row ya yb) = cmp xa ya && cmp xb yb
+
 instance Hashable1 Row
+
 instance Hashable a => Hashable (Row a)
+
+instance Ord1 Row where
+  liftCompare cmp ~(Row xa xb) ~(Row ya yb) = cmp xa ya <> cmp xb yb
 
 -- | A data type that determines the state of the four subparts of the block.
 data Block a = Block {
@@ -46,8 +57,17 @@ data Block a = Block {
   , lower :: Row a  -- ^ The lower part of the block.
   } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
 
+instance Eq1 Block where
+  liftEq cmp ~(Block ua la) ~(Block ub lb) = cmp' ua ub && cmp' la lb
+    where cmp' = liftEq cmp
+
 instance Hashable a => Hashable (Block a)
+
 instance Hashable1 Block
+
+instance Ord1 Block where
+  liftCompare cmp ~(Block ua la) ~(Block ub lb) = cmp' ua ub <> cmp' la lb
+    where cmp' = liftCompare cmp
 
 instance Applicative Row where
     pure x = Row x x

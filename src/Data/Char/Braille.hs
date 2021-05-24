@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, Safe #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, Safe #-}
 
 {-|
 Module      : Data.Char.Braille
@@ -28,8 +28,12 @@ import Data.Char(chr, ord)
 import Data.Char.Block(Row(Row))
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
 import Data.Data(Data)
+import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
 import Data.Hashable(Hashable)
 import Data.Hashable.Lifted(Hashable1)
+#if __GLASGOW_HASKELL__ < 803
+import Data.Semigroup((<>))
+#endif
 
 import GHC.Generics(Generic, Generic1)
 
@@ -42,9 +46,17 @@ data Braille6 a = Braille6 {
   , bottom :: Row a  -- ^ The state of the bottom row of the Braille character.
   } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
 
+instance Eq1 Braille6 where
+  liftEq cmp ~(Braille6 ta ma ba) ~(Braille6 tb mb bb) = cmp' ta tb && cmp' ma mb && cmp' ba bb
+    where cmp' = liftEq cmp
+
 instance Hashable1 Braille6
 
 instance Hashable a => Hashable (Braille6 a)
+
+instance Ord1 Braille6 where
+  liftCompare cmp ~(Braille6 ta ma ba) ~(Braille6 tb mb bb) = cmp' ta tb <> cmp' ma mb <> cmp' ba bb
+    where cmp' = liftCompare cmp
 
 -- | A datastructure to render Braille patterns with eight dots cells.
 data Braille a = Braille {
@@ -54,9 +66,18 @@ data Braille a = Braille {
   , row4 :: Row a  -- ^ The state of the bottom row of the Braille character.
   } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
 
+instance Eq1 Braille where
+  liftEq cmp ~(Braille a1 a2 a3 a4) ~(Braille b1 b2 b3 b4) = cmp' a1 b1 && cmp' a2 b2 && cmp' a3 b3 && cmp' a4 b4
+    where cmp' = liftEq cmp
+
 instance Hashable1 Braille
 
 instance Hashable a => Hashable (Braille a)
+
+instance Ord1 Braille where
+  liftCompare cmp ~(Braille a1 a2 a3 a4) ~(Braille b1 b2 b3 b4) = cmp' a1 b1 <> cmp' a2 b2 <> cmp' a3 b3 <> cmp' a4 b4
+    where cmp' = liftCompare cmp
+
 
 -- | Convert a 'Braille6' value to a 'Braille' character, by putting in a given
 -- value at the two values at the bottom row.

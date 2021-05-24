@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe #-}
 
 {-|
 Module      : Data.Char.Domino
@@ -29,8 +29,12 @@ import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnico
 import Data.Char.Dice(DieValue)
 import Data.Data(Data)
 import Data.Function(on)
+import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
 import Data.Hashable(Hashable)
 import Data.Hashable.Lifted(Hashable1)
+#if __GLASGOW_HASKELL__ < 803
+import Data.Semigroup((<>))
+#endif
 
 import GHC.Generics(Generic, Generic1)
 
@@ -48,9 +52,20 @@ data Domino a
   | Back  -- ^ The back side of the domino piece.
   deriving (Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
 
+instance Eq1 Domino where
+  liftEq cmp (Domino lta rba) (Domino ltb rbb) = cmp lta ltb && cmp rba rbb
+  liftEq _ Back Back = True
+  liftEq _ _ _ = False
+
 instance Hashable1 Domino
 
 instance Hashable a => Hashable (Domino a)
+
+instance Ord1 Domino where
+  liftCompare cmp (Domino lta rba) (Domino ltb rbb) = cmp lta ltb <> cmp rba rbb
+  liftCompare _ (Domino _ _) Back = LT
+  liftCompare _ Back Back = EQ
+  liftCompare _ Back (Domino _ _) = GT
 
 -- | A pattern synonym that makes it more convenient to write expressions that
 -- look like domino's like for example @II :| IV@.
