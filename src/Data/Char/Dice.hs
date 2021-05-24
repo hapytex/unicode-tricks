@@ -1,4 +1,4 @@
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}
 
 {-|
 Module      : Data.Char.Dice
@@ -23,6 +23,10 @@ module Data.Char.Dice(
 import Data.Bits((.|.))
 import Data.Char(chr)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Data(Data)
+import Data.Hashable(Hashable)
+
+import GHC.Generics(Generic)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
@@ -37,7 +41,9 @@ data DieValue
   | IV  -- ^ A die with value /four/, represented with ⚃.
   | V  -- ^ A die with value /five/, represented with ⚄.
   | VI  -- ^ A die with value /six/, represented with ⚅.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable DieValue
 
 -- | Convert the given integral value to a 'DieValue' that represents the given
 -- number. If the number is less than one, or greater than six, 'Nothing' is

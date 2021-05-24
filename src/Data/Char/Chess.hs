@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternSynonyms, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe #-}
 
 {-|
 Module      : Data.Char.Chess
@@ -31,9 +31,11 @@ module Data.Char.Chess (
 
 import Data.Bits((.|.))
 import Data.Char(chr)
-import Data.Char.Core(
-    Rotate90(R0, R180)
-  )
+import Data.Char.Core(Rotate90(R0, R180))
+import Data.Data(Data)
+import Data.Hashable(Hashable)
+
+import GHC.Generics(Generic)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 import Test.QuickCheck.Gen(oneof)
@@ -44,7 +46,9 @@ import Test.QuickCheck.Gen(oneof)
 data ChessColorBinary
   = BWhite  -- ^ /White/ color.
   | BBlack  -- ^ /Black/ color.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable ChessColorBinary
 
 -- | The color of a chess piece, this can for most pieces be 'Black', 'White',
 -- or 'Neutral'.
@@ -52,7 +56,9 @@ data ChessColor
   = White  -- ^ /White/ color.
   | Black  -- ^ /Black/ color.
   | Neutral  -- ^ Neutral chess pieces, sometimes depicted half /white/ and half /black/.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable ChessColor
 
 -- | The type of chess pieces. Unicode includes an 'Equihopper' as piece as
 -- well.
@@ -64,7 +70,9 @@ data ChessPieceType
   | Knight  -- ^ The /knight/ chess piece.
   | Pawn  -- ^ The /pawn/ chess piece.
   | Equihopper  -- ^ The /equihopper/ chess piece.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable ChessPieceType
 
 -- | Extra rotations that can be performed for knight chess pieces.
 data Rotate45
@@ -72,7 +80,9 @@ data Rotate45
   | R135  -- ^ Rotation over /135/ degrees.
   | R225  -- ^ Rotation over /225/ degrees.
   | R315  -- ^ Rotation over /315/ degrees.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable Rotate45
 
 -- | Hybrid chess pieces like the /knight-queen/, /knight-rook/ and
 -- /knight-bishop/.
@@ -80,7 +90,9 @@ data ChessHybridType
   = KnightQueen  -- ^ The /knight-queen/ chess piece.
   | KnightRook  -- ^ The /knight-rook/ chess piece.
   | KnightBishop  -- ^ The /knight-bishop/ chess piece.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable ChessHybridType
 
 -- | Chess pieces that can be represented in Unicode. These are the /king/,
 -- /queen/, /rook/, /bishop/, /knight/, /pawn/, and /equihopper/ over 0, 90,
@@ -92,7 +104,9 @@ data ChessPiece
   = Chess90 ChessColor ChessPieceType Rotate90  -- ^ Standard pieces drawn in /black/, /white/, or /neutral/ and with rotation.
   | Chess45Knight ChessColor Rotate45  -- ^ /Knights/ have unicode characters to render these rotated over /45/, /135/, /225/ and /315/ degrees.
   | ChessHybrid ChessHybridType ChessColorBinary  -- ^ Hybrid chess pieces can only be rendered in 'BBlack' and 'BWhite'.
-  deriving (Eq, Ord, Read, Show)
+  deriving (Data, Eq, Generic, Ord, Read, Show)
+
+instance Hashable ChessPiece
 
 instance Arbitrary ChessColorBinary where
     arbitrary = arbitraryBoundedEnum

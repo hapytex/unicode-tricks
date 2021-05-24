@@ -14,3 +14,5 @@ spec = do
     testUnicodeCharacter @ (Parts Bool)
     testUnicodeText @ (Parts Weight)
     testUnicodeText @ (Parts Bool)
+    testHashable @ (Parts Weight)
+    testHashable @ (Parts Bool)

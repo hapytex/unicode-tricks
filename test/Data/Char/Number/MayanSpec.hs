@@ -12,3 +12,4 @@ spec :: Spec
 spec = do
     testUnicodeCharacter @ MayanLiteral
     testUnicodeText @ MayanLiteral
+    testHashable @ MayanLiteral

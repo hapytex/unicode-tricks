@@ -12,3 +12,4 @@ spec :: Spec
 spec = do
     testUnicodeCharacter @ BallotBox
     testUnicodeText @ BallotBox
+    testHashable @BallotBox

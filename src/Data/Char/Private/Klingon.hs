@@ -1,4 +1,4 @@
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}
 
 {-|
 Module      : Data.Char.Private.Klingon
@@ -23,6 +23,10 @@ module Data.Char.Private.Klingon (
 
 import Data.Char(chr, ord)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
+import Data.Data(Data)
+import Data.Hashable(Hashable)
+
+import GHC.Generics(Generic)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
@@ -67,10 +71,12 @@ data Klingon
   | Comma  -- ^ The /comma/ character in Klingon script, denoted by an /up-turned triangle/.
   | FullStop  -- ^ The /full stop/ character in Klingon script, denoted by a /down-turned triangle/.
   | Mummification  -- ^ The /mummification/ character in Klingon script, also known as the /klingon character for the empire/ or /heart of virtue/.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary Klingon where
     arbitrary = arbitraryBoundedEnum
+
+instance Hashable Klingon
 
 instance UnicodeCharacter Klingon where
     toUnicodeChar c

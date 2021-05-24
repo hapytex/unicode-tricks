@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, FlexibleInstances, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, Safe #-}
 
 {-|
 Module      : Data.Char.Braille
@@ -27,6 +27,11 @@ import Data.Bool(bool)
 import Data.Char(chr, ord)
 import Data.Char.Block(Row(Row))
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
+import Data.Data(Data)
+import Data.Hashable(Hashable)
+import Data.Hashable.Lifted(Hashable1)
+
+import GHC.Generics(Generic, Generic1)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1)
 
@@ -35,7 +40,11 @@ data Braille6 a = Braille6 {
     top :: Row a  -- ^ The state of the top row of the Braille character.
   , middle :: Row a  -- ^ The state of the middle row of the Braille character.
   , bottom :: Row a  -- ^ The state of the bottom row of the Braille character.
-  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
+
+instance Hashable1 Braille6
+
+instance Hashable a => Hashable (Braille6 a)
 
 -- | A datastructure to render Braille patterns with eight dots cells.
 data Braille a = Braille {
@@ -43,7 +52,11 @@ data Braille a = Braille {
   , row2 :: Row a  -- ^ The state of the second row of the Braille character.
   , row3 :: Row a  -- ^ The state of the third row of the Braille character.
   , row4 :: Row a  -- ^ The state of the bottom row of the Braille character.
-  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
+
+instance Hashable1 Braille
+
+instance Hashable a => Hashable (Braille a)
 
 -- | Convert a 'Braille6' value to a 'Braille' character, by putting in a given
 -- value at the two values at the bottom row.

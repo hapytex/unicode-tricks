@@ -1,4 +1,4 @@
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}
 
 {-|
 Module      : Data.Char.Brackets
@@ -32,9 +32,13 @@ import Prelude hiding (lookup)
 
 import Control.Applicative((<|>))
 
+import Data.Data(Data)
+import Data.Hashable(Hashable)
 import Data.Map(Map, fromList, lookup, member)
 import Data.Maybe(fromMaybe)
 import Data.Tuple(swap)
+
+import GHC.Generics(Generic)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
@@ -42,10 +46,12 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 data BracketType
   = Open  -- ^ The bracket is used to "open" a context.
   | Close  -- ^ The bracket is used to "close" a context.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary BracketType where
   arbitrary = arbitraryBoundedEnum
+
+instance Hashable BracketType
 
 -- | A list of 2-tuples where the first item
 -- of each tuple is the opening bracket, and the

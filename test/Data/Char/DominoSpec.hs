@@ -16,3 +16,5 @@ spec = do
     testUnicodeCharacter @ (Oriented (Domino DieValue))
     testUnicodeText @ (Oriented (Domino (Maybe DieValue)))
     testUnicodeText @ (Oriented (Domino DieValue))
+    testHashable @ (Oriented (Domino (Maybe DieValue)))
+    testHashable @ (Oriented (Domino DieValue))

@@ -12,3 +12,4 @@ spec :: Spec
 spec = do
     testUnicodeCharacter @ CardSuit
     testUnicodeText @ CardSuit
+    testHashable @ CardSuit

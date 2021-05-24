@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternSynonyms, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe #-}
 
 {-|
 Module      : Data.Char.Card
@@ -59,6 +59,10 @@ module Data.Char.Card (
 import Data.Bits(shiftL, (.|.))
 import Data.Char(chr)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Data(Data)
+import Data.Hashable(Hashable)
+
+import GHC.Generics(Generic)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 import Test.QuickCheck.Gen(oneof)
@@ -72,7 +76,9 @@ data CardSuit
   | Hearts  -- ^ The /hearts/ card suit.
   | Diamonds  -- ^ The /diamonds/ card suit.
   | Clubs  -- ^ The /clubs/ card suit.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable CardSuit
 
 -- | A data type for the rank of the card.
 data CardRank
@@ -90,7 +96,9 @@ data CardRank
   | Knight  -- ^ The /knight/ card rank.
   | Queen  -- ^ The /queen/ card rank.
   | King  -- ^ The /king/ card rank.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable CardRank
 
 -- | A data type to represent the three colors for which there are jokers:
 -- /red/, /black/ and /white/.
@@ -98,7 +106,9 @@ data JokerColor
   = Red  -- ^ The /red/ joker.
   | Black  -- ^ The /black/ joker.
   | White  -- ^ The /white/ joker.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable JokerColor
 
 -- | A data type for the trump cards, often used for /tarot/.
 data Trump
@@ -124,7 +134,9 @@ data Trump
   | Trump19  -- ^ Tarot card /XIX/.
   | Trump20  -- ^ Tarot card /XX/.
   | Trump21  -- ^ Tarot card /XXI/.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable Trump
 
 -- | A data type that represents the possible types of cards for which there is
 -- a Unicode characters. This is the back of a card, a card with a suit and
@@ -134,7 +146,7 @@ data Card
   | Card CardSuit CardRank  -- ^ A card that is a combination of a 'CardSuit' and a 'CardRank'. There are 56 possibilities.
   | Joker JokerColor  -- ^ Three possible 'JokerColor' cards.
   | Trump Trump -- The 21 't:Trump' cards (together with the 'Fool', which is usually not numbered).
-  deriving (Eq, Ord, Read, Show)
+  deriving (Data, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary CardSuit where
     arbitrary = arbitraryBoundedEnum
@@ -154,6 +166,8 @@ instance Arbitrary Card where
 instance Bounded Card where
     minBound = Back
     maxBound = Trump maxBound
+
+instance Hashable Card
 
 instance UnicodeCharacter CardSuit where
     toUnicodeChar = mapFromEnum _suitOffset

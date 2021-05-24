@@ -14,3 +14,5 @@ spec = do
     testUnicodeCharacter @ (Braille6 Bool)
     testUnicodeText @ (Braille Bool)
     testUnicodeText @ (Braille6 Bool)
+    testHashable @ (Braille Bool)
+    testHashable @ (Braille6 Bool)

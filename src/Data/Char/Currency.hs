@@ -1,4 +1,4 @@
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}
 
 {-|
 Module      : Data.Char.Currency
@@ -37,8 +37,13 @@ module Data.Char.Currency (
   , isCurrency
   ) where
 
-import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
+import Data.Data(Data)
+import Data.Hashable(Hashable)
+
+import GHC.Generics(Generic)
+
+import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
 -- | A datatype to present the currencies that have a unicode character.
 data Currency
@@ -104,10 +109,12 @@ data Currency
   | TamilVaraakan  -- ^ A currency that is rendered as @𑿠@.
   | WanchoNgun  -- ^ A currency that is rendered as @𞋿@.
   | IndicSiyaqRupeeMark  -- ^ A currency that is rendered as @𞲰@.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary Currency where
   arbitrary = arbitraryBoundedEnum
+
+instance Hashable Currency
 
 instance UnicodeCharacter Currency where
   toUnicodeChar Dollar = dollar
