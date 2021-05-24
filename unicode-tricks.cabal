@@ -1,5 +1,5 @@
 name:                unicode-tricks
-version:             0.10.0.0
+version:             0.10.1.0
 synopsis: Functions to work with unicode blocks more convenient.
 description:
   A package that makes rendering of frames, blocks, subscript and superscript

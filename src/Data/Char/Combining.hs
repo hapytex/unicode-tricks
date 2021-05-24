@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, FlexibleInstances, FunctionalDependencies, PatternSynonyms, Safe #-}
+{-# LANGUAGE FlexibleInstances, FunctionalDependencies, PatternSynonyms, Safe #-}
 
 {-|
 Module      : Data.Char.Combining
@@ -142,14 +142,10 @@ module Data.Char.Combining (
   ) where
 
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
-import Data.Data(Data)
-import Data.Hashable(Hashable)
 import Data.List.NonEmpty(NonEmpty((:|)), (<|), toList)
 import Data.String(IsString(fromString))
 import Data.Text(Text, cons, pack, singleton)
 import qualified Data.Text as T
-
-import GHC.Generics(Generic)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
@@ -998,9 +994,7 @@ data CombiningCharacter
   | AdlamConsonantModifier  -- ^ The combining character @ADLAM CONSONANT MODIFIER@ from the Unicode standard, defined by @'\\x1e948'@ (&#x2022;&#x1e948;).
   | AdlamGeminateConsonantModifier  -- ^ The combining character @ADLAM GEMINATE CONSONANT MODIFIER@ from the Unicode standard, defined by @'\\x1e949'@ (&#x2022;&#x1e949;).
   | AdlamNukta  -- ^ The combining character @ADLAM NUKTA@ from the Unicode standard, defined by @'\\x1e94a'@ (&#x2022;&#x1e94a;).
-  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
-
-instance Hashable CombiningCharacter
+  deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 -- | A type synonym to make working with 'CombiningCharacter' more convenient.
 type CombiningChar = CombiningCharacter
@@ -1013,9 +1007,7 @@ instance IsString CombiningCharacter where
 -- character. The '(*^)' is used both to "stack" characters in a
 -- 'CombiningSequence', and to apply a 'CombiningCharacter' or a
 -- 'CombiningSequence' to a 'Char'.
-newtype CombiningSequence = CombiningSequence (NonEmpty CombiningCharacter) deriving (Data, Eq, Generic, Ord, Read, Show)
-
-instance Hashable CombiningSequence
+newtype CombiningSequence = CombiningSequence (NonEmpty CombiningCharacter) deriving (Eq, Ord, Read, Show)
 
 instance IsString CombiningSequence where
     fromString (c:cs)
