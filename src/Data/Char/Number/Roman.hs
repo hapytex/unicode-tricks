@@ -1,4 +1,4 @@
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}
 
 {-|
 Module      : Data.Char.Number.Roman
@@ -28,8 +28,12 @@ module Data.Char.Number.Roman (
 import Data.Bits((.|.))
 import Data.Char(chr)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, LetterCase, Ligate, ligateF, mapFromEnum, mapToEnum, mapToEnumSafe, splitLetterCase)
+import Data.Data(Data)
 import Data.Default(Default(def))
+import Data.Hashable(Hashable)
 import Data.Text(Text, cons, empty)
+
+import GHC.Generics(Generic)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
@@ -38,7 +42,7 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 data RomanStyle
   = Additive  -- ^ The additive style converts four to ⅠⅠⅠⅠ.
   | Subtractive  -- ^ The subtractive style converts four to ⅠⅤ.
-  deriving (Bounded, Enum, Eq, Show, Read)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary RomanStyle where
     arbitrary = arbitraryBoundedEnum
@@ -48,6 +52,8 @@ instance Arbitrary RomanLiteral where
 
 instance Default RomanStyle where
     def = Subtractive
+
+instance Hashable RomanStyle
 
 instance UnicodeCharacter RomanLiteral where
     toUnicodeChar = mapFromEnum _romanUppercaseOffset
@@ -74,7 +80,9 @@ data RomanLiteral
   | C  -- ^ The unicode character for the Roman numeral /hundred/: Ⅽ.
   | D  -- ^ The unicode character for the Roman numeral /five hundred/: Ⅾ.
   | M  -- ^ The unicode character for the Roman numeral /thousand/: Ⅿ.
-  deriving (Bounded, Enum, Eq, Show, Read)
+  deriving (Bounded, Data, Enum, Eq, Generic, Show, Read)
+
+instance Hashable RomanLiteral
 
 _literals :: Integral i => RomanStyle -> [(i, [RomanLiteral] -> [RomanLiteral])]
 _literals Additive = [

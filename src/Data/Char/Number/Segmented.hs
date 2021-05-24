@@ -16,7 +16,6 @@ module Data.Char.Number.Segmented (
     segmentedDigit, segmentedDigit'
   ) where
 
-
 import Data.Char(chr)
 
 _segmentedDigit :: Int -> Char

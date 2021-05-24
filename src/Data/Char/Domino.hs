@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe #-}
 
 {-|
 Module      : Data.Char.Domino
@@ -27,7 +27,12 @@ import Control.Monad((>=>))
 import Data.Char(chr, ord)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, Orientation(Horizontal, Vertical), Oriented(Oriented))
 import Data.Char.Dice(DieValue)
+import Data.Data(Data)
 import Data.Function(on)
+import Data.Hashable(Hashable)
+import Data.Hashable.Lifted(Hashable1)
+
+import GHC.Generics(Generic, Generic1)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1)
 import Test.QuickCheck.Gen(frequency)
@@ -41,7 +46,11 @@ data Domino a
   , rightBottom :: a  -- ^ The part that is located at the /right/ side in case the piece is located /horizontally/, or at the /bottom/ in case the piece is located /vertically/.
   }
   | Back  -- ^ The back side of the domino piece.
-  deriving (Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  deriving (Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
+
+instance Hashable1 Domino
+
+instance Hashable a => Hashable (Domino a)
 
 -- | A pattern synonym that makes it more convenient to write expressions that
 -- look like domino's like for example @II :| IV@.

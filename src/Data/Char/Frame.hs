@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe #-}
 
 {-|
 Module      : Data.Char.Frame
@@ -30,10 +30,15 @@ module Data.Char.Frame(
 
 import Data.Bool(bool)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
+import Data.Data(Data)
+import Data.Hashable(Hashable)
+import Data.Hashable.Lifted(Hashable1)
 import Data.Maybe(fromJust)
 #if __GLASGOW_HASKELL__ < 803
 import Data.Semigroup(Semigroup((<>)))
 #endif
+
+import GHC.Generics(Generic, Generic1)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
 
@@ -42,25 +47,39 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary)
 data Horizontal a = Horizontal {
     left :: a  -- ^ The state of the left line of the frame.
   , right :: a  -- ^ The state of the right line of the frame.
-  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
+
+instance Hashable1 Horizontal
+
+instance Hashable a => Hashable (Horizontal a)
 
 -- | A data type that determines the state of the /vertical/ lines of the frame
 -- ('up' and 'down').
 data Vertical a = Vertical {
     up :: a  -- ^ The state of the line in the up direction of the frame.
   , down :: a  -- ^ The state of the line in the down direction of the frame.
-  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
+
+instance Hashable1 Vertical
+
+instance Hashable a => Hashable (Vertical a)
 
 -- | A data type that specifies the four lines that should (not) be drawn for
 -- the frame.
-data Parts a = Parts (Vertical a) (Horizontal a) deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+data Parts a = Parts (Vertical a) (Horizontal a) deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
+
+instance Hashable1 Parts
+
+instance Hashable a => Hashable (Parts a)
 
 -- | The weights of the frame lines, these can be 'Empty', 'Light' or 'Heavy'.
 data Weight
   = Empty  -- ^ The frame does not contain such line.
   | Light  -- ^ The frame contains such line.
   | Heavy  -- ^ The frame contains such line, in /boldface/.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable Weight
 
 instance Semigroup a => Semigroup (Horizontal a) where
     Horizontal a1 a2 <> Horizontal b1 b2 = Horizontal (a1 <> b1) (a2 <> b2)

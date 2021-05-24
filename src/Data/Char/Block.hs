@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, FlexibleInstances, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, Safe #-}
 
 {-|
 Module      : Data.Char.Block
@@ -20,23 +20,34 @@ module Data.Char.Block(
   , fromBlock, fromBlock'
   ) where
 
-import Data.Maybe(fromJust)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
+import Data.Data(Data)
+import Data.Hashable(Hashable)
+import Data.Hashable.Lifted(Hashable1)
+import Data.Maybe(fromJust)
+
+import GHC.Generics(Generic, Generic1)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1)
 
 -- | A data type that determines the state of the /row/ in a block.
 -- it determines the left and the right part of the row of the block.
-data Row a = Row { 
+data Row a = Row {
     left :: a  -- ^ The left part of a row of the block.
   , right :: a  -- ^ The right part of the row of the block.
-  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
+
+instance Hashable1 Row
+instance Hashable a => Hashable (Row a)
 
 -- | A data type that determines the state of the four subparts of the block.
 data Block a = Block {
     upper :: Row a  -- ^ The upper part of the block.
   , lower :: Row a  -- ^ The lower part of the block.
-  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
+
+instance Hashable a => Hashable (Block a)
+instance Hashable1 Block
 
 instance Applicative Row where
     pure x = Row x x

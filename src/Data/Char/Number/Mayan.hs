@@ -1,4 +1,4 @@
-{-# LANGUAGE Safe, TypeApplications #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Number.Mayan
@@ -21,7 +21,11 @@ module Data.Char.Number.Mayan (
   ) where
 
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Data(Data)
+import Data.Hashable(Hashable)
 import Data.Text(Text, pack)
+
+import GHC.Generics(Generic)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
@@ -47,13 +51,15 @@ data MayanLiteral
   | Seventeen  -- ^ The unicode character for the Mayan numeral /seventeen/: 𝋱.
   | Eighteen  -- ^ The unicode character for the Mayan numeral /eighteen/: 𝋲.
   | Nineteen  -- ^ The unicode character for the Mayan numeral /nineteen/: 𝋳.
- deriving (Bounded, Enum, Eq, Ord, Read, Show)
+ deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 _mayanOffset :: Int
 _mayanOffset = 0x1d2e0
 
 instance Arbitrary MayanLiteral where
   arbitrary = arbitraryBoundedEnum
+
+instance Hashable MayanLiteral
 
 instance UnicodeCharacter MayanLiteral where
     toUnicodeChar = mapFromEnum _mayanOffset

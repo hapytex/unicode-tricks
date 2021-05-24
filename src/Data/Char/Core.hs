@@ -1,4 +1,4 @@
-{-# LANGUAGE BangPatterns, CPP, ConstraintKinds, DefaultSignatures, DeriveTraversable, FlexibleInstances, Safe, ScopedTypeVariables #-}
+{-# LANGUAGE BangPatterns, CPP, ConstraintKinds, DefaultSignatures, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, Safe, ScopedTypeVariables #-}
 
 {-|
 Module      : Data.Char.Core
@@ -48,12 +48,17 @@ module Data.Char.Core (
 
 import Data.Bits((.&.))
 import Data.Char(chr, isAlpha, isAlphaNum, isAscii, ord)
+import Data.Data(Data)
 import Data.Default(Default(def))
+import Data.Hashable(Hashable)
+import Data.Hashable.Lifted(Hashable1)
 import Data.Maybe(fromJust)
 #if __GLASGOW_HASKELL__ < 803
 import Data.Semigroup((<>))
 #endif
 import Data.Text(Text, cons, pack, singleton, snoc, unpack)
+
+import GHC.Generics(Generic, Generic1)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
 
@@ -63,7 +68,9 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary)
 data LetterCase
   = UpperCase  -- ^ The /upper case/ formatting.
   | LowerCase  -- ^ The /lower case/ formatting.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable LetterCase
 
 -- | Pick one of the two values based on the 'LetterCase' value.
 splitLetterCase
@@ -80,7 +87,9 @@ splitLetterCase x y = go
 data PlusStyle
   = WithoutPlus  -- ^ Write positive numbers /without/ using a plus sign.
   | WithPlus  -- ^ Write positive numbers /with/ a plus sign.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable PlusStyle
 
 -- | Pick one of the two values based on the 't:PlusStyle' value.
 splitPlusStyle
@@ -97,14 +106,20 @@ splitPlusStyle x y = go
 data Orientation
   = Horizontal  -- ^ /Horizontal/ orientation.
   | Vertical  -- ^ /Vertical/ orientation.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable Orientation
 
 -- | A data type that specifies that an item has been given an orientation.
 data Oriented a
   = Oriented {
     oobject :: a  -- ^ The object that is oriented.
   , orientation :: Orientation  -- ^ The oriented of the oriented object.
-  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
+
+instance Hashable1 Oriented
+
+instance Hashable a => Hashable (Oriented a)
 
 -- | Possible rotations of a unicode character if that character can be rotated
 -- over 0, 90, 180, and 270 degrees.
@@ -113,21 +128,29 @@ data Rotate90
   | R90  -- ^ Rotation over /90/ degrees.
   | R180  -- ^ Rotation over /180/ degrees.
   | R270  -- ^ Rotation over /270/ degrees.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable Rotate90
 
 -- | A data type that specifies that an item has been given a rotation.
 data Rotated a
   = Rotated {
     robject :: a  -- ^ The object that is rotated.
   , rotation :: Rotate90  -- ^ The rotation of the rotated object.
-  } deriving (Bounded, Eq, Foldable, Functor, Ord, Read, Show, Traversable)
+  } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
+
+instance Hashable1 Rotated
+
+instance Hashable a => Hashable (Rotated a)
 
 -- | A data type that lists the possible emphasis of a font. This can be 'Bold'
 -- or 'NoBold' the 'Default' is 'NoBold'.
 data Emphasis
   = NoBold  -- ^ The characters are not stressed with boldface.
   | Bold  -- ^ The characters are stressed in boldface.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable Emphasis
 
 -- | Pick one of the two values based on the 't:Emphasis' value.
 splitEmphasis
@@ -144,7 +167,9 @@ splitEmphasis x y = go
 data ItalicType
   = NoItalic  -- ^ No italic characters are used.
   | Italic  -- ^ Italic characters are used.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable ItalicType
 
 -- | Pick one of the two values based on the 't:ItalicType' value.
 splitItalicType
@@ -161,7 +186,9 @@ splitItalicType x y = go
 data FontStyle
   = SansSerif  -- ^ The character is a character rendered /without/ serifs.
   | Serif  -- ^ The character is a character rendered /with/ serifs.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable FontStyle
 
 -- | Pick one of the two values based on the 't:FontStyle' value.
 splitFontStyle
@@ -179,7 +206,9 @@ splitFontStyle x y = go
 data Ligate
   = Ligate  -- ^ A ligate operation is performed on the characters, the 'def' for 't:Ligate'.
   | NoLigate  -- ^ No ligate operation is performed on the charaters.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable Ligate
 
 -- | Pick one of the two values based on the value for 't:Ligate'.
 splitLigate

@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternSynonyms, OverloadedStrings, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, OverloadedStrings, Safe #-}
 
 {-|
 Module      : Data.Char.Emoji
@@ -72,10 +72,13 @@ import Data.Bool(bool)
 import Data.Char(chr, ord, toUpper, toLower)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Char.Enclosed(regionalIndicatorUppercase')
+import Data.Data(Data)
 import Data.Function(on)
+import Data.Hashable(Hashable)
 import Data.Maybe(fromJust)
 import Data.Text(Text, pack, unpack)
 
+import GHC.Generics(Generic)
 import GHC.Enum(fromEnumError, toEnumError)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
@@ -101,14 +104,18 @@ _moonPhaseOffset = 0x1f311
 -- Antarctica (AQ), the European Union (EU) and the United Nations (UN) have a
 -- flag. Deprecated territories like the Soviet Union (SU) and Yugoslavia (YU)
 -- have no corresponding flag.
-data Flag = Flag Char Char deriving (Eq, Ord, Show)
+data Flag = Flag Char Char deriving (Data, Eq, Generic, Ord, Read, Show)
+
+instance Hashable Flag
 
 -- | A data type to store a subregion flag. This is specified by the /parent/
 -- flag, and three characters of the subregion. At the moment, the only three
 -- subregional flags are /England/ (eng), /Scotland/ (sct) and /Wales/ (wls),
 -- all beloning under the /United Kingdom/ flag (GB).
 -- The data constructor is made private to prevent making non-existing subflags.
-data SubFlag = SubFlag Flag Char Char Char deriving (Eq, Ord, Show)
+data SubFlag = SubFlag Flag Char Char Char deriving (Data, Eq, Generic, Ord, Read, Show)
+
+instance Hashable SubFlag
 
 instance Bounded Flag where
     minBound = AC
@@ -1207,10 +1214,12 @@ instance Bounded SubFlag where
 -- a clock with the given time. The 'Clock' has an 'hours' field that contains
 -- the given hours between 0 and 12, and a 'minutes30' field that if 'True',
 -- means that the clock is half past that hour.
-data Clock = Clock { 
+data Clock = Clock {
     hours :: Int  -- ^ The number of hours on the given clock. Is between 0 and 12. For 0, the 'minutes30' is 'True'; and for 12, the 'minutes30' is 'False'.
   , minutes30 :: Bool  -- ^ Is 'True' if it is half past the given hour on the 'Clock'.
-  } deriving (Eq, Ord, Show)
+  } deriving (Data, Eq, Generic, Ord, Read, Show)
+
+instance Hashable Clock
 
 -- | A 'BloodType' object used to convert to its unicode equivalent. The
 -- 'BloodType' is also seen as a 2-bit value with the leftmost bit representing
@@ -1220,7 +1229,9 @@ data BloodType
   | B  -- ^ The /B blood type/, with presence of the B antigen.
   | A  -- ^ The /A blood type/, with presence of the A antigen.
   | AB  -- ^ The /AB blood type/, with presence of the A and B antigens.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable BloodType
 
 _overEnumMask :: Enum a => Int -> (Int -> Int) -> a -> a
 _overEnumMask m f = toEnum . (m .&.) . f . fromEnum
@@ -1299,7 +1310,9 @@ clock h b
 data Gender
   = Female -- The female sign, dented by ♀️.
   | Male  -- The male sign, denoted by ♂️.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable Gender
 
 -- | Some emoji deal with people. One can change the color of the skin with the
 -- 'SkinColorModifier'. For the skin color, the <https://en.wikipedia.org/wiki/Fitzpatrick_scale /Fitzpatrick scale/> is used.
@@ -1310,7 +1323,9 @@ data SkinColorModifier
   | Medium  -- ^ An emoji /modifier/ that applies /Fitzpatrick skin type/ four to the Emoji.
   | MediumDark  -- ^ An emoji /modifier/ that applies /Fitzpatrick skin type/ five to the Emoji.
   | Dark  -- ^ An emoji /modifier/ that applies /Fitzpatrick skin type/ six to the Emoji.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable SkinColorModifier
 
 -- | A data type to deal with the /zodiac sign/ emoji. The data type lists the
 -- different zodiac signs as data constructors, and the instance of the
@@ -1328,7 +1343,9 @@ data Zodiac
   | Capricorn  -- ^ The /capricorn/ zodiac sign, /sea-goat/ in English, is denoted as ♑.
   | Aquarius  -- ^ The /aquarius/ zodiac sign, /water-bearer/ in English, is denoted as ♒.
   | Pisces  -- ^ The /pices/ zodiac sign, /fish/ in English, is denoted as ♓.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable Zodiac
 
 -- | A data type that defines the eight different moon phases, and is an
 -- instance of 'UnicodeCharacter' to convert these to the corresponding Unicode
@@ -1342,7 +1359,9 @@ data MoonPhase
   | WaningGibbous  -- ^ The /waning gibbous/, the sixth phase of the moon represented by 🌖.
   | ThirdQuarter  -- ^ The /third quarter/, the seventh phase of the moon represented by 🌗.
   | WaningCrescent  -- ^ The /waning crescent/, the eighth phase of the moon represented by 🌘.
-  deriving (Bounded, Enum, Eq, Ord, Read, Show)
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Hashable MoonPhase
 
 -- | The 'SkinColorModifier' that corresponds to type one of the /Fitzpatrick
 -- scale/.
