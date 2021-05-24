@@ -13,3 +13,4 @@ spec = do
     testUnicodeCharacter @ RomanLiteral
     testUnicodeText @ RomanLiteral
     testHashable @ RomanLiteral
+    testHashable @ RomanStyle

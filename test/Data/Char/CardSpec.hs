@@ -13,3 +13,7 @@ spec = do
     testUnicodeCharacter @ CardSuit
     testUnicodeText @ CardSuit
     testHashable @ CardSuit
+    testHashable @ CardRank
+    testHashable @ JokerColor
+    testHashable @ Trump
+    testHashable @ Card

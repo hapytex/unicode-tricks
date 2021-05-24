@@ -23,4 +23,5 @@ spec = do
       \c -> combiningCharacter (combiningToUnicode c) == Just c
   testUnicodeCharacter @ CombiningCharacter
   testUnicodeText @ CombiningCharacter
-  testHashable @CombiningCharacter
+  testHashable @ CombiningCharacter
+  testHashable @ CombiningSequence
