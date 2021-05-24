@@ -24,5 +24,4 @@ spec = do
   testUnicodeCharacter @ CombiningCharacter
   testUnicodeText @ CombiningCharacter
   testHashable @ CombiningCharacter
-  testHashable @ CambiningSequence
-  testHashable @CombiningCharacter
+  testHashable @ CombiningSequence

@@ -1,5 +1,8 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Data.Char.BracketsSpec where
 
+import Data.Char.CoreTest
 import Data.Char.Brackets
 import Data.List(nub)
 
