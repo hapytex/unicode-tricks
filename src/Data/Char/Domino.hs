@@ -63,9 +63,9 @@ instance Hashable a => Hashable (Domino a)
 
 instance Ord1 Domino where
   liftCompare cmp (Domino lta rba) (Domino ltb rbb) = cmp lta ltb <> cmp rba rbb
-  liftCompare _ (Domino _ _) ~Back = LT
+  liftCompare _ (Domino _ _) Back = LT
   liftCompare _ Back Back = EQ
-  liftCompare _ Back ~(Domino _ _) = GT
+  liftCompare _ Back (Domino _ _) = GT
 
 -- | A pattern synonym that makes it more convenient to write expressions that
 -- look like domino's like for example @II :| IV@.
