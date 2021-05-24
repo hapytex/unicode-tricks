@@ -2,10 +2,14 @@
 
 For a full list of changes, see the history on [GitHub](https://github.com/hapytex/unicode-tricks).
 
+## Version 0.10.0.0
+
+Added modules for /currency/, /Mayan numbers/, and /vulgar fractions/. The data types are now members of the `Data`, `Generic`, and `Hashable`
+typeclass. Types with a type parameter are instances of `Eq1` and `Ord1`.
+
 ## Version 0.9.0.0
 
 Added support for /ballot boxes/, /brackets/, /control pictures/, seven-segment displays, and Klingon characters (for the private codeblock).
-
 
 ## Version 0.8.0.0
 
