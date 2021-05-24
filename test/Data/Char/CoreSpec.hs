@@ -27,3 +27,5 @@ spec = do
   testUnicodeCharacter @ Char
   testUnicodeText @ Char
   testUnicodeText @ String
+  testHashable @Char
+  testHashable @String

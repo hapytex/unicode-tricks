@@ -12,3 +12,4 @@ spec :: Spec
 spec = do
     testUnicodeCharacter @ DieValue
     testUnicodeText @ DieValue
+    testHashable @ DieValue

@@ -12,3 +12,4 @@ spec :: Spec
 spec = do
     testUnicodeCharacter @ (Block Bool)
     testUnicodeText @ (Block Bool)
+    testHashable @ (Block Bool)

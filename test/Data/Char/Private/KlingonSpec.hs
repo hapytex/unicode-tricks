@@ -12,3 +12,4 @@ spec :: Spec
 spec = do
     testUnicodeCharacter @ Klingon
     testUnicodeText @ Klingon
+    testHashable @ Klingon

@@ -12,3 +12,4 @@ spec :: Spec
 spec = do
     testUnicodeCharacter @ Currency
     testUnicodeText @ Currency
+    testHashable @ Currency

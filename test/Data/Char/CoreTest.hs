@@ -3,9 +3,11 @@
 module Data.Char.CoreTest (
     testUnicodeCharacter
   , testUnicodeText
+  , testHashable
   ) where
 
 import Data.Char.Core
+import Data.Hashable(Hashable(hash))
 import Data.Maybe(isJust)
 import Data.Typeable(Typeable, typeOf)
 
@@ -24,6 +26,9 @@ testUnicodeCharacter = describe (instanceText "UnicodeCharacter" ++ instanceName
 
 testUnicodeText :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeText a) => SpecWith ()
 testUnicodeText = describe (instanceText "UnicodeText" ++ instanceName (show (typeOf (undefined :: a)))) $ it "equivalent over text" $ property (mapOverText @ a)
+
+testHashable :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, Hashable a) => SpecWith ()
+testHashable = describe (instanceText "Hashable" ++ instanceName (show (typeOf (undefined :: a)))) $ it "hashing law" $ (property (hashEquality @a))
 
 instanceName :: String -> String
 instanceName s | ' ' `elem` s = '(' : s ++ ")"
@@ -46,3 +51,6 @@ equivalentFromChar = forAll (suchThat (arbitrary :: Gen Char) (isJust . fromUnic
 
 mapOverText :: (Eq a, UnicodeText a) => a -> a -> Bool
 mapOverText _ c = Just c == fromUnicodeText (toUnicodeText c)
+
+hashEquality :: (Eq a, Hashable a) => a -> a -> Bool
+hashEquality ca cb = hash ca == hash cb || ca /= cb
