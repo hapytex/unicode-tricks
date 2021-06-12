@@ -21,6 +21,8 @@ module Data.Char.Private.Klingon (
       )
   ) where
 
+import Control.DeepSeq(NFData)
+
 import Data.Char(chr, ord)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
 import Data.Data(Data)
@@ -77,6 +79,8 @@ instance Arbitrary Klingon where
     arbitrary = arbitraryBoundedEnum
 
 instance Hashable Klingon
+
+instance NFData Klingon
 
 instance UnicodeCharacter Klingon where
     toUnicodeChar c

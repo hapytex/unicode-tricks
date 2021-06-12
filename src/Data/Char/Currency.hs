@@ -37,6 +37,8 @@ module Data.Char.Currency (
   , isCurrency
   ) where
 
+import Control.DeepSeq(NFData)
+
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
@@ -115,6 +117,8 @@ instance Arbitrary Currency where
   arbitrary = arbitraryBoundedEnum
 
 instance Hashable Currency
+
+instance NFData Currency
 
 instance UnicodeCharacter Currency where
   toUnicodeChar Dollar = dollar

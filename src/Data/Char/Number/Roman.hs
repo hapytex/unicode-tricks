@@ -25,6 +25,8 @@ module Data.Char.Number.Roman (
   , romanNumber,  romanNumber',  romanNumberCase
   ) where
 
+import Control.DeepSeq(NFData)
+
 import Data.Bits((.|.))
 import Data.Char(chr)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, LetterCase, Ligate, ligateF, mapFromEnum, mapToEnum, mapToEnumSafe, splitLetterCase)
@@ -55,6 +57,8 @@ instance Default RomanStyle where
 
 instance Hashable RomanStyle
 
+instance NFData RomanStyle
+
 instance UnicodeCharacter RomanLiteral where
     toUnicodeChar = mapFromEnum _romanUppercaseOffset
     fromUnicodeChar = mapToEnumSafe _romanUppercaseOffset
@@ -83,6 +87,8 @@ data RomanLiteral
   deriving (Bounded, Data, Enum, Eq, Generic, Show, Read)
 
 instance Hashable RomanLiteral
+
+instance NFData RomanLiteral
 
 _literals :: Integral i => RomanStyle -> [(i, [RomanLiteral] -> [RomanLiteral])]
 _literals Additive = [

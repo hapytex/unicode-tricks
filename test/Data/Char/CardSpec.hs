@@ -12,6 +12,11 @@ spec :: Spec
 spec = do
     testUnicodeCharacter @ CardSuit
     testUnicodeText @ CardSuit
+    testBounded @ CardSuit
+    testBounded @ CardRank
+    testBounded @ JokerColor
+    testBounded @ Trump
+    testBounded @ Card
     testHashable @ CardSuit
     testHashable @ CardRank
     testHashable @ JokerColor

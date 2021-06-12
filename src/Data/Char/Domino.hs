@@ -22,6 +22,7 @@ module Data.Char.Domino (
   , fromDomino, fromDomino'
   ) where
 
+import Control.DeepSeq(NFData, NFData1)
 import Control.Monad((>=>))
 
 import Data.Char(chr, ord)
@@ -60,6 +61,10 @@ instance Eq1 Domino where
 instance Hashable1 Domino
 
 instance Hashable a => Hashable (Domino a)
+
+instance NFData a => NFData (Domino a)
+
+instance NFData1 Domino
 
 instance Ord1 Domino where
   liftCompare cmp (Domino lta rba) (Domino ltb rbb) = cmp lta ltb <> cmp rba rbb

@@ -22,6 +22,8 @@ module Data.Char.Braille(
   , fromBraille6, fromBraille6', fromBraille, fromBraille'
   ) where
 
+import Control.DeepSeq(NFData, NFData1)
+
 import Data.Bits((.&.), (.|.), shiftL, shiftR, testBit)
 import Data.Bool(bool)
 import Data.Char(chr, ord)
@@ -54,6 +56,10 @@ instance Hashable1 Braille6
 
 instance Hashable a => Hashable (Braille6 a)
 
+instance NFData a => NFData (Braille6 a)
+
+instance NFData1 Braille6
+
 instance Ord1 Braille6 where
   liftCompare cmp ~(Braille6 ta ma ba) ~(Braille6 tb mb bb) = cmp' ta tb <> cmp' ma mb <> cmp' ba bb
     where cmp' = liftCompare cmp
@@ -73,6 +79,10 @@ instance Eq1 Braille where
 instance Hashable1 Braille
 
 instance Hashable a => Hashable (Braille a)
+
+instance NFData a => NFData (Braille a)
+
+instance NFData1 Braille
 
 instance Ord1 Braille where
   liftCompare cmp ~(Braille a1 a2 a3 a4) ~(Braille b1 b2 b3 b4) = cmp' a1 b1 <> cmp' a2 b2 <> cmp' a3 b3 <> cmp' a4 b4

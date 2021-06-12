@@ -20,6 +20,8 @@ module Data.Char.Number.Mayan (
   , toMayanVertical, toMayanVertical', toMayanVertical'', toMayan, toMayan', toMayan''
   ) where
 
+import Control.DeepSeq(NFData)
+
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
@@ -52,6 +54,8 @@ data MayanLiteral
   | Eighteen  -- ^ The unicode character for the Mayan numeral /eighteen/: 𝋲.
   | Nineteen  -- ^ The unicode character for the Mayan numeral /nineteen/: 𝋳.
  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance NFData MayanLiteral
 
 _mayanOffset :: Int
 _mayanOffset = 0x1d2e0

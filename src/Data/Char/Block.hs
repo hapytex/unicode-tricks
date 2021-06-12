@@ -20,6 +20,8 @@ module Data.Char.Block(
   , fromBlock, fromBlock'
   ) where
 
+import Control.DeepSeq(NFData, NFData1)
+
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
 import Data.Data(Data)
 import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
@@ -48,6 +50,10 @@ instance Hashable1 Row
 
 instance Hashable a => Hashable (Row a)
 
+instance NFData a => NFData (Row a)
+
+instance NFData1 Row
+
 instance Ord1 Row where
   liftCompare cmp ~(Row xa xb) ~(Row ya yb) = cmp xa ya <> cmp xb yb
 
@@ -64,6 +70,10 @@ instance Eq1 Block where
 instance Hashable a => Hashable (Block a)
 
 instance Hashable1 Block
+
+instance NFData a => NFData (Block a)
+
+instance NFData1 Block
 
 instance Ord1 Block where
   liftCompare cmp ~(Block ua la) ~(Block ub lb) = cmp' ua ub <> cmp' la lb

@@ -17,6 +17,8 @@ module Data.Char.BallotBox (
     , toCheckBox, toCrossBox
   ) where
 
+import Control.DeepSeq(NFData)
+
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
@@ -36,6 +38,8 @@ data BallotBox
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable BallotBox
+
+instance NFData BallotBox
 
 -- | Convert the given 'Bool'ean to a 'BallotBox' that is 'Empty', or contains a 'Check'.
 toCheckBox

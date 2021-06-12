@@ -28,6 +28,8 @@ module Data.Char.Frame(
   , fromWeighted, fromWeighted', fromLight, fromLight', fromHeavy, fromHeavy', fromSimple, fromSimple'
   ) where
 
+import Control.DeepSeq(NFData, NFData1)
+
 import Data.Bool(bool)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
 import Data.Data(Data)
@@ -57,6 +59,10 @@ instance Hashable1 Horizontal
 
 instance Hashable a => Hashable (Horizontal a)
 
+instance NFData a => NFData (Horizontal a)
+
+instance NFData1 Horizontal
+
 instance Ord1 Horizontal where
   liftCompare cmp ~(Horizontal la ra) ~(Horizontal lb rb) = cmp la lb <> cmp ra rb
 
@@ -74,6 +80,10 @@ instance Hashable1 Vertical
 
 instance Hashable a => Hashable (Vertical a)
 
+instance NFData a => NFData (Vertical a)
+
+instance NFData1 Vertical
+
 instance Ord1 Vertical where
   liftCompare cmp ~(Vertical la ra) ~(Vertical lb rb) = cmp la lb <> cmp ra rb
 
@@ -88,6 +98,10 @@ instance Hashable1 Parts
 
 instance Hashable a => Hashable (Parts a)
 
+instance NFData a => NFData (Parts a)
+
+instance NFData1 Parts
+
 instance Ord1 Parts where
   liftCompare cmp ~(Parts la ra) ~(Parts lb rb) = liftCompare cmp la lb <> liftCompare cmp ra rb
 
@@ -99,6 +113,8 @@ data Weight
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable Weight
+
+instance NFData Weight
 
 instance Semigroup a => Semigroup (Horizontal a) where
     Horizontal a1 a2 <> Horizontal b1 b2 = Horizontal (a1 <> b1) (a2 <> b2)

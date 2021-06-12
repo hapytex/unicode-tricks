@@ -65,6 +65,7 @@ library
       base >= 4.7 && < 5
     , containers >=0.4.2.1
     , data-default >= 0.2
+    , deepseq >=1.4.3.0
     , hashable >=1.2.7.0
     , QuickCheck >=2.10.0 && <2.14.3
     , text >=1.1 && <1.3

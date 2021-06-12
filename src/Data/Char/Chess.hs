@@ -29,6 +29,8 @@ module Data.Char.Chess (
   , pattern Princess
   ) where
 
+import Control.DeepSeq(NFData)
+
 import Data.Bits((.|.))
 import Data.Char(chr)
 import Data.Char.Core(Rotate90(R0, R180))
@@ -50,6 +52,8 @@ data ChessColorBinary
 
 instance Hashable ChessColorBinary
 
+instance NFData ChessColorBinary
+
 -- | The color of a chess piece, this can for most pieces be 'Black', 'White',
 -- or 'Neutral'.
 data ChessColor
@@ -59,6 +63,8 @@ data ChessColor
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable ChessColor
+
+instance NFData ChessColor
 
 -- | The type of chess pieces. Unicode includes an 'Equihopper' as piece as
 -- well.
@@ -74,6 +80,8 @@ data ChessPieceType
 
 instance Hashable ChessPieceType
 
+instance NFData ChessPieceType
+
 -- | Extra rotations that can be performed for knight chess pieces.
 data Rotate45
   = R45  -- ^ Rotation over /45/ degrees.
@@ -84,6 +92,8 @@ data Rotate45
 
 instance Hashable Rotate45
 
+instance NFData Rotate45
+
 -- | Hybrid chess pieces like the /knight-queen/, /knight-rook/ and
 -- /knight-bishop/.
 data ChessHybridType
@@ -93,6 +103,8 @@ data ChessHybridType
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable ChessHybridType
+
+instance NFData ChessHybridType
 
 -- | Chess pieces that can be represented in Unicode. These are the /king/,
 -- /queen/, /rook/, /bishop/, /knight/, /pawn/, and /equihopper/ over 0, 90,
@@ -107,6 +119,8 @@ data ChessPiece
   deriving (Data, Eq, Generic, Ord, Read, Show)
 
 instance Hashable ChessPiece
+
+instance NFData ChessPiece
 
 instance Arbitrary ChessColorBinary where
     arbitrary = arbitraryBoundedEnum
