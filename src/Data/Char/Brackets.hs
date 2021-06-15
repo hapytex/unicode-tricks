@@ -31,6 +31,7 @@ module Data.Char.Brackets (
 import Prelude hiding (lookup)
 
 import Control.Applicative((<|>))
+import Control.DeepSeq(NFData)
 
 import Data.Data(Data)
 import Data.Hashable(Hashable)
@@ -52,6 +53,8 @@ instance Arbitrary BracketType where
   arbitrary = arbitraryBoundedEnum
 
 instance Hashable BracketType
+
+instance NFData BracketType
 
 -- | A list of 2-tuples where the first item
 -- of each tuple is the opening bracket, and the

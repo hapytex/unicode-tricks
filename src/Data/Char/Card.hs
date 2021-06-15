@@ -56,6 +56,8 @@ module Data.Char.Card (
   , pattern Collective, pattern Individual
   ) where
 
+import Control.DeepSeq(NFData)
+
 import Data.Bits(shiftL, (.|.))
 import Data.Char(chr)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
@@ -80,6 +82,8 @@ data CardSuit
 
 instance Hashable CardSuit
 
+instance NFData CardSuit
+
 -- | A data type for the rank of the card.
 data CardRank
   = Ace  -- ^ The /ace/ card rank.
@@ -100,6 +104,8 @@ data CardRank
 
 instance Hashable CardRank
 
+instance NFData CardRank
+
 -- | A data type to represent the three colors for which there are jokers:
 -- /red/, /black/ and /white/.
 data JokerColor
@@ -109,6 +115,8 @@ data JokerColor
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable JokerColor
+
+instance NFData JokerColor
 
 -- | A data type for the trump cards, often used for /tarot/.
 data Trump
@@ -137,6 +145,8 @@ data Trump
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable Trump
+
+instance NFData Trump
 
 -- | A data type that represents the possible types of cards for which there is
 -- a Unicode characters. This is the back of a card, a card with a suit and
@@ -168,6 +178,8 @@ instance Bounded Card where
     maxBound = Trump maxBound
 
 instance Hashable Card
+
+instance NFData Card
 
 instance UnicodeCharacter CardSuit where
     toUnicodeChar = mapFromEnum _suitOffset

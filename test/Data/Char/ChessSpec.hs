@@ -5,11 +5,9 @@ module Data.Char.ChessSpec
   ) where
 
 import Data.Char.Chess
-import Data.Maybe
 import Data.Char.CoreTest
 
 import Test.Hspec
-import Test.QuickCheck
 
 spec :: Spec
 spec = do

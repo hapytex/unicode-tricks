@@ -1,7 +1,8 @@
 {-# LANGUAGE AllowAmbiguousTypes, ScopedTypeVariables, TypeApplications #-}
 
 module Data.Char.CoreTest (
-    testUnicodeCharacter
+    testBounded
+  , testUnicodeCharacter
   , testUnicodeText
   , testHashable
   ) where
@@ -17,12 +18,30 @@ import Test.QuickCheck
 instanceText :: String -> String
 instanceText cls = "\ESC[1;34minstance\ESC[0m \ESC[1m" ++ cls ++ "\ESC[0m "
 
+instanceText' :: forall a b . Typeable a => String -> SpecWith b -> SpecWith b
+instanceText' st = describe (instanceText st ++ instanceName (show (typeOf (undefined :: a))))
+
 testUnicodeCharacter :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeCharacter a) => SpecWith ()
-testUnicodeCharacter = describe (instanceText "UnicodeCharacter" ++ instanceName (show (typeOf (undefined :: a)))) $ do
+testUnicodeCharacter = instanceText' @a "UnicodeCharacter" $ do
     it "equivalent over character" $ property (mapOverChar @ a)
     it "equivalent over item" $ property (mapOverItem @ a)
     it "equivalent from valid chars over item" (mapValidItem @ a)
     it "fromUnicodeChar and fromUnicodeChar' are equivalent" (equivalentFromChar @ a)
+
+testBounded :: forall a . (Arbitrary a, Bounded a, Ord a, Show a, Typeable a) => SpecWith ()
+testBounded = instanceText' @a "Bounded" $ do
+    it "all items are greater than or equal to the lowerbound" $ property (checkLowerbound @a)
+    it "all items are less than or equal to the upperbound" $ property (checkUpperbound @a)
+
+checkLowerbound :: (Bounded a, Ord a) => a -> Bool
+checkLowerbound x = x >= minBound
+
+checkUpperbound :: (Bounded a, Ord a) => a -> Bool
+checkUpperbound x = x <= maxBound
+
+-- testBounded :: forall a . (Arbitrary a, Ord a, Show a) => SpecWith ()
+-- testBounded = describe (instanceText' "Bounded") $ do
+--  it "equivalent over character" (property (mapOverChar @ a))
 
 testUnicodeText :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeText a) => SpecWith ()
 testUnicodeText = describe (instanceText "UnicodeText" ++ instanceName (show (typeOf (undefined :: a)))) $ it "equivalent over text" $ property (mapOverText @ a)

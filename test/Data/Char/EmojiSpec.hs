@@ -22,6 +22,9 @@ spec = do
   testUnicodeText @ Flag
   testUnicodeText @ SubFlag
   testUnicodeText @ BloodType
+  testBounded @Clock
+  testBounded @Flag
+  testBounded @SubFlag
   testHashable @ SkinColorModifier
   testHashable @ MoonPhase
   testHashable @ Zodiac

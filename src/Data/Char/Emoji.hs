@@ -67,6 +67,8 @@ module Data.Char.Emoji (
 
 import Prelude hiding (LT, GT)
 
+import Control.DeepSeq(NFData)
+
 import Data.Bits(Bits((.&.), (.|.), bit, bitSize, bitSizeMaybe, complement, isSigned, popCount, rotate, shift, shiftL, shiftR, testBit, xor))
 import Data.Bool(bool)
 import Data.Char(chr, ord, toUpper, toLower)
@@ -108,6 +110,8 @@ data Flag = Flag Char Char deriving (Data, Eq, Generic, Ord, Read, Show)
 
 instance Hashable Flag
 
+instance NFData Flag
+
 -- | A data type to store a subregion flag. This is specified by the /parent/
 -- flag, and three characters of the subregion. At the moment, the only three
 -- subregional flags are /England/ (eng), /Scotland/ (sct) and /Wales/ (wls),
@@ -115,11 +119,13 @@ instance Hashable Flag
 -- The data constructor is made private to prevent making non-existing subflags.
 data SubFlag = SubFlag Flag Char Char Char deriving (Data, Eq, Generic, Ord, Read, Show)
 
-instance Hashable SubFlag
-
 instance Bounded Flag where
     minBound = AC
     maxBound = ZW
+
+instance Hashable SubFlag
+
+instance NFData SubFlag
 
 -- | Convert the given two characters that represent a flag according to the ISO
 -- 3166 Alpha-2 standard to a 'Flag' wrapped in a 'Just' data constructor, if
@@ -1221,6 +1227,8 @@ data Clock = Clock {
 
 instance Hashable Clock
 
+instance NFData Clock
+
 -- | A 'BloodType' object used to convert to its unicode equivalent. The
 -- 'BloodType' is also seen as a 2-bit value with the leftmost bit representing
 -- the presence of /A antigens/ and the rightmost the presence of /B antigens/.
@@ -1232,6 +1240,8 @@ data BloodType
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable BloodType
+
+instance NFData BloodType
 
 _overEnumMask :: Enum a => Int -> (Int -> Int) -> a -> a
 _overEnumMask m f = toEnum . (m .&.) . f . fromEnum
@@ -1314,6 +1324,8 @@ data Gender
 
 instance Hashable Gender
 
+instance NFData Gender
+
 -- | Some emoji deal with people. One can change the color of the skin with the
 -- 'SkinColorModifier'. For the skin color, the <https://en.wikipedia.org/wiki/Fitzpatrick_scale /Fitzpatrick scale/> is used.
 -- A numerical classification system for skin types.
@@ -1326,6 +1338,8 @@ data SkinColorModifier
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable SkinColorModifier
+
+instance NFData SkinColorModifier
 
 -- | A data type to deal with the /zodiac sign/ emoji. The data type lists the
 -- different zodiac signs as data constructors, and the instance of the
@@ -1347,6 +1361,8 @@ data Zodiac
 
 instance Hashable Zodiac
 
+instance NFData Zodiac
+
 -- | A data type that defines the eight different moon phases, and is an
 -- instance of 'UnicodeCharacter' to convert these to the corresponding Unicode
 -- character.
@@ -1362,6 +1378,8 @@ data MoonPhase
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable MoonPhase
+
+instance NFData MoonPhase
 
 -- | The 'SkinColorModifier' that corresponds to type one of the /Fitzpatrick
 -- scale/.

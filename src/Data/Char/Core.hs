@@ -46,6 +46,8 @@ module Data.Char.Core (
   , chr, isAlpha, isAlphaNum, isAscii, ord
   ) where
 
+import Control.DeepSeq(NFData, NFData1)
+
 import Data.Bits((.&.))
 import Data.Char(chr, isAlpha, isAlphaNum, isAscii, ord)
 import Data.Data(Data)
@@ -73,6 +75,8 @@ data LetterCase
 
 instance Hashable LetterCase
 
+instance NFData LetterCase
+
 -- | Pick one of the two values based on the 'LetterCase' value.
 splitLetterCase
   :: a  -- ^ The value to return in case of 'UpperCase'.
@@ -91,6 +95,8 @@ data PlusStyle
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable PlusStyle
+
+instance NFData PlusStyle
 
 -- | Pick one of the two values based on the 't:PlusStyle' value.
 splitPlusStyle
@@ -111,6 +117,8 @@ data Orientation
 
 instance Hashable Orientation
 
+instance NFData Orientation
+
 -- | A data type that specifies that an item has been given an orientation.
 data Oriented a
   = Oriented {
@@ -124,6 +132,10 @@ instance Eq1 Oriented where
 instance Hashable1 Oriented
 
 instance Hashable a => Hashable (Oriented a)
+
+instance NFData a => NFData (Oriented a)
+
+instance NFData1 Oriented
 
 instance Ord1 Oriented where
   liftCompare cmp ~(Oriented ba oa) ~(Oriented bb ob) = cmp ba bb <> compare oa ob
@@ -139,6 +151,8 @@ data Rotate90
 
 instance Hashable Rotate90
 
+instance NFData Rotate90
+
 -- | A data type that specifies that an item has been given a rotation.
 data Rotated a
   = Rotated {
@@ -153,6 +167,10 @@ instance Hashable1 Rotated
 
 instance Hashable a => Hashable (Rotated a)
 
+instance NFData a => NFData (Rotated a)
+
+instance NFData1 Rotated
+
 instance Ord1 Rotated where
   liftCompare cmp ~(Rotated oa ra) ~(Rotated ob rb) = cmp oa ob <> compare ra rb
 
@@ -164,6 +182,8 @@ data Emphasis
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable Emphasis
+
+instance NFData Emphasis
 
 -- | Pick one of the two values based on the 't:Emphasis' value.
 splitEmphasis
@@ -184,6 +204,8 @@ data ItalicType
 
 instance Hashable ItalicType
 
+instance NFData ItalicType
+
 -- | Pick one of the two values based on the 't:ItalicType' value.
 splitItalicType
   :: a  -- ^ The value to return in case of 'NoItalic'.
@@ -202,6 +224,8 @@ data FontStyle
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable FontStyle
+
+instance NFData FontStyle
 
 -- | Pick one of the two values based on the 't:FontStyle' value.
 splitFontStyle
@@ -222,6 +246,8 @@ data Ligate
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable Ligate
+
+instance NFData Ligate
 
 -- | Pick one of the two values based on the value for 't:Ligate'.
 splitLigate

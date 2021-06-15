@@ -20,6 +20,8 @@ module Data.Char.Dice(
   , die
   ) where
 
+import Control.DeepSeq(NFData)
+
 import Data.Bits((.|.))
 import Data.Char(chr)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
@@ -44,6 +46,8 @@ data DieValue
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable DieValue
+
+instance NFData DieValue
 
 -- | Convert the given integral value to a 'DieValue' that represents the given
 -- number. If the number is less than one, or greater than six, 'Nothing' is
