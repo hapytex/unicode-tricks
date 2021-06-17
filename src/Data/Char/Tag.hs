@@ -9,7 +9,7 @@ Portability : POSIX
 
 Unicode has a /tags/ block. This is used to make hidden annotations to specify the language of the text, this is no longer recommended.
 Since then this Unicode block has been repurposed as modifiers for region flag emoji. These are used for example in the flag of Scotland
-with @"\x1f3f4\xe0067\xe0062\xe0073\xe0063\xe0074\xe007f"@ where the first character is the emoji of a black flag, the following two
+with @"\\x1f3f4\\xe0067\\xe0062\\xe0073\\xe0063\\xe0074\\xe007f"@ where the first character is the emoji of a black flag, the following two
 characters are tags for @g@, and @b@ to present /Great Brittain/, then the following three characters are used to specify the
 region where @s@, @c@ and @t@ are used to specify /Scotland/ and finally the /stateful tag terminator/ to end the Emoji sequence.
 -}
