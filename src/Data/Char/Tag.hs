@@ -1,3 +1,15 @@
+{-# LANGUAGE Safe #-}
+
+{-|
+Module      : Data.Char.Tags
+Description : Write characters that have been used to add tags to the text.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+
+-}
+
 module Data.Char.Tag {-# WARNING "Using tags to convey language tags is strongly discouraged by the Unicode developers." #-} (
     toTag, toTag', fromTag, fromTag'
   , isTag, isAsciiTag, hasTagCounterPart
@@ -25,8 +37,14 @@ toTag c
   | hasTagCounterPart c = Just (toTag' c)
   | otherwise = Nothing
 
+toTags :: String -> Maybe String
+toTags = mapM toTag
+
 toTag' :: Char -> Char
 toTag' = chr . (_tagOffset .|.) . ord
+
+toTags' :: String -> String
+toTags' = map toTag'
 
 fromTag :: Char -> Maybe Char
 fromTag c
