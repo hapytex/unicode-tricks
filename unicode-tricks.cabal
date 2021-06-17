@@ -58,6 +58,7 @@ library
     , Data.Char.Private
     , Data.Char.Private.Klingon
     , Data.Char.Small
+    , Data.Char.Tag
   other-modules:
       Data.Char.Internal
     , Data.Char.Math.Internal
@@ -101,6 +102,7 @@ test-suite             utricks
     , Data.Char.Number.MayanSpec
     , Data.Char.Number.RomanSpec
     , Data.Char.Private.KlingonSpec
+    , Data.Char.TagSpec
   build-depends:
       base
     , unicode-tricks
