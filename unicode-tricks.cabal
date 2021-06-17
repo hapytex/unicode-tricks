@@ -58,6 +58,7 @@ library
     , Data.Char.Private
     , Data.Char.Private.Klingon
     , Data.Char.Small
+    , Data.Char.Tag
   other-modules:
       Data.Char.Internal
     , Data.Char.Math.Internal
