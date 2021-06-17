@@ -35,8 +35,9 @@ Currently the package contains the following modules:
  - **`Data.Char.Number.Segmented`**: a module to render numbers on a [seven-segment display](https://en.wikipedia.org/wiki/Seven-segment_display);
  - **`Data.Char.Number.VulgarFraction`**: a module to use *vulgar fractions* defined in the Unicode standard;
  - **`Data.Char.Private`**: characters belonging to the *private usage area*;
- - **`Data.Char.Private.Klingon`**: Klingon script characters; and
- - **`Data.Char.Small`**: making use of subscript and superscript in unicode, and for example formatting `Ratio` objects.
+ - **`Data.Char.Private.Klingon`**: Klingon script characters;
+ - **`Data.Char.Small`**: making use of subscript and superscript in unicode, and for example formatting `Ratio` objects; and
+ - **`Data.Char.Tag`**: a unicode block that is used as emoji modifiers for regional flags.
 
 ## `unicode-tricks` is *safe* Haskell
 

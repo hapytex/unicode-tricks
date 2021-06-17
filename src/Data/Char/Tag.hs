@@ -1,7 +1,7 @@
 {-# LANGUAGE Safe #-}
 
 {-|
-Module      : Data.Char.Tags
+Module      : Data.Char.Tag
 Description : Write characters that have been used to add tags to the text.
 Maintainer  : hapytexeu+gh@gmail.com
 Stability   : experimental
