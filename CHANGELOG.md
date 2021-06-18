@@ -2,6 +2,11 @@
 
 For a full list of changes, see the history on [GitHub](https://github.com/hapytex/unicode-tricks).
 
+## Version 0.11.0.0
+
+Most data types now are instance of the `NFData` typeclass, there are typeclasses to mirror horizontally and vertically, and there is module
+for unicode tags that are now used as Emoji modifiers.
+
 ## Version 0.10.0.0
 
 Added modules for /currency/, /Mayan numbers/, and /vulgar fractions/. The data types are now members of the `Data`, `Generic`, and `Hashable`
