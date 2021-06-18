@@ -31,7 +31,7 @@ module Data.Char.Frame(
 import Control.DeepSeq(NFData, NFData1)
 
 import Data.Bool(bool)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
+import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
 import Data.Data(Data)
 import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
 import Data.Hashable(Hashable)
@@ -59,6 +59,9 @@ instance Hashable1 Horizontal
 
 instance Hashable a => Hashable (Horizontal a)
 
+instance MirrorVertical (Horizontal a) where
+  mirrorVertical (Horizontal l r) = Horizontal r l
+
 instance NFData a => NFData (Horizontal a)
 
 instance NFData1 Horizontal
@@ -80,6 +83,9 @@ instance Hashable1 Vertical
 
 instance Hashable a => Hashable (Vertical a)
 
+instance MirrorHorizontal (Vertical a) where
+  mirrorHorizontal (Vertical u d) = Vertical u d
+
 instance NFData a => NFData (Vertical a)
 
 instance NFData1 Vertical
@@ -97,6 +103,12 @@ instance Eq1 Parts where
 instance Hashable1 Parts
 
 instance Hashable a => Hashable (Parts a)
+
+instance MirrorHorizontal (Parts a) where
+  mirrorHorizontal (Parts v h) = Parts (mirrorHorizontal v) h
+
+instance MirrorVertical (Parts a) where
+  mirrorVertical (Parts v h) = Parts v (mirrorVertical h)
 
 instance NFData a => NFData (Parts a)
 
