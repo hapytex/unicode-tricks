@@ -18,3 +18,7 @@ spec = do
     testHashable @ (Parts Bool)
     testHashable @ (Horizontal Bool)
     testHashable @ (Vertical Bool)
+    testMirrorHorizontally @ (Vertical Bool)
+    testMirrorHorizontally @ (Parts Bool)
+    testMirrorVertically @ (Horizontal Bool)
+    testMirrorVertically @ (Parts Bool)

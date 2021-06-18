@@ -5,6 +5,8 @@ module Data.Char.CoreTest (
   , testUnicodeCharacter
   , testUnicodeText
   , testHashable
+  , testMirrorHorizontally
+  , testMirrorVertically
   ) where
 
 import Data.Char.Core
@@ -20,6 +22,21 @@ instanceText cls = "\ESC[1;34minstance\ESC[0m \ESC[1m" ++ cls ++ "\ESC[0m "
 
 instanceText' :: forall a b . Typeable a => String -> SpecWith b -> SpecWith b
 instanceText' st = describe (instanceText st ++ instanceName (show (typeOf (undefined :: a))))
+
+testMirrorHorizontally :: forall a . (Arbitrary a, Eq a, MirrorHorizontal a, Show a, Typeable a) => SpecWith ()
+testMirrorHorizontally = instanceText' @a "MirrorHorizontally" $ do
+  it "test if two calls are an identity" $ property (doubleCallHorizontally @a)
+
+doubleCallHorizontally :: (Eq a, MirrorHorizontal a) => a -> Bool
+doubleCallHorizontally x = mirrorHorizontal (mirrorHorizontal x) == x
+
+testMirrorVertically :: forall a . (Arbitrary a, Eq a, MirrorVertical a, Show a, Typeable a) => SpecWith ()
+testMirrorVertically = instanceText' @a "MirrorVertically" $ do
+  it "test if two calls are an identity" $ property (doubleCallVertically @a)
+
+doubleCallVertically :: (Eq a, MirrorVertical a) => a -> Bool
+doubleCallVertically x = mirrorVertical (mirrorVertical x) == x
+
 
 testUnicodeCharacter :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeCharacter a) => SpecWith ()
 testUnicodeCharacter = instanceText' @a "UnicodeCharacter" $ do
