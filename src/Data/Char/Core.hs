@@ -38,6 +38,8 @@ module Data.Char.Core (
     -- * Convert objects from and to Unicode 'Char'acters
   , UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeChar
   , UnicodeText(toUnicodeText, fromUnicodeText, fromUnicodeText')
+    -- * Mirroring items horizontally and/or vertically
+  , MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical)
     -- * Ways to display numbers
   , PlusStyle(WithoutPlus, WithPlus), splitPlusStyle
     -- * Functions to implement a number system
@@ -514,6 +516,24 @@ class UnicodeText a where
       :: Text  -- ^ The given 'Text' to convert to an object.
       -> a  -- ^ The given equivalent object. If there is no equivalent object, the behavior is unspecified.
     fromUnicodeText' = fromJust . fromUnicodeText
+
+-- | A type class that specifies that the items can be mirrored in the /horizontal/ direction (such that up is now down).
+class MirrorHorizontal a where
+  -- | Obtain the /horizontally/ mirrored variant of the given item. Applying the same function twice should
+  -- return the original object.
+  mirrorHorizontal
+    :: a  -- ^ The given item to mirror /horizontally/.
+    -> a  -- ^ The corresponding mirrored item.
+  {-# MINIMAL mirrorHorizontal #-}
+
+-- | A type class that specifies that the items can be mirrored in the /vertical/ direction (such that left is now right).
+class MirrorVertical a where
+  -- | Obtain the /vertically/ mirrored variant of the given item. Applying the same function twice should
+  -- return the original object.
+  mirrorVertical
+    :: a  -- ^ The given item to mirror /vertically/.
+    -> a  -- ^ The corresponding mirrored item.
+  {-# MINIMAL mirrorVertical #-}
 
 -- | Construct a function that maps digits to the character with the given value
 -- for the offset.
