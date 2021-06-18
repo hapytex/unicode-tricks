@@ -5,10 +5,14 @@ module Data.Char.CoreTest (
   , testUnicodeCharacter
   , testUnicodeText
   , testHashable
+  , testMirrorHorizontally
+  , testMirrorVertically
+  , testMirrorHorizontallyVertically
   ) where
 
 import Data.Char.Core
 import Data.Hashable(Hashable(hash))
+import Data.List(intercalate)
 import Data.Maybe(isJust)
 import Data.Typeable(Typeable, typeOf)
 
@@ -18,8 +22,35 @@ import Test.QuickCheck
 instanceText :: String -> String
 instanceText cls = "\ESC[1;34minstance\ESC[0m \ESC[1m" ++ cls ++ "\ESC[0m "
 
+instanceTexts' :: forall a b . Typeable a => [String] -> SpecWith b -> SpecWith b
+instanceTexts' sts = describe (intercalate " and " [instanceText st ++ instanceName (show (typeOf (undefined :: a))) | st <- sts])
+
+
 instanceText' :: forall a b . Typeable a => String -> SpecWith b -> SpecWith b
 instanceText' st = describe (instanceText st ++ instanceName (show (typeOf (undefined :: a))))
+
+testMirrorHorizontallyVertically :: forall a . (Arbitrary a, Eq a, MirrorHorizontal a, MirrorVertical a, Show a, Typeable a) => SpecWith ()
+testMirrorHorizontallyVertically = instanceTexts' @a ["MirrorHorizontal", "MirrorVertical"] $ do
+  it "test if mirror horizontal, vertical, horizontal, and vertical yield the same object" $ property (doubleCallHorizontallyVertically @a)
+  it "test if two horizontal mirror calls are an identity" $ property (doubleCallHorizontally @a)
+  it "test if two vertical mirror calls are an identity" $ property (doubleCallVertically @a)
+
+testMirrorHorizontally :: forall a . (Arbitrary a, Eq a, MirrorHorizontal a, Show a, Typeable a) => SpecWith ()
+testMirrorHorizontally = instanceText' @a "MirrorHorizontal" $ do
+  it "test if two calls are an identity" $ property (doubleCallHorizontally @a)
+
+doubleCallHorizontally :: (Eq a, MirrorHorizontal a) => a -> Bool
+doubleCallHorizontally x = mirrorHorizontal (mirrorHorizontal x) == x
+
+testMirrorVertically :: forall a . (Arbitrary a, Eq a, MirrorVertical a, Show a, Typeable a) => SpecWith ()
+testMirrorVertically = instanceText' @a "MirrorVertical" $ do
+  it "test if two calls are an identity" $ property (doubleCallVertically @a)
+
+doubleCallVertically :: (Eq a, MirrorVertical a) => a -> Bool
+doubleCallVertically x = mirrorVertical (mirrorVertical x) == x
+
+doubleCallHorizontallyVertically :: (Eq a, MirrorHorizontal a, MirrorVertical a) => a -> Bool
+doubleCallHorizontallyVertically x = mirrorVertical (mirrorHorizontal (mirrorVertical (mirrorHorizontal x))) == x
 
 testUnicodeCharacter :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeCharacter a) => SpecWith ()
 testUnicodeCharacter = instanceText' @a "UnicodeCharacter" $ do

@@ -28,7 +28,7 @@ import Data.Bits((.&.), (.|.), shiftL, shiftR, testBit)
 import Data.Bool(bool)
 import Data.Char(chr, ord)
 import Data.Char.Block(Row(Row))
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
+import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
 import Data.Data(Data)
 import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
 import Data.Hashable(Hashable)
@@ -56,6 +56,12 @@ instance Hashable1 Braille6
 
 instance Hashable a => Hashable (Braille6 a)
 
+instance MirrorHorizontal (Braille6 a) where
+  mirrorHorizontal (Braille6 a b c) = Braille6 c b a
+
+instance MirrorVertical (Braille6 a) where
+  mirrorVertical (Braille6 a b c) = Braille6 (mirrorVertical a) (mirrorVertical b) (mirrorVertical c)
+
 instance NFData a => NFData (Braille6 a)
 
 instance NFData1 Braille6
@@ -79,6 +85,12 @@ instance Eq1 Braille where
 instance Hashable1 Braille
 
 instance Hashable a => Hashable (Braille a)
+
+instance MirrorHorizontal (Braille a) where
+  mirrorHorizontal (Braille a b c d) = Braille d c b a
+
+instance MirrorVertical (Braille a) where
+  mirrorVertical (Braille a b c d) = Braille (mirrorVertical a) (mirrorVertical b) (mirrorVertical c) (mirrorVertical d)
 
 instance NFData a => NFData (Braille a)
 

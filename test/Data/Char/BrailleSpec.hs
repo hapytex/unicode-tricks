@@ -16,3 +16,5 @@ spec = do
     testUnicodeText @ (Braille6 Bool)
     testHashable @ (Braille Bool)
     testHashable @ (Braille6 Bool)
+    testMirrorHorizontallyVertically @ (Braille6 Bool)
+    testMirrorHorizontallyVertically @ (Braille Bool)
