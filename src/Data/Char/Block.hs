@@ -22,7 +22,7 @@ module Data.Char.Block(
 
 import Control.DeepSeq(NFData, NFData1)
 
-import Data.Char.Core(MirrorHorizontal, MirrorVertical, UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
+import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
 import Data.Data(Data)
 import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
 import Data.Hashable(Hashable)
