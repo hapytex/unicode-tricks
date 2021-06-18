@@ -24,14 +24,14 @@ instanceText' :: forall a b . Typeable a => String -> SpecWith b -> SpecWith b
 instanceText' st = describe (instanceText st ++ instanceName (show (typeOf (undefined :: a))))
 
 testMirrorHorizontally :: forall a . (Arbitrary a, Eq a, MirrorHorizontal a, Show a, Typeable a) => SpecWith ()
-testMirrorHorizontally = instanceText' @a "MirrorHorizontally" $ do
+testMirrorHorizontally = instanceText' @a "MirrorHorizontal" $ do
   it "test if two calls are an identity" $ property (doubleCallHorizontally @a)
 
 doubleCallHorizontally :: (Eq a, MirrorHorizontal a) => a -> Bool
 doubleCallHorizontally x = mirrorHorizontal (mirrorHorizontal x) == x
 
 testMirrorVertically :: forall a . (Arbitrary a, Eq a, MirrorVertical a, Show a, Typeable a) => SpecWith ()
-testMirrorVertically = instanceText' @a "MirrorVertically" $ do
+testMirrorVertically = instanceText' @a "MirrorVertical" $ do
   it "test if two calls are an identity" $ property (doubleCallVertically @a)
 
 doubleCallVertically :: (Eq a, MirrorVertical a) => a -> Bool

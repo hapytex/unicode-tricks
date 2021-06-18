@@ -22,7 +22,7 @@ module Data.Char.Block(
 
 import Control.DeepSeq(NFData, NFData1)
 
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
+import Data.Char.Core(MirrorHorizontal, MirrorVertical, UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
 import Data.Data(Data)
 import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
 import Data.Hashable(Hashable)
@@ -50,6 +50,9 @@ instance Hashable1 Row
 
 instance Hashable a => Hashable (Row a)
 
+instance MirrorVertical (Row a) where
+  mirrorVertical (Row l r) = Row r l
+
 instance NFData a => NFData (Row a)
 
 instance NFData1 Row
@@ -70,6 +73,12 @@ instance Eq1 Block where
 instance Hashable a => Hashable (Block a)
 
 instance Hashable1 Block
+
+instance MirrorVertical (Block a) where
+  mirrorVertical (Block u d) = Block (mirrorVertical u) (mirrorVertical d)
+
+instance MirrorHorizontal (Block a) where
+  mirrorHorizontal (Block u d) = Block d u
 
 instance NFData a => NFData (Block a)
 
