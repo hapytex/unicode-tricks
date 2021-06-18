@@ -72,7 +72,7 @@ import Control.DeepSeq(NFData)
 import Data.Bits(Bits((.&.), (.|.), bit, bitSize, bitSizeMaybe, complement, isSigned, popCount, rotate, shift, shiftL, shiftR, testBit, xor))
 import Data.Bool(bool)
 import Data.Char(chr, ord, toUpper, toLower)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Char.Enclosed(regionalIndicatorUppercase')
 import Data.Data(Data)
 import Data.Function(on)
@@ -1378,6 +1378,9 @@ data MoonPhase
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable MoonPhase
+
+instance MirrorVertical MoonPhase where
+  mirrorVertical = toEnum . (`mod` 8) . (8 -) . fromEnum
 
 instance NFData MoonPhase
 

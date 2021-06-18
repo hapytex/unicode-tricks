@@ -33,3 +33,4 @@ spec = do
   testHashable @ Flag
   testHashable @ SubFlag
   testHashable @ BloodType
+  testMirrorVertically @ MoonPhase
