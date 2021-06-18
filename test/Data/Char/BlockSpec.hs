@@ -14,6 +14,5 @@ spec = do
     testUnicodeText @ (Block Bool)
     testHashable @ (Row Bool)
     testHashable @ (Block Bool)
-    testMirrorHorizontally @ (Block Bool)
+    testMirrorHorizontallyVertically @ (Block Bool)
     testMirrorVertically @ (Row Bool)
-    testMirrorVertically @ (Block Bool)
