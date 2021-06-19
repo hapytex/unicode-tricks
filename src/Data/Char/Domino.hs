@@ -201,6 +201,16 @@ instance UnicodeCharacter (Oriented (Domino (Maybe DieValue))) where
     fromUnicodeChar = fromDomino
     fromUnicodeChar' = fromDomino'
 
+instance MirrorHorizontal (Oriented (Domino a)) where
+  mirrorHorizontal (Oriented (Domino a b) Vertical) = Oriented (Domino b a) Vertical
+  mirrorHorizontal o@(Oriented Back _) = o
+  mirrorHorizontal o@(Oriented _ Horizontal) = o
+
+instance MirrorVertical (Oriented (Domino a)) where
+  mirrorVertical (Oriented (Domino a b) Horizontal) = Oriented (Domino b a) Horizontal
+  mirrorVertical o@(Oriented Back _) = o
+  mirrorVertical o@(Oriented _ Vertical) = o
+
 instance UnicodeCharacter (Oriented (Domino DieValue)) where
     toUnicodeChar = domino'
     fromUnicodeChar = fromDomino >=> traverse toSimple
