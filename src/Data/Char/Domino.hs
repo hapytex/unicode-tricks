@@ -26,7 +26,7 @@ import Control.DeepSeq(NFData, NFData1)
 import Control.Monad((>=>))
 
 import Data.Char(chr, ord)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, Orientation(Horizontal, Vertical), Oriented(Oriented))
+import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, Orientation(Horizontal, Vertical), Oriented(Oriented))
 import Data.Char.Dice(DieValue)
 import Data.Data(Data)
 import Data.Function(on)
