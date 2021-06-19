@@ -32,6 +32,8 @@ instanceText' st = describe (instanceText st ++ instanceName (show (typeOf (unde
 testMirrorHorizontallyVertically :: forall a . (Arbitrary a, Eq a, MirrorHorizontal a, MirrorVertical a, Show a, Typeable a) => SpecWith ()
 testMirrorHorizontallyVertically = instanceTexts' @a ["MirrorHorizontal", "MirrorVertical"] $ do
   it "test if mirror horizontal, vertical, horizontal, and vertical yield the same object" $ property (doubleCallHorizontallyVertically @a)
+  it "test if mirror horizontal, vertical, vertical, and horizontal yield the same object" $ property (doubleCallHorizontallyVertically2 @a)
+  it "test if mirror vertical, horizontal, horizontal, vertical, yield the same object" $ property (doubleCallHorizontallyVertically3 @a)
   it "test if two horizontal mirror calls are an identity" $ property (doubleCallHorizontally @a)
   it "test if two vertical mirror calls are an identity" $ property (doubleCallVertically @a)
 
@@ -51,6 +53,12 @@ doubleCallVertically x = mirrorVertical (mirrorVertical x) == x
 
 doubleCallHorizontallyVertically :: (Eq a, MirrorHorizontal a, MirrorVertical a) => a -> Bool
 doubleCallHorizontallyVertically x = mirrorVertical (mirrorHorizontal (mirrorVertical (mirrorHorizontal x))) == x
+
+doubleCallHorizontallyVertically2 :: (Eq a, MirrorHorizontal a, MirrorVertical a) => a -> Bool
+doubleCallHorizontallyVertically2 x = mirrorHorizontal (mirrorVertical (mirrorVertical (mirrorHorizontal x))) == x
+
+doubleCallHorizontallyVertically3 :: (Eq a, MirrorHorizontal a, MirrorVertical a) => a -> Bool
+doubleCallHorizontallyVertically3 x = mirrorVertical (mirrorHorizontal (mirrorHorizontal (mirrorVertical x))) == x
 
 testUnicodeCharacter :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeCharacter a) => SpecWith ()
 testUnicodeCharacter = instanceText' @a "UnicodeCharacter" $ do
