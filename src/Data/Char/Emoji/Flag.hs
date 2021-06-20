@@ -2038,15 +2038,16 @@ instance UnicodeText SubFlag where
               go '\xe0077' '\xe006c' '\xe0073' = Just WLS
               go _ _ _ = Nothing
 
+-- | A data type to represent additional non-regional flags defined by the Unicode standard.
 data ExtraFlag
-  = ChequeredFlag
-  | TriangularFlagOnPost
-  | CrossedFlags
-  | BlackFlag
-  | WavingWhiteFlag
-  | RainbowFlag
-  | TransgenderFlag
-  | PirateFlag
+  = ChequeredFlag  -- ^ A flag with black and white square like in a checkerboard pattern. These are often used to signal the start or end of a car race. This is rendered as 🏁.
+  | TriangularFlagOnPost  -- ^ A triangular flag that is often used for golf. This is rendered as 🚩.
+  | CrossedFlags  -- ^ This emoji depicts two /Japanese/ flags crossed at the base. Older versions of Samsung use two South Korean flags. This is rendered as 🎌.
+  | BlackFlag  -- ^ A waving black flag. This is rendered as 🏴.
+  | WavingWhiteFlag  -- ^ A waving white flag. This is often used as a sign of /surrender/. This is rendered as 🏳️.
+  | RainbowFlag  -- ^ A flag with six colors of the rainbow that usually include red, orange, yellow, green, blue and purple. This is rendered as 🏳️‍🌈.
+  | TransgenderFlag  -- ^ A flag with horizontal pale blue and pale pink stripes and a single white stripe in the middle. This is used as a /transgender/ pride flag. This is rendered as 🏳️‍⚧️.
+  | PirateFlag  -- ^ A /skull and crossbones/ displayed on a black flag. On pirate ships this is known as the Jolly Roger. This is rendered as 🏴‍☠️.
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary ExtraFlag where
@@ -2065,13 +2066,12 @@ instance UnicodeText ExtraFlag where
   toUnicodeText RainbowFlag = "\x1f3f3\xfe0f\x200d\x1f308"
   toUnicodeText TransgenderFlag = "\x1f3f3\xfe0f\x200d\x26a7\xfe0f"
   toUnicodeText PirateFlag = "\x1f3f4\x200d\x2620\xfe0f"
-
   fromUnicodeText "\x1f3c1" = Just ChequeredFlag
   fromUnicodeText "\x1f6a9" = Just TriangularFlagOnPost
   fromUnicodeText "\x1f38c" = Just CrossedFlags
   fromUnicodeText "\x1f3f4" = Just BlackFlag
   fromUnicodeText "\x1f3f3\xfe0f" = Just WavingWhiteFlag
   fromUnicodeText "\x1f3f3\xfe0f\x200d\x1f308" = Just RainbowFlag
-  fromUnicodeText "\x1f3f3\xfe0f\x200d\x26a7\fe0f" = Just TransgenderFlag
+  fromUnicodeText "\x1f3f3\xfe0f\x200d\x26a7\xfe0f" = Just TransgenderFlag
   fromUnicodeText "\x1f3f4\x200d\x2620\xfe0f" = Just PirateFlag
   fromUnicodeText _ = Nothing
