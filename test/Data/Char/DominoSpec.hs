@@ -21,3 +21,5 @@ spec = do
     testHashable @ (Domino DieValue)
     testHashable @ (Oriented (Domino (Maybe DieValue)))
     testHashable @ (Oriented (Domino DieValue))
+    testMirrorHorizontallyVertically @ (Oriented (Domino (Maybe DieValue)))
+    testMirrorHorizontallyVertically @ (Oriented (Domino DieValue))

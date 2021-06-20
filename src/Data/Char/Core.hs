@@ -518,6 +518,8 @@ class UnicodeText a where
     fromUnicodeText' = fromJust . fromUnicodeText
 
 -- | A type class that specifies that the items can be mirrored in the /horizontal/ direction (such that up is now down).
+-- The mirror is /not/ per se /pixel perfect/. For example the mirror of 🂁 is 🁵, so the dots of the bottom pat
+-- of the domino are not mirrored correctly.
 class MirrorHorizontal a where
   -- | Obtain the /horizontally/ mirrored variant of the given item. Applying the same function twice should
   -- return the original object.
@@ -527,6 +529,8 @@ class MirrorHorizontal a where
   {-# MINIMAL mirrorHorizontal #-}
 
 -- | A type class that specifies that the items can be mirrored in the /vertical/ direction (such that left is now right).
+-- The mirror is /not/ per se pixel perfect. For example the vertical mirror of 🁏 is 🁃, so the dots of the right part
+-- of the domino are not mirrored correctly.
 class MirrorVertical a where
   -- | Obtain the /vertically/ mirrored variant of the given item. Applying the same function twice should
   -- return the original object.
