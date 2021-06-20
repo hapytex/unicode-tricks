@@ -35,6 +35,7 @@ library
     , Data.Char.Emoji
     , Data.Char.Emoji.Core
     , Data.Char.Emoji.Flag
+    , Data.Char.Emoji.Zodiac
     , Data.Char.Enclosed
     , Data.Char.Egyptian
     , Data.Char.Frame
@@ -100,6 +101,7 @@ test-suite             utricks
     , Data.Char.DominoSpec
     , Data.Char.EmojiSpec
     , Data.Char.Emoji.FlagSpec
+    , Data.Char.Emoji.ZodiacSpec
     , Data.Char.FrameSpec
     , Data.Char.MathSpec
     , Data.Char.Number.MayanSpec
