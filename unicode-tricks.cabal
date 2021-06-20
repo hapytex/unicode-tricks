@@ -101,7 +101,7 @@ test-suite             utricks
     , Data.Char.DiceSpec
     , Data.Char.DominoSpec
     , Data.Char.EmojiSpec
-    , Data.Char.Emoji.BloodType
+    , Data.Char.Emoji.BloodTypeSpec
     , Data.Char.Emoji.FlagSpec
     , Data.Char.Emoji.ZodiacSpec
     , Data.Char.FrameSpec
