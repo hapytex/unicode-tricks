@@ -1,5 +1,17 @@
 {-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, OverloadedStrings, Safe #-}
 
+{-|
+Module      : Data.Char.Emoji.Core
+Description : A module that defines the /flag/ Emoji.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+A module that defines the /flag/ emoji. There are basically three types of flags:
+flags for nations, flags for subnations (like England, Scotland and Wales); and
+'ExtraFlag's that contain a list of flags used for occassions and political purposes.
+-}
+
 module Data.Char.Emoji.Flag (
     -- * Flag emoji
     Flag, flag, flag', flagChars
