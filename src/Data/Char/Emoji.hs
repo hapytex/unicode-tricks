@@ -41,6 +41,7 @@ import Data.Bits(Bits((.&.), (.|.), bit, bitSize, bitSizeMaybe, complement, isSi
 import Data.Bool(bool)
 import Data.Char(chr, ord)
 import Data.Char.Core(MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Emoji.Core
 import Data.Char.Emoji.Flag
 import Data.Data(Data)
 import Data.Function(on)
@@ -51,11 +52,6 @@ import GHC.Enum(toEnumError)
 import GHC.Generics(Generic)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
-
--- | A 'Char'acter that is often used as a suffix to turn a character into an
--- emoji.
-pattern EmojiSuffix :: Char
-pattern EmojiSuffix = '\xfe0f'
 
 _skinColorOffset :: Int
 _skinColorOffset = 0x1f3fb

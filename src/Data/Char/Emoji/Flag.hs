@@ -6,6 +6,7 @@ module Data.Char.Emoji.Flag (
   , iso3166Alpha2ToFlag, iso3166Alpha2ToFlag', validFlagEmoji
     -- * Subregional flag emoji
   , SubFlag
+  , ExtraFlag(ChequeredFlag, TriangularFlagOnPost, CrossedFlags, BlackFlag, WavingWhiteFlag, RainbowFlag, TransgenderFlag, PirateFlag)
     -- * Pattern symbols for 'Flag's
   , pattern AC, pattern AD, pattern AE, pattern AF, pattern AG, pattern AI, pattern AL, pattern AM, pattern AO, pattern AQ, pattern AR
   , pattern AS, pattern AT, pattern AU, pattern AW, pattern AX, pattern AZ, pattern BA, pattern BB, pattern BD, pattern BE, pattern BF
@@ -2036,3 +2037,41 @@ instance UnicodeText SubFlag where
               go '\xe0073' '\xe0063' '\xe0074' = Just SCT
               go '\xe0077' '\xe006c' '\xe0073' = Just WLS
               go _ _ _ = Nothing
+
+data ExtraFlag
+  = ChequeredFlag
+  | TriangularFlagOnPost
+  | CrossedFlags
+  | BlackFlag
+  | WavingWhiteFlag
+  | RainbowFlag
+  | TransgenderFlag
+  | PirateFlag
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Arbitrary ExtraFlag where
+  arbitrary = arbitraryBoundedEnum
+
+instance Hashable ExtraFlag
+
+instance NFData ExtraFlag
+
+instance UnicodeText ExtraFlag where
+  toUnicodeText ChequeredFlag = "\x1f3c1"
+  toUnicodeText TriangularFlagOnPost = "\x1f6a9"
+  toUnicodeText CrossedFlags = "\x1f38c"
+  toUnicodeText BlackFlag = "\x1f3f4"
+  toUnicodeText WavingWhiteFlag = "\x1f3f3\xfe0f"
+  toUnicodeText RainbowFlag = "\x1f3f3\xfe0f\x200d\x1f308"
+  toUnicodeText TransgenderFlag = "\x1f3f3\xfe0f\x200d\x26a7\xfe0f"
+  toUnicodeText PirateFlag = "\x1f3f4\x200d\x2620\xfe0f"
+
+  fromUnicodeText "\x1f3c1" = Just ChequeredFlag
+  fromUnicodeText "\x1f6a9" = Just TriangularFlagOnPost
+  fromUnicodeText "\x1f38c" = Just CrossedFlags
+  fromUnicodeText "\x1f3f4" = Just BlackFlag
+  fromUnicodeText "\x1f3f3\xfe0f" = Just WavingWhiteFlag
+  fromUnicodeText "\x1f3f3\xfe0f\x200d\x1f308" = Just RainbowFlag
+  fromUnicodeText "\x1f3f3\xfe0f\x200d\x26a7\fe0f" = Just TransgenderFlag
+  fromUnicodeText "\x1f3f4\x200d\x2620\xfe0f" = Just PirateFlag
+  fromUnicodeText _ = Nothing

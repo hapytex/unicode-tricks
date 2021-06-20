@@ -33,6 +33,7 @@ library
     , Data.Char.Dice
     , Data.Char.Domino
     , Data.Char.Emoji
+    , Data.Char.Emoji.Core
     , Data.Char.Emoji.Flag
     , Data.Char.Enclosed
     , Data.Char.Egyptian
@@ -98,6 +99,7 @@ test-suite             utricks
     , Data.Char.DiceSpec
     , Data.Char.DominoSpec
     , Data.Char.EmojiSpec
+    , Data.Char.Emoji.FlagSpec
     , Data.Char.FrameSpec
     , Data.Char.MathSpec
     , Data.Char.Number.MayanSpec

@@ -19,18 +19,12 @@ spec = do
   testUnicodeText @ Zodiac
   testUnicodeText @ Clock
   testUnicodeText @ Gender
-  testUnicodeText @ Flag
-  testUnicodeText @ SubFlag
   testUnicodeText @ BloodType
   testBounded @Clock
-  testBounded @Flag
-  testBounded @SubFlag
   testHashable @ SkinColorModifier
   testHashable @ MoonPhase
   testHashable @ Zodiac
   testHashable @ Clock
   testHashable @ Gender
-  testHashable @ Flag
-  testHashable @ SubFlag
   testHashable @ BloodType
   testMirrorVertically @ MoonPhase
