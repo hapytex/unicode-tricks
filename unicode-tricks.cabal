@@ -33,6 +33,7 @@ library
     , Data.Char.Dice
     , Data.Char.Domino
     , Data.Char.Emoji
+    , Data.Char.Emoji.BloodType
     , Data.Char.Emoji.Core
     , Data.Char.Emoji.Flag
     , Data.Char.Emoji.Zodiac
@@ -100,6 +101,7 @@ test-suite             utricks
     , Data.Char.DiceSpec
     , Data.Char.DominoSpec
     , Data.Char.EmojiSpec
+    , Data.Char.Emoji.BloodType
     , Data.Char.Emoji.FlagSpec
     , Data.Char.Emoji.ZodiacSpec
     , Data.Char.FrameSpec

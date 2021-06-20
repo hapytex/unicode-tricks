@@ -12,19 +12,14 @@ spec :: Spec
 spec = do
   testUnicodeCharacter @ SkinColorModifier
   testUnicodeCharacter @ MoonPhase
-  testUnicodeCharacter @ Zodiac
   testUnicodeCharacter @ Clock
   testUnicodeText @ SkinColorModifier
   testUnicodeText @ MoonPhase
-  testUnicodeText @ Zodiac
   testUnicodeText @ Clock
   testUnicodeText @ Gender
-  testUnicodeText @ BloodType
   testBounded @Clock
   testHashable @ SkinColorModifier
   testHashable @ MoonPhase
-  testHashable @ Zodiac
   testHashable @ Clock
   testHashable @ Gender
-  testHashable @ BloodType
   testMirrorVertically @ MoonPhase

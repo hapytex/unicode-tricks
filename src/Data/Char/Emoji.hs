@@ -11,12 +11,8 @@ Unicode defines 2182 emoji characters, this module aims to make working with emo
 -}
 
 module Data.Char.Emoji (
-    -- * Emoji suffix
-    pattern EmojiSuffix
     -- * Clock emoji
-  , Clock, hours, minutes30, clock, closestClock
-    -- * Blood type emoji
-  , BloodType(O, B, A, AB)
+    Clock, hours, minutes30, clock, closestClock
     -- * Moon phase emoji
   , MoonPhase(NewMoon, WaxingCrescent, FirstQuarter, WaxingGibbous, FullMoon, WaningGibbous, ThirdQuarter, WaningCrescent)
     -- * Gender sign emoji
@@ -26,23 +22,24 @@ module Data.Char.Emoji (
     -- * Pattern synonyms for the 'SkinColorModifier' elements
   , pattern FitzPatrickI, pattern FitzPatrickII, pattern FitzPatrickIII, pattern FitzPatrickIV, pattern FitzPatrickV, pattern FitzPatrickVI
     -- * Submodule import
+  , module Data.Char.Emoji.Core
+  , module Data.Char.Emoji.BloodType
   , module Data.Char.Emoji.Flag
   , module Data.Char.Emoji.Zodiac
   ) where
 
 import Control.DeepSeq(NFData)
 
-import Data.Bits(Bits((.&.), (.|.), bit, bitSize, bitSizeMaybe, complement, isSigned, popCount, rotate, shift, shiftL, shiftR, testBit, xor))
+import Data.Bits((.|.), shiftL, shiftR)
 import Data.Bool(bool)
 import Data.Char(chr, ord)
 import Data.Char.Core(MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Char.Emoji.Core
+import Data.Char.Emoji.BloodType
 import Data.Char.Emoji.Flag
 import Data.Char.Emoji.Zodiac
 import Data.Data(Data)
-import Data.Function(on)
 import Data.Hashable(Hashable)
-import Data.Text(unpack)
 
 import GHC.Enum(toEnumError)
 import GHC.Generics(Generic)
@@ -51,9 +48,6 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
 _skinColorOffset :: Int
 _skinColorOffset = 0x1f3fb
-
-_zodiacOffset :: Int
-_zodiacOffset = 0x2648
 
 _moonPhaseOffset :: Int
 _moonPhaseOffset = 0x1f311
@@ -70,57 +64,6 @@ data Clock = Clock {
 instance Hashable Clock
 
 instance NFData Clock
-
--- | A 'BloodType' object used to convert to its unicode equivalent. The
--- 'BloodType' is also seen as a 2-bit value with the leftmost bit representing
--- the presence of /A antigens/ and the rightmost the presence of /B antigens/.
-data BloodType
-  = O  -- ^ The /O blood type/, with no presence of A and B antigens.
-  | B  -- ^ The /B blood type/, with presence of the B antigen.
-  | A  -- ^ The /A blood type/, with presence of the A antigen.
-  | AB  -- ^ The /AB blood type/, with presence of the A and B antigens.
-  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
-
-instance Arbitrary BloodType where
-    arbitrary = arbitraryBoundedEnum
-
-instance Hashable BloodType
-
-instance NFData BloodType
-
-_overEnumMask :: Enum a => Int -> (Int -> Int) -> a -> a
-_overEnumMask m f = toEnum . (m .&.) . f . fromEnum
-
-_overEnum2 :: Enum a => (Int -> Int -> Int) -> a -> a -> a
-_overEnum2 f x y = toEnum (on f fromEnum x y)
-
-_overEnumMask2 :: Enum a => Int -> (Int -> Int -> Int) -> a -> a -> a
-_overEnumMask2 m f x y = toEnum (m .&. on f fromEnum x y)
-
-instance Bits BloodType where
-    (.&.) = _overEnum2 (.&.)
-    (.|.) = _overEnum2 (.|.)
-    xor = _overEnumMask2 0x03 xor
-    complement O = AB
-    complement A = B
-    complement B = A
-    complement AB = O
-    shift abo n = _overEnumMask 0x03 (`shift` n) abo
-    rotate = flip (go . (0x01 .&.))
-        where go 1 A = B
-              go 1 B = B
-              go _ x = x
-    bitSize = const 2
-    bitSizeMaybe = const (Just 2)
-    isSigned = const False
-    testBit = testBit . fromEnum
-    bit 0 = B
-    bit 1 = A
-    bit _ = O
-    popCount O = 0
-    popCount A = 1
-    popCount B = 1
-    popCount AB = 2
 
 instance Bounded Clock where
     minBound = Clock 0 True
@@ -295,17 +238,3 @@ instance UnicodeText Gender where
     fromUnicodeText "\x2640\xfe0f" = Just Male
     fromUnicodeText "\x2642\xfe0f" = Just Female
     fromUnicodeText _ = Nothing
-
-instance UnicodeText BloodType where
-    toUnicodeText AB = "\x1f18e"
-    toUnicodeText A = "\x1f170\xfe0f"
-    toUnicodeText B = "\x1f171\xfe0f"
-    toUnicodeText O = "\x1f17e\xfe0f"
-    fromUnicodeText "\x1f18e" = Just AB
-    fromUnicodeText t
-        | [c, EmojiSuffix] <- unpack t = go c
-        | otherwise = Nothing
-        where go '\x1f170' = Just A
-              go '\x1f171' = Just B
-              go '\x1f17e' = Just O
-              go _ = Nothing
