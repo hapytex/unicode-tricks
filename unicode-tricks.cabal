@@ -33,6 +33,7 @@ library
     , Data.Char.Dice
     , Data.Char.Domino
     , Data.Char.Emoji
+    , Data.Char.Emoji.Flag
     , Data.Char.Enclosed
     , Data.Char.Egyptian
     , Data.Char.Frame
