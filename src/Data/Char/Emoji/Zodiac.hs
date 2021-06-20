@@ -1,5 +1,17 @@
 {-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe #-}
 
+{-|
+Module      : Data.Char.Emoji.Zodiac
+Description : A module that defines zodiac emoji together with the English names as pattern synonyms.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Unicode has emojis for the twelve zodiac signs. In this module a data type is used to present the zodiac
+emoji and also defines pattern synonyms for these.
+-}
+
+
 module Data.Char.Emoji.Zodiac (
     -- * Zodiac datatype
     Zodiac(Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
