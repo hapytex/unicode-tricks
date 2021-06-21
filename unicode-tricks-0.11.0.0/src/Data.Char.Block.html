@@ -1,0 +1,1466 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, Safe #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">{-|
+Module      : Data.Char.Block
+Description : A module used to render blocks in unicode.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Unicode has 2-by-2 blocks, this module aims to make it more convenient to render such blocks.
+-}</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Block</span><span class="hs-special">(</span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Datastructures to store the state of the frame.</span></span><span>
+</span><span id="line-15"></span><span>    </span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier">Row</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier">Row</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Block.html#left"><span class="hs-identifier">left</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Block.html#right"><span class="hs-identifier">right</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier">Block</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier">Block</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Block.html#upper"><span class="hs-identifier">upper</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Block.html#lower"><span class="hs-identifier">lower</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><span class="hs-comment">-- * A unicode character that is (partially) filled block.</span></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier">filled</span></a></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Convert a 'Char'acter to a (partially) filled block.</span></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier">fromBlock</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Block.html#fromBlock%27"><span class="hs-identifier">fromBlock'</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">NFData1</span></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#MirrorHorizontal"><span class="hs-identifier">MirrorHorizontal</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#mirrorHorizontal"><span class="hs-identifier">mirrorHorizontal</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#MirrorVertical"><span class="hs-identifier">MirrorVertical</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#mirrorVertical"><span class="hs-identifier">mirrorVertical</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier">UnicodeCharacter</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier">toUnicodeChar</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier">fromUnicodeChar</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier">UnicodeText</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Functor.Classes</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Eq1</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">liftEq</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Ord1</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">liftCompare</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable.Lifted</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable1</span></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">fromJust</span></span><span class="hs-special">)</span><span class="hs-cpp">
+#if __GLASGOW_HASKELL__ &lt; 803
+</span><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">Data.Semigroup</span><span class="hs-special">(</span><span class="hs-special">(</span><span class="hs-operator">&lt;&gt;</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-cpp">
+#endif
+</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Generic1</span></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Arbitrary1</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">liftArbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitrary1</span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- | A data type that determines the state of the /row/ in a block.</span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- it determines the left and the right part of the row of the block.</span><span>
+</span><span id="line-41"></span><span id="local-6989586621679240276"><span id="local-6989586621679240277"><span id="local-6989586621679240278"><span id="local-6989586621679240279"></span></span></span></span><span class="hs-keyword">data</span><span> </span><span id="Row"><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span></span><span> </span><span id="local-6989586621679240452"><span class="annot"><a href="#local-6989586621679240452"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Row"><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-42"></span><span>    </span><span id="left"><span class="annot"><span class="annottext">Row a -&gt; a
+</span><a href="Data.Char.Block.html#left"><span class="hs-identifier hs-var hs-var">left</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679240452"><span class="hs-identifier hs-type">a</span></a></span><span>  </span><span class="hs-comment">-- ^ The left part of a row of the block.</span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="right"><span class="annot"><span class="annottext">Row a -&gt; a
+</span><a href="Data.Char.Block.html#right"><span class="hs-identifier hs-var hs-var">right</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679240452"><span class="hs-identifier hs-type">a</span></a></span><span>  </span><span class="hs-comment">-- ^ The right part of the row of the block.</span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679240272"><span id="local-6989586621679240274"><span class="annot"><span class="annottext">Row a
+Row a -&gt; Row a -&gt; Bounded (Row a)
+forall a. a -&gt; a -&gt; Bounded a
+forall a. Bounded a =&gt; Row a
+maxBound :: Row a
+$cmaxBound :: forall a. Bounded a =&gt; Row a
+minBound :: Row a
+$cminBound :: forall a. Bounded a =&gt; Row a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="%24cRow"><span id="%24tRow"><span id="local-6989586621679240242"><span id="local-6989586621679240244"><span id="local-6989586621679240246"><span id="local-6989586621679240248"><span id="local-6989586621679240250"><span id="local-6989586621679240252"><span id="local-6989586621679240254"><span id="local-6989586621679240256"><span id="local-6989586621679240258"><span id="local-6989586621679240260"><span id="local-6989586621679240262"><span id="local-6989586621679240264"><span id="local-6989586621679240266"><span id="local-6989586621679240268"><span class="annot"><span class="annottext">Typeable (Row a)
+DataType
+Constr
+Typeable (Row a) =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; Row a -&gt; c (Row a))
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Row a))
+-&gt; (Row a -&gt; Constr)
+-&gt; (Row a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Row a)))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c (Row a)))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; Row a -&gt; Row a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Row a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Row a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Row a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Row a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Row a -&gt; m (Row a))
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Row a -&gt; m (Row a))
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Row a -&gt; m (Row a))
+-&gt; Data (Row a)
+Row a -&gt; DataType
+Row a -&gt; Constr
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Row a))
+(forall b. Data b =&gt; b -&gt; b) -&gt; Row a -&gt; Row a
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Row a -&gt; c (Row a)
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Row a)
+forall a. Data a =&gt; Typeable (Row a)
+forall a. Data a =&gt; Row a -&gt; DataType
+forall a. Data a =&gt; Row a -&gt; Constr
+forall a. Data a =&gt; (forall b. Data b =&gt; b -&gt; b) -&gt; Row a -&gt; Row a
+forall a u.
+Data a =&gt;
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Row a -&gt; u
+forall a u. Data a =&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Row a -&gt; [u]
+forall a r r'.
+Data a =&gt;
+(r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Row a -&gt; r
+forall a r r'.
+Data a =&gt;
+(r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Row a -&gt; r
+forall a (m :: * -&gt; *).
+(Data a, Monad m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Row a -&gt; m (Row a)
+forall a (m :: * -&gt; *).
+(Data a, MonadPlus m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Row a -&gt; m (Row a)
+forall a (c :: * -&gt; *).
+Data a =&gt;
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Row a)
+forall a (c :: * -&gt; *).
+Data a =&gt;
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Row a -&gt; c (Row a)
+forall a (t :: * -&gt; *) (c :: * -&gt; *).
+(Data a, Typeable t) =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Row a))
+forall a (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+(Data a, Typeable t) =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c (Row a))
+forall a.
+Typeable a =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Row a -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Row a -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Row a -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Row a -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Row a -&gt; m (Row a)
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Row a -&gt; m (Row a)
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Row a)
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Row a -&gt; c (Row a)
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Row a))
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c (Row a))
+$cRow :: Constr
+$tRow :: DataType
+gmapMo :: (forall d. Data d =&gt; d -&gt; m d) -&gt; Row a -&gt; m (Row a)
+$cgmapMo :: forall a (m :: * -&gt; *).
+(Data a, MonadPlus m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Row a -&gt; m (Row a)
+gmapMp :: (forall d. Data d =&gt; d -&gt; m d) -&gt; Row a -&gt; m (Row a)
+$cgmapMp :: forall a (m :: * -&gt; *).
+(Data a, MonadPlus m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Row a -&gt; m (Row a)
+gmapM :: (forall d. Data d =&gt; d -&gt; m d) -&gt; Row a -&gt; m (Row a)
+$cgmapM :: forall a (m :: * -&gt; *).
+(Data a, Monad m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Row a -&gt; m (Row a)
+gmapQi :: Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Row a -&gt; u
+$cgmapQi :: forall a u.
+Data a =&gt;
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Row a -&gt; u
+gmapQ :: (forall d. Data d =&gt; d -&gt; u) -&gt; Row a -&gt; [u]
+$cgmapQ :: forall a u. Data a =&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Row a -&gt; [u]
+gmapQr :: (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Row a -&gt; r
+$cgmapQr :: forall a r r'.
+Data a =&gt;
+(r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Row a -&gt; r
+gmapQl :: (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Row a -&gt; r
+$cgmapQl :: forall a r r'.
+Data a =&gt;
+(r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Row a -&gt; r
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; Row a -&gt; Row a
+$cgmapT :: forall a. Data a =&gt; (forall b. Data b =&gt; b -&gt; b) -&gt; Row a -&gt; Row a
+dataCast2 :: (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c (Row a))
+$cdataCast2 :: forall a (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+(Data a, Typeable t) =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c (Row a))
+dataCast1 :: (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Row a))
+$cdataCast1 :: forall a (t :: * -&gt; *) (c :: * -&gt; *).
+(Data a, Typeable t) =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Row a))
+dataTypeOf :: Row a -&gt; DataType
+$cdataTypeOf :: forall a. Data a =&gt; Row a -&gt; DataType
+toConstr :: Row a -&gt; Constr
+$ctoConstr :: forall a. Data a =&gt; Row a -&gt; Constr
+gunfold :: (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Row a)
+$cgunfold :: forall a (c :: * -&gt; *).
+Data a =&gt;
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Row a)
+gfoldl :: (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Row a -&gt; c (Row a)
+$cgfoldl :: forall a (c :: * -&gt; *).
+Data a =&gt;
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Row a -&gt; c (Row a)
+$cp1Data :: forall a. Data a =&gt; Typeable (Row a)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679240235"><span id="local-6989586621679240237"><span class="annot"><span class="annottext">Row a -&gt; Row a -&gt; Bool
+(Row a -&gt; Row a -&gt; Bool) -&gt; (Row a -&gt; Row a -&gt; Bool) -&gt; Eq (Row a)
+forall a. Eq a =&gt; Row a -&gt; Row a -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Row a -&gt; Row a -&gt; Bool
+$c/= :: forall a. Eq a =&gt; Row a -&gt; Row a -&gt; Bool
+== :: Row a -&gt; Row a -&gt; Bool
+$c== :: forall a. Eq a =&gt; Row a -&gt; Row a -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679240200"><span id="local-6989586621679240202"><span id="local-6989586621679240204"><span id="local-6989586621679240206"><span id="local-6989586621679240208"><span id="local-6989586621679240210"><span id="local-6989586621679240212"><span id="local-6989586621679240214"><span id="local-6989586621679240216"><span id="local-6989586621679240218"><span id="local-6989586621679240220"><span id="local-6989586621679240222"><span id="local-6989586621679240224"><span id="local-6989586621679240226"><span id="local-6989586621679240228"><span id="local-6989586621679240230"><span id="local-6989586621679240232"><span class="annot"><span class="annottext">Row a -&gt; Bool
+(a -&gt; m) -&gt; Row a -&gt; m
+(a -&gt; b -&gt; b) -&gt; b -&gt; Row a -&gt; b
+(forall m. Monoid m =&gt; Row m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Row a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Row a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Row a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Row a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Row a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Row a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; Row a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; Row a -&gt; a)
+-&gt; (forall a. Row a -&gt; [a])
+-&gt; (forall a. Row a -&gt; Bool)
+-&gt; (forall a. Row a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; Row a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; Row a -&gt; a)
+-&gt; (forall a. Ord a =&gt; Row a -&gt; a)
+-&gt; (forall a. Num a =&gt; Row a -&gt; a)
+-&gt; (forall a. Num a =&gt; Row a -&gt; a)
+-&gt; Foldable Row
+forall a. Eq a =&gt; a -&gt; Row a -&gt; Bool
+forall a. Num a =&gt; Row a -&gt; a
+forall a. Ord a =&gt; Row a -&gt; a
+forall m. Monoid m =&gt; Row m -&gt; m
+forall a. Row a -&gt; Bool
+forall a. Row a -&gt; Int
+forall a. Row a -&gt; [a]
+forall a. (a -&gt; a -&gt; a) -&gt; Row a -&gt; a
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Row a -&gt; m
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Row a -&gt; b
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Row a -&gt; b
+forall (t :: * -&gt; *).
+(forall m. Monoid m =&gt; t m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. t a -&gt; [a])
+-&gt; (forall a. t a -&gt; Bool)
+-&gt; (forall a. t a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; t a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; Foldable t
+product :: Row a -&gt; a
+$cproduct :: forall a. Num a =&gt; Row a -&gt; a
+sum :: Row a -&gt; a
+$csum :: forall a. Num a =&gt; Row a -&gt; a
+minimum :: Row a -&gt; a
+$cminimum :: forall a. Ord a =&gt; Row a -&gt; a
+maximum :: Row a -&gt; a
+$cmaximum :: forall a. Ord a =&gt; Row a -&gt; a
+elem :: a -&gt; Row a -&gt; Bool
+$celem :: forall a. Eq a =&gt; a -&gt; Row a -&gt; Bool
+length :: Row a -&gt; Int
+$clength :: forall a. Row a -&gt; Int
+null :: Row a -&gt; Bool
+$cnull :: forall a. Row a -&gt; Bool
+toList :: Row a -&gt; [a]
+$ctoList :: forall a. Row a -&gt; [a]
+foldl1 :: (a -&gt; a -&gt; a) -&gt; Row a -&gt; a
+$cfoldl1 :: forall a. (a -&gt; a -&gt; a) -&gt; Row a -&gt; a
+foldr1 :: (a -&gt; a -&gt; a) -&gt; Row a -&gt; a
+$cfoldr1 :: forall a. (a -&gt; a -&gt; a) -&gt; Row a -&gt; a
+foldl' :: (b -&gt; a -&gt; b) -&gt; b -&gt; Row a -&gt; b
+$cfoldl' :: forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Row a -&gt; b
+foldl :: (b -&gt; a -&gt; b) -&gt; b -&gt; Row a -&gt; b
+$cfoldl :: forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Row a -&gt; b
+foldr' :: (a -&gt; b -&gt; b) -&gt; b -&gt; Row a -&gt; b
+$cfoldr' :: forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Row a -&gt; b
+foldr :: (a -&gt; b -&gt; b) -&gt; b -&gt; Row a -&gt; b
+$cfoldr :: forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Row a -&gt; b
+foldMap' :: (a -&gt; m) -&gt; Row a -&gt; m
+$cfoldMap' :: forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Row a -&gt; m
+foldMap :: (a -&gt; m) -&gt; Row a -&gt; m
+$cfoldMap :: forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Row a -&gt; m
+fold :: Row m -&gt; m
+$cfold :: forall m. Monoid m =&gt; Row m -&gt; m
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Foldable</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679240195"><span id="local-6989586621679240197"><span class="annot"><span class="annottext">a -&gt; Row b -&gt; Row a
+(a -&gt; b) -&gt; Row a -&gt; Row b
+(forall a b. (a -&gt; b) -&gt; Row a -&gt; Row b)
+-&gt; (forall a b. a -&gt; Row b -&gt; Row a) -&gt; Functor Row
+forall a b. a -&gt; Row b -&gt; Row a
+forall a b. (a -&gt; b) -&gt; Row a -&gt; Row b
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b. a -&gt; f b -&gt; f a) -&gt; Functor f
+&lt;$ :: a -&gt; Row b -&gt; Row a
+$c&lt;$ :: forall a b. a -&gt; Row b -&gt; Row a
+fmap :: (a -&gt; b) -&gt; Row a -&gt; Row b
+$cfmap :: forall a b. (a -&gt; b) -&gt; Row a -&gt; Row b
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Functor</span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. Row a -&gt; Rep (Row a) x)
+-&gt; (forall x. Rep (Row a) x -&gt; Row a) -&gt; Generic (Row a)
+forall x. Rep (Row a) x -&gt; Row a
+forall x. Row a -&gt; Rep (Row a) x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+forall a x. Rep (Row a) x -&gt; Row a
+forall a x. Row a -&gt; Rep (Row a) x
+$cto :: forall a x. Rep (Row a) x -&gt; Row a
+$cfrom :: forall a x. Row a -&gt; Rep (Row a) x
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall a. Row a -&gt; Rep1 Row a)
+-&gt; (forall a. Rep1 Row a -&gt; Row a) -&gt; Generic1 Row
+forall a. Rep1 Row a -&gt; Row a
+forall a. Row a -&gt; Rep1 Row a
+forall k (f :: k -&gt; *).
+(forall (a :: k). f a -&gt; Rep1 f a)
+-&gt; (forall (a :: k). Rep1 f a -&gt; f a) -&gt; Generic1 f
+$cto1 :: forall a. Rep1 Row a -&gt; Row a
+$cfrom1 :: forall a. Row a -&gt; Rep1 Row a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic1</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679240173"><span id="local-6989586621679240175"><span id="local-6989586621679240177"><span id="local-6989586621679240179"><span id="local-6989586621679240181"><span id="local-6989586621679240183"><span id="local-6989586621679240185"><span class="annot"><span class="annottext">Eq (Row a)
+Eq (Row a) =&gt;
+(Row a -&gt; Row a -&gt; Ordering)
+-&gt; (Row a -&gt; Row a -&gt; Bool)
+-&gt; (Row a -&gt; Row a -&gt; Bool)
+-&gt; (Row a -&gt; Row a -&gt; Bool)
+-&gt; (Row a -&gt; Row a -&gt; Bool)
+-&gt; (Row a -&gt; Row a -&gt; Row a)
+-&gt; (Row a -&gt; Row a -&gt; Row a)
+-&gt; Ord (Row a)
+Row a -&gt; Row a -&gt; Bool
+Row a -&gt; Row a -&gt; Ordering
+Row a -&gt; Row a -&gt; Row a
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+forall a. Ord a =&gt; Eq (Row a)
+forall a. Ord a =&gt; Row a -&gt; Row a -&gt; Bool
+forall a. Ord a =&gt; Row a -&gt; Row a -&gt; Ordering
+forall a. Ord a =&gt; Row a -&gt; Row a -&gt; Row a
+min :: Row a -&gt; Row a -&gt; Row a
+$cmin :: forall a. Ord a =&gt; Row a -&gt; Row a -&gt; Row a
+max :: Row a -&gt; Row a -&gt; Row a
+$cmax :: forall a. Ord a =&gt; Row a -&gt; Row a -&gt; Row a
+&gt;= :: Row a -&gt; Row a -&gt; Bool
+$c&gt;= :: forall a. Ord a =&gt; Row a -&gt; Row a -&gt; Bool
+&gt; :: Row a -&gt; Row a -&gt; Bool
+$c&gt; :: forall a. Ord a =&gt; Row a -&gt; Row a -&gt; Bool
+&lt;= :: Row a -&gt; Row a -&gt; Bool
+$c&lt;= :: forall a. Ord a =&gt; Row a -&gt; Row a -&gt; Bool
+&lt; :: Row a -&gt; Row a -&gt; Bool
+$c&lt; :: forall a. Ord a =&gt; Row a -&gt; Row a -&gt; Bool
+compare :: Row a -&gt; Row a -&gt; Ordering
+$ccompare :: forall a. Ord a =&gt; Row a -&gt; Row a -&gt; Ordering
+$cp1Ord :: forall a. Ord a =&gt; Eq (Row a)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679240164"><span id="local-6989586621679240166"><span id="local-6989586621679240168"><span id="local-6989586621679240170"><span class="annot"><span class="annottext">ReadPrec [Row a]
+ReadPrec (Row a)
+Int -&gt; ReadS (Row a)
+ReadS [Row a]
+(Int -&gt; ReadS (Row a))
+-&gt; ReadS [Row a]
+-&gt; ReadPrec (Row a)
+-&gt; ReadPrec [Row a]
+-&gt; Read (Row a)
+forall a. Read a =&gt; ReadPrec [Row a]
+forall a. Read a =&gt; ReadPrec (Row a)
+forall a. Read a =&gt; Int -&gt; ReadS (Row a)
+forall a. Read a =&gt; ReadS [Row a]
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+readListPrec :: ReadPrec [Row a]
+$creadListPrec :: forall a. Read a =&gt; ReadPrec [Row a]
+readPrec :: ReadPrec (Row a)
+$creadPrec :: forall a. Read a =&gt; ReadPrec (Row a)
+readList :: ReadS [Row a]
+$creadList :: forall a. Read a =&gt; ReadS [Row a]
+readsPrec :: Int -&gt; ReadS (Row a)
+$creadsPrec :: forall a. Read a =&gt; Int -&gt; ReadS (Row a)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679240157"><span id="local-6989586621679240159"><span id="local-6989586621679240161"><span class="annot"><span class="annottext">Int -&gt; Row a -&gt; ShowS
+[Row a] -&gt; ShowS
+Row a -&gt; String
+(Int -&gt; Row a -&gt; ShowS)
+-&gt; (Row a -&gt; String) -&gt; ([Row a] -&gt; ShowS) -&gt; Show (Row a)
+forall a. Show a =&gt; Int -&gt; Row a -&gt; ShowS
+forall a. Show a =&gt; [Row a] -&gt; ShowS
+forall a. Show a =&gt; Row a -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Row a] -&gt; ShowS
+$cshowList :: forall a. Show a =&gt; [Row a] -&gt; ShowS
+show :: Row a -&gt; String
+$cshow :: forall a. Show a =&gt; Row a -&gt; String
+showsPrec :: Int -&gt; Row a -&gt; ShowS
+$cshowsPrec :: forall a. Show a =&gt; Int -&gt; Row a -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679240146"><span id="local-6989586621679240148"><span id="local-6989586621679240150"><span id="local-6989586621679240152"><span class="annot"><span class="annottext">Functor Row
+Foldable Row
+(Functor Row, Foldable Row) =&gt;
+(forall (f :: * -&gt; *) a b.
+ Applicative f =&gt;
+ (a -&gt; f b) -&gt; Row a -&gt; f (Row b))
+-&gt; (forall (f :: * -&gt; *) a.
+    Applicative f =&gt;
+    Row (f a) -&gt; f (Row a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; Row a -&gt; m (Row b))
+-&gt; (forall (m :: * -&gt; *) a. Monad m =&gt; Row (m a) -&gt; m (Row a))
+-&gt; Traversable Row
+(a -&gt; f b) -&gt; Row a -&gt; f (Row b)
+forall (t :: * -&gt; *).
+(Functor t, Foldable t) =&gt;
+(forall (f :: * -&gt; *) a b.
+ Applicative f =&gt;
+ (a -&gt; f b) -&gt; t a -&gt; f (t b))
+-&gt; (forall (f :: * -&gt; *) a. Applicative f =&gt; t (f a) -&gt; f (t a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; t a -&gt; m (t b))
+-&gt; (forall (m :: * -&gt; *) a. Monad m =&gt; t (m a) -&gt; m (t a))
+-&gt; Traversable t
+forall (m :: * -&gt; *) a. Monad m =&gt; Row (m a) -&gt; m (Row a)
+forall (f :: * -&gt; *) a. Applicative f =&gt; Row (f a) -&gt; f (Row a)
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; Row a -&gt; m (Row b)
+forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; Row a -&gt; f (Row b)
+sequence :: Row (m a) -&gt; m (Row a)
+$csequence :: forall (m :: * -&gt; *) a. Monad m =&gt; Row (m a) -&gt; m (Row a)
+mapM :: (a -&gt; m b) -&gt; Row a -&gt; m (Row b)
+$cmapM :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; Row a -&gt; m (Row b)
+sequenceA :: Row (f a) -&gt; f (Row a)
+$csequenceA :: forall (f :: * -&gt; *) a. Applicative f =&gt; Row (f a) -&gt; f (Row a)
+traverse :: (a -&gt; f b) -&gt; Row a -&gt; f (Row b)
+$ctraverse :: forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; Row a -&gt; f (Row b)
+$cp2Traversable :: Foldable Row
+$cp1Traversable :: Functor Row
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Traversable</span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-47"></span><span>  </span><span id="local-6989586621679240142"><span class="annot"><span class="annottext">liftEq :: (a -&gt; b -&gt; Bool) -&gt; Row a -&gt; Row b -&gt; Bool
+</span><a href="#local-6989586621679240142"><span class="hs-identifier hs-var hs-var hs-var hs-var">liftEq</span></a></span></span><span> </span><span id="local-6989586621679240141"><span class="annot"><span class="annottext">cmp :: a -&gt; b -&gt; Bool
+</span><a href="#local-6989586621679240141"><span class="hs-identifier hs-var">cmp</span></a></span></span><span> </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span id="local-6989586621679240140"><span class="annot"><span class="annottext">xa :: a
+</span><a href="#local-6989586621679240140"><span class="hs-identifier hs-var">xa</span></a></span></span><span> </span><span id="local-6989586621679240139"><span class="annot"><span class="annottext">xb :: a
+</span><a href="#local-6989586621679240139"><span class="hs-identifier hs-var">xb</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span id="local-6989586621679240138"><span class="annot"><span class="annottext">ya :: b
+</span><a href="#local-6989586621679240138"><span class="hs-identifier hs-var">ya</span></a></span></span><span> </span><span id="local-6989586621679240137"><span class="annot"><span class="annottext">yb :: b
+</span><a href="#local-6989586621679240137"><span class="hs-identifier hs-var">yb</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; b -&gt; Bool
+</span><a href="#local-6989586621679240141"><span class="hs-identifier hs-var">cmp</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679240140"><span class="hs-identifier hs-var">xa</span></a></span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679240138"><span class="hs-identifier hs-var">ya</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; b -&gt; Bool
+</span><a href="#local-6989586621679240141"><span class="hs-identifier hs-var">cmp</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679240139"><span class="hs-identifier hs-var">xb</span></a></span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679240137"><span class="hs-identifier hs-var">yb</span></a></span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679240134"><span class="annot"><span class="hs-identifier hs-type">Hashable1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span></span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span id="local-6989586621679240132"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679240128"><span id="local-6989586621679240130"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="#local-6989586621679240132"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679240132"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span></span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span id="local-6989586621679240126"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Data.Char.Core.html#MirrorVertical"><span class="hs-identifier hs-type">MirrorVertical</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679240126"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-54"></span><span>  </span><span id="local-6989586621679240123"><span class="annot"><span class="annottext">mirrorVertical :: Row a -&gt; Row a
+</span><a href="#local-6989586621679240123"><span class="hs-identifier hs-var hs-var hs-var hs-var">mirrorVertical</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span id="local-6989586621679240122"><span class="annot"><span class="annottext">l :: a
+</span><a href="#local-6989586621679240122"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679240121"><span class="annot"><span class="annottext">r :: a
+</span><a href="#local-6989586621679240121"><span class="hs-identifier hs-var">r</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Row a
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679240121"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679240122"><span class="hs-identifier hs-var">l</span></a></span></span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span id="local-6989586621679240120"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679240118"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="#local-6989586621679240120"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679240120"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-57"></span><span>
+</span><span id="line-58"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679240115"><span class="annot"><span class="hs-identifier hs-type">NFData1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span></span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-61"></span><span>  </span><span id="local-6989586621679240110"><span class="annot"><span class="annottext">liftCompare :: (a -&gt; b -&gt; Ordering) -&gt; Row a -&gt; Row b -&gt; Ordering
+</span><a href="#local-6989586621679240110"><span class="hs-identifier hs-var hs-var hs-var hs-var">liftCompare</span></a></span></span><span> </span><span id="local-6989586621679240109"><span class="annot"><span class="annottext">cmp :: a -&gt; b -&gt; Ordering
+</span><a href="#local-6989586621679240109"><span class="hs-identifier hs-var">cmp</span></a></span></span><span> </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span id="local-6989586621679240108"><span class="annot"><span class="annottext">xa :: a
+</span><a href="#local-6989586621679240108"><span class="hs-identifier hs-var">xa</span></a></span></span><span> </span><span id="local-6989586621679240107"><span class="annot"><span class="annottext">xb :: a
+</span><a href="#local-6989586621679240107"><span class="hs-identifier hs-var">xb</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span id="local-6989586621679240106"><span class="annot"><span class="annottext">ya :: b
+</span><a href="#local-6989586621679240106"><span class="hs-identifier hs-var">ya</span></a></span></span><span> </span><span id="local-6989586621679240105"><span class="annot"><span class="annottext">yb :: b
+</span><a href="#local-6989586621679240105"><span class="hs-identifier hs-var">yb</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; b -&gt; Ordering
+</span><a href="#local-6989586621679240109"><span class="hs-identifier hs-var">cmp</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679240108"><span class="hs-identifier hs-var">xa</span></a></span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679240106"><span class="hs-identifier hs-var">ya</span></a></span><span> </span><span class="annot"><span class="annottext">Ordering -&gt; Ordering -&gt; Ordering
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; b -&gt; Ordering
+</span><a href="#local-6989586621679240109"><span class="hs-identifier hs-var">cmp</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679240107"><span class="hs-identifier hs-var">xb</span></a></span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679240105"><span class="hs-identifier hs-var">yb</span></a></span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span class="hs-comment">-- | A data type that determines the state of the four subparts of the block.</span><span>
+</span><span id="line-64"></span><span id="local-6989586621679240101"><span id="local-6989586621679240102"><span id="local-6989586621679240103"><span id="local-6989586621679240104"></span></span></span></span><span class="hs-keyword">data</span><span> </span><span id="Block"><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span></span><span> </span><span id="local-6989586621679240366"><span class="annot"><a href="#local-6989586621679240366"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Block"><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-65"></span><span>    </span><span id="upper"><span class="annot"><span class="annottext">Block a -&gt; Row a
+</span><a href="Data.Char.Block.html#upper"><span class="hs-identifier hs-var hs-var">upper</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679240366"><span class="hs-identifier hs-type">a</span></a></span><span>  </span><span class="hs-comment">-- ^ The upper part of the block.</span><span>
+</span><span id="line-66"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="lower"><span class="annot"><span class="annottext">Block a -&gt; Row a
+</span><a href="Data.Char.Block.html#lower"><span class="hs-identifier hs-var hs-var">lower</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679240366"><span class="hs-identifier hs-type">a</span></a></span><span>  </span><span class="hs-comment">-- ^ The lower part of the block.</span><span>
+</span><span id="line-67"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679240097"><span id="local-6989586621679240099"><span class="annot"><span class="annottext">Block a
+Block a -&gt; Block a -&gt; Bounded (Block a)
+forall a. a -&gt; a -&gt; Bounded a
+forall a. Bounded a =&gt; Block a
+maxBound :: Block a
+$cmaxBound :: forall a. Bounded a =&gt; Block a
+minBound :: Block a
+$cminBound :: forall a. Bounded a =&gt; Block a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="%24cBlock"><span id="%24tBlock"><span id="local-6989586621679240068"><span id="local-6989586621679240070"><span id="local-6989586621679240072"><span id="local-6989586621679240074"><span id="local-6989586621679240076"><span id="local-6989586621679240078"><span id="local-6989586621679240080"><span id="local-6989586621679240082"><span id="local-6989586621679240084"><span id="local-6989586621679240086"><span id="local-6989586621679240088"><span id="local-6989586621679240090"><span id="local-6989586621679240092"><span id="local-6989586621679240094"><span class="annot"><span class="annottext">Typeable (Block a)
+DataType
+Constr
+Typeable (Block a) =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; Block a -&gt; c (Block a))
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Block a))
+-&gt; (Block a -&gt; Constr)
+-&gt; (Block a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Block a)))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c (Block a)))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; Block a -&gt; Block a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Block a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Block a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Block a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Block a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Block a -&gt; m (Block a))
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Block a -&gt; m (Block a))
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Block a -&gt; m (Block a))
+-&gt; Data (Block a)
+Block a -&gt; DataType
+Block a -&gt; Constr
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Block a))
+(forall b. Data b =&gt; b -&gt; b) -&gt; Block a -&gt; Block a
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Block a -&gt; c (Block a)
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Block a)
+forall a. Data a =&gt; Typeable (Block a)
+forall a. Data a =&gt; Block a -&gt; DataType
+forall a. Data a =&gt; Block a -&gt; Constr
+forall a.
+Data a =&gt;
+(forall b. Data b =&gt; b -&gt; b) -&gt; Block a -&gt; Block a
+forall a u.
+Data a =&gt;
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Block a -&gt; u
+forall a u.
+Data a =&gt;
+(forall d. Data d =&gt; d -&gt; u) -&gt; Block a -&gt; [u]
+forall a r r'.
+Data a =&gt;
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Block a -&gt; r
+forall a r r'.
+Data a =&gt;
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Block a -&gt; r
+forall a (m :: * -&gt; *).
+(Data a, Monad m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Block a -&gt; m (Block a)
+forall a (m :: * -&gt; *).
+(Data a, MonadPlus m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Block a -&gt; m (Block a)
+forall a (c :: * -&gt; *).
+Data a =&gt;
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Block a)
+forall a (c :: * -&gt; *).
+Data a =&gt;
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Block a -&gt; c (Block a)
+forall a (t :: * -&gt; *) (c :: * -&gt; *).
+(Data a, Typeable t) =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Block a))
+forall a (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+(Data a, Typeable t) =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c (Block a))
+forall a.
+Typeable a =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Block a -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Block a -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Block a -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Block a -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Block a -&gt; m (Block a)
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Block a -&gt; m (Block a)
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Block a)
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Block a -&gt; c (Block a)
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Block a))
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c (Block a))
+$cBlock :: Constr
+$tBlock :: DataType
+gmapMo :: (forall d. Data d =&gt; d -&gt; m d) -&gt; Block a -&gt; m (Block a)
+$cgmapMo :: forall a (m :: * -&gt; *).
+(Data a, MonadPlus m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Block a -&gt; m (Block a)
+gmapMp :: (forall d. Data d =&gt; d -&gt; m d) -&gt; Block a -&gt; m (Block a)
+$cgmapMp :: forall a (m :: * -&gt; *).
+(Data a, MonadPlus m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Block a -&gt; m (Block a)
+gmapM :: (forall d. Data d =&gt; d -&gt; m d) -&gt; Block a -&gt; m (Block a)
+$cgmapM :: forall a (m :: * -&gt; *).
+(Data a, Monad m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Block a -&gt; m (Block a)
+gmapQi :: Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Block a -&gt; u
+$cgmapQi :: forall a u.
+Data a =&gt;
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Block a -&gt; u
+gmapQ :: (forall d. Data d =&gt; d -&gt; u) -&gt; Block a -&gt; [u]
+$cgmapQ :: forall a u.
+Data a =&gt;
+(forall d. Data d =&gt; d -&gt; u) -&gt; Block a -&gt; [u]
+gmapQr :: (r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Block a -&gt; r
+$cgmapQr :: forall a r r'.
+Data a =&gt;
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Block a -&gt; r
+gmapQl :: (r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Block a -&gt; r
+$cgmapQl :: forall a r r'.
+Data a =&gt;
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Block a -&gt; r
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; Block a -&gt; Block a
+$cgmapT :: forall a.
+Data a =&gt;
+(forall b. Data b =&gt; b -&gt; b) -&gt; Block a -&gt; Block a
+dataCast2 :: (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c (Block a))
+$cdataCast2 :: forall a (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+(Data a, Typeable t) =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c (Block a))
+dataCast1 :: (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Block a))
+$cdataCast1 :: forall a (t :: * -&gt; *) (c :: * -&gt; *).
+(Data a, Typeable t) =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Block a))
+dataTypeOf :: Block a -&gt; DataType
+$cdataTypeOf :: forall a. Data a =&gt; Block a -&gt; DataType
+toConstr :: Block a -&gt; Constr
+$ctoConstr :: forall a. Data a =&gt; Block a -&gt; Constr
+gunfold :: (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Block a)
+$cgunfold :: forall a (c :: * -&gt; *).
+Data a =&gt;
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Block a)
+gfoldl :: (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Block a -&gt; c (Block a)
+$cgfoldl :: forall a (c :: * -&gt; *).
+Data a =&gt;
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Block a -&gt; c (Block a)
+$cp1Data :: forall a. Data a =&gt; Typeable (Block a)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679240062"><span id="local-6989586621679240064"><span class="annot"><span class="annottext">Block a -&gt; Block a -&gt; Bool
+(Block a -&gt; Block a -&gt; Bool)
+-&gt; (Block a -&gt; Block a -&gt; Bool) -&gt; Eq (Block a)
+forall a. Eq a =&gt; Block a -&gt; Block a -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Block a -&gt; Block a -&gt; Bool
+$c/= :: forall a. Eq a =&gt; Block a -&gt; Block a -&gt; Bool
+== :: Block a -&gt; Block a -&gt; Bool
+$c== :: forall a. Eq a =&gt; Block a -&gt; Block a -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679240028"><span id="local-6989586621679240030"><span id="local-6989586621679240032"><span id="local-6989586621679240034"><span id="local-6989586621679240036"><span id="local-6989586621679240038"><span id="local-6989586621679240040"><span id="local-6989586621679240042"><span id="local-6989586621679240044"><span id="local-6989586621679240046"><span id="local-6989586621679240048"><span id="local-6989586621679240050"><span id="local-6989586621679240052"><span id="local-6989586621679240054"><span id="local-6989586621679240056"><span id="local-6989586621679240058"><span id="local-6989586621679240060"><span class="annot"><span class="annottext">Block a -&gt; Bool
+(a -&gt; m) -&gt; Block a -&gt; m
+(a -&gt; b -&gt; b) -&gt; b -&gt; Block a -&gt; b
+(forall m. Monoid m =&gt; Block m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Block a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Block a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Block a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Block a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Block a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Block a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; Block a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; Block a -&gt; a)
+-&gt; (forall a. Block a -&gt; [a])
+-&gt; (forall a. Block a -&gt; Bool)
+-&gt; (forall a. Block a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; Block a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; Block a -&gt; a)
+-&gt; (forall a. Ord a =&gt; Block a -&gt; a)
+-&gt; (forall a. Num a =&gt; Block a -&gt; a)
+-&gt; (forall a. Num a =&gt; Block a -&gt; a)
+-&gt; Foldable Block
+forall a. Eq a =&gt; a -&gt; Block a -&gt; Bool
+forall a. Num a =&gt; Block a -&gt; a
+forall a. Ord a =&gt; Block a -&gt; a
+forall m. Monoid m =&gt; Block m -&gt; m
+forall a. Block a -&gt; Bool
+forall a. Block a -&gt; Int
+forall a. Block a -&gt; [a]
+forall a. (a -&gt; a -&gt; a) -&gt; Block a -&gt; a
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Block a -&gt; m
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Block a -&gt; b
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Block a -&gt; b
+forall (t :: * -&gt; *).
+(forall m. Monoid m =&gt; t m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. t a -&gt; [a])
+-&gt; (forall a. t a -&gt; Bool)
+-&gt; (forall a. t a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; t a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; Foldable t
+product :: Block a -&gt; a
+$cproduct :: forall a. Num a =&gt; Block a -&gt; a
+sum :: Block a -&gt; a
+$csum :: forall a. Num a =&gt; Block a -&gt; a
+minimum :: Block a -&gt; a
+$cminimum :: forall a. Ord a =&gt; Block a -&gt; a
+maximum :: Block a -&gt; a
+$cmaximum :: forall a. Ord a =&gt; Block a -&gt; a
+elem :: a -&gt; Block a -&gt; Bool
+$celem :: forall a. Eq a =&gt; a -&gt; Block a -&gt; Bool
+length :: Block a -&gt; Int
+$clength :: forall a. Block a -&gt; Int
+null :: Block a -&gt; Bool
+$cnull :: forall a. Block a -&gt; Bool
+toList :: Block a -&gt; [a]
+$ctoList :: forall a. Block a -&gt; [a]
+foldl1 :: (a -&gt; a -&gt; a) -&gt; Block a -&gt; a
+$cfoldl1 :: forall a. (a -&gt; a -&gt; a) -&gt; Block a -&gt; a
+foldr1 :: (a -&gt; a -&gt; a) -&gt; Block a -&gt; a
+$cfoldr1 :: forall a. (a -&gt; a -&gt; a) -&gt; Block a -&gt; a
+foldl' :: (b -&gt; a -&gt; b) -&gt; b -&gt; Block a -&gt; b
+$cfoldl' :: forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Block a -&gt; b
+foldl :: (b -&gt; a -&gt; b) -&gt; b -&gt; Block a -&gt; b
+$cfoldl :: forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Block a -&gt; b
+foldr' :: (a -&gt; b -&gt; b) -&gt; b -&gt; Block a -&gt; b
+$cfoldr' :: forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Block a -&gt; b
+foldr :: (a -&gt; b -&gt; b) -&gt; b -&gt; Block a -&gt; b
+$cfoldr :: forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Block a -&gt; b
+foldMap' :: (a -&gt; m) -&gt; Block a -&gt; m
+$cfoldMap' :: forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Block a -&gt; m
+foldMap :: (a -&gt; m) -&gt; Block a -&gt; m
+$cfoldMap :: forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Block a -&gt; m
+fold :: Block m -&gt; m
+$cfold :: forall m. Monoid m =&gt; Block m -&gt; m
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Foldable</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679240024"><span id="local-6989586621679240026"><span class="annot"><span class="annottext">a -&gt; Block b -&gt; Block a
+(a -&gt; b) -&gt; Block a -&gt; Block b
+(forall a b. (a -&gt; b) -&gt; Block a -&gt; Block b)
+-&gt; (forall a b. a -&gt; Block b -&gt; Block a) -&gt; Functor Block
+forall a b. a -&gt; Block b -&gt; Block a
+forall a b. (a -&gt; b) -&gt; Block a -&gt; Block b
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b. a -&gt; f b -&gt; f a) -&gt; Functor f
+&lt;$ :: a -&gt; Block b -&gt; Block a
+$c&lt;$ :: forall a b. a -&gt; Block b -&gt; Block a
+fmap :: (a -&gt; b) -&gt; Block a -&gt; Block b
+$cfmap :: forall a b. (a -&gt; b) -&gt; Block a -&gt; Block b
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Functor</span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. Block a -&gt; Rep (Block a) x)
+-&gt; (forall x. Rep (Block a) x -&gt; Block a) -&gt; Generic (Block a)
+forall x. Rep (Block a) x -&gt; Block a
+forall x. Block a -&gt; Rep (Block a) x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+forall a x. Rep (Block a) x -&gt; Block a
+forall a x. Block a -&gt; Rep (Block a) x
+$cto :: forall a x. Rep (Block a) x -&gt; Block a
+$cfrom :: forall a x. Block a -&gt; Rep (Block a) x
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall a. Block a -&gt; Rep1 Block a)
+-&gt; (forall a. Rep1 Block a -&gt; Block a) -&gt; Generic1 Block
+forall a. Rep1 Block a -&gt; Block a
+forall a. Block a -&gt; Rep1 Block a
+forall k (f :: k -&gt; *).
+(forall (a :: k). f a -&gt; Rep1 f a)
+-&gt; (forall (a :: k). Rep1 f a -&gt; f a) -&gt; Generic1 f
+$cto1 :: forall a. Rep1 Block a -&gt; Block a
+$cfrom1 :: forall a. Block a -&gt; Rep1 Block a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic1</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679240005"><span id="local-6989586621679240007"><span id="local-6989586621679240009"><span id="local-6989586621679240011"><span id="local-6989586621679240013"><span id="local-6989586621679240015"><span id="local-6989586621679240017"><span class="annot"><span class="annottext">Eq (Block a)
+Eq (Block a) =&gt;
+(Block a -&gt; Block a -&gt; Ordering)
+-&gt; (Block a -&gt; Block a -&gt; Bool)
+-&gt; (Block a -&gt; Block a -&gt; Bool)
+-&gt; (Block a -&gt; Block a -&gt; Bool)
+-&gt; (Block a -&gt; Block a -&gt; Bool)
+-&gt; (Block a -&gt; Block a -&gt; Block a)
+-&gt; (Block a -&gt; Block a -&gt; Block a)
+-&gt; Ord (Block a)
+Block a -&gt; Block a -&gt; Bool
+Block a -&gt; Block a -&gt; Ordering
+Block a -&gt; Block a -&gt; Block a
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+forall a. Ord a =&gt; Eq (Block a)
+forall a. Ord a =&gt; Block a -&gt; Block a -&gt; Bool
+forall a. Ord a =&gt; Block a -&gt; Block a -&gt; Ordering
+forall a. Ord a =&gt; Block a -&gt; Block a -&gt; Block a
+min :: Block a -&gt; Block a -&gt; Block a
+$cmin :: forall a. Ord a =&gt; Block a -&gt; Block a -&gt; Block a
+max :: Block a -&gt; Block a -&gt; Block a
+$cmax :: forall a. Ord a =&gt; Block a -&gt; Block a -&gt; Block a
+&gt;= :: Block a -&gt; Block a -&gt; Bool
+$c&gt;= :: forall a. Ord a =&gt; Block a -&gt; Block a -&gt; Bool
+&gt; :: Block a -&gt; Block a -&gt; Bool
+$c&gt; :: forall a. Ord a =&gt; Block a -&gt; Block a -&gt; Bool
+&lt;= :: Block a -&gt; Block a -&gt; Bool
+$c&lt;= :: forall a. Ord a =&gt; Block a -&gt; Block a -&gt; Bool
+&lt; :: Block a -&gt; Block a -&gt; Bool
+$c&lt; :: forall a. Ord a =&gt; Block a -&gt; Block a -&gt; Bool
+compare :: Block a -&gt; Block a -&gt; Ordering
+$ccompare :: forall a. Ord a =&gt; Block a -&gt; Block a -&gt; Ordering
+$cp1Ord :: forall a. Ord a =&gt; Eq (Block a)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679239997"><span id="local-6989586621679239999"><span id="local-6989586621679240001"><span id="local-6989586621679240003"><span class="annot"><span class="annottext">ReadPrec [Block a]
+ReadPrec (Block a)
+Int -&gt; ReadS (Block a)
+ReadS [Block a]
+(Int -&gt; ReadS (Block a))
+-&gt; ReadS [Block a]
+-&gt; ReadPrec (Block a)
+-&gt; ReadPrec [Block a]
+-&gt; Read (Block a)
+forall a. Read a =&gt; ReadPrec [Block a]
+forall a. Read a =&gt; ReadPrec (Block a)
+forall a. Read a =&gt; Int -&gt; ReadS (Block a)
+forall a. Read a =&gt; ReadS [Block a]
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+readListPrec :: ReadPrec [Block a]
+$creadListPrec :: forall a. Read a =&gt; ReadPrec [Block a]
+readPrec :: ReadPrec (Block a)
+$creadPrec :: forall a. Read a =&gt; ReadPrec (Block a)
+readList :: ReadS [Block a]
+$creadList :: forall a. Read a =&gt; ReadS [Block a]
+readsPrec :: Int -&gt; ReadS (Block a)
+$creadsPrec :: forall a. Read a =&gt; Int -&gt; ReadS (Block a)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679239991"><span id="local-6989586621679239993"><span id="local-6989586621679239995"><span class="annot"><span class="annottext">Int -&gt; Block a -&gt; ShowS
+[Block a] -&gt; ShowS
+Block a -&gt; String
+(Int -&gt; Block a -&gt; ShowS)
+-&gt; (Block a -&gt; String) -&gt; ([Block a] -&gt; ShowS) -&gt; Show (Block a)
+forall a. Show a =&gt; Int -&gt; Block a -&gt; ShowS
+forall a. Show a =&gt; [Block a] -&gt; ShowS
+forall a. Show a =&gt; Block a -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Block a] -&gt; ShowS
+$cshowList :: forall a. Show a =&gt; [Block a] -&gt; ShowS
+show :: Block a -&gt; String
+$cshow :: forall a. Show a =&gt; Block a -&gt; String
+showsPrec :: Int -&gt; Block a -&gt; ShowS
+$cshowsPrec :: forall a. Show a =&gt; Int -&gt; Block a -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679239981"><span id="local-6989586621679239983"><span id="local-6989586621679239985"><span id="local-6989586621679239987"><span class="annot"><span class="annottext">Functor Block
+Foldable Block
+(Functor Block, Foldable Block) =&gt;
+(forall (f :: * -&gt; *) a b.
+ Applicative f =&gt;
+ (a -&gt; f b) -&gt; Block a -&gt; f (Block b))
+-&gt; (forall (f :: * -&gt; *) a.
+    Applicative f =&gt;
+    Block (f a) -&gt; f (Block a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; Block a -&gt; m (Block b))
+-&gt; (forall (m :: * -&gt; *) a. Monad m =&gt; Block (m a) -&gt; m (Block a))
+-&gt; Traversable Block
+(a -&gt; f b) -&gt; Block a -&gt; f (Block b)
+forall (t :: * -&gt; *).
+(Functor t, Foldable t) =&gt;
+(forall (f :: * -&gt; *) a b.
+ Applicative f =&gt;
+ (a -&gt; f b) -&gt; t a -&gt; f (t b))
+-&gt; (forall (f :: * -&gt; *) a. Applicative f =&gt; t (f a) -&gt; f (t a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; t a -&gt; m (t b))
+-&gt; (forall (m :: * -&gt; *) a. Monad m =&gt; t (m a) -&gt; m (t a))
+-&gt; Traversable t
+forall (m :: * -&gt; *) a. Monad m =&gt; Block (m a) -&gt; m (Block a)
+forall (f :: * -&gt; *) a. Applicative f =&gt; Block (f a) -&gt; f (Block a)
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; Block a -&gt; m (Block b)
+forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; Block a -&gt; f (Block b)
+sequence :: Block (m a) -&gt; m (Block a)
+$csequence :: forall (m :: * -&gt; *) a. Monad m =&gt; Block (m a) -&gt; m (Block a)
+mapM :: (a -&gt; m b) -&gt; Block a -&gt; m (Block b)
+$cmapM :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; Block a -&gt; m (Block b)
+sequenceA :: Block (f a) -&gt; f (Block a)
+$csequenceA :: forall (f :: * -&gt; *) a. Applicative f =&gt; Block (f a) -&gt; f (Block a)
+traverse :: (a -&gt; f b) -&gt; Block a -&gt; f (Block b)
+$ctraverse :: forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; Block a -&gt; f (Block b)
+$cp2Traversable :: Foldable Block
+$cp1Traversable :: Functor Block
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Traversable</span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-68"></span><span>
+</span><span id="line-69"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-70"></span><span>  </span><span id="local-6989586621679239979"><span class="annot"><span class="annottext">liftEq :: (a -&gt; b -&gt; Bool) -&gt; Block a -&gt; Block b -&gt; Bool
+</span><a href="#local-6989586621679239979"><span class="hs-identifier hs-var hs-var hs-var hs-var">liftEq</span></a></span></span><span> </span><span id="local-6989586621679239978"><span class="annot"><span class="annottext">cmp :: a -&gt; b -&gt; Bool
+</span><a href="#local-6989586621679239978"><span class="hs-identifier hs-var">cmp</span></a></span></span><span> </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span id="local-6989586621679239977"><span class="annot"><span class="annottext">ua :: Row a
+</span><a href="#local-6989586621679239977"><span class="hs-identifier hs-var">ua</span></a></span></span><span> </span><span id="local-6989586621679239976"><span class="annot"><span class="annottext">la :: Row a
+</span><a href="#local-6989586621679239976"><span class="hs-identifier hs-var">la</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span id="local-6989586621679239975"><span class="annot"><span class="annottext">ub :: Row b
+</span><a href="#local-6989586621679239975"><span class="hs-identifier hs-var">ub</span></a></span></span><span> </span><span id="local-6989586621679239974"><span class="annot"><span class="annottext">lb :: Row b
+</span><a href="#local-6989586621679239974"><span class="hs-identifier hs-var">lb</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row b -&gt; Bool
+</span><a href="#local-6989586621679239973"><span class="hs-identifier hs-var">cmp'</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679239977"><span class="hs-identifier hs-var">ua</span></a></span><span> </span><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679239975"><span class="hs-identifier hs-var">ub</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row b -&gt; Bool
+</span><a href="#local-6989586621679239973"><span class="hs-identifier hs-var">cmp'</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679239976"><span class="hs-identifier hs-var">la</span></a></span><span> </span><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679239974"><span class="hs-identifier hs-var">lb</span></a></span><span>
+</span><span id="line-71"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679239973"><span class="annot"><span class="annottext">cmp' :: Row a -&gt; Row b -&gt; Bool
+</span><a href="#local-6989586621679239973"><span class="hs-identifier hs-var hs-var">cmp'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(a -&gt; b -&gt; Bool) -&gt; Row a -&gt; Row b -&gt; Bool
+forall (f :: * -&gt; *) a b.
+Eq1 f =&gt;
+(a -&gt; b -&gt; Bool) -&gt; f a -&gt; f b -&gt; Bool
+</span><span class="hs-identifier hs-var">liftEq</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; b -&gt; Bool
+</span><a href="#local-6989586621679239978"><span class="hs-identifier hs-var">cmp</span></a></span><span>
+</span><span id="line-72"></span><span>
+</span><span id="line-73"></span><span id="local-6989586621679239972"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679239968"><span id="local-6989586621679239970"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="#local-6989586621679239972"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679239972"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span></span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679239966"><span class="annot"><span class="hs-identifier hs-type">Hashable1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span></span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span id="local-6989586621679239965"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Data.Char.Core.html#MirrorVertical"><span class="hs-identifier hs-type">MirrorVertical</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679239965"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-78"></span><span>  </span><span id="local-6989586621679239963"><span class="annot"><span class="annottext">mirrorVertical :: Block a -&gt; Block a
+</span><a href="#local-6989586621679239963"><span class="hs-identifier hs-var hs-var hs-var hs-var">mirrorVertical</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span id="local-6989586621679239962"><span class="annot"><span class="annottext">u :: Row a
+</span><a href="#local-6989586621679239962"><span class="hs-identifier hs-var">u</span></a></span></span><span> </span><span id="local-6989586621679239961"><span class="annot"><span class="annottext">d :: Row a
+</span><a href="#local-6989586621679239961"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row a -&gt; Block a
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row a -&gt; Row a
+forall a. MirrorVertical a =&gt; a -&gt; a
+</span><a href="Data.Char.Core.html#mirrorVertical"><span class="hs-identifier hs-var">mirrorVertical</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679239962"><span class="hs-identifier hs-var">u</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row a -&gt; Row a
+forall a. MirrorVertical a =&gt; a -&gt; a
+</span><a href="Data.Char.Core.html#mirrorVertical"><span class="hs-identifier hs-var">mirrorVertical</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679239961"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-79"></span><span>
+</span><span id="line-80"></span><span id="local-6989586621679239960"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Data.Char.Core.html#MirrorHorizontal"><span class="hs-identifier hs-type">MirrorHorizontal</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679239960"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-81"></span><span>  </span><span id="local-6989586621679239957"><span class="annot"><span class="annottext">mirrorHorizontal :: Block a -&gt; Block a
+</span><a href="#local-6989586621679239957"><span class="hs-identifier hs-var hs-var hs-var hs-var">mirrorHorizontal</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span id="local-6989586621679239956"><span class="annot"><span class="annottext">u :: Row a
+</span><a href="#local-6989586621679239956"><span class="hs-identifier hs-var">u</span></a></span></span><span> </span><span id="local-6989586621679239955"><span class="annot"><span class="annottext">d :: Row a
+</span><a href="#local-6989586621679239955"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row a -&gt; Block a
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679239955"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679239956"><span class="hs-identifier hs-var">u</span></a></span></span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span id="local-6989586621679239954"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679239952"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="#local-6989586621679239954"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679239954"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679239950"><span class="annot"><span class="hs-identifier hs-type">NFData1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span></span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-88"></span><span>  </span><span id="local-6989586621679239947"><span class="annot"><span class="annottext">liftCompare :: (a -&gt; b -&gt; Ordering) -&gt; Block a -&gt; Block b -&gt; Ordering
+</span><a href="#local-6989586621679239947"><span class="hs-identifier hs-var hs-var hs-var hs-var">liftCompare</span></a></span></span><span> </span><span id="local-6989586621679239946"><span class="annot"><span class="annottext">cmp :: a -&gt; b -&gt; Ordering
+</span><a href="#local-6989586621679239946"><span class="hs-identifier hs-var">cmp</span></a></span></span><span> </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span id="local-6989586621679239945"><span class="annot"><span class="annottext">ua :: Row a
+</span><a href="#local-6989586621679239945"><span class="hs-identifier hs-var">ua</span></a></span></span><span> </span><span id="local-6989586621679239944"><span class="annot"><span class="annottext">la :: Row a
+</span><a href="#local-6989586621679239944"><span class="hs-identifier hs-var">la</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span id="local-6989586621679239943"><span class="annot"><span class="annottext">ub :: Row b
+</span><a href="#local-6989586621679239943"><span class="hs-identifier hs-var">ub</span></a></span></span><span> </span><span id="local-6989586621679239942"><span class="annot"><span class="annottext">lb :: Row b
+</span><a href="#local-6989586621679239942"><span class="hs-identifier hs-var">lb</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row b -&gt; Ordering
+</span><a href="#local-6989586621679239941"><span class="hs-identifier hs-var">cmp'</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679239945"><span class="hs-identifier hs-var">ua</span></a></span><span> </span><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679239943"><span class="hs-identifier hs-var">ub</span></a></span><span> </span><span class="annot"><span class="annottext">Ordering -&gt; Ordering -&gt; Ordering
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row b -&gt; Ordering
+</span><a href="#local-6989586621679239941"><span class="hs-identifier hs-var">cmp'</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679239944"><span class="hs-identifier hs-var">la</span></a></span><span> </span><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679239942"><span class="hs-identifier hs-var">lb</span></a></span><span>
+</span><span id="line-89"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679239941"><span class="annot"><span class="annottext">cmp' :: Row a -&gt; Row b -&gt; Ordering
+</span><a href="#local-6989586621679239941"><span class="hs-identifier hs-var hs-var">cmp'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(a -&gt; b -&gt; Ordering) -&gt; Row a -&gt; Row b -&gt; Ordering
+forall (f :: * -&gt; *) a b.
+Ord1 f =&gt;
+(a -&gt; b -&gt; Ordering) -&gt; f a -&gt; f b -&gt; Ordering
+</span><span class="hs-identifier hs-var">liftCompare</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; b -&gt; Ordering
+</span><a href="#local-6989586621679239946"><span class="hs-identifier hs-var">cmp</span></a></span><span>
+</span><span id="line-90"></span><span>
+</span><span id="line-91"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679239932"><span id="local-6989586621679239934"><span id="local-6989586621679239936"><span class="annot"><span class="hs-identifier hs-type">Applicative</span></span><span> </span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-92"></span><span>    </span><span id="local-6989586621679239930"><span class="annot"><span class="annottext">pure :: a -&gt; Row a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">pure</span></span></span><span> </span><span id="local-6989586621679239929"><span class="annot"><span class="annottext">x :: a
+</span><a href="#local-6989586621679239929"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Row a
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679239929"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679239929"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-93"></span><span>    </span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span id="local-6989586621679239928"><span class="annot"><span class="annottext">fl :: a -&gt; b
+</span><a href="#local-6989586621679239928"><span class="hs-identifier hs-var">fl</span></a></span></span><span> </span><span id="local-6989586621679239927"><span class="annot"><span class="annottext">fr :: a -&gt; b
+</span><a href="#local-6989586621679239927"><span class="hs-identifier hs-var">fr</span></a></span></span><span> </span><span id="local-6989586621679239926"><span class="annot"><span class="annottext">&lt;*&gt; :: Row (a -&gt; b) -&gt; Row a -&gt; Row b
+</span><span class="hs-operator hs-var hs-var hs-var hs-var">&lt;*&gt;</span></span></span><span> </span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span id="local-6989586621679239925"><span class="annot"><span class="annottext">l :: a
+</span><a href="#local-6989586621679239925"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679239924"><span class="annot"><span class="annottext">r :: a
+</span><a href="#local-6989586621679239924"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">b -&gt; b -&gt; Row b
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679239928"><span class="hs-identifier hs-var">fl</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679239925"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679239927"><span class="hs-identifier hs-var">fr</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679239924"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-94"></span><span>
+</span><span id="line-95"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679239915"><span id="local-6989586621679239917"><span id="local-6989586621679239919"><span class="annot"><span class="hs-identifier hs-type">Applicative</span></span><span> </span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-96"></span><span>    </span><span id="local-6989586621679239914"><span class="annot"><span class="annottext">pure :: a -&gt; Block a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">pure</span></span></span><span> </span><span id="local-6989586621679239913"><span class="annot"><span class="annottext">x :: a
+</span><a href="#local-6989586621679239913"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row a -&gt; Block a
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Row a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679239913"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Row a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679239913"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-97"></span><span>    </span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span id="local-6989586621679239912"><span class="annot"><span class="annottext">fu :: Row (a -&gt; b)
+</span><a href="#local-6989586621679239912"><span class="hs-identifier hs-var">fu</span></a></span></span><span> </span><span id="local-6989586621679239911"><span class="annot"><span class="annottext">fl :: Row (a -&gt; b)
+</span><a href="#local-6989586621679239911"><span class="hs-identifier hs-var">fl</span></a></span></span><span> </span><span id="local-6989586621679239910"><span class="annot"><span class="annottext">&lt;*&gt; :: Block (a -&gt; b) -&gt; Block a -&gt; Block b
+</span><span class="hs-operator hs-var hs-var hs-var hs-var">&lt;*&gt;</span></span></span><span> </span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span id="local-6989586621679239909"><span class="annot"><span class="annottext">u :: Row a
+</span><a href="#local-6989586621679239909"><span class="hs-identifier hs-var">u</span></a></span></span><span> </span><span id="local-6989586621679239908"><span class="annot"><span class="annottext">l :: Row a
+</span><a href="#local-6989586621679239908"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row b -&gt; Row b -&gt; Block b
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row (a -&gt; b)
+</span><a href="#local-6989586621679239912"><span class="hs-identifier hs-var">fu</span></a></span><span> </span><span class="annot"><span class="annottext">Row (a -&gt; b) -&gt; Row a -&gt; Row b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679239909"><span class="hs-identifier hs-var">u</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row (a -&gt; b)
+</span><a href="#local-6989586621679239911"><span class="hs-identifier hs-var">fl</span></a></span><span> </span><span class="annot"><span class="annottext">Row (a -&gt; b) -&gt; Row a -&gt; Row b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679239908"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-98"></span><span>
+</span><span id="line-99"></span><span id="local-6989586621679239907"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679239904"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="#local-6989586621679239907"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679239907"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-100"></span><span>    </span><span id="local-6989586621679239902"><span class="annot"><span class="annottext">arbitrary :: Gen (Row a)
+</span><a href="#local-6989586621679239902"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen (Row a)
+forall (f :: * -&gt; *) a. (Arbitrary1 f, Arbitrary a) =&gt; Gen (f a)
+</span><span class="hs-identifier hs-var">arbitrary1</span></span></span><span>
+</span><span id="line-101"></span><span>
+</span><span id="line-102"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679239899"><span class="annot"><span class="hs-identifier hs-type">Arbitrary1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-103"></span><span>    </span><span id="local-6989586621679239897"><span class="annot"><span class="annottext">liftArbitrary :: Gen a -&gt; Gen (Row a)
+</span><a href="#local-6989586621679239897"><span class="hs-identifier hs-var hs-var hs-var hs-var">liftArbitrary</span></a></span></span><span> </span><span id="local-6989586621679239896"><span class="annot"><span class="annottext">arb :: Gen a
+</span><a href="#local-6989586621679239896"><span class="hs-identifier hs-var">arb</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Row a
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">(a -&gt; a -&gt; Row a) -&gt; Gen a -&gt; Gen (a -&gt; Row a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen a
+</span><a href="#local-6989586621679239896"><span class="hs-identifier hs-var">arb</span></a></span><span> </span><span class="annot"><span class="annottext">Gen (a -&gt; Row a) -&gt; Gen a -&gt; Gen (Row a)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen a
+</span><a href="#local-6989586621679239896"><span class="hs-identifier hs-var">arb</span></a></span><span>
+</span><span id="line-104"></span><span>
+</span><span id="line-105"></span><span id="local-6989586621679239894"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679239891"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="#local-6989586621679239894"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679239894"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-106"></span><span>    </span><span id="local-6989586621679239890"><span class="annot"><span class="annottext">arbitrary :: Gen (Block a)
+</span><a href="#local-6989586621679239890"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen (Block a)
+forall (f :: * -&gt; *) a. (Arbitrary1 f, Arbitrary a) =&gt; Gen (f a)
+</span><span class="hs-identifier hs-var">arbitrary1</span></span></span><span>
+</span><span id="line-107"></span><span>
+</span><span id="line-108"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679239887"><span class="annot"><span class="hs-identifier hs-type">Arbitrary1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-109"></span><span>    </span><span id="local-6989586621679239886"><span class="annot"><span class="annottext">liftArbitrary :: Gen a -&gt; Gen (Block a)
+</span><a href="#local-6989586621679239886"><span class="hs-identifier hs-var hs-var hs-var hs-var">liftArbitrary</span></a></span></span><span> </span><span id="local-6989586621679239885"><span class="annot"><span class="annottext">arb :: Gen a
+</span><a href="#local-6989586621679239885"><span class="hs-identifier hs-var">arb</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row a -&gt; Block a
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="annot"><span class="annottext">(Row a -&gt; Row a -&gt; Block a)
+-&gt; Gen (Row a) -&gt; Gen (Row a -&gt; Block a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen (Row a)
+</span><a href="#local-6989586621679239884"><span class="hs-identifier hs-var">arb'</span></a></span><span> </span><span class="annot"><span class="annottext">Gen (Row a -&gt; Block a) -&gt; Gen (Row a) -&gt; Gen (Block a)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen (Row a)
+</span><a href="#local-6989586621679239884"><span class="hs-identifier hs-var">arb'</span></a></span><span>
+</span><span id="line-110"></span><span>        </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679239884"><span class="annot"><span class="annottext">arb' :: Gen (Row a)
+</span><a href="#local-6989586621679239884"><span class="hs-identifier hs-var hs-var">arb'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen a -&gt; Gen (Row a)
+forall (f :: * -&gt; *) a. Arbitrary1 f =&gt; Gen a -&gt; Gen (f a)
+</span><span class="hs-identifier hs-var">liftArbitrary</span></span><span> </span><span class="annot"><span class="annottext">Gen a
+</span><a href="#local-6989586621679239885"><span class="hs-identifier hs-var">arb</span></a></span><span>
+</span><span id="line-111"></span><span>
+</span><span id="line-112"></span><span class="hs-comment">-- | Convert the given 'Char'acter to a 'Block' of 'Bool's wrapped in a 'Just'</span><span>
+</span><span id="line-113"></span><span class="hs-comment">-- if it exists; 'Nothing' otherwise.</span><span>
+</span><span id="line-114"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-type">fromBlock</span></a></span><span>
+</span><span id="line-115"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>  </span><span class="hs-comment">-- ^ The given 'Char'acter to convert to a 'Block' of 'Bool's.</span><span>
+</span><span id="line-116"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span><span>  </span><span class="hs-comment">-- The equivalent 'Block' of 'Bool's wrapped in a 'Just' if such block exists; 'Nothing' otherwise.</span><span>
+</span><span id="line-117"></span><span id="fromBlock"><span class="annot"><span class="annottext">fromBlock :: Char -&gt; Maybe (Block Bool)
+</span><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var hs-var">fromBlock</span></a></span></span><span> </span><span class="hs-char">' '</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-118"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x2580'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-119"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x2584'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-120"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x2588'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-121"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x258c'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-122"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x2590'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-123"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x2596'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-124"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x2597'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-125"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x2598'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-126"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x2599'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-127"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x259a'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-128"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x259b'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-129"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x259c'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-130"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x259d'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-131"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x259e'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-132"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-char">'\x259f'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Maybe (Block Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Block Bool
+forall a. Row a -&gt; Row a -&gt; Block a
+</span><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Row Bool
+forall a. a -&gt; a -&gt; Row a
+</span><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-var">Row</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-133"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (Block Bool)
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-134"></span><span>
+</span><span id="line-135"></span><span class="hs-comment">-- | Convert the given 'Char'acter to a 'Block' of 'Bool's if it exists; unspecified result otherwise.</span><span>
+</span><span id="line-136"></span><span class="annot"><a href="Data.Char.Block.html#fromBlock%27"><span class="hs-identifier hs-type">fromBlock'</span></a></span><span>
+</span><span id="line-137"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>  </span><span class="hs-comment">-- ^ The given 'Char'acter to convert to a 'Block' of 'Bool's.</span><span>
+</span><span id="line-138"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>  </span><span class="hs-comment">-- ^ The equivalent 'Block' of 'Bool's.</span><span>
+</span><span id="line-139"></span><span id="fromBlock%27"><span class="annot"><span class="annottext">fromBlock' :: Char -&gt; Block Bool
+</span><a href="Data.Char.Block.html#fromBlock%27"><span class="hs-identifier hs-var hs-var">fromBlock'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (Block Bool) -&gt; Block Bool
+forall a. HasCallStack =&gt; Maybe a -&gt; a
+</span><span class="hs-identifier hs-var">fromJust</span></span><span> </span><span class="annot"><span class="annottext">(Maybe (Block Bool) -&gt; Block Bool)
+-&gt; (Char -&gt; Maybe (Block Bool)) -&gt; Char -&gt; Block Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe (Block Bool)
+</span><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span>
+</span><span id="line-140"></span><span>
+</span><span id="line-141"></span><span class="hs-comment">-- | Convert the given 'Block' value to a block character in unicode.</span><span>
+</span><span id="line-142"></span><span class="hs-comment">-- 'True' means that part is filled, and 'False' means the part is not filled.</span><span>
+</span><span id="line-143"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-type">filled</span></a></span><span>
+</span><span id="line-144"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>  </span><span class="hs-comment">-- ^ The given 'Block' of 'Bool's to convert to a 'Char'acter.</span><span>
+</span><span id="line-145"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>  </span><span class="hs-comment">-- ^ The equivalent Unicode 'Char'acter for the given 'Block' of 'Bool's.</span><span>
+</span><span id="line-146"></span><span id="filled"><span class="annot"><span class="annottext">filled :: Block Bool -&gt; Char
+</span><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var hs-var">filled</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">' '</span></span><span>
+</span><span id="line-147"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x2580'</span></span><span>
+</span><span id="line-148"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x2584'</span></span><span>
+</span><span id="line-149"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x2588'</span></span><span>
+</span><span id="line-150"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x258c'</span></span><span>
+</span><span id="line-151"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x2590'</span></span><span>
+</span><span id="line-152"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x2596'</span></span><span>
+</span><span id="line-153"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x2597'</span></span><span>
+</span><span id="line-154"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x2598'</span></span><span>
+</span><span id="line-155"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x2599'</span></span><span>
+</span><span id="line-156"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x259a'</span></span><span>
+</span><span id="line-157"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x259b'</span></span><span>
+</span><span id="line-158"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x259c'</span></span><span>
+</span><span id="line-159"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x259d'</span></span><span>
+</span><span id="line-160"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x259e'</span></span><span>
+</span><span id="line-161"></span><span class="annot"><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">False</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x259f'</span></span><span>
+</span><span id="line-162"></span><span>
+</span><span id="line-163"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679239879"><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier hs-type">UnicodeCharacter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-164"></span><span>    </span><span id="local-6989586621679239877"><span class="annot"><span class="annottext">toUnicodeChar :: Block Bool -&gt; Char
+</span><a href="#local-6989586621679239877"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block Bool -&gt; Char
+</span><a href="Data.Char.Block.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span>
+</span><span id="line-165"></span><span>    </span><span id="local-6989586621679239876"><span class="annot"><span class="annottext">fromUnicodeChar :: Char -&gt; Maybe (Block Bool)
+</span><a href="#local-6989586621679239876"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe (Block Bool)
+</span><a href="Data.Char.Block.html#fromBlock"><span class="hs-identifier hs-var">fromBlock</span></a></span><span>
+</span><span id="line-166"></span><span>
+</span><span id="line-167"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679239870"><span id="local-6989586621679239872"><span id="local-6989586621679239874"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span></span></span></span><span>
+</span><span id="line-168"></span></pre></body></html>

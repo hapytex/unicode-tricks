@@ -1,0 +1,754 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24con2tag_Exj5BYBcurxCXLloc6h1LF"><span id="%24maxtag_Exj5BYBcurxCXLloc6h1LF"><span id="%24tag2con_Exj5BYBcurxCXLloc6h1LF"><span id="%24con2tag_KMckbPKuqP6JhRXjNuJVAc"><span id="%24maxtag_KMckbPKuqP6JhRXjNuJVAc"><span id="%24tag2con_KMckbPKuqP6JhRXjNuJVAc"></span></span></span></span></span></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">{-|
+Module      : Data.Char.Emoji.Moon
+Description : A module that defines moon emoji.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Unicode has two types of emoji for the moon: it contains eight emoji for the moonphase, and four
+emoji where the moon has a face.
+-}</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Emoji.Moon</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Moon phase emoji</span></span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonPhase"><span class="hs-identifier">MoonPhase</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Emoji.Moon.html#NewMoon"><span class="hs-identifier">NewMoon</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#WaxingCrescent"><span class="hs-identifier">WaxingCrescent</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#FirstQuarter"><span class="hs-identifier">FirstQuarter</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#WaxingGibbous"><span class="hs-identifier">WaxingGibbous</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#FullMoon"><span class="hs-identifier">FullMoon</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#WaningGibbous"><span class="hs-identifier">WaningGibbous</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#ThirdQuarter"><span class="hs-identifier">ThirdQuarter</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#WaningCrescent"><span class="hs-identifier">WaningCrescent</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Moon faces emoji</span></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonFace"><span class="hs-identifier">MoonFace</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Emoji.Moon.html#NewMoonFace"><span class="hs-identifier">NewMoonFace</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#FirstQuarterFace"><span class="hs-identifier">FirstQuarterFace</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#FullMoonFace"><span class="hs-identifier">FullMoonFace</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#ThirdQuarterFace"><span class="hs-identifier">ThirdQuarterFace</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#MirrorVertical"><span class="hs-identifier">MirrorVertical</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#mirrorVertical"><span class="hs-identifier">mirrorVertical</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier">UnicodeCharacter</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier">toUnicodeChar</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier">fromUnicodeChar</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar%27"><span class="hs-identifier">fromUnicodeChar'</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier">UnicodeText</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapFromEnum"><span class="hs-identifier">mapFromEnum</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapToEnum"><span class="hs-identifier">mapToEnum</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapToEnumSafe"><span class="hs-identifier">mapToEnumSafe</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitraryBoundedEnum</span></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="annot"><a href="Data.Char.Emoji.Moon.html#_moonPhaseOffset"><span class="hs-identifier hs-type">_moonPhaseOffset</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-33"></span><span id="_moonPhaseOffset"><span class="annot"><span class="annottext">_moonPhaseOffset :: Int
+</span><a href="Data.Char.Emoji.Moon.html#_moonPhaseOffset"><span class="hs-identifier hs-var hs-var">_moonPhaseOffset</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-number">0x1f311</span></span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span class="hs-comment">-- | A data type that defines the eight different moon phases, and is an</span><span>
+</span><span id="line-36"></span><span class="hs-comment">-- instance of 'UnicodeCharacter' to convert these to the corresponding Unicode</span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- character.</span><span>
+</span><span id="line-38"></span><span id="local-6989586621679246980"><span id="local-6989586621679246981"></span></span><span class="hs-keyword">data</span><span> </span><span id="MoonPhase"><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonPhase"><span class="hs-identifier hs-var">MoonPhase</span></a></span></span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="NewMoon"><span class="annot"><a href="Data.Char.Emoji.Moon.html#NewMoon"><span class="hs-identifier hs-var">NewMoon</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /new moon/, the first phase of the moon represented by &#127761;.</span><span>
+</span><span id="line-40"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="WaxingCrescent"><span class="annot"><a href="Data.Char.Emoji.Moon.html#WaxingCrescent"><span class="hs-identifier hs-var">WaxingCrescent</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /waxing crescent/, the second phase of the moon represented by &#127762;.</span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="FirstQuarter"><span class="annot"><a href="Data.Char.Emoji.Moon.html#FirstQuarter"><span class="hs-identifier hs-var">FirstQuarter</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /first quarter/, the third phase of the moon represented by &#127763;.</span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="WaxingGibbous"><span class="annot"><a href="Data.Char.Emoji.Moon.html#WaxingGibbous"><span class="hs-identifier hs-var">WaxingGibbous</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /waxing gibbous/, the fourth phase of the moon represented by &#127764;.</span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="FullMoon"><span class="annot"><a href="Data.Char.Emoji.Moon.html#FullMoon"><span class="hs-identifier hs-var">FullMoon</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /full moon/, the fifth phase of the moon represented by &#127765;.</span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="WaningGibbous"><span class="annot"><a href="Data.Char.Emoji.Moon.html#WaningGibbous"><span class="hs-identifier hs-var">WaningGibbous</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /waning gibbous/, the sixth phase of the moon represented by &#127766;.</span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ThirdQuarter"><span class="annot"><a href="Data.Char.Emoji.Moon.html#ThirdQuarter"><span class="hs-identifier hs-var">ThirdQuarter</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /third quarter/, the seventh phase of the moon represented by &#127767;.</span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="WaningCrescent"><span class="annot"><a href="Data.Char.Emoji.Moon.html#WaningCrescent"><span class="hs-identifier hs-var">WaningCrescent</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /waning crescent/, the eighth phase of the moon represented by &#127768;.</span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679246976"><span id="local-6989586621679246978"><span class="annot"><span class="annottext">MoonPhase
+MoonPhase -&gt; MoonPhase -&gt; Bounded MoonPhase
+forall a. a -&gt; a -&gt; Bounded a
+maxBound :: MoonPhase
+$cmaxBound :: MoonPhase
+minBound :: MoonPhase
+$cminBound :: MoonPhase
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="%24cWaningCrescent"><span id="%24cThirdQuarter"><span id="%24cWaningGibbous"><span id="%24cFullMoon"><span id="%24cWaxingGibbous"><span id="%24cFirstQuarter"><span id="%24cWaxingCrescent"><span id="%24cNewMoon"><span id="%24tMoonPhase"><span id="local-6989586621679246946"><span id="local-6989586621679246948"><span id="local-6989586621679246950"><span id="local-6989586621679246952"><span id="local-6989586621679246954"><span id="local-6989586621679246956"><span id="local-6989586621679246958"><span id="local-6989586621679246960"><span id="local-6989586621679246962"><span id="local-6989586621679246964"><span id="local-6989586621679246966"><span id="local-6989586621679246968"><span id="local-6989586621679246970"><span id="local-6989586621679246972"><span class="annot"><span class="annottext">Typeable MoonPhase
+DataType
+Constr
+Typeable MoonPhase =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; MoonPhase -&gt; c MoonPhase)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MoonPhase)
+-&gt; (MoonPhase -&gt; Constr)
+-&gt; (MoonPhase -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MoonPhase))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c MoonPhase))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; MoonPhase -&gt; MoonPhase)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonPhase -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonPhase -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; MoonPhase -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MoonPhase -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; MoonPhase -&gt; m MoonPhase)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; MoonPhase -&gt; m MoonPhase)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; MoonPhase -&gt; m MoonPhase)
+-&gt; Data MoonPhase
+MoonPhase -&gt; DataType
+MoonPhase -&gt; Constr
+(forall b. Data b =&gt; b -&gt; b) -&gt; MoonPhase -&gt; MoonPhase
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; MoonPhase -&gt; c MoonPhase
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MoonPhase
+forall a.
+Typeable a =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MoonPhase -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; MoonPhase -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonPhase -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonPhase -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MoonPhase -&gt; m MoonPhase
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MoonPhase -&gt; m MoonPhase
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MoonPhase
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; MoonPhase -&gt; c MoonPhase
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MoonPhase)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c MoonPhase)
+$cWaningCrescent :: Constr
+$cThirdQuarter :: Constr
+$cWaningGibbous :: Constr
+$cFullMoon :: Constr
+$cWaxingGibbous :: Constr
+$cFirstQuarter :: Constr
+$cWaxingCrescent :: Constr
+$cNewMoon :: Constr
+$tMoonPhase :: DataType
+gmapMo :: (forall d. Data d =&gt; d -&gt; m d) -&gt; MoonPhase -&gt; m MoonPhase
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MoonPhase -&gt; m MoonPhase
+gmapMp :: (forall d. Data d =&gt; d -&gt; m d) -&gt; MoonPhase -&gt; m MoonPhase
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MoonPhase -&gt; m MoonPhase
+gmapM :: (forall d. Data d =&gt; d -&gt; m d) -&gt; MoonPhase -&gt; m MoonPhase
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MoonPhase -&gt; m MoonPhase
+gmapQi :: Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MoonPhase -&gt; u
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MoonPhase -&gt; u
+gmapQ :: (forall d. Data d =&gt; d -&gt; u) -&gt; MoonPhase -&gt; [u]
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; MoonPhase -&gt; [u]
+gmapQr :: (r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonPhase -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonPhase -&gt; r
+gmapQl :: (r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonPhase -&gt; r
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonPhase -&gt; r
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; MoonPhase -&gt; MoonPhase
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; MoonPhase -&gt; MoonPhase
+dataCast2 :: (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c MoonPhase)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c MoonPhase)
+dataCast1 :: (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MoonPhase)
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MoonPhase)
+dataTypeOf :: MoonPhase -&gt; DataType
+$cdataTypeOf :: MoonPhase -&gt; DataType
+toConstr :: MoonPhase -&gt; Constr
+$ctoConstr :: MoonPhase -&gt; Constr
+gunfold :: (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MoonPhase
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MoonPhase
+gfoldl :: (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; MoonPhase -&gt; c MoonPhase
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; MoonPhase -&gt; c MoonPhase
+$cp1Data :: Typeable MoonPhase
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679246920"><span id="local-6989586621679246922"><span id="local-6989586621679246924"><span id="local-6989586621679246926"><span id="local-6989586621679246928"><span id="local-6989586621679246930"><span id="local-6989586621679246932"><span id="local-6989586621679246934"><span class="annot"><span class="annottext">Int -&gt; MoonPhase
+MoonPhase -&gt; Int
+MoonPhase -&gt; [MoonPhase]
+MoonPhase -&gt; MoonPhase
+MoonPhase -&gt; MoonPhase -&gt; [MoonPhase]
+MoonPhase -&gt; MoonPhase -&gt; MoonPhase -&gt; [MoonPhase]
+(MoonPhase -&gt; MoonPhase)
+-&gt; (MoonPhase -&gt; MoonPhase)
+-&gt; (Int -&gt; MoonPhase)
+-&gt; (MoonPhase -&gt; Int)
+-&gt; (MoonPhase -&gt; [MoonPhase])
+-&gt; (MoonPhase -&gt; MoonPhase -&gt; [MoonPhase])
+-&gt; (MoonPhase -&gt; MoonPhase -&gt; [MoonPhase])
+-&gt; (MoonPhase -&gt; MoonPhase -&gt; MoonPhase -&gt; [MoonPhase])
+-&gt; Enum MoonPhase
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+enumFromThenTo :: MoonPhase -&gt; MoonPhase -&gt; MoonPhase -&gt; [MoonPhase]
+$cenumFromThenTo :: MoonPhase -&gt; MoonPhase -&gt; MoonPhase -&gt; [MoonPhase]
+enumFromTo :: MoonPhase -&gt; MoonPhase -&gt; [MoonPhase]
+$cenumFromTo :: MoonPhase -&gt; MoonPhase -&gt; [MoonPhase]
+enumFromThen :: MoonPhase -&gt; MoonPhase -&gt; [MoonPhase]
+$cenumFromThen :: MoonPhase -&gt; MoonPhase -&gt; [MoonPhase]
+enumFrom :: MoonPhase -&gt; [MoonPhase]
+$cenumFrom :: MoonPhase -&gt; [MoonPhase]
+fromEnum :: MoonPhase -&gt; Int
+$cfromEnum :: MoonPhase -&gt; Int
+toEnum :: Int -&gt; MoonPhase
+$ctoEnum :: Int -&gt; MoonPhase
+pred :: MoonPhase -&gt; MoonPhase
+$cpred :: MoonPhase -&gt; MoonPhase
+succ :: MoonPhase -&gt; MoonPhase
+$csucc :: MoonPhase -&gt; MoonPhase
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679246915"><span id="local-6989586621679246917"><span class="annot"><span class="annottext">MoonPhase -&gt; MoonPhase -&gt; Bool
+(MoonPhase -&gt; MoonPhase -&gt; Bool)
+-&gt; (MoonPhase -&gt; MoonPhase -&gt; Bool) -&gt; Eq MoonPhase
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: MoonPhase -&gt; MoonPhase -&gt; Bool
+$c/= :: MoonPhase -&gt; MoonPhase -&gt; Bool
+== :: MoonPhase -&gt; MoonPhase -&gt; Bool
+$c== :: MoonPhase -&gt; MoonPhase -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. MoonPhase -&gt; Rep MoonPhase x)
+-&gt; (forall x. Rep MoonPhase x -&gt; MoonPhase) -&gt; Generic MoonPhase
+forall x. Rep MoonPhase x -&gt; MoonPhase
+forall x. MoonPhase -&gt; Rep MoonPhase x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep MoonPhase x -&gt; MoonPhase
+$cfrom :: forall x. MoonPhase -&gt; Rep MoonPhase x
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679246896"><span id="local-6989586621679246898"><span id="local-6989586621679246900"><span id="local-6989586621679246902"><span id="local-6989586621679246904"><span id="local-6989586621679246906"><span id="local-6989586621679246908"><span class="annot"><span class="annottext">Eq MoonPhase
+Eq MoonPhase =&gt;
+(MoonPhase -&gt; MoonPhase -&gt; Ordering)
+-&gt; (MoonPhase -&gt; MoonPhase -&gt; Bool)
+-&gt; (MoonPhase -&gt; MoonPhase -&gt; Bool)
+-&gt; (MoonPhase -&gt; MoonPhase -&gt; Bool)
+-&gt; (MoonPhase -&gt; MoonPhase -&gt; Bool)
+-&gt; (MoonPhase -&gt; MoonPhase -&gt; MoonPhase)
+-&gt; (MoonPhase -&gt; MoonPhase -&gt; MoonPhase)
+-&gt; Ord MoonPhase
+MoonPhase -&gt; MoonPhase -&gt; Bool
+MoonPhase -&gt; MoonPhase -&gt; Ordering
+MoonPhase -&gt; MoonPhase -&gt; MoonPhase
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: MoonPhase -&gt; MoonPhase -&gt; MoonPhase
+$cmin :: MoonPhase -&gt; MoonPhase -&gt; MoonPhase
+max :: MoonPhase -&gt; MoonPhase -&gt; MoonPhase
+$cmax :: MoonPhase -&gt; MoonPhase -&gt; MoonPhase
+&gt;= :: MoonPhase -&gt; MoonPhase -&gt; Bool
+$c&gt;= :: MoonPhase -&gt; MoonPhase -&gt; Bool
+&gt; :: MoonPhase -&gt; MoonPhase -&gt; Bool
+$c&gt; :: MoonPhase -&gt; MoonPhase -&gt; Bool
+&lt;= :: MoonPhase -&gt; MoonPhase -&gt; Bool
+$c&lt;= :: MoonPhase -&gt; MoonPhase -&gt; Bool
+&lt; :: MoonPhase -&gt; MoonPhase -&gt; Bool
+$c&lt; :: MoonPhase -&gt; MoonPhase -&gt; Bool
+compare :: MoonPhase -&gt; MoonPhase -&gt; Ordering
+$ccompare :: MoonPhase -&gt; MoonPhase -&gt; Ordering
+$cp1Ord :: Eq MoonPhase
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679246887"><span id="local-6989586621679246889"><span id="local-6989586621679246891"><span id="local-6989586621679246893"><span class="annot"><span class="annottext">ReadPrec [MoonPhase]
+ReadPrec MoonPhase
+Int -&gt; ReadS MoonPhase
+ReadS [MoonPhase]
+(Int -&gt; ReadS MoonPhase)
+-&gt; ReadS [MoonPhase]
+-&gt; ReadPrec MoonPhase
+-&gt; ReadPrec [MoonPhase]
+-&gt; Read MoonPhase
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+readListPrec :: ReadPrec [MoonPhase]
+$creadListPrec :: ReadPrec [MoonPhase]
+readPrec :: ReadPrec MoonPhase
+$creadPrec :: ReadPrec MoonPhase
+readList :: ReadS [MoonPhase]
+$creadList :: ReadS [MoonPhase]
+readsPrec :: Int -&gt; ReadS MoonPhase
+$creadsPrec :: Int -&gt; ReadS MoonPhase
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679246880"><span id="local-6989586621679246882"><span id="local-6989586621679246884"><span class="annot"><span class="annottext">Int -&gt; MoonPhase -&gt; ShowS
+[MoonPhase] -&gt; ShowS
+MoonPhase -&gt; String
+(Int -&gt; MoonPhase -&gt; ShowS)
+-&gt; (MoonPhase -&gt; String)
+-&gt; ([MoonPhase] -&gt; ShowS)
+-&gt; Show MoonPhase
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [MoonPhase] -&gt; ShowS
+$cshowList :: [MoonPhase] -&gt; ShowS
+show :: MoonPhase -&gt; String
+$cshow :: MoonPhase -&gt; String
+showsPrec :: Int -&gt; MoonPhase -&gt; ShowS
+$cshowsPrec :: Int -&gt; MoonPhase -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679246876"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonPhase"><span class="hs-identifier hs-type">MoonPhase</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-50"></span><span>    </span><span id="local-6989586621679246874"><span class="annot"><span class="annottext">arbitrary :: Gen MoonPhase
+</span><a href="#local-6989586621679246874"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen MoonPhase
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679246870"><span id="local-6989586621679246872"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonPhase"><span class="hs-identifier hs-type">MoonPhase</span></a></span></span></span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Data.Char.Core.html#MirrorVertical"><span class="hs-identifier hs-type">MirrorVertical</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonPhase"><span class="hs-identifier hs-type">MoonPhase</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-55"></span><span>  </span><span id="local-6989586621679246866"><span class="annot"><span class="annottext">mirrorVertical :: MoonPhase -&gt; MoonPhase
+</span><a href="#local-6989586621679246866"><span class="hs-identifier hs-var hs-var hs-var hs-var">mirrorVertical</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; MoonPhase
+forall a. Enum a =&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; MoonPhase) -&gt; (MoonPhase -&gt; Int) -&gt; MoonPhase -&gt; MoonPhase
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">`mod`</span></span><span> </span><span class="annot"><span class="hs-number">8</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int) -&gt; (MoonPhase -&gt; Int) -&gt; MoonPhase -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-number">8</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int) -&gt; (MoonPhase -&gt; Int) -&gt; MoonPhase -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">MoonPhase -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679246860"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonPhase"><span class="hs-identifier hs-type">MoonPhase</span></a></span></span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier hs-type">UnicodeCharacter</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonPhase"><span class="hs-identifier hs-type">MoonPhase</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-60"></span><span>    </span><span id="local-6989586621679246854"><span class="annot"><span class="annottext">toUnicodeChar :: MoonPhase -&gt; Char
+</span><a href="#local-6989586621679246854"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; MoonPhase -&gt; Char
+forall a. Enum a =&gt; Int -&gt; a -&gt; Char
+</span><a href="Data.Char.Core.html#mapFromEnum"><span class="hs-identifier hs-var">mapFromEnum</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Emoji.Moon.html#_moonPhaseOffset"><span class="hs-identifier hs-var">_moonPhaseOffset</span></a></span><span>
+</span><span id="line-61"></span><span>    </span><span id="local-6989586621679246853"><span class="annot"><span class="annottext">fromUnicodeChar :: Char -&gt; Maybe MoonPhase
+</span><a href="#local-6989586621679246853"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Maybe MoonPhase
+forall a. (Bounded a, Enum a) =&gt; Int -&gt; Char -&gt; Maybe a
+</span><a href="Data.Char.Core.html#mapToEnumSafe"><span class="hs-identifier hs-var">mapToEnumSafe</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Emoji.Moon.html#_moonPhaseOffset"><span class="hs-identifier hs-var">_moonPhaseOffset</span></a></span><span>
+</span><span id="line-62"></span><span>    </span><span id="local-6989586621679246852"><span class="annot"><span class="annottext">fromUnicodeChar' :: Char -&gt; MoonPhase
+</span><a href="#local-6989586621679246852"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; MoonPhase
+forall a. Enum a =&gt; Int -&gt; Char -&gt; a
+</span><a href="Data.Char.Core.html#mapToEnum"><span class="hs-identifier hs-var">mapToEnum</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Emoji.Moon.html#_moonPhaseOffset"><span class="hs-identifier hs-var">_moonPhaseOffset</span></a></span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679246846"><span id="local-6989586621679246848"><span id="local-6989586621679246850"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonPhase"><span class="hs-identifier hs-type">MoonPhase</span></a></span></span></span></span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span class="hs-comment">-- | A data type that defines the four different moon faces (not to be confused with</span><span>
+</span><span id="line-67"></span><span class="hs-comment">-- phases). This data type is an instance of the 'UnicodeCharacter' type class</span><span>
+</span><span id="line-68"></span><span class="hs-comment">-- to convert these to the corresponding Unicode character.</span><span>
+</span><span id="line-69"></span><span id="local-6989586621679246843"><span id="local-6989586621679246844"></span></span><span class="hs-keyword">data</span><span> </span><span id="MoonFace"><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonFace"><span class="hs-identifier hs-var">MoonFace</span></a></span></span><span>
+</span><span id="line-70"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="NewMoonFace"><span class="annot"><a href="Data.Char.Emoji.Moon.html#NewMoonFace"><span class="hs-identifier hs-var">NewMoonFace</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /new moon/, the first phase of the moon faces represented by &#127770;.</span><span>
+</span><span id="line-71"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="FirstQuarterFace"><span class="annot"><a href="Data.Char.Emoji.Moon.html#FirstQuarterFace"><span class="hs-identifier hs-var">FirstQuarterFace</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /first quarter/, the second phase of the moon faces represented by &#127771;.</span><span>
+</span><span id="line-72"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="FullMoonFace"><span class="annot"><a href="Data.Char.Emoji.Moon.html#FullMoonFace"><span class="hs-identifier hs-var">FullMoonFace</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /full moon/, the third phase of the moon faces represented by &#127773;.</span><span>
+</span><span id="line-73"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ThirdQuarterFace"><span class="annot"><a href="Data.Char.Emoji.Moon.html#ThirdQuarterFace"><span class="hs-identifier hs-var">ThirdQuarterFace</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /third quarter/, the fourth phase of the moon faces represented by &#127772;.</span><span>
+</span><span id="line-74"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679246839"><span id="local-6989586621679246841"><span class="annot"><span class="annottext">MoonFace
+MoonFace -&gt; MoonFace -&gt; Bounded MoonFace
+forall a. a -&gt; a -&gt; Bounded a
+maxBound :: MoonFace
+$cmaxBound :: MoonFace
+minBound :: MoonFace
+$cminBound :: MoonFace
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="%24cThirdQuarterFace"><span id="%24cFullMoonFace"><span id="%24cFirstQuarterFace"><span id="%24cNewMoonFace"><span id="%24tMoonFace"><span id="local-6989586621679246810"><span id="local-6989586621679246812"><span id="local-6989586621679246814"><span id="local-6989586621679246816"><span id="local-6989586621679246818"><span id="local-6989586621679246820"><span id="local-6989586621679246822"><span id="local-6989586621679246824"><span id="local-6989586621679246826"><span id="local-6989586621679246828"><span id="local-6989586621679246830"><span id="local-6989586621679246832"><span id="local-6989586621679246834"><span id="local-6989586621679246836"><span class="annot"><span class="annottext">Typeable MoonFace
+DataType
+Constr
+Typeable MoonFace =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; MoonFace -&gt; c MoonFace)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MoonFace)
+-&gt; (MoonFace -&gt; Constr)
+-&gt; (MoonFace -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MoonFace))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c MoonFace))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; MoonFace -&gt; MoonFace)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonFace -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonFace -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; MoonFace -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MoonFace -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; MoonFace -&gt; m MoonFace)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; MoonFace -&gt; m MoonFace)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; MoonFace -&gt; m MoonFace)
+-&gt; Data MoonFace
+MoonFace -&gt; DataType
+MoonFace -&gt; Constr
+(forall b. Data b =&gt; b -&gt; b) -&gt; MoonFace -&gt; MoonFace
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; MoonFace -&gt; c MoonFace
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MoonFace
+forall a.
+Typeable a =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MoonFace -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; MoonFace -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonFace -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonFace -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MoonFace -&gt; m MoonFace
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MoonFace -&gt; m MoonFace
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MoonFace
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; MoonFace -&gt; c MoonFace
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MoonFace)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c MoonFace)
+$cThirdQuarterFace :: Constr
+$cFullMoonFace :: Constr
+$cFirstQuarterFace :: Constr
+$cNewMoonFace :: Constr
+$tMoonFace :: DataType
+gmapMo :: (forall d. Data d =&gt; d -&gt; m d) -&gt; MoonFace -&gt; m MoonFace
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MoonFace -&gt; m MoonFace
+gmapMp :: (forall d. Data d =&gt; d -&gt; m d) -&gt; MoonFace -&gt; m MoonFace
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MoonFace -&gt; m MoonFace
+gmapM :: (forall d. Data d =&gt; d -&gt; m d) -&gt; MoonFace -&gt; m MoonFace
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MoonFace -&gt; m MoonFace
+gmapQi :: Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MoonFace -&gt; u
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MoonFace -&gt; u
+gmapQ :: (forall d. Data d =&gt; d -&gt; u) -&gt; MoonFace -&gt; [u]
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; MoonFace -&gt; [u]
+gmapQr :: (r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonFace -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonFace -&gt; r
+gmapQl :: (r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonFace -&gt; r
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MoonFace -&gt; r
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; MoonFace -&gt; MoonFace
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; MoonFace -&gt; MoonFace
+dataCast2 :: (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c MoonFace)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c MoonFace)
+dataCast1 :: (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MoonFace)
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MoonFace)
+dataTypeOf :: MoonFace -&gt; DataType
+$cdataTypeOf :: MoonFace -&gt; DataType
+toConstr :: MoonFace -&gt; Constr
+$ctoConstr :: MoonFace -&gt; Constr
+gunfold :: (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MoonFace
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MoonFace
+gfoldl :: (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; MoonFace -&gt; c MoonFace
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; MoonFace -&gt; c MoonFace
+$cp1Data :: Typeable MoonFace
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679246789"><span id="local-6989586621679246791"><span id="local-6989586621679246793"><span id="local-6989586621679246795"><span id="local-6989586621679246797"><span id="local-6989586621679246799"><span id="local-6989586621679246801"><span id="local-6989586621679246803"><span class="annot"><span class="annottext">Int -&gt; MoonFace
+MoonFace -&gt; Int
+MoonFace -&gt; [MoonFace]
+MoonFace -&gt; MoonFace
+MoonFace -&gt; MoonFace -&gt; [MoonFace]
+MoonFace -&gt; MoonFace -&gt; MoonFace -&gt; [MoonFace]
+(MoonFace -&gt; MoonFace)
+-&gt; (MoonFace -&gt; MoonFace)
+-&gt; (Int -&gt; MoonFace)
+-&gt; (MoonFace -&gt; Int)
+-&gt; (MoonFace -&gt; [MoonFace])
+-&gt; (MoonFace -&gt; MoonFace -&gt; [MoonFace])
+-&gt; (MoonFace -&gt; MoonFace -&gt; [MoonFace])
+-&gt; (MoonFace -&gt; MoonFace -&gt; MoonFace -&gt; [MoonFace])
+-&gt; Enum MoonFace
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+enumFromThenTo :: MoonFace -&gt; MoonFace -&gt; MoonFace -&gt; [MoonFace]
+$cenumFromThenTo :: MoonFace -&gt; MoonFace -&gt; MoonFace -&gt; [MoonFace]
+enumFromTo :: MoonFace -&gt; MoonFace -&gt; [MoonFace]
+$cenumFromTo :: MoonFace -&gt; MoonFace -&gt; [MoonFace]
+enumFromThen :: MoonFace -&gt; MoonFace -&gt; [MoonFace]
+$cenumFromThen :: MoonFace -&gt; MoonFace -&gt; [MoonFace]
+enumFrom :: MoonFace -&gt; [MoonFace]
+$cenumFrom :: MoonFace -&gt; [MoonFace]
+fromEnum :: MoonFace -&gt; Int
+$cfromEnum :: MoonFace -&gt; Int
+toEnum :: Int -&gt; MoonFace
+$ctoEnum :: Int -&gt; MoonFace
+pred :: MoonFace -&gt; MoonFace
+$cpred :: MoonFace -&gt; MoonFace
+succ :: MoonFace -&gt; MoonFace
+$csucc :: MoonFace -&gt; MoonFace
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679246785"><span id="local-6989586621679246787"><span class="annot"><span class="annottext">MoonFace -&gt; MoonFace -&gt; Bool
+(MoonFace -&gt; MoonFace -&gt; Bool)
+-&gt; (MoonFace -&gt; MoonFace -&gt; Bool) -&gt; Eq MoonFace
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: MoonFace -&gt; MoonFace -&gt; Bool
+$c/= :: MoonFace -&gt; MoonFace -&gt; Bool
+== :: MoonFace -&gt; MoonFace -&gt; Bool
+$c== :: MoonFace -&gt; MoonFace -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. MoonFace -&gt; Rep MoonFace x)
+-&gt; (forall x. Rep MoonFace x -&gt; MoonFace) -&gt; Generic MoonFace
+forall x. Rep MoonFace x -&gt; MoonFace
+forall x. MoonFace -&gt; Rep MoonFace x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep MoonFace x -&gt; MoonFace
+$cfrom :: forall x. MoonFace -&gt; Rep MoonFace x
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679246768"><span id="local-6989586621679246770"><span id="local-6989586621679246772"><span id="local-6989586621679246774"><span id="local-6989586621679246776"><span id="local-6989586621679246778"><span id="local-6989586621679246780"><span class="annot"><span class="annottext">Eq MoonFace
+Eq MoonFace =&gt;
+(MoonFace -&gt; MoonFace -&gt; Ordering)
+-&gt; (MoonFace -&gt; MoonFace -&gt; Bool)
+-&gt; (MoonFace -&gt; MoonFace -&gt; Bool)
+-&gt; (MoonFace -&gt; MoonFace -&gt; Bool)
+-&gt; (MoonFace -&gt; MoonFace -&gt; Bool)
+-&gt; (MoonFace -&gt; MoonFace -&gt; MoonFace)
+-&gt; (MoonFace -&gt; MoonFace -&gt; MoonFace)
+-&gt; Ord MoonFace
+MoonFace -&gt; MoonFace -&gt; Bool
+MoonFace -&gt; MoonFace -&gt; Ordering
+MoonFace -&gt; MoonFace -&gt; MoonFace
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: MoonFace -&gt; MoonFace -&gt; MoonFace
+$cmin :: MoonFace -&gt; MoonFace -&gt; MoonFace
+max :: MoonFace -&gt; MoonFace -&gt; MoonFace
+$cmax :: MoonFace -&gt; MoonFace -&gt; MoonFace
+&gt;= :: MoonFace -&gt; MoonFace -&gt; Bool
+$c&gt;= :: MoonFace -&gt; MoonFace -&gt; Bool
+&gt; :: MoonFace -&gt; MoonFace -&gt; Bool
+$c&gt; :: MoonFace -&gt; MoonFace -&gt; Bool
+&lt;= :: MoonFace -&gt; MoonFace -&gt; Bool
+$c&lt;= :: MoonFace -&gt; MoonFace -&gt; Bool
+&lt; :: MoonFace -&gt; MoonFace -&gt; Bool
+$c&lt; :: MoonFace -&gt; MoonFace -&gt; Bool
+compare :: MoonFace -&gt; MoonFace -&gt; Ordering
+$ccompare :: MoonFace -&gt; MoonFace -&gt; Ordering
+$cp1Ord :: Eq MoonFace
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679246760"><span id="local-6989586621679246762"><span id="local-6989586621679246764"><span id="local-6989586621679246766"><span class="annot"><span class="annottext">ReadPrec [MoonFace]
+ReadPrec MoonFace
+Int -&gt; ReadS MoonFace
+ReadS [MoonFace]
+(Int -&gt; ReadS MoonFace)
+-&gt; ReadS [MoonFace]
+-&gt; ReadPrec MoonFace
+-&gt; ReadPrec [MoonFace]
+-&gt; Read MoonFace
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+readListPrec :: ReadPrec [MoonFace]
+$creadListPrec :: ReadPrec [MoonFace]
+readPrec :: ReadPrec MoonFace
+$creadPrec :: ReadPrec MoonFace
+readList :: ReadS [MoonFace]
+$creadList :: ReadS [MoonFace]
+readsPrec :: Int -&gt; ReadS MoonFace
+$creadsPrec :: Int -&gt; ReadS MoonFace
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679246754"><span id="local-6989586621679246756"><span id="local-6989586621679246758"><span class="annot"><span class="annottext">Int -&gt; MoonFace -&gt; ShowS
+[MoonFace] -&gt; ShowS
+MoonFace -&gt; String
+(Int -&gt; MoonFace -&gt; ShowS)
+-&gt; (MoonFace -&gt; String) -&gt; ([MoonFace] -&gt; ShowS) -&gt; Show MoonFace
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [MoonFace] -&gt; ShowS
+$cshowList :: [MoonFace] -&gt; ShowS
+show :: MoonFace -&gt; String
+$cshow :: MoonFace -&gt; String
+showsPrec :: Int -&gt; MoonFace -&gt; ShowS
+$cshowsPrec :: Int -&gt; MoonFace -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-75"></span><span>
+</span><span id="line-76"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679246751"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonFace"><span class="hs-identifier hs-type">MoonFace</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-77"></span><span>    </span><span id="local-6989586621679246750"><span class="annot"><span class="annottext">arbitrary :: Gen MoonFace
+</span><a href="#local-6989586621679246750"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen MoonFace
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-78"></span><span>
+</span><span id="line-79"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679246746"><span id="local-6989586621679246748"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonFace"><span class="hs-identifier hs-type">MoonFace</span></a></span></span></span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Data.Char.Core.html#MirrorVertical"><span class="hs-identifier hs-type">MirrorVertical</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonFace"><span class="hs-identifier hs-type">MoonFace</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-82"></span><span>  </span><span id="local-6989586621679246744"><span class="annot"><span class="annottext">mirrorVertical :: MoonFace -&gt; MoonFace
+</span><a href="#local-6989586621679246744"><span class="hs-identifier hs-var hs-var hs-var hs-var">mirrorVertical</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; MoonFace
+forall a. Enum a =&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; MoonFace) -&gt; (MoonFace -&gt; Int) -&gt; MoonFace -&gt; MoonFace
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-number">3</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int) -&gt; (MoonFace -&gt; Int) -&gt; MoonFace -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">MoonFace -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679246742"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonFace"><span class="hs-identifier hs-type">MoonFace</span></a></span></span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679246738"><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier hs-type">UnicodeCharacter</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonFace"><span class="hs-identifier hs-type">MoonFace</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-87"></span><span>    </span><span id="local-6989586621679246737"><span class="annot"><span class="annottext">toUnicodeChar :: MoonFace -&gt; Char
+</span><a href="#local-6989586621679246737"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeChar</span></a></span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#NewMoonFace"><span class="hs-identifier hs-type">NewMoonFace</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x1f31a'</span></span><span>
+</span><span id="line-88"></span><span>    </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#FirstQuarterFace"><span class="hs-identifier hs-type">FirstQuarterFace</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x1f31b'</span></span><span>
+</span><span id="line-89"></span><span>    </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#FullMoonFace"><span class="hs-identifier hs-type">FullMoonFace</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x1F31d'</span></span><span>
+</span><span id="line-90"></span><span>    </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#ThirdQuarterFace"><span class="hs-identifier hs-type">ThirdQuarterFace</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x1f31c'</span></span><span>
+</span><span id="line-91"></span><span>    </span><span id="local-6989586621679246736"><span class="annot"><span class="annottext">fromUnicodeChar :: Char -&gt; Maybe MoonFace
+</span><a href="#local-6989586621679246736"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar</span></a></span></span><span> </span><span class="hs-char">'\x1f31a'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MoonFace -&gt; Maybe MoonFace
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">MoonFace
+</span><a href="Data.Char.Emoji.Moon.html#NewMoonFace"><span class="hs-identifier hs-var">NewMoonFace</span></a></span><span>
+</span><span id="line-92"></span><span>    </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="hs-char">'\x1f31b'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MoonFace -&gt; Maybe MoonFace
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">MoonFace
+</span><a href="Data.Char.Emoji.Moon.html#FirstQuarterFace"><span class="hs-identifier hs-var">FirstQuarterFace</span></a></span><span>
+</span><span id="line-93"></span><span>    </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="hs-char">'\x1f31d'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MoonFace -&gt; Maybe MoonFace
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">MoonFace
+</span><a href="Data.Char.Emoji.Moon.html#FullMoonFace"><span class="hs-identifier hs-var">FullMoonFace</span></a></span><span>
+</span><span id="line-94"></span><span>    </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="hs-char">'\x1f31c'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MoonFace -&gt; Maybe MoonFace
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">MoonFace
+</span><a href="Data.Char.Emoji.Moon.html#ThirdQuarterFace"><span class="hs-identifier hs-var">ThirdQuarterFace</span></a></span><span>
+</span><span id="line-95"></span><span>    </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe MoonFace
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-96"></span><span>
+</span><span id="line-97"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679246730"><span id="local-6989586621679246732"><span id="local-6989586621679246734"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Moon.html#MoonFace"><span class="hs-identifier hs-type">MoonFace</span></a></span></span></span></span><span>
+</span><span id="line-98"></span></pre></body></html>

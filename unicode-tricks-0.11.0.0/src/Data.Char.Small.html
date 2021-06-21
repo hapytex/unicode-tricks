@@ -1,0 +1,441 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE CPP, Safe #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">{-|
+Module      : Data.Char.Small
+Description : A module used to render subscript and superscript in Unicode.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+One can make use of a &lt;https://www.unicode.org/charts/PDF/U2070.pdf block of Unicode characters&gt; to /emulate/ subscript and superscript. Note that the subscript and superscript will be
+aligned with the /baseline/ and the /cap line/ respectively, and is thus not equivalent to @&lt;sub&gt;...&lt;/sub&gt;@ and @&lt;sup&gt;...&lt;/sup&gt;@ in HTML. Furthermore only a small subset of characters
+is supported.
+
+This module allows one to map certain characters to their subscript and superscript counterpart, and furthermore makes it more convenient to transform a number (both positive and negative)
+to a 'Text' that specifies this number in subscript and superscript.
+-}</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Small</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-19"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Convert characters to their subscript and superscript counterpart</span></span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier">toSub</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Small.html#toSup"><span class="hs-identifier">toSup</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Numbers as subscript and superscript.</span></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Small.html#asSub"><span class="hs-identifier">asSub</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Small.html#asSub%27"><span class="hs-identifier">asSub'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Small.html#asSubPlus"><span class="hs-identifier">asSubPlus</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Small.html#asSup"><span class="hs-identifier">asSup</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Small.html#asSup%27"><span class="hs-identifier">asSup'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Small.html#asSupPlus"><span class="hs-identifier">asSupPlus</span></a></span><span>
+</span><span id="line-24"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Ratio formatting</span></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Small.html#ratioToUnicode"><span class="hs-identifier">ratioToUnicode</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Small.html#ratioToUnicode%27"><span class="hs-identifier">ratioToUnicode'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Small.html#ratioPartsToUnicode"><span class="hs-identifier">ratioPartsToUnicode</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Small.html#ratioPartsToUnicode%27"><span class="hs-identifier">ratioPartsToUnicode'</span></a></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Char</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">chr</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">isDigit</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ord</span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#PlusStyle"><span class="hs-identifier">PlusStyle</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#WithPlus"><span class="hs-identifier">WithPlus</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#WithoutPlus"><span class="hs-identifier">WithoutPlus</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#positionalNumberSystem10"><span class="hs-identifier">positionalNumberSystem10</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Default</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Default</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">def</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Ratio</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Ratio</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">denominator</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">numerator</span></span><span class="hs-special">)</span><span class="hs-cpp">
+#if __GLASGOW_HASKELL__ &lt; 803
+</span><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">Data.Semigroup</span><span class="hs-special">(</span><span class="hs-special">(</span><span class="hs-operator">&lt;&gt;</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-cpp">
+#endif
+</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">cons</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">snoc</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">singleton</span></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- | Convert a set of characters to their superscript counterpart, given that</span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- characters exists.</span><span>
+</span><span id="line-40"></span><span class="annot"><a href="Data.Char.Small.html#toSup"><span class="hs-identifier hs-type">toSup</span></a></span><span>
+</span><span id="line-41"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>  </span><span class="hs-comment">-- ^ The given character to convert to its superscript counterpart.</span><span>
+</span><span id="line-42"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>  </span><span class="hs-comment">-- ^ A character wrapped in a 'Just' given the counterpart exists, 'Nothing' otherwise.</span><span>
+</span><span id="line-43"></span><span id="toSup"><span class="annot"><span class="annottext">toSup :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Small.html#toSup"><span class="hs-identifier hs-var hs-var">toSup</span></a></span></span><span> </span><span class="hs-char">'i'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x2071'</span></span><span>
+</span><span id="line-44"></span><span class="annot"><a href="Data.Char.Small.html#toSup"><span class="hs-identifier hs-var">toSup</span></a></span><span> </span><span class="hs-char">'+'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x207a'</span></span><span>
+</span><span id="line-45"></span><span class="annot"><a href="Data.Char.Small.html#toSup"><span class="hs-identifier hs-var">toSup</span></a></span><span> </span><span class="hs-char">'-'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x207b'</span></span><span>
+</span><span id="line-46"></span><span class="annot"><a href="Data.Char.Small.html#toSup"><span class="hs-identifier hs-var">toSup</span></a></span><span> </span><span class="hs-char">'\x2212'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x207b'</span></span><span>
+</span><span id="line-47"></span><span class="annot"><a href="Data.Char.Small.html#toSup"><span class="hs-identifier hs-var">toSup</span></a></span><span> </span><span class="hs-char">'='</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x207c'</span></span><span>
+</span><span id="line-48"></span><span class="annot"><a href="Data.Char.Small.html#toSup"><span class="hs-identifier hs-var">toSup</span></a></span><span> </span><span class="hs-char">'('</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x207d'</span></span><span>
+</span><span id="line-49"></span><span class="annot"><a href="Data.Char.Small.html#toSup"><span class="hs-identifier hs-var">toSup</span></a></span><span> </span><span class="hs-char">')'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x207e'</span></span><span>
+</span><span id="line-50"></span><span class="annot"><a href="Data.Char.Small.html#toSup"><span class="hs-identifier hs-var">toSup</span></a></span><span> </span><span class="hs-char">'n'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x207f'</span></span><span>
+</span><span id="line-51"></span><span class="annot"><a href="Data.Char.Small.html#toSup"><span class="hs-identifier hs-var">toSup</span></a></span><span> </span><span id="local-6989586621679252600"><span class="annot"><span class="annottext">c :: Char
+</span><a href="#local-6989586621679252600"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><span class="hs-identifier hs-var">isDigit</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679252600"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="Data.Char.Small.html#_digitToSub"><span class="hs-identifier hs-var">_digitToSub</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char -&gt; Int
+</span><span class="hs-identifier hs-var">ord</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679252600"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Int
+</span><span class="hs-identifier hs-var">ord</span></span><span> </span><span class="annot"><span class="hs-char">'0'</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-52"></span><span>        </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Char
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="hs-comment">-- | Convert a set of characters to their subscript counterpart, given that</span><span>
+</span><span id="line-55"></span><span class="hs-comment">-- characters exists.</span><span>
+</span><span id="line-56"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-type">toSub</span></a></span><span>
+</span><span id="line-57"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>  </span><span class="hs-comment">-- ^ The given character to convert to its subscript counterpart.</span><span>
+</span><span id="line-58"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>  </span><span class="hs-comment">-- ^ A character wrapped in a 'Just' given the counterpart exists, 'Nothing' otherwise.</span><span>
+</span><span id="line-59"></span><span id="toSub"><span class="annot"><span class="annottext">toSub :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var hs-var">toSub</span></a></span></span><span> </span><span class="hs-char">'+'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x208a'</span></span><span>
+</span><span id="line-60"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'-'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x208b'</span></span><span>
+</span><span id="line-61"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'\x2212'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x208b'</span></span><span>
+</span><span id="line-62"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'='</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x208c'</span></span><span>
+</span><span id="line-63"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'('</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x208d'</span></span><span>
+</span><span id="line-64"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">')'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x208e'</span></span><span>
+</span><span id="line-65"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'a'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x2090'</span></span><span>
+</span><span id="line-66"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'e'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x2091'</span></span><span>
+</span><span id="line-67"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'o'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x2092'</span></span><span>
+</span><span id="line-68"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'x'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x2093'</span></span><span>
+</span><span id="line-69"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'\x259'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x2094'</span></span><span>
+</span><span id="line-70"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'h'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x2095'</span></span><span>
+</span><span id="line-71"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'k'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x2095'</span></span><span>
+</span><span id="line-72"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'l'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x2095'</span></span><span>
+</span><span id="line-73"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'m'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x2095'</span></span><span>
+</span><span id="line-74"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'n'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x2095'</span></span><span>
+</span><span id="line-75"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'p'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x2095'</span></span><span>
+</span><span id="line-76"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'s'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x2095'</span></span><span>
+</span><span id="line-77"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span class="hs-char">'t'</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="hs-char">'\x2095'</span></span><span>
+</span><span id="line-78"></span><span class="annot"><a href="Data.Char.Small.html#toSub"><span class="hs-identifier hs-var">toSub</span></a></span><span> </span><span id="local-6989586621679252598"><span class="annot"><span class="annottext">c :: Char
+</span><a href="#local-6989586621679252598"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><span class="hs-identifier hs-var">isDigit</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679252598"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="Data.Char.Small.html#_digitToSub"><span class="hs-identifier hs-var">_digitToSub</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char -&gt; Int
+</span><span class="hs-identifier hs-var">ord</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679252598"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Int
+</span><span class="hs-identifier hs-var">ord</span></span><span> </span><span class="annot"><span class="hs-char">'0'</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-79"></span><span>        </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Char
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span id="local-6989586621679252649"><span class="annot"><a href="Data.Char.Small.html#_value"><span class="hs-identifier hs-type">_value</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252649"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679252649"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-82"></span><span id="_value"><span class="annot"><span class="annottext">_value :: (Int -&gt; Char) -&gt; i -&gt; Text
+</span><a href="Data.Char.Small.html#_value"><span class="hs-identifier hs-var hs-var">_value</span></a></span></span><span> </span><span id="local-6989586621679252596"><span class="annot"><span class="annottext">f :: Int -&gt; Char
+</span><a href="#local-6989586621679252596"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; Text
+</span><a href="#local-6989586621679252595"><span class="hs-identifier hs-var">go</span></a></span><span>
+</span><span id="line-83"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679252594"><span class="annot"><span class="annottext">f' :: i -&gt; Char
+</span><a href="#local-6989586621679252594"><span class="hs-identifier hs-var hs-var">f'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="#local-6989586621679252596"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Char) -&gt; (i -&gt; Int) -&gt; i -&gt; Char
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">i -&gt; Int
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span>
+</span><span id="line-84"></span><span>          </span><span id="local-6989586621679252595"><span class="annot"><span class="annottext">go :: i -&gt; Text
+</span><a href="#local-6989586621679252595"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621679252592"><span class="annot"><span class="annottext">n :: i
+</span><a href="#local-6989586621679252592"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679252592"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="hs-number">9</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Text
+</span><span class="hs-identifier hs-var">singleton</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; Char
+</span><a href="#local-6989586621679252594"><span class="hs-identifier hs-var">f'</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679252592"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-85"></span><span>               </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Char -&gt; Text
+</span><span class="hs-identifier hs-var">snoc</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; Text
+</span><a href="#local-6989586621679252595"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679252590"><span class="hs-identifier hs-var">q</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; Char
+</span><a href="#local-6989586621679252594"><span class="hs-identifier hs-var">f'</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679252589"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-86"></span><span>               </span><span class="hs-keyword">where</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679252590"><span class="annot"><span class="annottext">q :: i
+</span><a href="#local-6989586621679252590"><span class="hs-identifier hs-var">q</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679252589"><span class="annot"><span class="annottext">r :: i
+</span><a href="#local-6989586621679252589"><span class="hs-identifier hs-var">r</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; (i, i)
+forall a. Integral a =&gt; a -&gt; a -&gt; (a, a)
+</span><span class="hs-identifier hs-var">quotRem</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679252592"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="hs-number">10</span></span><span>
+</span><span id="line-87"></span><span>
+</span><span id="line-88"></span><span id="local-6989586621679252587"><span class="annot"><a href="Data.Char.Small.html#_prefixSign"><span class="hs-identifier hs-type">_prefixSign</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252587"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679252587"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-89"></span><span id="_prefixSign"><span class="annot"><span class="annottext">_prefixSign :: Char -&gt; (Int -&gt; Char) -&gt; i -&gt; Text
+</span><a href="Data.Char.Small.html#_prefixSign"><span class="hs-identifier hs-var hs-var">_prefixSign</span></a></span></span><span> </span><span id="local-6989586621679252585"><span class="annot"><span class="annottext">c :: Char
+</span><a href="#local-6989586621679252585"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679252584"><span class="annot"><span class="annottext">f :: Int -&gt; Char
+</span><a href="#local-6989586621679252584"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679252583"><span class="annot"><span class="annottext">v :: i
+</span><a href="#local-6989586621679252583"><span class="hs-identifier hs-var">v</span></a></span></span><span>
+</span><span id="line-90"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679252583"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Text -&gt; Text
+</span><span class="hs-identifier hs-var">cons</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679252585"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; Text
+</span><a href="#local-6989586621679252581"><span class="hs-identifier hs-var">f'</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">-</span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679252583"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-91"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; Text
+</span><a href="#local-6989586621679252581"><span class="hs-identifier hs-var">f'</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679252583"><span class="hs-identifier hs-var">v</span></a></span><span>
+</span><span id="line-92"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679252581"><span class="annot"><span class="annottext">f' :: i -&gt; Text
+</span><a href="#local-6989586621679252581"><span class="hs-identifier hs-var hs-var">f'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Char) -&gt; i -&gt; Text
+forall i. Integral i =&gt; (Int -&gt; Char) -&gt; i -&gt; Text
+</span><a href="Data.Char.Small.html#_value"><span class="hs-identifier hs-var">_value</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="#local-6989586621679252584"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-93"></span><span>
+</span><span id="line-94"></span><span id="local-6989586621679252580"><span class="annot"><a href="Data.Char.Small.html#_prefixSignPlus"><span class="hs-identifier hs-type">_prefixSignPlus</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252580"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679252580"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-95"></span><span id="_prefixSignPlus"><span class="annot"><span class="annottext">_prefixSignPlus :: Char -&gt; Char -&gt; (Int -&gt; Char) -&gt; i -&gt; Text
+</span><a href="Data.Char.Small.html#_prefixSignPlus"><span class="hs-identifier hs-var hs-var">_prefixSignPlus</span></a></span></span><span> </span><span id="local-6989586621679252578"><span class="annot"><span class="annottext">cp :: Char
+</span><a href="#local-6989586621679252578"><span class="hs-identifier hs-var">cp</span></a></span></span><span> </span><span id="local-6989586621679252577"><span class="annot"><span class="annottext">cn :: Char
+</span><a href="#local-6989586621679252577"><span class="hs-identifier hs-var">cn</span></a></span></span><span> </span><span id="local-6989586621679252576"><span class="annot"><span class="annottext">f :: Int -&gt; Char
+</span><a href="#local-6989586621679252576"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679252575"><span class="annot"><span class="annottext">v :: i
+</span><a href="#local-6989586621679252575"><span class="hs-identifier hs-var">v</span></a></span></span><span>
+</span><span id="line-96"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679252575"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; i -&gt; Text
+</span><a href="#local-6989586621679252574"><span class="hs-identifier hs-var">c'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679252577"><span class="hs-identifier hs-var">cn</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">-</span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679252575"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-97"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; i -&gt; Text
+</span><a href="#local-6989586621679252574"><span class="hs-identifier hs-var">c'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679252578"><span class="hs-identifier hs-var">cp</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679252575"><span class="hs-identifier hs-var">v</span></a></span><span>
+</span><span id="line-98"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679252574"><span class="annot"><span class="annottext">c' :: Char -&gt; i -&gt; Text
+</span><a href="#local-6989586621679252574"><span class="hs-identifier hs-var hs-var">c'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Text -&gt; Text) -&gt; (i -&gt; Text) -&gt; i -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Char) -&gt; i -&gt; Text
+forall i. Integral i =&gt; (Int -&gt; Char) -&gt; i -&gt; Text
+</span><a href="Data.Char.Small.html#_value"><span class="hs-identifier hs-var">_value</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="#local-6989586621679252576"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((Text -&gt; Text) -&gt; i -&gt; Text)
+-&gt; (Char -&gt; Text -&gt; Text) -&gt; Char -&gt; i -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Text -&gt; Text
+</span><span class="hs-identifier hs-var">cons</span></span><span>
+</span><span id="line-99"></span><span>
+</span><span id="line-100"></span><span class="hs-comment">-- | Converting the given numerator and denominator to a fraction</span><span>
+</span><span id="line-101"></span><span class="hs-comment">-- where the numerator is written in superscript, and the denominator</span><span>
+</span><span id="line-102"></span><span class="hs-comment">-- in subscript. If the denominator is negative, the item is rendered</span><span>
+</span><span id="line-103"></span><span class="hs-comment">-- with a minus at the numerator part.</span><span>
+</span><span id="line-104"></span><span id="local-6989586621679252643"><span id="local-6989586621679252644"><span class="annot"><a href="Data.Char.Small.html#ratioPartsToUnicode"><span class="hs-identifier hs-type">ratioPartsToUnicode</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252644"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252643"><span class="hs-identifier hs-type">j</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-105"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Data.Char.Core.html#PlusStyle"><span class="hs-identifier hs-type">PlusStyle</span></a></span><span> </span><span class="hs-comment">-- ^ the given plus style that will be applied to the numerator.</span><span>
+</span><span id="line-106"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679252644"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The given numerator.</span><span>
+</span><span id="line-107"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679252643"><span class="hs-identifier hs-type">j</span></a></span><span>  </span><span class="hs-comment">-- ^ The given denominator.</span><span>
+</span><span id="line-108"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A 'Text' object that presents the fraction with superscript and subscript.</span></span></span><span>
+</span><span id="line-109"></span><span id="ratioPartsToUnicode"><span class="annot"><span class="annottext">ratioPartsToUnicode :: PlusStyle -&gt; i -&gt; j -&gt; Text
+</span><a href="Data.Char.Small.html#ratioPartsToUnicode"><span class="hs-identifier hs-var hs-var">ratioPartsToUnicode</span></a></span></span><span> </span><span id="local-6989586621679252573"><span class="annot"><span class="annottext">ps :: PlusStyle
+</span><a href="#local-6989586621679252573"><span class="hs-identifier hs-var">ps</span></a></span></span><span> </span><span id="local-6989586621679252572"><span class="annot"><span class="annottext">num :: i
+</span><a href="#local-6989586621679252572"><span class="hs-identifier hs-var">num</span></a></span></span><span> </span><span id="local-6989586621679252571"><span class="annot"><span class="annottext">den :: j
+</span><a href="#local-6989586621679252571"><span class="hs-identifier hs-var">den</span></a></span></span><span>
+</span><span id="line-110"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">j
+</span><a href="#local-6989586621679252571"><span class="hs-identifier hs-var">den</span></a></span><span> </span><span class="annot"><span class="annottext">j -&gt; j -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PlusStyle -&gt; i -&gt; j -&gt; Text
+forall i j. (Integral i, Integral j) =&gt; PlusStyle -&gt; i -&gt; j -&gt; Text
+</span><a href="Data.Char.Small.html#ratioPartsToUnicode"><span class="hs-identifier hs-var">ratioPartsToUnicode</span></a></span><span> </span><span class="annot"><span class="annottext">PlusStyle
+</span><a href="#local-6989586621679252573"><span class="hs-identifier hs-var">ps</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">-</span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679252572"><span class="hs-identifier hs-var">num</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="hs-glyph">-</span><span class="annot"><span class="annottext">j
+</span><a href="#local-6989586621679252571"><span class="hs-identifier hs-var">den</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-111"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PlusStyle -&gt; i -&gt; Text
+forall i. Integral i =&gt; PlusStyle -&gt; i -&gt; Text
+</span><a href="Data.Char.Small.html#asSup"><span class="hs-identifier hs-var">asSup</span></a></span><span> </span><span class="annot"><span class="annottext">PlusStyle
+</span><a href="#local-6989586621679252573"><span class="hs-identifier hs-var">ps</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679252572"><span class="hs-identifier hs-var">num</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Text -&gt; Text
+</span><span class="hs-identifier hs-var">cons</span></span><span> </span><span class="annot"><span class="hs-char">'\x2044'</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">j -&gt; Text
+forall i. Integral i =&gt; i -&gt; Text
+</span><a href="Data.Char.Small.html#asSub%27"><span class="hs-identifier hs-var">asSub'</span></a></span><span> </span><span class="annot"><span class="annottext">j
+</span><a href="#local-6989586621679252571"><span class="hs-identifier hs-var">den</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-112"></span><span>
+</span><span id="line-113"></span><span>
+</span><span id="line-114"></span><span class="hs-comment">-- | Converting the given numerator and denominator to a fraction</span><span>
+</span><span id="line-115"></span><span class="hs-comment">-- where the numerator is written in superscript, and the denominator</span><span>
+</span><span id="line-116"></span><span class="hs-comment">-- in subscript. If the denominator is negative, the item is rendered</span><span>
+</span><span id="line-117"></span><span class="hs-comment">-- with a minus at the numerator part.</span><span>
+</span><span id="line-118"></span><span id="local-6989586621679252569"><span id="local-6989586621679252570"><span class="annot"><a href="Data.Char.Small.html#ratioPartsToUnicode%27"><span class="hs-identifier hs-type">ratioPartsToUnicode'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252570"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252569"><span class="hs-identifier hs-type">j</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-119"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679252570"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The given numerator.</span><span>
+</span><span id="line-120"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679252569"><span class="hs-identifier hs-type">j</span></a></span><span>  </span><span class="hs-comment">-- ^ The given denominator.</span><span>
+</span><span id="line-121"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A 'Text' object that presents the fraction with superscript and subscript.</span></span></span><span>
+</span><span id="line-122"></span><span id="ratioPartsToUnicode%27"><span class="annot"><span class="annottext">ratioPartsToUnicode' :: i -&gt; j -&gt; Text
+</span><a href="Data.Char.Small.html#ratioPartsToUnicode%27"><span class="hs-identifier hs-var hs-var">ratioPartsToUnicode'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PlusStyle -&gt; i -&gt; j -&gt; Text
+forall i j. (Integral i, Integral j) =&gt; PlusStyle -&gt; i -&gt; j -&gt; Text
+</span><a href="Data.Char.Small.html#ratioPartsToUnicode"><span class="hs-identifier hs-var">ratioPartsToUnicode</span></a></span><span> </span><span class="annot"><span class="annottext">PlusStyle
+</span><a href="Data.Char.Core.html#WithoutPlus"><span class="hs-identifier hs-var">WithoutPlus</span></a></span><span>
+</span><span id="line-123"></span><span>
+</span><span id="line-124"></span><span class="hs-comment">-- | Convert the given 'Ratio' object to a sequence of characters with the</span><span>
+</span><span id="line-125"></span><span class="hs-comment">-- numerator in superscript and the denominator in subscript. The given</span><span>
+</span><span id="line-126"></span><span class="hs-comment">-- 'PlusStyle' is applied to the numerator.</span><span>
+</span><span id="line-127"></span><span id="local-6989586621679252634"><span class="annot"><a href="Data.Char.Small.html#ratioToUnicode"><span class="hs-identifier hs-type">ratioToUnicode</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252634"><span class="hs-identifier hs-type">i</span></a></span><span>
+</span><span id="line-128"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Data.Char.Core.html#PlusStyle"><span class="hs-identifier hs-type">PlusStyle</span></a></span><span>  </span><span class="hs-comment">-- ^ The given 'PlusStyle' to use.</span><span>
+</span><span id="line-129"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ratio</span></span><span> </span><span class="annot"><a href="#local-6989586621679252634"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The given 'Ratio' object to convert to a 'Text'.</span><span>
+</span><span id="line-130"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A 'Text' object that denotes the given 'Ratio' making use of superscript and subscript.</span></span><span>
+</span><span id="line-131"></span><span id="ratioToUnicode"><span class="annot"><span class="annottext">ratioToUnicode :: PlusStyle -&gt; Ratio i -&gt; Text
+</span><a href="Data.Char.Small.html#ratioToUnicode"><span class="hs-identifier hs-var hs-var">ratioToUnicode</span></a></span></span><span> </span><span id="local-6989586621679252568"><span class="annot"><span class="annottext">ps :: PlusStyle
+</span><a href="#local-6989586621679252568"><span class="hs-identifier hs-var">ps</span></a></span></span><span> </span><span id="local-6989586621679252567"><span class="annot"><span class="annottext">dn :: Ratio i
+</span><a href="#local-6989586621679252567"><span class="hs-identifier hs-var">dn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PlusStyle -&gt; i -&gt; i -&gt; Text
+forall i j. (Integral i, Integral j) =&gt; PlusStyle -&gt; i -&gt; j -&gt; Text
+</span><a href="Data.Char.Small.html#ratioPartsToUnicode"><span class="hs-identifier hs-var">ratioPartsToUnicode</span></a></span><span> </span><span class="annot"><span class="annottext">PlusStyle
+</span><a href="#local-6989586621679252568"><span class="hs-identifier hs-var">ps</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Ratio i -&gt; i
+forall a. Ratio a -&gt; a
+</span><span class="hs-identifier hs-var">numerator</span></span><span> </span><span class="annot"><span class="annottext">Ratio i
+</span><a href="#local-6989586621679252567"><span class="hs-identifier hs-var">dn</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Ratio i -&gt; i
+forall a. Ratio a -&gt; a
+</span><span class="hs-identifier hs-var">denominator</span></span><span> </span><span class="annot"><span class="annottext">Ratio i
+</span><a href="#local-6989586621679252567"><span class="hs-identifier hs-var">dn</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-132"></span><span>
+</span><span id="line-133"></span><span class="hs-comment">-- | Format a given 'Ratio' object to a 'Text' value that formats the ratio with</span><span>
+</span><span id="line-134"></span><span class="hs-comment">-- superscript and subscript using the 'Default' 'PlusStyle'.</span><span>
+</span><span id="line-135"></span><span id="local-6989586621679252566"><span class="annot"><a href="Data.Char.Small.html#ratioToUnicode%27"><span class="hs-identifier hs-type">ratioToUnicode'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252566"><span class="hs-identifier hs-type">i</span></a></span><span>
+</span><span id="line-136"></span><span>    </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ratio</span></span><span> </span><span class="annot"><a href="#local-6989586621679252566"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The given 'Ratio' value to format.</span><span>
+</span><span id="line-137"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ The 'Text' block that contains a textual representation of the 'Ratio'.</span></span><span>
+</span><span id="line-138"></span><span id="ratioToUnicode%27"><span class="annot"><span class="annottext">ratioToUnicode' :: Ratio i -&gt; Text
+</span><a href="Data.Char.Small.html#ratioToUnicode%27"><span class="hs-identifier hs-var hs-var">ratioToUnicode'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PlusStyle -&gt; Ratio i -&gt; Text
+forall i. Integral i =&gt; PlusStyle -&gt; Ratio i -&gt; Text
+</span><a href="Data.Char.Small.html#ratioToUnicode"><span class="hs-identifier hs-var">ratioToUnicode</span></a></span><span> </span><span class="annot"><span class="annottext">PlusStyle
+forall a. Default a =&gt; a
+</span><span class="hs-identifier hs-var">def</span></span><span>
+</span><span id="line-139"></span><span>
+</span><span id="line-140"></span><span class="hs-comment">-- | Convert a number (positive or negative) to a 'Text' object that denotes</span><span>
+</span><span id="line-141"></span><span class="hs-comment">-- that number in superscript characters.</span><span>
+</span><span id="line-142"></span><span id="local-6989586621679252642"><span class="annot"><a href="Data.Char.Small.html#asSup"><span class="hs-identifier hs-type">asSup</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252642"><span class="hs-identifier hs-type">i</span></a></span><span>
+</span><span id="line-143"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Data.Char.Core.html#PlusStyle"><span class="hs-identifier hs-type">PlusStyle</span></a></span><span>  </span><span class="hs-comment">-- ^ The given 'PlusStyle' to use.</span><span>
+</span><span id="line-144"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679252642"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The given number to convert.</span><span>
+</span><span id="line-145"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A 'Text' value that denotes the number as a sequence of superscript characters.</span></span><span>
+</span><span id="line-146"></span><span id="asSup"><span class="annot"><span class="annottext">asSup :: PlusStyle -&gt; i -&gt; Text
+</span><a href="Data.Char.Small.html#asSup"><span class="hs-identifier hs-var hs-var">asSup</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Char) -&gt; Char -&gt; Char -&gt; PlusStyle -&gt; i -&gt; Text
+forall i.
+Integral i =&gt;
+(Int -&gt; Char) -&gt; Char -&gt; Char -&gt; PlusStyle -&gt; i -&gt; Text
+</span><a href="Data.Char.Core.html#positionalNumberSystem10"><span class="hs-identifier hs-var">positionalNumberSystem10</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="Data.Char.Small.html#_digitToSup"><span class="hs-identifier hs-var">_digitToSup</span></a></span><span> </span><span class="annot"><span class="hs-char">'\x207a'</span></span><span> </span><span class="annot"><span class="hs-char">'\x207b'</span></span><span>
+</span><span id="line-147"></span><span>
+</span><span id="line-148"></span><span class="hs-comment">-- | Convert a number (positive or negative) to a 'Text' object that denotes that</span><span>
+</span><span id="line-149"></span><span class="hs-comment">-- number in superscript characters.</span><span>
+</span><span id="line-150"></span><span id="local-6989586621679252564"><span class="annot"><a href="Data.Char.Small.html#asSup%27"><span class="hs-identifier hs-type">asSup'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252564"><span class="hs-identifier hs-type">i</span></a></span><span>
+</span><span id="line-151"></span><span>    </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679252564"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The number to convert.</span><span>
+</span><span id="line-152"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A 'Text' value that contains the number as a sequence of superscript characters.</span></span><span>
+</span><span id="line-153"></span><span id="asSup%27"><span class="annot"><span class="annottext">asSup' :: i -&gt; Text
+</span><a href="Data.Char.Small.html#asSup%27"><span class="hs-identifier hs-var hs-var">asSup'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PlusStyle -&gt; i -&gt; Text
+forall i. Integral i =&gt; PlusStyle -&gt; i -&gt; Text
+</span><a href="Data.Char.Small.html#asSup"><span class="hs-identifier hs-var">asSup</span></a></span><span> </span><span class="annot"><span class="annottext">PlusStyle
+</span><a href="Data.Char.Core.html#WithoutPlus"><span class="hs-identifier hs-var">WithoutPlus</span></a></span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span class="hs-comment">-- | Convert a number (positive or negative) to a 'Text' that specifies that</span><span>
+</span><span id="line-156"></span><span class="hs-comment">-- number in superscript characters. For positive characters, the superscript</span><span>
+</span><span id="line-157"></span><span class="hs-comment">-- contains a plus character (@&#8314;@).</span><span>
+</span><span id="line-158"></span><span id="local-6989586621679252563"><span class="annot"><a href="Data.Char.Small.html#asSupPlus"><span class="hs-identifier hs-type">asSupPlus</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252563"><span class="hs-identifier hs-type">i</span></a></span><span>
+</span><span id="line-159"></span><span>    </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679252563"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The number to convert.</span><span>
+</span><span id="line-160"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A 'Text' value that contains the number as a sequence of superscript characters.</span></span><span>
+</span><span id="line-161"></span><span id="asSupPlus"><span class="annot"><span class="annottext">asSupPlus :: i -&gt; Text
+</span><a href="Data.Char.Small.html#asSupPlus"><span class="hs-identifier hs-var hs-var">asSupPlus</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PlusStyle -&gt; i -&gt; Text
+forall i. Integral i =&gt; PlusStyle -&gt; i -&gt; Text
+</span><a href="Data.Char.Small.html#asSup"><span class="hs-identifier hs-var">asSup</span></a></span><span> </span><span class="annot"><span class="annottext">PlusStyle
+</span><a href="Data.Char.Core.html#WithPlus"><span class="hs-identifier hs-var">WithPlus</span></a></span><span> </span><span class="hs-comment">-- _prefixSignPlus '\x207a' '\x207b' _digitToSup</span><span>
+</span><span id="line-162"></span><span>
+</span><span id="line-163"></span><span class="hs-comment">-- | Convert a number (positive or negative) to a 'Text' object that denotes</span><span>
+</span><span id="line-164"></span><span class="hs-comment">-- that number in subscript characters.</span><span>
+</span><span id="line-165"></span><span id="local-6989586621679252562"><span class="annot"><a href="Data.Char.Small.html#asSub"><span class="hs-identifier hs-type">asSub</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252562"><span class="hs-identifier hs-type">i</span></a></span><span>
+</span><span id="line-166"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Data.Char.Core.html#PlusStyle"><span class="hs-identifier hs-type">PlusStyle</span></a></span><span>  </span><span class="hs-comment">-- ^ The given 'PlusStyle' to use.</span><span>
+</span><span id="line-167"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679252562"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The given number to convert.</span><span>
+</span><span id="line-168"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A 'Text' value that denotes the number as a sequence of subscript characters.</span></span><span>
+</span><span id="line-169"></span><span id="asSub"><span class="annot"><span class="annottext">asSub :: PlusStyle -&gt; i -&gt; Text
+</span><a href="Data.Char.Small.html#asSub"><span class="hs-identifier hs-var hs-var">asSub</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Char) -&gt; Char -&gt; Char -&gt; PlusStyle -&gt; i -&gt; Text
+forall i.
+Integral i =&gt;
+(Int -&gt; Char) -&gt; Char -&gt; Char -&gt; PlusStyle -&gt; i -&gt; Text
+</span><a href="Data.Char.Core.html#positionalNumberSystem10"><span class="hs-identifier hs-var">positionalNumberSystem10</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="Data.Char.Small.html#_digitToSub"><span class="hs-identifier hs-var">_digitToSub</span></a></span><span> </span><span class="annot"><span class="hs-char">'\x208a'</span></span><span> </span><span class="annot"><span class="hs-char">'\x208b'</span></span><span>
+</span><span id="line-170"></span><span>
+</span><span id="line-171"></span><span class="hs-comment">-- | Convert a number (positive or negative) to a 'Text' that specifies that</span><span>
+</span><span id="line-172"></span><span class="hs-comment">-- number in subscript characters.</span><span>
+</span><span id="line-173"></span><span id="local-6989586621679252640"><span class="annot"><a href="Data.Char.Small.html#asSub%27"><span class="hs-identifier hs-type">asSub'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252640"><span class="hs-identifier hs-type">i</span></a></span><span>
+</span><span id="line-174"></span><span>    </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679252640"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The number to convert.</span><span>
+</span><span id="line-175"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A 'Text' value that contains the number as a sequence of subscript characters.</span></span><span>
+</span><span id="line-176"></span><span id="asSub%27"><span class="annot"><span class="annottext">asSub' :: i -&gt; Text
+</span><a href="Data.Char.Small.html#asSub%27"><span class="hs-identifier hs-var hs-var">asSub'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PlusStyle -&gt; i -&gt; Text
+forall i. Integral i =&gt; PlusStyle -&gt; i -&gt; Text
+</span><a href="Data.Char.Small.html#asSub"><span class="hs-identifier hs-var">asSub</span></a></span><span> </span><span class="annot"><span class="annottext">PlusStyle
+</span><a href="Data.Char.Core.html#WithoutPlus"><span class="hs-identifier hs-var">WithoutPlus</span></a></span><span>
+</span><span id="line-177"></span><span>
+</span><span id="line-178"></span><span class="hs-comment">-- | Convert a number (positive or negative) to a 'Text' that specifies that</span><span>
+</span><span id="line-179"></span><span class="hs-comment">-- number in subscript characters. For positive characters, the subscript</span><span>
+</span><span id="line-180"></span><span class="hs-comment">-- contains a plus character (@&#8330;@).</span><span>
+</span><span id="line-181"></span><span id="local-6989586621679252561"><span class="annot"><a href="Data.Char.Small.html#asSubPlus"><span class="hs-identifier hs-type">asSubPlus</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679252561"><span class="hs-identifier hs-type">i</span></a></span><span>
+</span><span id="line-182"></span><span>    </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679252561"><span class="hs-identifier hs-type">i</span></a></span><span>  </span><span class="hs-comment">-- ^ The number to convert.</span><span>
+</span><span id="line-183"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>  </span><span class="hs-comment">-- ^ A 'Text' value that contains the number as a sequence of subscript characters.</span></span><span>
+</span><span id="line-184"></span><span id="asSubPlus"><span class="annot"><span class="annottext">asSubPlus :: i -&gt; Text
+</span><a href="Data.Char.Small.html#asSubPlus"><span class="hs-identifier hs-var hs-var">asSubPlus</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PlusStyle -&gt; i -&gt; Text
+forall i. Integral i =&gt; PlusStyle -&gt; i -&gt; Text
+</span><a href="Data.Char.Small.html#asSub"><span class="hs-identifier hs-var">asSub</span></a></span><span> </span><span class="annot"><span class="annottext">PlusStyle
+</span><a href="Data.Char.Core.html#WithPlus"><span class="hs-identifier hs-var">WithPlus</span></a></span><span>
+</span><span id="line-185"></span><span>
+</span><span id="line-186"></span><span class="annot"><a href="Data.Char.Small.html#_digitToSub"><span class="hs-identifier hs-type">_digitToSub</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-187"></span><span id="_digitToSub"><span class="annot"><span class="annottext">_digitToSub :: Int -&gt; Char
+</span><a href="Data.Char.Small.html#_digitToSub"><span class="hs-identifier hs-var hs-var">_digitToSub</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Char) -&gt; (Int -&gt; Int) -&gt; Int -&gt; Char
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-number">8320</span></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="hs-special">)</span><span>
+</span><span id="line-188"></span><span>
+</span><span id="line-189"></span><span class="annot"><a href="Data.Char.Small.html#_digitToSup"><span class="hs-identifier hs-type">_digitToSup</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-190"></span><span id="_digitToSup"><span class="annot"><span class="annottext">_digitToSup :: Int -&gt; Char
+</span><a href="Data.Char.Small.html#_digitToSup"><span class="hs-identifier hs-var hs-var">_digitToSup</span></a></span></span><span> </span><span class="hs-number">0</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x2070'</span></span><span>
+</span><span id="line-191"></span><span class="annot"><a href="Data.Char.Small.html#_digitToSup"><span class="hs-identifier hs-var">_digitToSup</span></a></span><span> </span><span class="hs-number">1</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\xb9'</span></span><span>
+</span><span id="line-192"></span><span class="annot"><a href="Data.Char.Small.html#_digitToSup"><span class="hs-identifier hs-var">_digitToSup</span></a></span><span> </span><span id="local-6989586621679252559"><span class="annot"><span class="annottext">n :: Int
+</span><a href="#local-6989586621679252559"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679252559"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="hs-number">3</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-number">176</span></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679252559"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-193"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-number">8304</span></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679252559"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-194"></span></pre></body></html>

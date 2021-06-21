@@ -1,0 +1,2185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24con2tag_9sPixt9A8dJ4DBY5XMmaTJ"><span id="%24con2tag_563mH1STQ1J1a1ZasBwVN9"><span id="%24maxtag_563mH1STQ1J1a1ZasBwVN9"><span id="%24tag2con_563mH1STQ1J1a1ZasBwVN9"><span id="%24con2tag_KtLsXbegm1l1aZiudPON18"><span id="%24maxtag_KtLsXbegm1l1aZiudPON18"><span id="%24tag2con_KtLsXbegm1l1aZiudPON18"><span id="%24con2tag_4rlW8wSJQN6Cjiz579apCo"><span id="%24maxtag_4rlW8wSJQN6Cjiz579apCo"><span id="%24tag2con_4rlW8wSJQN6Cjiz579apCo"><span id="%24con2tag_7cD6lNC4LGp0LeIJQqtIgF"><span id="%24maxtag_7cD6lNC4LGp0LeIJQqtIgF"><span id="%24tag2con_7cD6lNC4LGp0LeIJQqtIgF"><span id="%24con2tag_p9uZkcsrfM4xbwrrHbSzi"><span id="%24maxtag_p9uZkcsrfM4xbwrrHbSzi"><span id="%24tag2con_p9uZkcsrfM4xbwrrHbSzi"></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">{-|
+Module      : Data.Char.Chess
+Description : Support for chess characters in unicode.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+One can make use of a &lt;https://www.unicode.org/charts/PDF/U2600.pdf block 2600&gt; and &lt;https://www.unicode.org/charts/PDF/U1FA00.pdf block 1fa00&gt; of Unicode characters to render chess characters. One can render chess characters as /netral/, /white/, or /black/
+pieces, for such pieces one can render these rotated by 0, 90, 180 and 270 degrees. Knights can be rendered on 45, 135, 225 and 315 degrees as well. Furthermore unicode allows to render an /equihopper/, and special variants like a /knight-queen/, /knight-rook/, and /knight-bishop/.
+
+The module contains pattern synonyms for names that are often given to the pieces.
+-}</span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Chess</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Data structures to represent the possible chess pieces.</span></span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><a href="Data.Char.Chess.html#ChessColor"><span class="hs-identifier">ChessColor</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Chess.html#White"><span class="hs-identifier">White</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Black"><span class="hs-identifier">Black</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Neutral"><span class="hs-identifier">Neutral</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier">ChessColorBinary</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Chess.html#BWhite"><span class="hs-identifier">BWhite</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#BBlack"><span class="hs-identifier">BBlack</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPieceType"><span class="hs-identifier">ChessPieceType</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Chess.html#King"><span class="hs-identifier">King</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Queen"><span class="hs-identifier">Queen</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Rook"><span class="hs-identifier">Rook</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Bishop"><span class="hs-identifier">Bishop</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Knight"><span class="hs-identifier">Knight</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Pawn"><span class="hs-identifier">Pawn</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Equihopper"><span class="hs-identifier">Equihopper</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybridType"><span class="hs-identifier">ChessHybridType</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Chess.html#KnightQueen"><span class="hs-identifier">KnightQueen</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#KnightRook"><span class="hs-identifier">KnightRook</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#KnightBishop"><span class="hs-identifier">KnightBishop</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier">ChessPiece</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Chess.html#Chess90"><span class="hs-identifier">Chess90</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Chess45Knight"><span class="hs-identifier">Chess45Knight</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybrid"><span class="hs-identifier">ChessHybrid</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Rotate45"><span class="hs-identifier">Rotate45</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Chess.html#R45"><span class="hs-identifier">R45</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#R135"><span class="hs-identifier">R135</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#R225"><span class="hs-identifier">R225</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#R315"><span class="hs-identifier">R315</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Convert the chess piece to its unicode equivalent.</span></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#chessPiece"><span class="hs-identifier">chessPiece</span></a></span><span>
+</span><span id="line-26"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Pattern synonyms of special pieces</span></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Grasshopper"><span class="hs-identifier">Grasshopper</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Nightrider"><span class="hs-identifier">Nightrider</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Amazon"><span class="hs-identifier">Amazon</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Terror"><span class="hs-identifier">Terror</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#OmnipotentQueen"><span class="hs-identifier">OmnipotentQueen</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Superqueen"><span class="hs-identifier">Superqueen</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Chancellor"><span class="hs-identifier">Chancellor</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Marshall"><span class="hs-identifier">Marshall</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Empress"><span class="hs-identifier">Empress</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Cardinal"><span class="hs-identifier">Cardinal</span></a></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Princess"><span class="hs-identifier">Princess</span></a></span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Bits</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-operator">(.|.)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Char</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">chr</span></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#Rotate90"><span class="hs-identifier">Rotate90</span></a></span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#R0"><span class="hs-identifier">R0</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#R180"><span class="hs-identifier">R180</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitraryBoundedEnum</span></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Gen</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">oneof</span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-comment">-- | A data type that defined binary colors ('BWhite', and 'BBlack'), this is</span><span>
+</span><span id="line-46"></span><span class="hs-comment">-- used for special chess pieces like a /knight queen/, /knight rook/, and</span><span>
+</span><span id="line-47"></span><span class="hs-comment">-- /knight bishop/ that only have no neutral color in unicode.</span><span>
+</span><span id="line-48"></span><span id="local-6989586621679238698"><span id="local-6989586621679238699"></span></span><span class="hs-keyword">data</span><span> </span><span id="ChessColorBinary"><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier hs-var">ChessColorBinary</span></a></span></span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="BWhite"><span class="annot"><a href="Data.Char.Chess.html#BWhite"><span class="hs-identifier hs-var">BWhite</span></a></span></span><span>  </span><span class="hs-comment">-- ^ /White/ color.</span><span>
+</span><span id="line-50"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="BBlack"><span class="annot"><a href="Data.Char.Chess.html#BBlack"><span class="hs-identifier hs-var">BBlack</span></a></span></span><span>  </span><span class="hs-comment">-- ^ /Black/ color.</span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679238694"><span id="local-6989586621679238696"><span class="annot"><span class="annottext">ChessColorBinary
+ChessColorBinary -&gt; ChessColorBinary -&gt; Bounded ChessColorBinary
+forall a. a -&gt; a -&gt; Bounded a
+maxBound :: ChessColorBinary
+$cmaxBound :: ChessColorBinary
+minBound :: ChessColorBinary
+$cminBound :: ChessColorBinary
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="%24cBBlack"><span id="%24cBWhite"><span id="%24tChessColorBinary"><span id="local-6989586621679238664"><span id="local-6989586621679238666"><span id="local-6989586621679238668"><span id="local-6989586621679238670"><span id="local-6989586621679238672"><span id="local-6989586621679238674"><span id="local-6989586621679238676"><span id="local-6989586621679238678"><span id="local-6989586621679238680"><span id="local-6989586621679238682"><span id="local-6989586621679238684"><span id="local-6989586621679238686"><span id="local-6989586621679238688"><span id="local-6989586621679238690"><span class="annot"><span class="annottext">Typeable ChessColorBinary
+DataType
+Constr
+Typeable ChessColorBinary =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; ChessColorBinary -&gt; c ChessColorBinary)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessColorBinary)
+-&gt; (ChessColorBinary -&gt; Constr)
+-&gt; (ChessColorBinary -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessColorBinary))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c ChessColorBinary))
+-&gt; ((forall b. Data b =&gt; b -&gt; b)
+    -&gt; ChessColorBinary -&gt; ChessColorBinary)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColorBinary -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColorBinary -&gt; r)
+-&gt; (forall u.
+    (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColorBinary -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColorBinary -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; ChessColorBinary -&gt; m ChessColorBinary)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; ChessColorBinary -&gt; m ChessColorBinary)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; ChessColorBinary -&gt; m ChessColorBinary)
+-&gt; Data ChessColorBinary
+ChessColorBinary -&gt; DataType
+ChessColorBinary -&gt; Constr
+(forall b. Data b =&gt; b -&gt; b)
+-&gt; ChessColorBinary -&gt; ChessColorBinary
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessColorBinary -&gt; c ChessColorBinary
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessColorBinary
+forall a.
+Typeable a =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u.
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColorBinary -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColorBinary -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColorBinary -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColorBinary -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessColorBinary -&gt; m ChessColorBinary
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessColorBinary -&gt; m ChessColorBinary
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessColorBinary
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessColorBinary -&gt; c ChessColorBinary
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessColorBinary)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c ChessColorBinary)
+$cBBlack :: Constr
+$cBWhite :: Constr
+$tChessColorBinary :: DataType
+gmapMo :: (forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessColorBinary -&gt; m ChessColorBinary
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessColorBinary -&gt; m ChessColorBinary
+gmapMp :: (forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessColorBinary -&gt; m ChessColorBinary
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessColorBinary -&gt; m ChessColorBinary
+gmapM :: (forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessColorBinary -&gt; m ChessColorBinary
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessColorBinary -&gt; m ChessColorBinary
+gmapQi :: Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColorBinary -&gt; u
+$cgmapQi :: forall u.
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColorBinary -&gt; u
+gmapQ :: (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColorBinary -&gt; [u]
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColorBinary -&gt; [u]
+gmapQr :: (r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColorBinary -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColorBinary -&gt; r
+gmapQl :: (r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColorBinary -&gt; r
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColorBinary -&gt; r
+gmapT :: (forall b. Data b =&gt; b -&gt; b)
+-&gt; ChessColorBinary -&gt; ChessColorBinary
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b)
+-&gt; ChessColorBinary -&gt; ChessColorBinary
+dataCast2 :: (forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c ChessColorBinary)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c ChessColorBinary)
+dataCast1 :: (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessColorBinary)
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessColorBinary)
+dataTypeOf :: ChessColorBinary -&gt; DataType
+$cdataTypeOf :: ChessColorBinary -&gt; DataType
+toConstr :: ChessColorBinary -&gt; Constr
+$ctoConstr :: ChessColorBinary -&gt; Constr
+gunfold :: (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessColorBinary
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessColorBinary
+gfoldl :: (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessColorBinary -&gt; c ChessColorBinary
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessColorBinary -&gt; c ChessColorBinary
+$cp1Data :: Typeable ChessColorBinary
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238644"><span id="local-6989586621679238646"><span id="local-6989586621679238648"><span id="local-6989586621679238650"><span id="local-6989586621679238652"><span id="local-6989586621679238654"><span id="local-6989586621679238656"><span id="local-6989586621679238658"><span class="annot"><span class="annottext">Int -&gt; ChessColorBinary
+ChessColorBinary -&gt; Int
+ChessColorBinary -&gt; [ChessColorBinary]
+ChessColorBinary -&gt; ChessColorBinary
+ChessColorBinary -&gt; ChessColorBinary -&gt; [ChessColorBinary]
+ChessColorBinary
+-&gt; ChessColorBinary -&gt; ChessColorBinary -&gt; [ChessColorBinary]
+(ChessColorBinary -&gt; ChessColorBinary)
+-&gt; (ChessColorBinary -&gt; ChessColorBinary)
+-&gt; (Int -&gt; ChessColorBinary)
+-&gt; (ChessColorBinary -&gt; Int)
+-&gt; (ChessColorBinary -&gt; [ChessColorBinary])
+-&gt; (ChessColorBinary -&gt; ChessColorBinary -&gt; [ChessColorBinary])
+-&gt; (ChessColorBinary -&gt; ChessColorBinary -&gt; [ChessColorBinary])
+-&gt; (ChessColorBinary
+    -&gt; ChessColorBinary -&gt; ChessColorBinary -&gt; [ChessColorBinary])
+-&gt; Enum ChessColorBinary
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+enumFromThenTo :: ChessColorBinary
+-&gt; ChessColorBinary -&gt; ChessColorBinary -&gt; [ChessColorBinary]
+$cenumFromThenTo :: ChessColorBinary
+-&gt; ChessColorBinary -&gt; ChessColorBinary -&gt; [ChessColorBinary]
+enumFromTo :: ChessColorBinary -&gt; ChessColorBinary -&gt; [ChessColorBinary]
+$cenumFromTo :: ChessColorBinary -&gt; ChessColorBinary -&gt; [ChessColorBinary]
+enumFromThen :: ChessColorBinary -&gt; ChessColorBinary -&gt; [ChessColorBinary]
+$cenumFromThen :: ChessColorBinary -&gt; ChessColorBinary -&gt; [ChessColorBinary]
+enumFrom :: ChessColorBinary -&gt; [ChessColorBinary]
+$cenumFrom :: ChessColorBinary -&gt; [ChessColorBinary]
+fromEnum :: ChessColorBinary -&gt; Int
+$cfromEnum :: ChessColorBinary -&gt; Int
+toEnum :: Int -&gt; ChessColorBinary
+$ctoEnum :: Int -&gt; ChessColorBinary
+pred :: ChessColorBinary -&gt; ChessColorBinary
+$cpred :: ChessColorBinary -&gt; ChessColorBinary
+succ :: ChessColorBinary -&gt; ChessColorBinary
+$csucc :: ChessColorBinary -&gt; ChessColorBinary
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238639"><span id="local-6989586621679238641"><span class="annot"><span class="annottext">ChessColorBinary -&gt; ChessColorBinary -&gt; Bool
+(ChessColorBinary -&gt; ChessColorBinary -&gt; Bool)
+-&gt; (ChessColorBinary -&gt; ChessColorBinary -&gt; Bool)
+-&gt; Eq ChessColorBinary
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: ChessColorBinary -&gt; ChessColorBinary -&gt; Bool
+$c/= :: ChessColorBinary -&gt; ChessColorBinary -&gt; Bool
+== :: ChessColorBinary -&gt; ChessColorBinary -&gt; Bool
+$c== :: ChessColorBinary -&gt; ChessColorBinary -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. ChessColorBinary -&gt; Rep ChessColorBinary x)
+-&gt; (forall x. Rep ChessColorBinary x -&gt; ChessColorBinary)
+-&gt; Generic ChessColorBinary
+forall x. Rep ChessColorBinary x -&gt; ChessColorBinary
+forall x. ChessColorBinary -&gt; Rep ChessColorBinary x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep ChessColorBinary x -&gt; ChessColorBinary
+$cfrom :: forall x. ChessColorBinary -&gt; Rep ChessColorBinary x
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238620"><span id="local-6989586621679238622"><span id="local-6989586621679238624"><span id="local-6989586621679238626"><span id="local-6989586621679238628"><span id="local-6989586621679238630"><span id="local-6989586621679238632"><span class="annot"><span class="annottext">Eq ChessColorBinary
+Eq ChessColorBinary =&gt;
+(ChessColorBinary -&gt; ChessColorBinary -&gt; Ordering)
+-&gt; (ChessColorBinary -&gt; ChessColorBinary -&gt; Bool)
+-&gt; (ChessColorBinary -&gt; ChessColorBinary -&gt; Bool)
+-&gt; (ChessColorBinary -&gt; ChessColorBinary -&gt; Bool)
+-&gt; (ChessColorBinary -&gt; ChessColorBinary -&gt; Bool)
+-&gt; (ChessColorBinary -&gt; ChessColorBinary -&gt; ChessColorBinary)
+-&gt; (ChessColorBinary -&gt; ChessColorBinary -&gt; ChessColorBinary)
+-&gt; Ord ChessColorBinary
+ChessColorBinary -&gt; ChessColorBinary -&gt; Bool
+ChessColorBinary -&gt; ChessColorBinary -&gt; Ordering
+ChessColorBinary -&gt; ChessColorBinary -&gt; ChessColorBinary
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: ChessColorBinary -&gt; ChessColorBinary -&gt; ChessColorBinary
+$cmin :: ChessColorBinary -&gt; ChessColorBinary -&gt; ChessColorBinary
+max :: ChessColorBinary -&gt; ChessColorBinary -&gt; ChessColorBinary
+$cmax :: ChessColorBinary -&gt; ChessColorBinary -&gt; ChessColorBinary
+&gt;= :: ChessColorBinary -&gt; ChessColorBinary -&gt; Bool
+$c&gt;= :: ChessColorBinary -&gt; ChessColorBinary -&gt; Bool
+&gt; :: ChessColorBinary -&gt; ChessColorBinary -&gt; Bool
+$c&gt; :: ChessColorBinary -&gt; ChessColorBinary -&gt; Bool
+&lt;= :: ChessColorBinary -&gt; ChessColorBinary -&gt; Bool
+$c&lt;= :: ChessColorBinary -&gt; ChessColorBinary -&gt; Bool
+&lt; :: ChessColorBinary -&gt; ChessColorBinary -&gt; Bool
+$c&lt; :: ChessColorBinary -&gt; ChessColorBinary -&gt; Bool
+compare :: ChessColorBinary -&gt; ChessColorBinary -&gt; Ordering
+$ccompare :: ChessColorBinary -&gt; ChessColorBinary -&gt; Ordering
+$cp1Ord :: Eq ChessColorBinary
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238611"><span id="local-6989586621679238613"><span id="local-6989586621679238615"><span id="local-6989586621679238617"><span class="annot"><span class="annottext">ReadPrec [ChessColorBinary]
+ReadPrec ChessColorBinary
+Int -&gt; ReadS ChessColorBinary
+ReadS [ChessColorBinary]
+(Int -&gt; ReadS ChessColorBinary)
+-&gt; ReadS [ChessColorBinary]
+-&gt; ReadPrec ChessColorBinary
+-&gt; ReadPrec [ChessColorBinary]
+-&gt; Read ChessColorBinary
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+readListPrec :: ReadPrec [ChessColorBinary]
+$creadListPrec :: ReadPrec [ChessColorBinary]
+readPrec :: ReadPrec ChessColorBinary
+$creadPrec :: ReadPrec ChessColorBinary
+readList :: ReadS [ChessColorBinary]
+$creadList :: ReadS [ChessColorBinary]
+readsPrec :: Int -&gt; ReadS ChessColorBinary
+$creadsPrec :: Int -&gt; ReadS ChessColorBinary
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238604"><span id="local-6989586621679238606"><span id="local-6989586621679238608"><span class="annot"><span class="annottext">Int -&gt; ChessColorBinary -&gt; ShowS
+[ChessColorBinary] -&gt; ShowS
+ChessColorBinary -&gt; String
+(Int -&gt; ChessColorBinary -&gt; ShowS)
+-&gt; (ChessColorBinary -&gt; String)
+-&gt; ([ChessColorBinary] -&gt; ShowS)
+-&gt; Show ChessColorBinary
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [ChessColorBinary] -&gt; ShowS
+$cshowList :: [ChessColorBinary] -&gt; ShowS
+show :: ChessColorBinary -&gt; String
+$cshow :: ChessColorBinary -&gt; String
+showsPrec :: Int -&gt; ChessColorBinary -&gt; ShowS
+$cshowsPrec :: Int -&gt; ChessColorBinary -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238599"><span id="local-6989586621679238601"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier hs-type">ChessColorBinary</span></a></span></span></span><span>
+</span><span id="line-54"></span><span>
+</span><span id="line-55"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238596"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier hs-type">ChessColorBinary</span></a></span></span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span class="hs-comment">-- | The color of a chess piece, this can for most pieces be 'Black', 'White',</span><span>
+</span><span id="line-58"></span><span class="hs-comment">-- or 'Neutral'.</span><span>
+</span><span id="line-59"></span><span id="local-6989586621679238593"><span id="local-6989586621679238594"></span></span><span class="hs-keyword">data</span><span> </span><span id="ChessColor"><span class="annot"><a href="Data.Char.Chess.html#ChessColor"><span class="hs-identifier hs-var">ChessColor</span></a></span></span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="White"><span class="annot"><a href="Data.Char.Chess.html#White"><span class="hs-identifier hs-var">White</span></a></span></span><span>  </span><span class="hs-comment">-- ^ /White/ color.</span><span>
+</span><span id="line-61"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Black"><span class="annot"><a href="Data.Char.Chess.html#Black"><span class="hs-identifier hs-var">Black</span></a></span></span><span>  </span><span class="hs-comment">-- ^ /Black/ color.</span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Neutral"><span class="annot"><a href="Data.Char.Chess.html#Neutral"><span class="hs-identifier hs-var">Neutral</span></a></span></span><span>  </span><span class="hs-comment">-- ^ Neutral chess pieces, sometimes depicted half /white/ and half /black/.</span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679238589"><span id="local-6989586621679238591"><span class="annot"><span class="annottext">ChessColor
+ChessColor -&gt; ChessColor -&gt; Bounded ChessColor
+forall a. a -&gt; a -&gt; Bounded a
+maxBound :: ChessColor
+$cmaxBound :: ChessColor
+minBound :: ChessColor
+$cminBound :: ChessColor
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="%24cNeutral"><span id="%24cBlack"><span id="%24cWhite"><span id="%24tChessColor"><span id="local-6989586621679238560"><span id="local-6989586621679238562"><span id="local-6989586621679238564"><span id="local-6989586621679238566"><span id="local-6989586621679238568"><span id="local-6989586621679238570"><span id="local-6989586621679238572"><span id="local-6989586621679238574"><span id="local-6989586621679238576"><span id="local-6989586621679238578"><span id="local-6989586621679238580"><span id="local-6989586621679238582"><span id="local-6989586621679238584"><span id="local-6989586621679238586"><span class="annot"><span class="annottext">Typeable ChessColor
+DataType
+Constr
+Typeable ChessColor =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; ChessColor -&gt; c ChessColor)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessColor)
+-&gt; (ChessColor -&gt; Constr)
+-&gt; (ChessColor -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessColor))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c ChessColor))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; ChessColor -&gt; ChessColor)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColor -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColor -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColor -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColor -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; ChessColor -&gt; m ChessColor)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; ChessColor -&gt; m ChessColor)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; ChessColor -&gt; m ChessColor)
+-&gt; Data ChessColor
+ChessColor -&gt; DataType
+ChessColor -&gt; Constr
+(forall b. Data b =&gt; b -&gt; b) -&gt; ChessColor -&gt; ChessColor
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessColor -&gt; c ChessColor
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessColor
+forall a.
+Typeable a =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColor -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColor -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColor -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColor -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ChessColor -&gt; m ChessColor
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ChessColor -&gt; m ChessColor
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessColor
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessColor -&gt; c ChessColor
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessColor)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c ChessColor)
+$cNeutral :: Constr
+$cBlack :: Constr
+$cWhite :: Constr
+$tChessColor :: DataType
+gmapMo :: (forall d. Data d =&gt; d -&gt; m d) -&gt; ChessColor -&gt; m ChessColor
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ChessColor -&gt; m ChessColor
+gmapMp :: (forall d. Data d =&gt; d -&gt; m d) -&gt; ChessColor -&gt; m ChessColor
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ChessColor -&gt; m ChessColor
+gmapM :: (forall d. Data d =&gt; d -&gt; m d) -&gt; ChessColor -&gt; m ChessColor
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ChessColor -&gt; m ChessColor
+gmapQi :: Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColor -&gt; u
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColor -&gt; u
+gmapQ :: (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColor -&gt; [u]
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ChessColor -&gt; [u]
+gmapQr :: (r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColor -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColor -&gt; r
+gmapQl :: (r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColor -&gt; r
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessColor -&gt; r
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; ChessColor -&gt; ChessColor
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; ChessColor -&gt; ChessColor
+dataCast2 :: (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c ChessColor)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c ChessColor)
+dataCast1 :: (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessColor)
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessColor)
+dataTypeOf :: ChessColor -&gt; DataType
+$cdataTypeOf :: ChessColor -&gt; DataType
+toConstr :: ChessColor -&gt; Constr
+$ctoConstr :: ChessColor -&gt; Constr
+gunfold :: (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessColor
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessColor
+gfoldl :: (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessColor -&gt; c ChessColor
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessColor -&gt; c ChessColor
+$cp1Data :: Typeable ChessColor
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238540"><span id="local-6989586621679238542"><span id="local-6989586621679238544"><span id="local-6989586621679238546"><span id="local-6989586621679238548"><span id="local-6989586621679238550"><span id="local-6989586621679238552"><span id="local-6989586621679238554"><span class="annot"><span class="annottext">Int -&gt; ChessColor
+ChessColor -&gt; Int
+ChessColor -&gt; [ChessColor]
+ChessColor -&gt; ChessColor
+ChessColor -&gt; ChessColor -&gt; [ChessColor]
+ChessColor -&gt; ChessColor -&gt; ChessColor -&gt; [ChessColor]
+(ChessColor -&gt; ChessColor)
+-&gt; (ChessColor -&gt; ChessColor)
+-&gt; (Int -&gt; ChessColor)
+-&gt; (ChessColor -&gt; Int)
+-&gt; (ChessColor -&gt; [ChessColor])
+-&gt; (ChessColor -&gt; ChessColor -&gt; [ChessColor])
+-&gt; (ChessColor -&gt; ChessColor -&gt; [ChessColor])
+-&gt; (ChessColor -&gt; ChessColor -&gt; ChessColor -&gt; [ChessColor])
+-&gt; Enum ChessColor
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+enumFromThenTo :: ChessColor -&gt; ChessColor -&gt; ChessColor -&gt; [ChessColor]
+$cenumFromThenTo :: ChessColor -&gt; ChessColor -&gt; ChessColor -&gt; [ChessColor]
+enumFromTo :: ChessColor -&gt; ChessColor -&gt; [ChessColor]
+$cenumFromTo :: ChessColor -&gt; ChessColor -&gt; [ChessColor]
+enumFromThen :: ChessColor -&gt; ChessColor -&gt; [ChessColor]
+$cenumFromThen :: ChessColor -&gt; ChessColor -&gt; [ChessColor]
+enumFrom :: ChessColor -&gt; [ChessColor]
+$cenumFrom :: ChessColor -&gt; [ChessColor]
+fromEnum :: ChessColor -&gt; Int
+$cfromEnum :: ChessColor -&gt; Int
+toEnum :: Int -&gt; ChessColor
+$ctoEnum :: Int -&gt; ChessColor
+pred :: ChessColor -&gt; ChessColor
+$cpred :: ChessColor -&gt; ChessColor
+succ :: ChessColor -&gt; ChessColor
+$csucc :: ChessColor -&gt; ChessColor
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238536"><span id="local-6989586621679238538"><span class="annot"><span class="annottext">ChessColor -&gt; ChessColor -&gt; Bool
+(ChessColor -&gt; ChessColor -&gt; Bool)
+-&gt; (ChessColor -&gt; ChessColor -&gt; Bool) -&gt; Eq ChessColor
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: ChessColor -&gt; ChessColor -&gt; Bool
+$c/= :: ChessColor -&gt; ChessColor -&gt; Bool
+== :: ChessColor -&gt; ChessColor -&gt; Bool
+$c== :: ChessColor -&gt; ChessColor -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. ChessColor -&gt; Rep ChessColor x)
+-&gt; (forall x. Rep ChessColor x -&gt; ChessColor) -&gt; Generic ChessColor
+forall x. Rep ChessColor x -&gt; ChessColor
+forall x. ChessColor -&gt; Rep ChessColor x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep ChessColor x -&gt; ChessColor
+$cfrom :: forall x. ChessColor -&gt; Rep ChessColor x
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238519"><span id="local-6989586621679238521"><span id="local-6989586621679238523"><span id="local-6989586621679238525"><span id="local-6989586621679238527"><span id="local-6989586621679238529"><span id="local-6989586621679238531"><span class="annot"><span class="annottext">Eq ChessColor
+Eq ChessColor =&gt;
+(ChessColor -&gt; ChessColor -&gt; Ordering)
+-&gt; (ChessColor -&gt; ChessColor -&gt; Bool)
+-&gt; (ChessColor -&gt; ChessColor -&gt; Bool)
+-&gt; (ChessColor -&gt; ChessColor -&gt; Bool)
+-&gt; (ChessColor -&gt; ChessColor -&gt; Bool)
+-&gt; (ChessColor -&gt; ChessColor -&gt; ChessColor)
+-&gt; (ChessColor -&gt; ChessColor -&gt; ChessColor)
+-&gt; Ord ChessColor
+ChessColor -&gt; ChessColor -&gt; Bool
+ChessColor -&gt; ChessColor -&gt; Ordering
+ChessColor -&gt; ChessColor -&gt; ChessColor
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: ChessColor -&gt; ChessColor -&gt; ChessColor
+$cmin :: ChessColor -&gt; ChessColor -&gt; ChessColor
+max :: ChessColor -&gt; ChessColor -&gt; ChessColor
+$cmax :: ChessColor -&gt; ChessColor -&gt; ChessColor
+&gt;= :: ChessColor -&gt; ChessColor -&gt; Bool
+$c&gt;= :: ChessColor -&gt; ChessColor -&gt; Bool
+&gt; :: ChessColor -&gt; ChessColor -&gt; Bool
+$c&gt; :: ChessColor -&gt; ChessColor -&gt; Bool
+&lt;= :: ChessColor -&gt; ChessColor -&gt; Bool
+$c&lt;= :: ChessColor -&gt; ChessColor -&gt; Bool
+&lt; :: ChessColor -&gt; ChessColor -&gt; Bool
+$c&lt; :: ChessColor -&gt; ChessColor -&gt; Bool
+compare :: ChessColor -&gt; ChessColor -&gt; Ordering
+$ccompare :: ChessColor -&gt; ChessColor -&gt; Ordering
+$cp1Ord :: Eq ChessColor
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238511"><span id="local-6989586621679238513"><span id="local-6989586621679238515"><span id="local-6989586621679238517"><span class="annot"><span class="annottext">ReadPrec [ChessColor]
+ReadPrec ChessColor
+Int -&gt; ReadS ChessColor
+ReadS [ChessColor]
+(Int -&gt; ReadS ChessColor)
+-&gt; ReadS [ChessColor]
+-&gt; ReadPrec ChessColor
+-&gt; ReadPrec [ChessColor]
+-&gt; Read ChessColor
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+readListPrec :: ReadPrec [ChessColor]
+$creadListPrec :: ReadPrec [ChessColor]
+readPrec :: ReadPrec ChessColor
+$creadPrec :: ReadPrec ChessColor
+readList :: ReadS [ChessColor]
+$creadList :: ReadS [ChessColor]
+readsPrec :: Int -&gt; ReadS ChessColor
+$creadsPrec :: Int -&gt; ReadS ChessColor
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238505"><span id="local-6989586621679238507"><span id="local-6989586621679238509"><span class="annot"><span class="annottext">Int -&gt; ChessColor -&gt; ShowS
+[ChessColor] -&gt; ShowS
+ChessColor -&gt; String
+(Int -&gt; ChessColor -&gt; ShowS)
+-&gt; (ChessColor -&gt; String)
+-&gt; ([ChessColor] -&gt; ShowS)
+-&gt; Show ChessColor
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [ChessColor] -&gt; ShowS
+$cshowList :: [ChessColor] -&gt; ShowS
+show :: ChessColor -&gt; String
+$cshow :: ChessColor -&gt; String
+showsPrec :: Int -&gt; ChessColor -&gt; ShowS
+$cshowsPrec :: Int -&gt; ChessColor -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238501"><span id="local-6989586621679238503"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColor"><span class="hs-identifier hs-type">ChessColor</span></a></span></span></span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238499"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColor"><span class="hs-identifier hs-type">ChessColor</span></a></span></span><span>
+</span><span id="line-68"></span><span>
+</span><span id="line-69"></span><span class="hs-comment">-- | The type of chess pieces. Unicode includes an 'Equihopper' as piece as</span><span>
+</span><span id="line-70"></span><span class="hs-comment">-- well.</span><span>
+</span><span id="line-71"></span><span id="local-6989586621679238497"><span id="local-6989586621679238498"></span></span><span class="hs-keyword">data</span><span> </span><span id="ChessPieceType"><span class="annot"><a href="Data.Char.Chess.html#ChessPieceType"><span class="hs-identifier hs-var">ChessPieceType</span></a></span></span><span>
+</span><span id="line-72"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="King"><span class="annot"><a href="Data.Char.Chess.html#King"><span class="hs-identifier hs-var">King</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /king/ chess piece.</span><span>
+</span><span id="line-73"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Queen"><span class="annot"><a href="Data.Char.Chess.html#Queen"><span class="hs-identifier hs-var">Queen</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /queen/ chess piece.</span><span>
+</span><span id="line-74"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Rook"><span class="annot"><a href="Data.Char.Chess.html#Rook"><span class="hs-identifier hs-var">Rook</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /rook/ chess piece.</span><span>
+</span><span id="line-75"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Bishop"><span class="annot"><a href="Data.Char.Chess.html#Bishop"><span class="hs-identifier hs-var">Bishop</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /bishop/ chess piece.</span><span>
+</span><span id="line-76"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Knight"><span class="annot"><a href="Data.Char.Chess.html#Knight"><span class="hs-identifier hs-var">Knight</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /knight/ chess piece.</span><span>
+</span><span id="line-77"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Pawn"><span class="annot"><a href="Data.Char.Chess.html#Pawn"><span class="hs-identifier hs-var">Pawn</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /pawn/ chess piece.</span><span>
+</span><span id="line-78"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Equihopper"><span class="annot"><a href="Data.Char.Chess.html#Equihopper"><span class="hs-identifier hs-var">Equihopper</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /equihopper/ chess piece.</span><span>
+</span><span id="line-79"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679238493"><span id="local-6989586621679238495"><span class="annot"><span class="annottext">ChessPieceType
+ChessPieceType -&gt; ChessPieceType -&gt; Bounded ChessPieceType
+forall a. a -&gt; a -&gt; Bounded a
+maxBound :: ChessPieceType
+$cmaxBound :: ChessPieceType
+minBound :: ChessPieceType
+$cminBound :: ChessPieceType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="%24cEquihopper"><span id="%24cPawn"><span id="%24cKnight"><span id="%24cBishop"><span id="%24cRook"><span id="%24cQueen"><span id="%24cKing"><span id="%24tChessPieceType"><span id="local-6989586621679238464"><span id="local-6989586621679238466"><span id="local-6989586621679238468"><span id="local-6989586621679238470"><span id="local-6989586621679238472"><span id="local-6989586621679238474"><span id="local-6989586621679238476"><span id="local-6989586621679238478"><span id="local-6989586621679238480"><span id="local-6989586621679238482"><span id="local-6989586621679238484"><span id="local-6989586621679238486"><span id="local-6989586621679238488"><span id="local-6989586621679238490"><span class="annot"><span class="annottext">Typeable ChessPieceType
+DataType
+Constr
+Typeable ChessPieceType =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; ChessPieceType -&gt; c ChessPieceType)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessPieceType)
+-&gt; (ChessPieceType -&gt; Constr)
+-&gt; (ChessPieceType -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessPieceType))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c ChessPieceType))
+-&gt; ((forall b. Data b =&gt; b -&gt; b)
+    -&gt; ChessPieceType -&gt; ChessPieceType)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPieceType -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPieceType -&gt; r)
+-&gt; (forall u.
+    (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPieceType -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPieceType -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; ChessPieceType -&gt; m ChessPieceType)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; ChessPieceType -&gt; m ChessPieceType)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; ChessPieceType -&gt; m ChessPieceType)
+-&gt; Data ChessPieceType
+ChessPieceType -&gt; DataType
+ChessPieceType -&gt; Constr
+(forall b. Data b =&gt; b -&gt; b) -&gt; ChessPieceType -&gt; ChessPieceType
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessPieceType -&gt; c ChessPieceType
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessPieceType
+forall a.
+Typeable a =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u.
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPieceType -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPieceType -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPieceType -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPieceType -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessPieceType -&gt; m ChessPieceType
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessPieceType -&gt; m ChessPieceType
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessPieceType
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessPieceType -&gt; c ChessPieceType
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessPieceType)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c ChessPieceType)
+$cEquihopper :: Constr
+$cPawn :: Constr
+$cKnight :: Constr
+$cBishop :: Constr
+$cRook :: Constr
+$cQueen :: Constr
+$cKing :: Constr
+$tChessPieceType :: DataType
+gmapMo :: (forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessPieceType -&gt; m ChessPieceType
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessPieceType -&gt; m ChessPieceType
+gmapMp :: (forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessPieceType -&gt; m ChessPieceType
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessPieceType -&gt; m ChessPieceType
+gmapM :: (forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessPieceType -&gt; m ChessPieceType
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessPieceType -&gt; m ChessPieceType
+gmapQi :: Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPieceType -&gt; u
+$cgmapQi :: forall u.
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPieceType -&gt; u
+gmapQ :: (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPieceType -&gt; [u]
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPieceType -&gt; [u]
+gmapQr :: (r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPieceType -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPieceType -&gt; r
+gmapQl :: (r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPieceType -&gt; r
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPieceType -&gt; r
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; ChessPieceType -&gt; ChessPieceType
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; ChessPieceType -&gt; ChessPieceType
+dataCast2 :: (forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c ChessPieceType)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c ChessPieceType)
+dataCast1 :: (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessPieceType)
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessPieceType)
+dataTypeOf :: ChessPieceType -&gt; DataType
+$cdataTypeOf :: ChessPieceType -&gt; DataType
+toConstr :: ChessPieceType -&gt; Constr
+$ctoConstr :: ChessPieceType -&gt; Constr
+gunfold :: (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessPieceType
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessPieceType
+gfoldl :: (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessPieceType -&gt; c ChessPieceType
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessPieceType -&gt; c ChessPieceType
+$cp1Data :: Typeable ChessPieceType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238440"><span id="local-6989586621679238442"><span id="local-6989586621679238444"><span id="local-6989586621679238446"><span id="local-6989586621679238448"><span id="local-6989586621679238450"><span id="local-6989586621679238452"><span id="local-6989586621679238454"><span class="annot"><span class="annottext">Int -&gt; ChessPieceType
+ChessPieceType -&gt; Int
+ChessPieceType -&gt; [ChessPieceType]
+ChessPieceType -&gt; ChessPieceType
+ChessPieceType -&gt; ChessPieceType -&gt; [ChessPieceType]
+ChessPieceType
+-&gt; ChessPieceType -&gt; ChessPieceType -&gt; [ChessPieceType]
+(ChessPieceType -&gt; ChessPieceType)
+-&gt; (ChessPieceType -&gt; ChessPieceType)
+-&gt; (Int -&gt; ChessPieceType)
+-&gt; (ChessPieceType -&gt; Int)
+-&gt; (ChessPieceType -&gt; [ChessPieceType])
+-&gt; (ChessPieceType -&gt; ChessPieceType -&gt; [ChessPieceType])
+-&gt; (ChessPieceType -&gt; ChessPieceType -&gt; [ChessPieceType])
+-&gt; (ChessPieceType
+    -&gt; ChessPieceType -&gt; ChessPieceType -&gt; [ChessPieceType])
+-&gt; Enum ChessPieceType
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+enumFromThenTo :: ChessPieceType
+-&gt; ChessPieceType -&gt; ChessPieceType -&gt; [ChessPieceType]
+$cenumFromThenTo :: ChessPieceType
+-&gt; ChessPieceType -&gt; ChessPieceType -&gt; [ChessPieceType]
+enumFromTo :: ChessPieceType -&gt; ChessPieceType -&gt; [ChessPieceType]
+$cenumFromTo :: ChessPieceType -&gt; ChessPieceType -&gt; [ChessPieceType]
+enumFromThen :: ChessPieceType -&gt; ChessPieceType -&gt; [ChessPieceType]
+$cenumFromThen :: ChessPieceType -&gt; ChessPieceType -&gt; [ChessPieceType]
+enumFrom :: ChessPieceType -&gt; [ChessPieceType]
+$cenumFrom :: ChessPieceType -&gt; [ChessPieceType]
+fromEnum :: ChessPieceType -&gt; Int
+$cfromEnum :: ChessPieceType -&gt; Int
+toEnum :: Int -&gt; ChessPieceType
+$ctoEnum :: Int -&gt; ChessPieceType
+pred :: ChessPieceType -&gt; ChessPieceType
+$cpred :: ChessPieceType -&gt; ChessPieceType
+succ :: ChessPieceType -&gt; ChessPieceType
+$csucc :: ChessPieceType -&gt; ChessPieceType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238436"><span id="local-6989586621679238438"><span class="annot"><span class="annottext">ChessPieceType -&gt; ChessPieceType -&gt; Bool
+(ChessPieceType -&gt; ChessPieceType -&gt; Bool)
+-&gt; (ChessPieceType -&gt; ChessPieceType -&gt; Bool) -&gt; Eq ChessPieceType
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: ChessPieceType -&gt; ChessPieceType -&gt; Bool
+$c/= :: ChessPieceType -&gt; ChessPieceType -&gt; Bool
+== :: ChessPieceType -&gt; ChessPieceType -&gt; Bool
+$c== :: ChessPieceType -&gt; ChessPieceType -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. ChessPieceType -&gt; Rep ChessPieceType x)
+-&gt; (forall x. Rep ChessPieceType x -&gt; ChessPieceType)
+-&gt; Generic ChessPieceType
+forall x. Rep ChessPieceType x -&gt; ChessPieceType
+forall x. ChessPieceType -&gt; Rep ChessPieceType x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep ChessPieceType x -&gt; ChessPieceType
+$cfrom :: forall x. ChessPieceType -&gt; Rep ChessPieceType x
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238419"><span id="local-6989586621679238421"><span id="local-6989586621679238423"><span id="local-6989586621679238425"><span id="local-6989586621679238427"><span id="local-6989586621679238429"><span id="local-6989586621679238431"><span class="annot"><span class="annottext">Eq ChessPieceType
+Eq ChessPieceType =&gt;
+(ChessPieceType -&gt; ChessPieceType -&gt; Ordering)
+-&gt; (ChessPieceType -&gt; ChessPieceType -&gt; Bool)
+-&gt; (ChessPieceType -&gt; ChessPieceType -&gt; Bool)
+-&gt; (ChessPieceType -&gt; ChessPieceType -&gt; Bool)
+-&gt; (ChessPieceType -&gt; ChessPieceType -&gt; Bool)
+-&gt; (ChessPieceType -&gt; ChessPieceType -&gt; ChessPieceType)
+-&gt; (ChessPieceType -&gt; ChessPieceType -&gt; ChessPieceType)
+-&gt; Ord ChessPieceType
+ChessPieceType -&gt; ChessPieceType -&gt; Bool
+ChessPieceType -&gt; ChessPieceType -&gt; Ordering
+ChessPieceType -&gt; ChessPieceType -&gt; ChessPieceType
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: ChessPieceType -&gt; ChessPieceType -&gt; ChessPieceType
+$cmin :: ChessPieceType -&gt; ChessPieceType -&gt; ChessPieceType
+max :: ChessPieceType -&gt; ChessPieceType -&gt; ChessPieceType
+$cmax :: ChessPieceType -&gt; ChessPieceType -&gt; ChessPieceType
+&gt;= :: ChessPieceType -&gt; ChessPieceType -&gt; Bool
+$c&gt;= :: ChessPieceType -&gt; ChessPieceType -&gt; Bool
+&gt; :: ChessPieceType -&gt; ChessPieceType -&gt; Bool
+$c&gt; :: ChessPieceType -&gt; ChessPieceType -&gt; Bool
+&lt;= :: ChessPieceType -&gt; ChessPieceType -&gt; Bool
+$c&lt;= :: ChessPieceType -&gt; ChessPieceType -&gt; Bool
+&lt; :: ChessPieceType -&gt; ChessPieceType -&gt; Bool
+$c&lt; :: ChessPieceType -&gt; ChessPieceType -&gt; Bool
+compare :: ChessPieceType -&gt; ChessPieceType -&gt; Ordering
+$ccompare :: ChessPieceType -&gt; ChessPieceType -&gt; Ordering
+$cp1Ord :: Eq ChessPieceType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238411"><span id="local-6989586621679238413"><span id="local-6989586621679238415"><span id="local-6989586621679238417"><span class="annot"><span class="annottext">ReadPrec [ChessPieceType]
+ReadPrec ChessPieceType
+Int -&gt; ReadS ChessPieceType
+ReadS [ChessPieceType]
+(Int -&gt; ReadS ChessPieceType)
+-&gt; ReadS [ChessPieceType]
+-&gt; ReadPrec ChessPieceType
+-&gt; ReadPrec [ChessPieceType]
+-&gt; Read ChessPieceType
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+readListPrec :: ReadPrec [ChessPieceType]
+$creadListPrec :: ReadPrec [ChessPieceType]
+readPrec :: ReadPrec ChessPieceType
+$creadPrec :: ReadPrec ChessPieceType
+readList :: ReadS [ChessPieceType]
+$creadList :: ReadS [ChessPieceType]
+readsPrec :: Int -&gt; ReadS ChessPieceType
+$creadsPrec :: Int -&gt; ReadS ChessPieceType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238405"><span id="local-6989586621679238407"><span id="local-6989586621679238409"><span class="annot"><span class="annottext">Int -&gt; ChessPieceType -&gt; ShowS
+[ChessPieceType] -&gt; ShowS
+ChessPieceType -&gt; String
+(Int -&gt; ChessPieceType -&gt; ShowS)
+-&gt; (ChessPieceType -&gt; String)
+-&gt; ([ChessPieceType] -&gt; ShowS)
+-&gt; Show ChessPieceType
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [ChessPieceType] -&gt; ShowS
+$cshowList :: [ChessPieceType] -&gt; ShowS
+show :: ChessPieceType -&gt; String
+$cshow :: ChessPieceType -&gt; String
+showsPrec :: Int -&gt; ChessPieceType -&gt; ShowS
+$cshowsPrec :: Int -&gt; ChessPieceType -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238401"><span id="local-6989586621679238403"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPieceType"><span class="hs-identifier hs-type">ChessPieceType</span></a></span></span></span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238399"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPieceType"><span class="hs-identifier hs-type">ChessPieceType</span></a></span></span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span class="hs-comment">-- | Extra rotations that can be performed for knight chess pieces.</span><span>
+</span><span id="line-86"></span><span id="local-6989586621679238397"><span id="local-6989586621679238398"></span></span><span class="hs-keyword">data</span><span> </span><span id="Rotate45"><span class="annot"><a href="Data.Char.Chess.html#Rotate45"><span class="hs-identifier hs-var">Rotate45</span></a></span></span><span>
+</span><span id="line-87"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="R45"><span class="annot"><a href="Data.Char.Chess.html#R45"><span class="hs-identifier hs-var">R45</span></a></span></span><span>  </span><span class="hs-comment">-- ^ Rotation over /45/ degrees.</span><span>
+</span><span id="line-88"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="R135"><span class="annot"><a href="Data.Char.Chess.html#R135"><span class="hs-identifier hs-var">R135</span></a></span></span><span>  </span><span class="hs-comment">-- ^ Rotation over /135/ degrees.</span><span>
+</span><span id="line-89"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="R225"><span class="annot"><a href="Data.Char.Chess.html#R225"><span class="hs-identifier hs-var">R225</span></a></span></span><span>  </span><span class="hs-comment">-- ^ Rotation over /225/ degrees.</span><span>
+</span><span id="line-90"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="R315"><span class="annot"><a href="Data.Char.Chess.html#R315"><span class="hs-identifier hs-var">R315</span></a></span></span><span>  </span><span class="hs-comment">-- ^ Rotation over /315/ degrees.</span><span>
+</span><span id="line-91"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679238393"><span id="local-6989586621679238395"><span class="annot"><span class="annottext">Rotate45
+Rotate45 -&gt; Rotate45 -&gt; Bounded Rotate45
+forall a. a -&gt; a -&gt; Bounded a
+maxBound :: Rotate45
+$cmaxBound :: Rotate45
+minBound :: Rotate45
+$cminBound :: Rotate45
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="%24cR315"><span id="%24cR225"><span id="%24cR135"><span id="%24cR45"><span id="%24tRotate45"><span id="local-6989586621679238364"><span id="local-6989586621679238366"><span id="local-6989586621679238368"><span id="local-6989586621679238370"><span id="local-6989586621679238372"><span id="local-6989586621679238374"><span id="local-6989586621679238376"><span id="local-6989586621679238378"><span id="local-6989586621679238380"><span id="local-6989586621679238382"><span id="local-6989586621679238384"><span id="local-6989586621679238386"><span id="local-6989586621679238388"><span id="local-6989586621679238390"><span class="annot"><span class="annottext">Typeable Rotate45
+DataType
+Constr
+Typeable Rotate45 =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; Rotate45 -&gt; c Rotate45)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Rotate45)
+-&gt; (Rotate45 -&gt; Constr)
+-&gt; (Rotate45 -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Rotate45))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Rotate45))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; Rotate45 -&gt; Rotate45)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Rotate45 -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Rotate45 -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Rotate45 -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Rotate45 -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Rotate45 -&gt; m Rotate45)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Rotate45 -&gt; m Rotate45)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Rotate45 -&gt; m Rotate45)
+-&gt; Data Rotate45
+Rotate45 -&gt; DataType
+Rotate45 -&gt; Constr
+(forall b. Data b =&gt; b -&gt; b) -&gt; Rotate45 -&gt; Rotate45
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Rotate45 -&gt; c Rotate45
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Rotate45
+forall a.
+Typeable a =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Rotate45 -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Rotate45 -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Rotate45 -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Rotate45 -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Rotate45 -&gt; m Rotate45
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Rotate45 -&gt; m Rotate45
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Rotate45
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Rotate45 -&gt; c Rotate45
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Rotate45)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Rotate45)
+$cR315 :: Constr
+$cR225 :: Constr
+$cR135 :: Constr
+$cR45 :: Constr
+$tRotate45 :: DataType
+gmapMo :: (forall d. Data d =&gt; d -&gt; m d) -&gt; Rotate45 -&gt; m Rotate45
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Rotate45 -&gt; m Rotate45
+gmapMp :: (forall d. Data d =&gt; d -&gt; m d) -&gt; Rotate45 -&gt; m Rotate45
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Rotate45 -&gt; m Rotate45
+gmapM :: (forall d. Data d =&gt; d -&gt; m d) -&gt; Rotate45 -&gt; m Rotate45
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Rotate45 -&gt; m Rotate45
+gmapQi :: Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Rotate45 -&gt; u
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Rotate45 -&gt; u
+gmapQ :: (forall d. Data d =&gt; d -&gt; u) -&gt; Rotate45 -&gt; [u]
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Rotate45 -&gt; [u]
+gmapQr :: (r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Rotate45 -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Rotate45 -&gt; r
+gmapQl :: (r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Rotate45 -&gt; r
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Rotate45 -&gt; r
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; Rotate45 -&gt; Rotate45
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; Rotate45 -&gt; Rotate45
+dataCast2 :: (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Rotate45)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Rotate45)
+dataCast1 :: (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Rotate45)
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Rotate45)
+dataTypeOf :: Rotate45 -&gt; DataType
+$cdataTypeOf :: Rotate45 -&gt; DataType
+toConstr :: Rotate45 -&gt; Constr
+$ctoConstr :: Rotate45 -&gt; Constr
+gunfold :: (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Rotate45
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Rotate45
+gfoldl :: (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Rotate45 -&gt; c Rotate45
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Rotate45 -&gt; c Rotate45
+$cp1Data :: Typeable Rotate45
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238343"><span id="local-6989586621679238345"><span id="local-6989586621679238347"><span id="local-6989586621679238349"><span id="local-6989586621679238351"><span id="local-6989586621679238353"><span id="local-6989586621679238355"><span id="local-6989586621679238357"><span class="annot"><span class="annottext">Int -&gt; Rotate45
+Rotate45 -&gt; Int
+Rotate45 -&gt; [Rotate45]
+Rotate45 -&gt; Rotate45
+Rotate45 -&gt; Rotate45 -&gt; [Rotate45]
+Rotate45 -&gt; Rotate45 -&gt; Rotate45 -&gt; [Rotate45]
+(Rotate45 -&gt; Rotate45)
+-&gt; (Rotate45 -&gt; Rotate45)
+-&gt; (Int -&gt; Rotate45)
+-&gt; (Rotate45 -&gt; Int)
+-&gt; (Rotate45 -&gt; [Rotate45])
+-&gt; (Rotate45 -&gt; Rotate45 -&gt; [Rotate45])
+-&gt; (Rotate45 -&gt; Rotate45 -&gt; [Rotate45])
+-&gt; (Rotate45 -&gt; Rotate45 -&gt; Rotate45 -&gt; [Rotate45])
+-&gt; Enum Rotate45
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+enumFromThenTo :: Rotate45 -&gt; Rotate45 -&gt; Rotate45 -&gt; [Rotate45]
+$cenumFromThenTo :: Rotate45 -&gt; Rotate45 -&gt; Rotate45 -&gt; [Rotate45]
+enumFromTo :: Rotate45 -&gt; Rotate45 -&gt; [Rotate45]
+$cenumFromTo :: Rotate45 -&gt; Rotate45 -&gt; [Rotate45]
+enumFromThen :: Rotate45 -&gt; Rotate45 -&gt; [Rotate45]
+$cenumFromThen :: Rotate45 -&gt; Rotate45 -&gt; [Rotate45]
+enumFrom :: Rotate45 -&gt; [Rotate45]
+$cenumFrom :: Rotate45 -&gt; [Rotate45]
+fromEnum :: Rotate45 -&gt; Int
+$cfromEnum :: Rotate45 -&gt; Int
+toEnum :: Int -&gt; Rotate45
+$ctoEnum :: Int -&gt; Rotate45
+pred :: Rotate45 -&gt; Rotate45
+$cpred :: Rotate45 -&gt; Rotate45
+succ :: Rotate45 -&gt; Rotate45
+$csucc :: Rotate45 -&gt; Rotate45
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238339"><span id="local-6989586621679238341"><span class="annot"><span class="annottext">Rotate45 -&gt; Rotate45 -&gt; Bool
+(Rotate45 -&gt; Rotate45 -&gt; Bool)
+-&gt; (Rotate45 -&gt; Rotate45 -&gt; Bool) -&gt; Eq Rotate45
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Rotate45 -&gt; Rotate45 -&gt; Bool
+$c/= :: Rotate45 -&gt; Rotate45 -&gt; Bool
+== :: Rotate45 -&gt; Rotate45 -&gt; Bool
+$c== :: Rotate45 -&gt; Rotate45 -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. Rotate45 -&gt; Rep Rotate45 x)
+-&gt; (forall x. Rep Rotate45 x -&gt; Rotate45) -&gt; Generic Rotate45
+forall x. Rep Rotate45 x -&gt; Rotate45
+forall x. Rotate45 -&gt; Rep Rotate45 x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep Rotate45 x -&gt; Rotate45
+$cfrom :: forall x. Rotate45 -&gt; Rep Rotate45 x
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238322"><span id="local-6989586621679238324"><span id="local-6989586621679238326"><span id="local-6989586621679238328"><span id="local-6989586621679238330"><span id="local-6989586621679238332"><span id="local-6989586621679238334"><span class="annot"><span class="annottext">Eq Rotate45
+Eq Rotate45 =&gt;
+(Rotate45 -&gt; Rotate45 -&gt; Ordering)
+-&gt; (Rotate45 -&gt; Rotate45 -&gt; Bool)
+-&gt; (Rotate45 -&gt; Rotate45 -&gt; Bool)
+-&gt; (Rotate45 -&gt; Rotate45 -&gt; Bool)
+-&gt; (Rotate45 -&gt; Rotate45 -&gt; Bool)
+-&gt; (Rotate45 -&gt; Rotate45 -&gt; Rotate45)
+-&gt; (Rotate45 -&gt; Rotate45 -&gt; Rotate45)
+-&gt; Ord Rotate45
+Rotate45 -&gt; Rotate45 -&gt; Bool
+Rotate45 -&gt; Rotate45 -&gt; Ordering
+Rotate45 -&gt; Rotate45 -&gt; Rotate45
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: Rotate45 -&gt; Rotate45 -&gt; Rotate45
+$cmin :: Rotate45 -&gt; Rotate45 -&gt; Rotate45
+max :: Rotate45 -&gt; Rotate45 -&gt; Rotate45
+$cmax :: Rotate45 -&gt; Rotate45 -&gt; Rotate45
+&gt;= :: Rotate45 -&gt; Rotate45 -&gt; Bool
+$c&gt;= :: Rotate45 -&gt; Rotate45 -&gt; Bool
+&gt; :: Rotate45 -&gt; Rotate45 -&gt; Bool
+$c&gt; :: Rotate45 -&gt; Rotate45 -&gt; Bool
+&lt;= :: Rotate45 -&gt; Rotate45 -&gt; Bool
+$c&lt;= :: Rotate45 -&gt; Rotate45 -&gt; Bool
+&lt; :: Rotate45 -&gt; Rotate45 -&gt; Bool
+$c&lt; :: Rotate45 -&gt; Rotate45 -&gt; Bool
+compare :: Rotate45 -&gt; Rotate45 -&gt; Ordering
+$ccompare :: Rotate45 -&gt; Rotate45 -&gt; Ordering
+$cp1Ord :: Eq Rotate45
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238314"><span id="local-6989586621679238316"><span id="local-6989586621679238318"><span id="local-6989586621679238320"><span class="annot"><span class="annottext">ReadPrec [Rotate45]
+ReadPrec Rotate45
+Int -&gt; ReadS Rotate45
+ReadS [Rotate45]
+(Int -&gt; ReadS Rotate45)
+-&gt; ReadS [Rotate45]
+-&gt; ReadPrec Rotate45
+-&gt; ReadPrec [Rotate45]
+-&gt; Read Rotate45
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+readListPrec :: ReadPrec [Rotate45]
+$creadListPrec :: ReadPrec [Rotate45]
+readPrec :: ReadPrec Rotate45
+$creadPrec :: ReadPrec Rotate45
+readList :: ReadS [Rotate45]
+$creadList :: ReadS [Rotate45]
+readsPrec :: Int -&gt; ReadS Rotate45
+$creadsPrec :: Int -&gt; ReadS Rotate45
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238308"><span id="local-6989586621679238310"><span id="local-6989586621679238312"><span class="annot"><span class="annottext">Int -&gt; Rotate45 -&gt; ShowS
+[Rotate45] -&gt; ShowS
+Rotate45 -&gt; String
+(Int -&gt; Rotate45 -&gt; ShowS)
+-&gt; (Rotate45 -&gt; String) -&gt; ([Rotate45] -&gt; ShowS) -&gt; Show Rotate45
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Rotate45] -&gt; ShowS
+$cshowList :: [Rotate45] -&gt; ShowS
+show :: Rotate45 -&gt; String
+$cshow :: Rotate45 -&gt; String
+showsPrec :: Int -&gt; Rotate45 -&gt; ShowS
+$cshowsPrec :: Int -&gt; Rotate45 -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238304"><span id="local-6989586621679238306"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Rotate45"><span class="hs-identifier hs-type">Rotate45</span></a></span></span></span><span>
+</span><span id="line-94"></span><span>
+</span><span id="line-95"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238302"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Rotate45"><span class="hs-identifier hs-type">Rotate45</span></a></span></span><span>
+</span><span id="line-96"></span><span>
+</span><span id="line-97"></span><span class="hs-comment">-- | Hybrid chess pieces like the /knight-queen/, /knight-rook/ and</span><span>
+</span><span id="line-98"></span><span class="hs-comment">-- /knight-bishop/.</span><span>
+</span><span id="line-99"></span><span id="local-6989586621679238300"><span id="local-6989586621679238301"></span></span><span class="hs-keyword">data</span><span> </span><span id="ChessHybridType"><span class="annot"><a href="Data.Char.Chess.html#ChessHybridType"><span class="hs-identifier hs-var">ChessHybridType</span></a></span></span><span>
+</span><span id="line-100"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="KnightQueen"><span class="annot"><a href="Data.Char.Chess.html#KnightQueen"><span class="hs-identifier hs-var">KnightQueen</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /knight-queen/ chess piece.</span><span>
+</span><span id="line-101"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="KnightRook"><span class="annot"><a href="Data.Char.Chess.html#KnightRook"><span class="hs-identifier hs-var">KnightRook</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /knight-rook/ chess piece.</span><span>
+</span><span id="line-102"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="KnightBishop"><span class="annot"><a href="Data.Char.Chess.html#KnightBishop"><span class="hs-identifier hs-var">KnightBishop</span></a></span></span><span>  </span><span class="hs-comment">-- ^ The /knight-bishop/ chess piece.</span><span>
+</span><span id="line-103"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679238296"><span id="local-6989586621679238298"><span class="annot"><span class="annottext">ChessHybridType
+ChessHybridType -&gt; ChessHybridType -&gt; Bounded ChessHybridType
+forall a. a -&gt; a -&gt; Bounded a
+maxBound :: ChessHybridType
+$cmaxBound :: ChessHybridType
+minBound :: ChessHybridType
+$cminBound :: ChessHybridType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="%24cKnightBishop"><span id="%24cKnightRook"><span id="%24cKnightQueen"><span id="%24tChessHybridType"><span id="local-6989586621679238267"><span id="local-6989586621679238269"><span id="local-6989586621679238271"><span id="local-6989586621679238273"><span id="local-6989586621679238275"><span id="local-6989586621679238277"><span id="local-6989586621679238279"><span id="local-6989586621679238281"><span id="local-6989586621679238283"><span id="local-6989586621679238285"><span id="local-6989586621679238287"><span id="local-6989586621679238289"><span id="local-6989586621679238291"><span id="local-6989586621679238293"><span class="annot"><span class="annottext">Typeable ChessHybridType
+DataType
+Constr
+Typeable ChessHybridType =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; ChessHybridType -&gt; c ChessHybridType)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessHybridType)
+-&gt; (ChessHybridType -&gt; Constr)
+-&gt; (ChessHybridType -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessHybridType))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c ChessHybridType))
+-&gt; ((forall b. Data b =&gt; b -&gt; b)
+    -&gt; ChessHybridType -&gt; ChessHybridType)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessHybridType -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessHybridType -&gt; r)
+-&gt; (forall u.
+    (forall d. Data d =&gt; d -&gt; u) -&gt; ChessHybridType -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessHybridType -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; ChessHybridType -&gt; m ChessHybridType)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; ChessHybridType -&gt; m ChessHybridType)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; ChessHybridType -&gt; m ChessHybridType)
+-&gt; Data ChessHybridType
+ChessHybridType -&gt; DataType
+ChessHybridType -&gt; Constr
+(forall b. Data b =&gt; b -&gt; b) -&gt; ChessHybridType -&gt; ChessHybridType
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessHybridType -&gt; c ChessHybridType
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessHybridType
+forall a.
+Typeable a =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u.
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessHybridType -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ChessHybridType -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessHybridType -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessHybridType -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessHybridType -&gt; m ChessHybridType
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessHybridType -&gt; m ChessHybridType
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessHybridType
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessHybridType -&gt; c ChessHybridType
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessHybridType)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c ChessHybridType)
+$cKnightBishop :: Constr
+$cKnightRook :: Constr
+$cKnightQueen :: Constr
+$tChessHybridType :: DataType
+gmapMo :: (forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessHybridType -&gt; m ChessHybridType
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessHybridType -&gt; m ChessHybridType
+gmapMp :: (forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessHybridType -&gt; m ChessHybridType
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessHybridType -&gt; m ChessHybridType
+gmapM :: (forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessHybridType -&gt; m ChessHybridType
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; ChessHybridType -&gt; m ChessHybridType
+gmapQi :: Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessHybridType -&gt; u
+$cgmapQi :: forall u.
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessHybridType -&gt; u
+gmapQ :: (forall d. Data d =&gt; d -&gt; u) -&gt; ChessHybridType -&gt; [u]
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ChessHybridType -&gt; [u]
+gmapQr :: (r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessHybridType -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessHybridType -&gt; r
+gmapQl :: (r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessHybridType -&gt; r
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessHybridType -&gt; r
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; ChessHybridType -&gt; ChessHybridType
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; ChessHybridType -&gt; ChessHybridType
+dataCast2 :: (forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c ChessHybridType)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c ChessHybridType)
+dataCast1 :: (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessHybridType)
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessHybridType)
+dataTypeOf :: ChessHybridType -&gt; DataType
+$cdataTypeOf :: ChessHybridType -&gt; DataType
+toConstr :: ChessHybridType -&gt; Constr
+$ctoConstr :: ChessHybridType -&gt; Constr
+gunfold :: (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessHybridType
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessHybridType
+gfoldl :: (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessHybridType -&gt; c ChessHybridType
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessHybridType -&gt; c ChessHybridType
+$cp1Data :: Typeable ChessHybridType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238247"><span id="local-6989586621679238249"><span id="local-6989586621679238251"><span id="local-6989586621679238253"><span id="local-6989586621679238255"><span id="local-6989586621679238257"><span id="local-6989586621679238259"><span id="local-6989586621679238261"><span class="annot"><span class="annottext">Int -&gt; ChessHybridType
+ChessHybridType -&gt; Int
+ChessHybridType -&gt; [ChessHybridType]
+ChessHybridType -&gt; ChessHybridType
+ChessHybridType -&gt; ChessHybridType -&gt; [ChessHybridType]
+ChessHybridType
+-&gt; ChessHybridType -&gt; ChessHybridType -&gt; [ChessHybridType]
+(ChessHybridType -&gt; ChessHybridType)
+-&gt; (ChessHybridType -&gt; ChessHybridType)
+-&gt; (Int -&gt; ChessHybridType)
+-&gt; (ChessHybridType -&gt; Int)
+-&gt; (ChessHybridType -&gt; [ChessHybridType])
+-&gt; (ChessHybridType -&gt; ChessHybridType -&gt; [ChessHybridType])
+-&gt; (ChessHybridType -&gt; ChessHybridType -&gt; [ChessHybridType])
+-&gt; (ChessHybridType
+    -&gt; ChessHybridType -&gt; ChessHybridType -&gt; [ChessHybridType])
+-&gt; Enum ChessHybridType
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+enumFromThenTo :: ChessHybridType
+-&gt; ChessHybridType -&gt; ChessHybridType -&gt; [ChessHybridType]
+$cenumFromThenTo :: ChessHybridType
+-&gt; ChessHybridType -&gt; ChessHybridType -&gt; [ChessHybridType]
+enumFromTo :: ChessHybridType -&gt; ChessHybridType -&gt; [ChessHybridType]
+$cenumFromTo :: ChessHybridType -&gt; ChessHybridType -&gt; [ChessHybridType]
+enumFromThen :: ChessHybridType -&gt; ChessHybridType -&gt; [ChessHybridType]
+$cenumFromThen :: ChessHybridType -&gt; ChessHybridType -&gt; [ChessHybridType]
+enumFrom :: ChessHybridType -&gt; [ChessHybridType]
+$cenumFrom :: ChessHybridType -&gt; [ChessHybridType]
+fromEnum :: ChessHybridType -&gt; Int
+$cfromEnum :: ChessHybridType -&gt; Int
+toEnum :: Int -&gt; ChessHybridType
+$ctoEnum :: Int -&gt; ChessHybridType
+pred :: ChessHybridType -&gt; ChessHybridType
+$cpred :: ChessHybridType -&gt; ChessHybridType
+succ :: ChessHybridType -&gt; ChessHybridType
+$csucc :: ChessHybridType -&gt; ChessHybridType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238243"><span id="local-6989586621679238245"><span class="annot"><span class="annottext">ChessHybridType -&gt; ChessHybridType -&gt; Bool
+(ChessHybridType -&gt; ChessHybridType -&gt; Bool)
+-&gt; (ChessHybridType -&gt; ChessHybridType -&gt; Bool)
+-&gt; Eq ChessHybridType
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: ChessHybridType -&gt; ChessHybridType -&gt; Bool
+$c/= :: ChessHybridType -&gt; ChessHybridType -&gt; Bool
+== :: ChessHybridType -&gt; ChessHybridType -&gt; Bool
+$c== :: ChessHybridType -&gt; ChessHybridType -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. ChessHybridType -&gt; Rep ChessHybridType x)
+-&gt; (forall x. Rep ChessHybridType x -&gt; ChessHybridType)
+-&gt; Generic ChessHybridType
+forall x. Rep ChessHybridType x -&gt; ChessHybridType
+forall x. ChessHybridType -&gt; Rep ChessHybridType x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep ChessHybridType x -&gt; ChessHybridType
+$cfrom :: forall x. ChessHybridType -&gt; Rep ChessHybridType x
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238226"><span id="local-6989586621679238228"><span id="local-6989586621679238230"><span id="local-6989586621679238232"><span id="local-6989586621679238234"><span id="local-6989586621679238236"><span id="local-6989586621679238238"><span class="annot"><span class="annottext">Eq ChessHybridType
+Eq ChessHybridType =&gt;
+(ChessHybridType -&gt; ChessHybridType -&gt; Ordering)
+-&gt; (ChessHybridType -&gt; ChessHybridType -&gt; Bool)
+-&gt; (ChessHybridType -&gt; ChessHybridType -&gt; Bool)
+-&gt; (ChessHybridType -&gt; ChessHybridType -&gt; Bool)
+-&gt; (ChessHybridType -&gt; ChessHybridType -&gt; Bool)
+-&gt; (ChessHybridType -&gt; ChessHybridType -&gt; ChessHybridType)
+-&gt; (ChessHybridType -&gt; ChessHybridType -&gt; ChessHybridType)
+-&gt; Ord ChessHybridType
+ChessHybridType -&gt; ChessHybridType -&gt; Bool
+ChessHybridType -&gt; ChessHybridType -&gt; Ordering
+ChessHybridType -&gt; ChessHybridType -&gt; ChessHybridType
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: ChessHybridType -&gt; ChessHybridType -&gt; ChessHybridType
+$cmin :: ChessHybridType -&gt; ChessHybridType -&gt; ChessHybridType
+max :: ChessHybridType -&gt; ChessHybridType -&gt; ChessHybridType
+$cmax :: ChessHybridType -&gt; ChessHybridType -&gt; ChessHybridType
+&gt;= :: ChessHybridType -&gt; ChessHybridType -&gt; Bool
+$c&gt;= :: ChessHybridType -&gt; ChessHybridType -&gt; Bool
+&gt; :: ChessHybridType -&gt; ChessHybridType -&gt; Bool
+$c&gt; :: ChessHybridType -&gt; ChessHybridType -&gt; Bool
+&lt;= :: ChessHybridType -&gt; ChessHybridType -&gt; Bool
+$c&lt;= :: ChessHybridType -&gt; ChessHybridType -&gt; Bool
+&lt; :: ChessHybridType -&gt; ChessHybridType -&gt; Bool
+$c&lt; :: ChessHybridType -&gt; ChessHybridType -&gt; Bool
+compare :: ChessHybridType -&gt; ChessHybridType -&gt; Ordering
+$ccompare :: ChessHybridType -&gt; ChessHybridType -&gt; Ordering
+$cp1Ord :: Eq ChessHybridType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238218"><span id="local-6989586621679238220"><span id="local-6989586621679238222"><span id="local-6989586621679238224"><span class="annot"><span class="annottext">ReadPrec [ChessHybridType]
+ReadPrec ChessHybridType
+Int -&gt; ReadS ChessHybridType
+ReadS [ChessHybridType]
+(Int -&gt; ReadS ChessHybridType)
+-&gt; ReadS [ChessHybridType]
+-&gt; ReadPrec ChessHybridType
+-&gt; ReadPrec [ChessHybridType]
+-&gt; Read ChessHybridType
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+readListPrec :: ReadPrec [ChessHybridType]
+$creadListPrec :: ReadPrec [ChessHybridType]
+readPrec :: ReadPrec ChessHybridType
+$creadPrec :: ReadPrec ChessHybridType
+readList :: ReadS [ChessHybridType]
+$creadList :: ReadS [ChessHybridType]
+readsPrec :: Int -&gt; ReadS ChessHybridType
+$creadsPrec :: Int -&gt; ReadS ChessHybridType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238212"><span id="local-6989586621679238214"><span id="local-6989586621679238216"><span class="annot"><span class="annottext">Int -&gt; ChessHybridType -&gt; ShowS
+[ChessHybridType] -&gt; ShowS
+ChessHybridType -&gt; String
+(Int -&gt; ChessHybridType -&gt; ShowS)
+-&gt; (ChessHybridType -&gt; String)
+-&gt; ([ChessHybridType] -&gt; ShowS)
+-&gt; Show ChessHybridType
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [ChessHybridType] -&gt; ShowS
+$cshowList :: [ChessHybridType] -&gt; ShowS
+show :: ChessHybridType -&gt; String
+$cshow :: ChessHybridType -&gt; String
+showsPrec :: Int -&gt; ChessHybridType -&gt; ShowS
+$cshowsPrec :: Int -&gt; ChessHybridType -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-104"></span><span>
+</span><span id="line-105"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238208"><span id="local-6989586621679238210"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybridType"><span class="hs-identifier hs-type">ChessHybridType</span></a></span></span></span><span>
+</span><span id="line-106"></span><span>
+</span><span id="line-107"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238206"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybridType"><span class="hs-identifier hs-type">ChessHybridType</span></a></span></span><span>
+</span><span id="line-108"></span><span>
+</span><span id="line-109"></span><span class="hs-comment">-- | Chess pieces that can be represented in Unicode. These are the /king/,</span><span>
+</span><span id="line-110"></span><span class="hs-comment">-- /queen/, /rook/, /bishop/, /knight/, /pawn/, and /equihopper/ over 0, 90,</span><span>
+</span><span id="line-111"></span><span class="hs-comment">-- 180, and 270 degrees; and the /knight/ over /45/, /135/, /225/, and /315/</span><span>
+</span><span id="line-112"></span><span class="hs-comment">-- degrees in 'Black', 'White' and 'Neutral'.</span><span>
+</span><span id="line-113"></span><span class="hs-comment">-- Furthermore one can draw a /knight-queen/, /knight-rook/, and /knight-bishop/</span><span>
+</span><span id="line-114"></span><span class="hs-comment">-- pieces can be drawn without rotation and only in 'BBlack' or 'BWhite'.</span><span>
+</span><span id="line-115"></span><span id="local-6989586621679238204"><span id="local-6989586621679238205"></span></span><span class="hs-keyword">data</span><span> </span><span id="ChessPiece"><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-var">ChessPiece</span></a></span></span><span>
+</span><span id="line-116"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Chess90"><span class="annot"><a href="Data.Char.Chess.html#Chess90"><span class="hs-identifier hs-var">Chess90</span></a></span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColor"><span class="hs-identifier hs-type">ChessColor</span></a></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPieceType"><span class="hs-identifier hs-type">ChessPieceType</span></a></span><span> </span><span class="annot"><a href="Data.Char.Core.html#Rotate90"><span class="hs-identifier hs-type">Rotate90</span></a></span><span>  </span><span class="hs-comment">-- ^ Standard pieces drawn in /black/, /white/, or /neutral/ and with rotation.</span><span>
+</span><span id="line-117"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Chess45Knight"><span class="annot"><a href="Data.Char.Chess.html#Chess45Knight"><span class="hs-identifier hs-var">Chess45Knight</span></a></span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColor"><span class="hs-identifier hs-type">ChessColor</span></a></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Rotate45"><span class="hs-identifier hs-type">Rotate45</span></a></span><span>  </span><span class="hs-comment">-- ^ /Knights/ have unicode characters to render these rotated over /45/, /135/, /225/ and /315/ degrees.</span><span>
+</span><span id="line-118"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ChessHybrid"><span class="annot"><a href="Data.Char.Chess.html#ChessHybrid"><span class="hs-identifier hs-var">ChessHybrid</span></a></span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybridType"><span class="hs-identifier hs-type">ChessHybridType</span></a></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier hs-type">ChessColorBinary</span></a></span><span>  </span><span class="hs-comment">-- ^ Hybrid chess pieces can only be rendered in 'BBlack' and 'BWhite'.</span><span>
+</span><span id="line-119"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="%24cChessHybrid"><span id="%24cChess45Knight"><span id="%24cChess90"><span id="%24tChessPiece"><span id="local-6989586621679238175"><span id="local-6989586621679238177"><span id="local-6989586621679238179"><span id="local-6989586621679238181"><span id="local-6989586621679238183"><span id="local-6989586621679238185"><span id="local-6989586621679238187"><span id="local-6989586621679238189"><span id="local-6989586621679238191"><span id="local-6989586621679238193"><span id="local-6989586621679238195"><span id="local-6989586621679238197"><span id="local-6989586621679238199"><span id="local-6989586621679238201"><span class="annot"><span class="annottext">Typeable ChessPiece
+DataType
+Constr
+Typeable ChessPiece =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; ChessPiece -&gt; c ChessPiece)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessPiece)
+-&gt; (ChessPiece -&gt; Constr)
+-&gt; (ChessPiece -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessPiece))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c ChessPiece))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; ChessPiece -&gt; ChessPiece)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPiece -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPiece -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPiece -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPiece -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; ChessPiece -&gt; m ChessPiece)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; ChessPiece -&gt; m ChessPiece)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; ChessPiece -&gt; m ChessPiece)
+-&gt; Data ChessPiece
+ChessPiece -&gt; DataType
+ChessPiece -&gt; Constr
+(forall b. Data b =&gt; b -&gt; b) -&gt; ChessPiece -&gt; ChessPiece
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessPiece -&gt; c ChessPiece
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessPiece
+forall a.
+Typeable a =&gt;
+(forall (c :: * -&gt; *).
+ (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+ -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPiece -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPiece -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPiece -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPiece -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ChessPiece -&gt; m ChessPiece
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ChessPiece -&gt; m ChessPiece
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessPiece
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessPiece -&gt; c ChessPiece
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessPiece)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c ChessPiece)
+$cChessHybrid :: Constr
+$cChess45Knight :: Constr
+$cChess90 :: Constr
+$tChessPiece :: DataType
+gmapMo :: (forall d. Data d =&gt; d -&gt; m d) -&gt; ChessPiece -&gt; m ChessPiece
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ChessPiece -&gt; m ChessPiece
+gmapMp :: (forall d. Data d =&gt; d -&gt; m d) -&gt; ChessPiece -&gt; m ChessPiece
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ChessPiece -&gt; m ChessPiece
+gmapM :: (forall d. Data d =&gt; d -&gt; m d) -&gt; ChessPiece -&gt; m ChessPiece
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ChessPiece -&gt; m ChessPiece
+gmapQi :: Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPiece -&gt; u
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPiece -&gt; u
+gmapQ :: (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPiece -&gt; [u]
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ChessPiece -&gt; [u]
+gmapQr :: (r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPiece -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPiece -&gt; r
+gmapQl :: (r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPiece -&gt; r
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ChessPiece -&gt; r
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; ChessPiece -&gt; ChessPiece
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; ChessPiece -&gt; ChessPiece
+dataCast2 :: (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c ChessPiece)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c ChessPiece)
+dataCast1 :: (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessPiece)
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ChessPiece)
+dataTypeOf :: ChessPiece -&gt; DataType
+$cdataTypeOf :: ChessPiece -&gt; DataType
+toConstr :: ChessPiece -&gt; Constr
+$ctoConstr :: ChessPiece -&gt; Constr
+gunfold :: (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessPiece
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ChessPiece
+gfoldl :: (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessPiece -&gt; c ChessPiece
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ChessPiece -&gt; c ChessPiece
+$cp1Data :: Typeable ChessPiece
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238167"><span id="local-6989586621679238169"><span class="annot"><span class="annottext">ChessPiece -&gt; ChessPiece -&gt; Bool
+(ChessPiece -&gt; ChessPiece -&gt; Bool)
+-&gt; (ChessPiece -&gt; ChessPiece -&gt; Bool) -&gt; Eq ChessPiece
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: ChessPiece -&gt; ChessPiece -&gt; Bool
+$c/= :: ChessPiece -&gt; ChessPiece -&gt; Bool
+== :: ChessPiece -&gt; ChessPiece -&gt; Bool
+$c== :: ChessPiece -&gt; ChessPiece -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. ChessPiece -&gt; Rep ChessPiece x)
+-&gt; (forall x. Rep ChessPiece x -&gt; ChessPiece) -&gt; Generic ChessPiece
+forall x. Rep ChessPiece x -&gt; ChessPiece
+forall x. ChessPiece -&gt; Rep ChessPiece x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep ChessPiece x -&gt; ChessPiece
+$cfrom :: forall x. ChessPiece -&gt; Rep ChessPiece x
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238150"><span id="local-6989586621679238152"><span id="local-6989586621679238154"><span id="local-6989586621679238156"><span id="local-6989586621679238158"><span id="local-6989586621679238160"><span id="local-6989586621679238162"><span class="annot"><span class="annottext">Eq ChessPiece
+Eq ChessPiece =&gt;
+(ChessPiece -&gt; ChessPiece -&gt; Ordering)
+-&gt; (ChessPiece -&gt; ChessPiece -&gt; Bool)
+-&gt; (ChessPiece -&gt; ChessPiece -&gt; Bool)
+-&gt; (ChessPiece -&gt; ChessPiece -&gt; Bool)
+-&gt; (ChessPiece -&gt; ChessPiece -&gt; Bool)
+-&gt; (ChessPiece -&gt; ChessPiece -&gt; ChessPiece)
+-&gt; (ChessPiece -&gt; ChessPiece -&gt; ChessPiece)
+-&gt; Ord ChessPiece
+ChessPiece -&gt; ChessPiece -&gt; Bool
+ChessPiece -&gt; ChessPiece -&gt; Ordering
+ChessPiece -&gt; ChessPiece -&gt; ChessPiece
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: ChessPiece -&gt; ChessPiece -&gt; ChessPiece
+$cmin :: ChessPiece -&gt; ChessPiece -&gt; ChessPiece
+max :: ChessPiece -&gt; ChessPiece -&gt; ChessPiece
+$cmax :: ChessPiece -&gt; ChessPiece -&gt; ChessPiece
+&gt;= :: ChessPiece -&gt; ChessPiece -&gt; Bool
+$c&gt;= :: ChessPiece -&gt; ChessPiece -&gt; Bool
+&gt; :: ChessPiece -&gt; ChessPiece -&gt; Bool
+$c&gt; :: ChessPiece -&gt; ChessPiece -&gt; Bool
+&lt;= :: ChessPiece -&gt; ChessPiece -&gt; Bool
+$c&lt;= :: ChessPiece -&gt; ChessPiece -&gt; Bool
+&lt; :: ChessPiece -&gt; ChessPiece -&gt; Bool
+$c&lt; :: ChessPiece -&gt; ChessPiece -&gt; Bool
+compare :: ChessPiece -&gt; ChessPiece -&gt; Ordering
+$ccompare :: ChessPiece -&gt; ChessPiece -&gt; Ordering
+$cp1Ord :: Eq ChessPiece
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238142"><span id="local-6989586621679238144"><span id="local-6989586621679238146"><span id="local-6989586621679238148"><span class="annot"><span class="annottext">ReadPrec [ChessPiece]
+ReadPrec ChessPiece
+Int -&gt; ReadS ChessPiece
+ReadS [ChessPiece]
+(Int -&gt; ReadS ChessPiece)
+-&gt; ReadS [ChessPiece]
+-&gt; ReadPrec ChessPiece
+-&gt; ReadPrec [ChessPiece]
+-&gt; Read ChessPiece
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+readListPrec :: ReadPrec [ChessPiece]
+$creadListPrec :: ReadPrec [ChessPiece]
+readPrec :: ReadPrec ChessPiece
+$creadPrec :: ReadPrec ChessPiece
+readList :: ReadS [ChessPiece]
+$creadList :: ReadS [ChessPiece]
+readsPrec :: Int -&gt; ReadS ChessPiece
+$creadsPrec :: Int -&gt; ReadS ChessPiece
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679238136"><span id="local-6989586621679238138"><span id="local-6989586621679238140"><span class="annot"><span class="annottext">Int -&gt; ChessPiece -&gt; ShowS
+[ChessPiece] -&gt; ShowS
+ChessPiece -&gt; String
+(Int -&gt; ChessPiece -&gt; ShowS)
+-&gt; (ChessPiece -&gt; String)
+-&gt; ([ChessPiece] -&gt; ShowS)
+-&gt; Show ChessPiece
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [ChessPiece] -&gt; ShowS
+$cshowList :: [ChessPiece] -&gt; ShowS
+show :: ChessPiece -&gt; String
+$cshow :: ChessPiece -&gt; String
+showsPrec :: Int -&gt; ChessPiece -&gt; ShowS
+$cshowsPrec :: Int -&gt; ChessPiece -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-120"></span><span>
+</span><span id="line-121"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238132"><span id="local-6989586621679238134"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span></span></span><span>
+</span><span id="line-122"></span><span>
+</span><span id="line-123"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238130"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span></span><span>
+</span><span id="line-124"></span><span>
+</span><span id="line-125"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238127"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier hs-type">ChessColorBinary</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-126"></span><span>    </span><span id="local-6989586621679238125"><span class="annot"><span class="annottext">arbitrary :: Gen ChessColorBinary
+</span><a href="#local-6989586621679238125"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen ChessColorBinary
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-127"></span><span>
+</span><span id="line-128"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238122"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColor"><span class="hs-identifier hs-type">ChessColor</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-129"></span><span>    </span><span id="local-6989586621679238121"><span class="annot"><span class="annottext">arbitrary :: Gen ChessColor
+</span><a href="#local-6989586621679238121"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen ChessColor
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-130"></span><span>
+</span><span id="line-131"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238118"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPieceType"><span class="hs-identifier hs-type">ChessPieceType</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-132"></span><span>    </span><span id="local-6989586621679238117"><span class="annot"><span class="annottext">arbitrary :: Gen ChessPieceType
+</span><a href="#local-6989586621679238117"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen ChessPieceType
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-133"></span><span>
+</span><span id="line-134"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238114"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybridType"><span class="hs-identifier hs-type">ChessHybridType</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-135"></span><span>    </span><span id="local-6989586621679238113"><span class="annot"><span class="annottext">arbitrary :: Gen ChessHybridType
+</span><a href="#local-6989586621679238113"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen ChessHybridType
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-136"></span><span>
+</span><span id="line-137"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238110"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Rotate45"><span class="hs-identifier hs-type">Rotate45</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-138"></span><span>    </span><span id="local-6989586621679238109"><span class="annot"><span class="annottext">arbitrary :: Gen Rotate45
+</span><a href="#local-6989586621679238109"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen Rotate45
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-139"></span><span>
+</span><span id="line-140"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679238106"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-141"></span><span>    </span><span id="local-6989586621679238105"><span class="annot"><span class="annottext">arbitrary :: Gen ChessPiece
+</span><a href="#local-6989586621679238105"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Gen ChessPiece] -&gt; Gen ChessPiece
+forall a. [Gen a] -&gt; Gen a
+</span><span class="hs-identifier hs-var">oneof</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">ChessColor -&gt; ChessPieceType -&gt; Rotate90 -&gt; ChessPiece
+</span><a href="Data.Char.Chess.html#Chess90"><span class="hs-identifier hs-var">Chess90</span></a></span><span> </span><span class="annot"><span class="annottext">(ChessColor -&gt; ChessPieceType -&gt; Rotate90 -&gt; ChessPiece)
+-&gt; Gen ChessColor -&gt; Gen (ChessPieceType -&gt; Rotate90 -&gt; ChessPiece)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen ChessColor
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span> </span><span class="annot"><span class="annottext">Gen (ChessPieceType -&gt; Rotate90 -&gt; ChessPiece)
+-&gt; Gen ChessPieceType -&gt; Gen (Rotate90 -&gt; ChessPiece)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen ChessPieceType
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span> </span><span class="annot"><span class="annottext">Gen (Rotate90 -&gt; ChessPiece) -&gt; Gen Rotate90 -&gt; Gen ChessPiece
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen Rotate90
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ChessColor -&gt; Rotate45 -&gt; ChessPiece
+</span><a href="Data.Char.Chess.html#Chess45Knight"><span class="hs-identifier hs-var">Chess45Knight</span></a></span><span> </span><span class="annot"><span class="annottext">(ChessColor -&gt; Rotate45 -&gt; ChessPiece)
+-&gt; Gen ChessColor -&gt; Gen (Rotate45 -&gt; ChessPiece)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen ChessColor
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span> </span><span class="annot"><span class="annottext">Gen (Rotate45 -&gt; ChessPiece) -&gt; Gen Rotate45 -&gt; Gen ChessPiece
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen Rotate45
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ChessHybridType -&gt; ChessColorBinary -&gt; ChessPiece
+</span><a href="Data.Char.Chess.html#ChessHybrid"><span class="hs-identifier hs-var">ChessHybrid</span></a></span><span> </span><span class="annot"><span class="annottext">(ChessHybridType -&gt; ChessColorBinary -&gt; ChessPiece)
+-&gt; Gen ChessHybridType -&gt; Gen (ChessColorBinary -&gt; ChessPiece)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen ChessHybridType
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span> </span><span class="annot"><span class="annottext">Gen (ChessColorBinary -&gt; ChessPiece)
+-&gt; Gen ChessColorBinary -&gt; Gen ChessPiece
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen ChessColorBinary
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-142"></span><span>
+</span><span id="line-143"></span><span class="hs-comment">-- | A /grasshopper/ is a /queen/ rotated over 180 degrees.</span><span>
+</span><span id="line-144"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Grasshopper"><span class="hs-identifier hs-type">Grasshopper</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColor"><span class="hs-identifier hs-type">ChessColor</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span><span>
+</span><span id="line-145"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bGrasshopper"><span id="%24mGrasshopper"><span id="Grasshopper"><span class="annot"><span class="annottext">$bGrasshopper :: ChessColor -&gt; ChessPiece
+$mGrasshopper :: forall r. ChessPiece -&gt; (ChessColor -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="Data.Char.Chess.html#%24bGrasshopper"><span class="hs-identifier hs-var hs-var hs-var">Grasshopper</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679238101"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Chess90"><span class="hs-identifier hs-type">Chess90</span></a></span><span> </span><span id="local-6989586621679238101"><span class="annot"><a href="#local-6989586621679238101"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Queen"><span class="hs-identifier hs-type">Queen</span></a></span><span> </span><span class="annot"><a href="Data.Char.Core.html#R180"><span class="hs-identifier hs-type">R180</span></a></span><span>
+</span><span id="line-146"></span><span>
+</span><span id="line-147"></span><span class="hs-comment">-- | A /Nightrider/ is a /knight/ rotated over 180 degrees.</span><span>
+</span><span id="line-148"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Nightrider"><span class="hs-identifier hs-type">Nightrider</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColor"><span class="hs-identifier hs-type">ChessColor</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span><span>
+</span><span id="line-149"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bNightrider"><span id="%24mNightrider"><span id="Nightrider"><span class="annot"><span class="annottext">$bNightrider :: ChessColor -&gt; ChessPiece
+$mNightrider :: forall r. ChessPiece -&gt; (ChessColor -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="Data.Char.Chess.html#%24bNightrider"><span class="hs-identifier hs-var hs-var hs-var">Nightrider</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679238098"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Chess90"><span class="hs-identifier hs-type">Chess90</span></a></span><span> </span><span id="local-6989586621679238098"><span class="annot"><a href="#local-6989586621679238098"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Knight"><span class="hs-identifier hs-type">Knight</span></a></span><span> </span><span class="annot"><a href="Data.Char.Core.html#R180"><span class="hs-identifier hs-type">R180</span></a></span><span>
+</span><span id="line-150"></span><span>
+</span><span id="line-151"></span><span class="hs-comment">-- | An /amazon/ is alterative name for a /knight-queen/.</span><span>
+</span><span id="line-152"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Amazon"><span class="hs-identifier hs-type">Amazon</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier hs-type">ChessColorBinary</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span><span>
+</span><span id="line-153"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bAmazon"><span id="%24mAmazon"><span id="Amazon"><span class="annot"><span class="annottext">$bAmazon :: ChessColorBinary -&gt; ChessPiece
+$mAmazon :: forall r.
+ChessPiece -&gt; (ChessColorBinary -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="Data.Char.Chess.html#%24bAmazon"><span class="hs-identifier hs-var hs-var hs-var">Amazon</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679238095"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybrid"><span class="hs-identifier hs-type">ChessHybrid</span></a></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#KnightQueen"><span class="hs-identifier hs-type">KnightQueen</span></a></span><span> </span><span id="local-6989586621679238095"><span class="annot"><a href="#local-6989586621679238095"><span class="hs-identifier hs-var">c</span></a></span></span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span class="hs-comment">-- | A /terror/ is alterative name for a /knight-queen/.</span><span>
+</span><span id="line-156"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Terror"><span class="hs-identifier hs-type">Terror</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier hs-type">ChessColorBinary</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span><span>
+</span><span id="line-157"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bTerror"><span id="%24mTerror"><span id="Terror"><span class="annot"><span class="annottext">$bTerror :: ChessColorBinary -&gt; ChessPiece
+$mTerror :: forall r.
+ChessPiece -&gt; (ChessColorBinary -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="Data.Char.Chess.html#%24bTerror"><span class="hs-identifier hs-var hs-var hs-var">Terror</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679238092"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybrid"><span class="hs-identifier hs-type">ChessHybrid</span></a></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#KnightQueen"><span class="hs-identifier hs-type">KnightQueen</span></a></span><span> </span><span id="local-6989586621679238092"><span class="annot"><a href="#local-6989586621679238092"><span class="hs-identifier hs-var">c</span></a></span></span><span>
+</span><span id="line-158"></span><span>
+</span><span id="line-159"></span><span class="hs-comment">-- | An /omnipotent queen/ is alterative name for a /knight-queen/.</span><span>
+</span><span id="line-160"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#OmnipotentQueen"><span class="hs-identifier hs-type">OmnipotentQueen</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier hs-type">ChessColorBinary</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span><span>
+</span><span id="line-161"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bOmnipotentQueen"><span id="%24mOmnipotentQueen"><span id="OmnipotentQueen"><span class="annot"><span class="annottext">$bOmnipotentQueen :: ChessColorBinary -&gt; ChessPiece
+$mOmnipotentQueen :: forall r.
+ChessPiece -&gt; (ChessColorBinary -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="Data.Char.Chess.html#%24bOmnipotentQueen"><span class="hs-identifier hs-var hs-var hs-var">OmnipotentQueen</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679238089"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybrid"><span class="hs-identifier hs-type">ChessHybrid</span></a></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#KnightQueen"><span class="hs-identifier hs-type">KnightQueen</span></a></span><span> </span><span id="local-6989586621679238089"><span class="annot"><a href="#local-6989586621679238089"><span class="hs-identifier hs-var">c</span></a></span></span><span>
+</span><span id="line-162"></span><span>
+</span><span id="line-163"></span><span class="hs-comment">-- | A /superqueen/ is alterative name for a /knight-queen/.</span><span>
+</span><span id="line-164"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Superqueen"><span class="hs-identifier hs-type">Superqueen</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier hs-type">ChessColorBinary</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span><span>
+</span><span id="line-165"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bSuperqueen"><span id="%24mSuperqueen"><span id="Superqueen"><span class="annot"><span class="annottext">$bSuperqueen :: ChessColorBinary -&gt; ChessPiece
+$mSuperqueen :: forall r.
+ChessPiece -&gt; (ChessColorBinary -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="Data.Char.Chess.html#%24bSuperqueen"><span class="hs-identifier hs-var hs-var hs-var">Superqueen</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679238086"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybrid"><span class="hs-identifier hs-type">ChessHybrid</span></a></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#KnightQueen"><span class="hs-identifier hs-type">KnightQueen</span></a></span><span> </span><span id="local-6989586621679238086"><span class="annot"><a href="#local-6989586621679238086"><span class="hs-identifier hs-var">c</span></a></span></span><span>
+</span><span id="line-166"></span><span>
+</span><span id="line-167"></span><span class="hs-comment">-- | A /chancellor/ is alterative name for a /knight-rook/.</span><span>
+</span><span id="line-168"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Chancellor"><span class="hs-identifier hs-type">Chancellor</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier hs-type">ChessColorBinary</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span><span>
+</span><span id="line-169"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bChancellor"><span id="%24mChancellor"><span id="Chancellor"><span class="annot"><span class="annottext">$bChancellor :: ChessColorBinary -&gt; ChessPiece
+$mChancellor :: forall r.
+ChessPiece -&gt; (ChessColorBinary -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="Data.Char.Chess.html#%24bChancellor"><span class="hs-identifier hs-var hs-var hs-var">Chancellor</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679238083"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybrid"><span class="hs-identifier hs-type">ChessHybrid</span></a></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#KnightRook"><span class="hs-identifier hs-type">KnightRook</span></a></span><span> </span><span id="local-6989586621679238083"><span class="annot"><a href="#local-6989586621679238083"><span class="hs-identifier hs-var">c</span></a></span></span><span>
+</span><span id="line-170"></span><span>
+</span><span id="line-171"></span><span class="hs-comment">-- | A /marshall/ is alterative name for a /knight-rook/.</span><span>
+</span><span id="line-172"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Marshall"><span class="hs-identifier hs-type">Marshall</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier hs-type">ChessColorBinary</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span><span>
+</span><span id="line-173"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bMarshall"><span id="%24mMarshall"><span id="Marshall"><span class="annot"><span class="annottext">$bMarshall :: ChessColorBinary -&gt; ChessPiece
+$mMarshall :: forall r.
+ChessPiece -&gt; (ChessColorBinary -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="Data.Char.Chess.html#%24bMarshall"><span class="hs-identifier hs-var hs-var hs-var">Marshall</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679238080"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybrid"><span class="hs-identifier hs-type">ChessHybrid</span></a></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#KnightRook"><span class="hs-identifier hs-type">KnightRook</span></a></span><span> </span><span id="local-6989586621679238080"><span class="annot"><a href="#local-6989586621679238080"><span class="hs-identifier hs-var">c</span></a></span></span><span>
+</span><span id="line-174"></span><span>
+</span><span id="line-175"></span><span class="hs-comment">-- | An /empress/ is alterative name for a /knight-rook/.</span><span>
+</span><span id="line-176"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Empress"><span class="hs-identifier hs-type">Empress</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier hs-type">ChessColorBinary</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span><span>
+</span><span id="line-177"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bEmpress"><span id="%24mEmpress"><span id="Empress"><span class="annot"><span class="annottext">$bEmpress :: ChessColorBinary -&gt; ChessPiece
+$mEmpress :: forall r.
+ChessPiece -&gt; (ChessColorBinary -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="Data.Char.Chess.html#%24bEmpress"><span class="hs-identifier hs-var hs-var hs-var">Empress</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679238077"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybrid"><span class="hs-identifier hs-type">ChessHybrid</span></a></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#KnightRook"><span class="hs-identifier hs-type">KnightRook</span></a></span><span> </span><span id="local-6989586621679238077"><span class="annot"><a href="#local-6989586621679238077"><span class="hs-identifier hs-var">c</span></a></span></span><span>
+</span><span id="line-178"></span><span>
+</span><span id="line-179"></span><span class="hs-comment">-- | A /cardinal/ is alterative name for a /knight-bishop/.</span><span>
+</span><span id="line-180"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Cardinal"><span class="hs-identifier hs-type">Cardinal</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier hs-type">ChessColorBinary</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span><span>
+</span><span id="line-181"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bCardinal"><span id="%24mCardinal"><span id="Cardinal"><span class="annot"><span class="annottext">$bCardinal :: ChessColorBinary -&gt; ChessPiece
+$mCardinal :: forall r.
+ChessPiece -&gt; (ChessColorBinary -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="Data.Char.Chess.html#%24bCardinal"><span class="hs-identifier hs-var hs-var hs-var">Cardinal</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679238074"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybrid"><span class="hs-identifier hs-type">ChessHybrid</span></a></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#KnightBishop"><span class="hs-identifier hs-type">KnightBishop</span></a></span><span> </span><span id="local-6989586621679238074"><span class="annot"><a href="#local-6989586621679238074"><span class="hs-identifier hs-var">c</span></a></span></span><span>
+</span><span id="line-182"></span><span>
+</span><span id="line-183"></span><span class="hs-comment">-- | A /princess/ is alterative name for a /knight-bishop/.</span><span>
+</span><span id="line-184"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Princess"><span class="hs-identifier hs-type">Princess</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColorBinary"><span class="hs-identifier hs-type">ChessColorBinary</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span><span>
+</span><span id="line-185"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bPrincess"><span id="%24mPrincess"><span id="Princess"><span class="annot"><span class="annottext">$bPrincess :: ChessColorBinary -&gt; ChessPiece
+$mPrincess :: forall r.
+ChessPiece -&gt; (ChessColorBinary -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="Data.Char.Chess.html#%24bPrincess"><span class="hs-identifier hs-var hs-var hs-var">Princess</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679238071"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessHybrid"><span class="hs-identifier hs-type">ChessHybrid</span></a></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#KnightBishop"><span class="hs-identifier hs-type">KnightBishop</span></a></span><span> </span><span id="local-6989586621679238071"><span class="annot"><a href="#local-6989586621679238071"><span class="hs-identifier hs-var">c</span></a></span></span><span>
+</span><span id="line-186"></span><span>
+</span><span id="line-187"></span><span class="annot"><a href="Data.Char.Chess.html#_chessValue"><span class="hs-identifier hs-type">_chessValue</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPieceType"><span class="hs-identifier hs-type">ChessPieceType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessColor"><span class="hs-identifier hs-type">ChessColor</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-188"></span><span id="_chessValue"><span class="annot"><span class="annottext">_chessValue :: ChessPieceType -&gt; ChessColor -&gt; Int
+</span><a href="Data.Char.Chess.html#_chessValue"><span class="hs-identifier hs-var hs-var">_chessValue</span></a></span></span><span> </span><span id="local-6989586621679238069"><span class="annot"><span class="annottext">t :: ChessPieceType
+</span><a href="#local-6989586621679238069"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679238068"><span class="annot"><span class="annottext">c :: ChessColor
+</span><a href="#local-6989586621679238068"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-number">6</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">ChessColor -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">ChessColor
+</span><a href="#local-6989586621679238068"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">ChessPieceType -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">ChessPieceType
+</span><a href="#local-6989586621679238069"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-189"></span><span>
+</span><span id="line-190"></span><span class="hs-comment">-- | Convert the given 'ChessPiece' to the corresponding unicode character.</span><span>
+</span><span id="line-191"></span><span class="annot"><a href="Data.Char.Chess.html#chessPiece"><span class="hs-identifier hs-type">chessPiece</span></a></span><span>
+</span><span id="line-192"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Chess.html#ChessPiece"><span class="hs-identifier hs-type">ChessPiece</span></a></span><span>  </span><span class="hs-comment">-- ^ The given 'ChessPiece' to convert.</span><span>
+</span><span id="line-193"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>  </span><span class="hs-comment">-- ^ The unicode character that represents the given 'ChessPiece'.</span><span>
+</span><span id="line-194"></span><span id="chessPiece"><span class="annot"><span class="annottext">chessPiece :: ChessPiece -&gt; Char
+</span><a href="Data.Char.Chess.html#chessPiece"><span class="hs-identifier hs-var hs-var">chessPiece</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Chess.html#Chess90"><span class="hs-identifier hs-type">Chess90</span></a></span><span> </span><span id="local-6989586621679238064"><span class="annot"><span class="annottext">c :: ChessColor
+</span><a href="#local-6989586621679238064"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Equihopper"><span class="hs-identifier hs-type">Equihopper</span></a></span><span> </span><span id="local-6989586621679238063"><span class="annot"><span class="annottext">r :: Rotate90
+</span><a href="#local-6989586621679238063"><span class="hs-identifier hs-var">r</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-number">3</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">mod</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Rotate90 -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">Rotate90
+</span><a href="#local-6989586621679238063"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-number">2</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">ChessColor -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">ChessColor
+</span><a href="#local-6989586621679238064"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="hs-number">0x1fa48</span></span><span class="hs-special">)</span><span>
+</span><span id="line-195"></span><span class="annot"><a href="Data.Char.Chess.html#chessPiece"><span class="hs-identifier hs-var">chessPiece</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Chess.html#Chess90"><span class="hs-identifier hs-type">Chess90</span></a></span><span> </span><span class="annot"><a href="Data.Char.Chess.html#Neutral"><span class="hs-identifier hs-type">Neutral</span></a></span><span> </span><span id="local-6989586621679238061"><span class="annot"><span class="annottext">t :: ChessPieceType
+</span><a href="#local-6989586621679238061"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="annot"><a href="Data.Char.Core.html#R0"><span class="hs-identifier hs-type">R0</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-number">0x1fa00</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.|.</span></span><span> </span><span class="annot"><span class="annottext">ChessPieceType -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">ChessPieceType
+</span><a href="#local-6989586621679238061"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-196"></span><span class="annot"><a href="Data.Char.Chess.html#chessPiece"><span class="hs-identifier hs-var">chessPiece</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Chess.html#Chess90"><span class="hs-identifier hs-type">Chess90</span></a></span><span> </span><span id="local-6989586621679238060"><span class="annot"><span class="annottext">c :: ChessColor
+</span><a href="#local-6989586621679238060"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679238059"><span class="annot"><span class="annottext">t :: ChessPieceType
+</span><a href="#local-6989586621679238059"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="annot"><a href="Data.Char.Core.html#R0"><span class="hs-identifier hs-type">R0</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChessPieceType -&gt; ChessColor -&gt; Int
+</span><a href="Data.Char.Chess.html#_chessValue"><span class="hs-identifier hs-var">_chessValue</span></a></span><span> </span><span class="annot"><span class="annottext">ChessPieceType
+</span><a href="#local-6989586621679238059"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">ChessColor
+</span><a href="#local-6989586621679238060"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="hs-number">0x2654</span></span><span class="hs-special">)</span><span>
+</span><span id="line-197"></span><span class="annot"><a href="Data.Char.Chess.html#chessPiece"><span class="hs-identifier hs-var">chessPiece</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Chess.html#Chess90"><span class="hs-identifier hs-type">Chess90</span></a></span><span> </span><span id="local-6989586621679238058"><span class="annot"><span class="annottext">c :: ChessColor
+</span><a href="#local-6989586621679238058"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679238057"><span class="annot"><span class="annottext">t :: ChessPieceType
+</span><a href="#local-6989586621679238057"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679238056"><span class="annot"><span class="annottext">r :: Rotate90
+</span><a href="#local-6989586621679238056"><span class="hs-identifier hs-var">r</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-number">0x15</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">Rotate90 -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">Rotate90
+</span><a href="#local-6989586621679238056"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">ChessPieceType -&gt; ChessColor -&gt; Int
+</span><a href="Data.Char.Chess.html#_chessValue"><span class="hs-identifier hs-var">_chessValue</span></a></span><span> </span><span class="annot"><span class="annottext">ChessPieceType
+</span><a href="#local-6989586621679238057"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">ChessColor
+</span><a href="#local-6989586621679238058"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="hs-number">0x1f9f4</span></span><span class="hs-special">)</span><span>
+</span><span id="line-198"></span><span class="annot"><a href="Data.Char.Chess.html#chessPiece"><span class="hs-identifier hs-var">chessPiece</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Chess.html#Chess45Knight"><span class="hs-identifier hs-type">Chess45Knight</span></a></span><span> </span><span id="local-6989586621679238055"><span class="annot"><span class="annottext">c :: ChessColor
+</span><a href="#local-6989586621679238055"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679238054"><span class="annot"><span class="annottext">r :: Rotate45
+</span><a href="#local-6989586621679238054"><span class="hs-identifier hs-var">r</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-number">0x15</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">Rotate45 -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">Rotate45
+</span><a href="#local-6989586621679238054"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">ChessColor -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">ChessColor
+</span><a href="#local-6989586621679238055"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="hs-number">0x1fa06</span></span><span class="hs-special">)</span><span>
+</span><span id="line-199"></span><span class="annot"><a href="Data.Char.Chess.html#chessPiece"><span class="hs-identifier hs-var">chessPiece</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Chess.html#ChessHybrid"><span class="hs-identifier hs-type">ChessHybrid</span></a></span><span> </span><span id="local-6989586621679238053"><span class="annot"><span class="annottext">t :: ChessHybridType
+</span><a href="#local-6989586621679238053"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679238052"><span class="annot"><span class="annottext">c :: ChessColorBinary
+</span><a href="#local-6989586621679238052"><span class="hs-identifier hs-var">c</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-number">3</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">ChessColorBinary -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">ChessColorBinary
+</span><a href="#local-6989586621679238052"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">ChessHybridType -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">ChessHybridType
+</span><a href="#local-6989586621679238053"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="hs-number">0x1fa4e</span></span><span class="hs-special">)</span><span>
+</span><span id="line-200"></span></pre></body></html>
