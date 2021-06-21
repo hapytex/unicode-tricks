@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, OverloadedStrings, Safe #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, OverloadedStrings, Safe #-}
 
 {-|
 Module      : Data.Char.Emoji.Gender
@@ -21,6 +21,9 @@ import Control.DeepSeq(NFData)
 import Data.Char.Core(UnicodeText(toUnicodeText, fromUnicodeText))
 import Data.Data(Data)
 import Data.Hashable(Hashable)
+#if __GLASGOW_HASKELL__ < 803
+import Data.Semigroup(Semigroup((<>)))
+#endif
 
 import GHC.Generics(Generic)
 
