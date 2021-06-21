@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, OverloadedStrings, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, OverloadedStrings, Safe #-}
 
 {-|
 Module      : Data.Char.Emoji.Gender
