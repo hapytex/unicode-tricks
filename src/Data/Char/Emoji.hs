@@ -13,8 +13,6 @@ Unicode defines 2182 emoji characters, this module aims to make working with emo
 module Data.Char.Emoji (
     -- * Clock emoji
     Clock, hours, minutes30, clock, closestClock
-    -- * Moon phase emoji
-  , MoonPhase(NewMoon, WaxingCrescent, FirstQuarter, WaxingGibbous, FullMoon, WaningGibbous, ThirdQuarter, WaningCrescent)
     -- * Gender sign emoji
   , Gender(Female, Male)
     -- * Skin color modifier
@@ -25,6 +23,7 @@ module Data.Char.Emoji (
   , module Data.Char.Emoji.Core
   , module Data.Char.Emoji.BloodType
   , module Data.Char.Emoji.Flag
+  , module Data.Char.Emoji.Moon
   , module Data.Char.Emoji.Zodiac
   ) where
 
@@ -33,10 +32,11 @@ import Control.DeepSeq(NFData)
 import Data.Bits((.|.), shiftL, shiftR)
 import Data.Bool(bool)
 import Data.Char(chr, ord)
-import Data.Char.Core(MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Char.Emoji.Core
 import Data.Char.Emoji.BloodType
 import Data.Char.Emoji.Flag
+import Data.Char.Emoji.Moon
 import Data.Char.Emoji.Zodiac
 import Data.Data(Data)
 import Data.Hashable(Hashable)
@@ -48,9 +48,6 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
 _skinColorOffset :: Int
 _skinColorOffset = 0x1f3fb
-
-_moonPhaseOffset :: Int
-_moonPhaseOffset = 0x1f311
 
 -- | A 'Clock' object that can be converted to a unicode character that displays
 -- a clock with the given time. The 'Clock' has an 'hours' field that contains
@@ -138,18 +135,12 @@ instance Arbitrary Gender where
 instance Arbitrary Clock where
     arbitrary = arbitraryBoundedEnum
 
-instance Arbitrary MoonPhase where
-    arbitrary = arbitraryBoundedEnum
 
 instance UnicodeCharacter SkinColorModifier where
     toUnicodeChar = mapFromEnum _skinColorOffset
     fromUnicodeChar = mapToEnumSafe _skinColorOffset
     fromUnicodeChar' = mapToEnum _skinColorOffset
 
-instance UnicodeCharacter MoonPhase where
-    toUnicodeChar = mapFromEnum _moonPhaseOffset
-    fromUnicodeChar = mapToEnumSafe _moonPhaseOffset
-    fromUnicodeChar' = mapToEnum _moonPhaseOffset
 
 instance UnicodeCharacter Clock where
     toUnicodeChar (Clock h False) = chr (0x1f54f + h)
@@ -160,28 +151,6 @@ instance UnicodeCharacter Clock where
         | c < '\x1f568' = Just (Clock (mod (ord c - 0x1f55b) 12) True)
         | otherwise = Nothing
 
-
-
--- | A data type that defines the eight different moon phases, and is an
--- instance of 'UnicodeCharacter' to convert these to the corresponding Unicode
--- character.
-data MoonPhase
-  = NewMoon  -- ^ The /new moon/, the first phase of the moon represented by 🌑.
-  | WaxingCrescent  -- ^ The /waxing crescent/, the second phase of the moon represented by 🌒.
-  | FirstQuarter  -- ^ The /first quarter/, the third phase of the moon represented by 🌓.
-  | WaxingGibbous  -- ^ The /waxing gibbous/, the fourth phase of the moon represented by 🌔.
-  | FullMoon  -- ^ The /full moon/, the fifth phase of the moon represented by 🌕.
-  | WaningGibbous  -- ^ The /waning gibbous/, the sixth phase of the moon represented by 🌖.
-  | ThirdQuarter  -- ^ The /third quarter/, the seventh phase of the moon represented by 🌗.
-  | WaningCrescent  -- ^ The /waning crescent/, the eighth phase of the moon represented by 🌘.
-  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
-
-instance Hashable MoonPhase
-
-instance MirrorVertical MoonPhase where
-  mirrorVertical = toEnum . (`mod` 8) . (8 -) . fromEnum
-
-instance NFData MoonPhase
 
 -- | The 'SkinColorModifier' that corresponds to type one of the /Fitzpatrick
 -- scale/.
@@ -229,7 +198,6 @@ fromFitzPatrick _ = Nothing
 
 
 instance UnicodeText SkinColorModifier
-instance UnicodeText MoonPhase
 instance UnicodeText Clock
 
 instance UnicodeText Gender where
