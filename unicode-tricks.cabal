@@ -34,10 +34,12 @@ library
     , Data.Char.Domino
     , Data.Char.Emoji
     , Data.Char.Emoji.BloodType
+    , Data.Char.Emoji.Clock
     , Data.Char.Emoji.Core
     , Data.Char.Emoji.Flag
     , Data.Char.Emoji.Gender
     , Data.Char.Emoji.Moon
+    , Data.Char.Emoji.SkinColor
     , Data.Char.Emoji.Zodiac
     , Data.Char.Enclosed
     , Data.Char.Egyptian
@@ -102,11 +104,12 @@ test-suite             utricks
     , Data.Char.CurrencySpec
     , Data.Char.DiceSpec
     , Data.Char.DominoSpec
-    , Data.Char.EmojiSpec
     , Data.Char.Emoji.BloodTypeSpec
+    , Data.Char.Emoji.ClockSpec
     , Data.Char.Emoji.FlagSpec
     , Data.Char.Emoji.GenderSpec
     , Data.Char.Emoji.MoonSpec
+    , Data.Char.Emoji.SkinColorSpec
     , Data.Char.Emoji.ZodiacSpec
     , Data.Char.FrameSpec
     , Data.Char.MathSpec
