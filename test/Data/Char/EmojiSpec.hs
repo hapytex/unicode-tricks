@@ -11,26 +11,9 @@ import Test.Hspec
 spec :: Spec
 spec = do
   testUnicodeCharacter @ SkinColorModifier
-  testUnicodeCharacter @ MoonPhase
-  testUnicodeCharacter @ Zodiac
   testUnicodeCharacter @ Clock
   testUnicodeText @ SkinColorModifier
-  testUnicodeText @ MoonPhase
-  testUnicodeText @ Zodiac
   testUnicodeText @ Clock
-  testUnicodeText @ Gender
-  testUnicodeText @ Flag
-  testUnicodeText @ SubFlag
-  testUnicodeText @ BloodType
   testBounded @Clock
-  testBounded @Flag
-  testBounded @SubFlag
   testHashable @ SkinColorModifier
-  testHashable @ MoonPhase
-  testHashable @ Zodiac
   testHashable @ Clock
-  testHashable @ Gender
-  testHashable @ Flag
-  testHashable @ SubFlag
-  testHashable @ BloodType
-  testMirrorVertically @ MoonPhase

@@ -36,19 +36,23 @@ testMirrorHorizontallyVertically = instanceTexts' @a ["MirrorHorizontal", "Mirro
   it "test if mirror vertical, horizontal, horizontal, vertical, yield the same object" $ property (doubleCallHorizontallyVertically3 @a)
   it "test if two horizontal mirror calls are an identity" $ property (doubleCallHorizontally @a)
   it "test if two vertical mirror calls are an identity" $ property (doubleCallVertically @a)
+  it "test of a horizontal and vertical flip is the same as a vertical and horizontal flip" $ property (horizontalVerticalSame @a)
 
 testMirrorHorizontally :: forall a . (Arbitrary a, Eq a, MirrorHorizontal a, Show a, Typeable a) => SpecWith ()
 testMirrorHorizontally = instanceText' @a "MirrorHorizontal" $ do
   it "test if two calls are an identity" $ property (doubleCallHorizontally @a)
 
-doubleCallHorizontally :: (Eq a, MirrorHorizontal a) => a -> Bool
+doubleCallHorizontally :: forall a . (Eq a, MirrorHorizontal a) => a -> Bool
 doubleCallHorizontally x = mirrorHorizontal (mirrorHorizontal x) == x
 
 testMirrorVertically :: forall a . (Arbitrary a, Eq a, MirrorVertical a, Show a, Typeable a) => SpecWith ()
 testMirrorVertically = instanceText' @a "MirrorVertical" $ do
   it "test if two calls are an identity" $ property (doubleCallVertically @a)
 
-doubleCallVertically :: (Eq a, MirrorVertical a) => a -> Bool
+horizontalVerticalSame :: forall a . (Eq a, MirrorHorizontal a, MirrorVertical a) => a -> Bool
+horizontalVerticalSame x = mirrorVertical (mirrorHorizontal x) == mirrorHorizontal (mirrorVertical x)
+
+doubleCallVertically :: forall a . (Eq a, MirrorVertical a) => a -> Bool
 doubleCallVertically x = mirrorVertical (mirrorVertical x) == x
 
 doubleCallHorizontallyVertically :: (Eq a, MirrorHorizontal a, MirrorVertical a) => a -> Bool
