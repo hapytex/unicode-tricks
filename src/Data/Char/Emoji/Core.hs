@@ -11,11 +11,21 @@ A module that defines Emoji patterns.
 -}
 
 module Data.Char.Emoji.Core (
+    -- * Append the emoji suffix
+    withEmojiSuffix
     -- * Pattern synonyms
-    pattern EmojiSuffix
+  , pattern EmojiSuffix
   ) where
+
+import Data.String(IsString, fromString)
 
 -- | A 'Char'acter that is often used as a suffix to turn a character into an
 -- emoji.
 pattern EmojiSuffix :: Char
 pattern EmojiSuffix = '\xfe0f'
+
+-- | Append the 'EmojiSuffix' to the string-like value.
+withEmojiSuffix :: (Monoid s, IsString s)
+  => s  -- ^ The string-like object to append the 'EmojiSuffix' to.
+  -> s  -- ^ The string-like object with an 'EmojiSuffix' as suffix.
+withEmojiSuffix = (<> fromString [EmojiSuffix])

@@ -13,8 +13,6 @@ Unicode defines 2182 emoji characters, this module aims to make working with emo
 module Data.Char.Emoji (
     -- * Clock emoji
     Clock, hours, minutes30, clock, closestClock
-    -- * Gender sign emoji
-  , Gender(Female, Male)
     -- * Skin color modifier
   , SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), fromFitzPatrick
     -- * Pattern synonyms for the 'SkinColorModifier' elements
@@ -23,6 +21,7 @@ module Data.Char.Emoji (
   , module Data.Char.Emoji.Core
   , module Data.Char.Emoji.BloodType
   , module Data.Char.Emoji.Flag
+  , module Data.Char.Emoji.Gender
   , module Data.Char.Emoji.Moon
   , module Data.Char.Emoji.Zodiac
   ) where
@@ -32,10 +31,11 @@ import Control.DeepSeq(NFData)
 import Data.Bits((.|.), shiftL, shiftR)
 import Data.Bool(bool)
 import Data.Char(chr, ord)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText(fromUnicodeText, toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Char.Emoji.Core
 import Data.Char.Emoji.BloodType
 import Data.Char.Emoji.Flag
+import Data.Char.Emoji.Gender
 import Data.Char.Emoji.Moon
 import Data.Char.Emoji.Zodiac
 import Data.Data(Data)
@@ -99,18 +99,6 @@ clock h b
     | otherwise = Clock h' b
     where h' = mod (h-1) 12 + 1
 
--- | A data type to specify the /gender/ of a person, animal, etc. used in an
--- emoji. The 'Gender' items are an instance of 'UnicodeText' that maps to the
--- /female/ and /male/ emoji.
-data Gender
-  = Female -- The female sign, dented by ♀️.
-  | Male  -- The male sign, denoted by ♂️.
-  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
-
-instance Hashable Gender
-
-instance NFData Gender
-
 -- | Some emoji deal with people. One can change the color of the skin with the
 -- 'SkinColorModifier'. For the skin color, the <https://en.wikipedia.org/wiki/Fitzpatrick_scale /Fitzpatrick scale/> is used.
 -- A numerical classification system for skin types.
@@ -127,9 +115,6 @@ instance Hashable SkinColorModifier
 instance NFData SkinColorModifier
 
 instance Arbitrary SkinColorModifier where
-    arbitrary = arbitraryBoundedEnum
-
-instance Arbitrary Gender where
     arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary Clock where
@@ -199,10 +184,3 @@ fromFitzPatrick _ = Nothing
 
 instance UnicodeText SkinColorModifier
 instance UnicodeText Clock
-
-instance UnicodeText Gender where
-    toUnicodeText Male = "\x2640\xfe0f"
-    toUnicodeText Female = "\x2642\xfe0f"
-    fromUnicodeText "\x2640\xfe0f" = Just Male
-    fromUnicodeText "\x2642\xfe0f" = Just Female
-    fromUnicodeText _ = Nothing
