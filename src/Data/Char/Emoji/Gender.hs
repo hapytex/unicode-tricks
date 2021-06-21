@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, OverloadedStrings, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, OverloadedStrings, Safe #-}
 
 {-|
 Module      : Data.Char.Emoji.Gender
@@ -13,7 +13,8 @@ emoji are also used as modifiers for other emoji.
 
 module Data.Char.Emoji.Gender (
     -- * Gender sign emoji
-    Gender(Female, Male)
+    BinaryGender(Female, Male)
+  , Trigender(BinaryGender, Transgender)
   ) where
 
 import Control.DeepSeq(NFData)
@@ -21,9 +22,6 @@ import Control.DeepSeq(NFData)
 import Data.Char.Core(UnicodeText(toUnicodeText, fromUnicodeText))
 import Data.Data(Data)
 import Data.Hashable(Hashable)
-#if __GLASGOW_HASKELL__ < 803
-import Data.Semigroup(Semigroup((<>)))
-#endif
 
 import GHC.Generics(Generic)
 
@@ -33,21 +31,50 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 -- emoji. The 'Gender' items are an instance of 'UnicodeText' that maps to the
 -- /female/ and /male/ emoji. Often the corresponding codepoints are used
 -- to annotate something as male/female.
-data Gender
+data BinaryGender
   = Female -- The female sign, dented by ♀️.
   | Male  -- The male sign, denoted by ♂️.
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
-instance Arbitrary Gender where
+instance Arbitrary BinaryGender where
     arbitrary = arbitraryBoundedEnum
 
-instance Hashable Gender
+instance Hashable BinaryGender
 
-instance NFData Gender
+instance NFData BinaryGender
 
-instance UnicodeText Gender where
+instance UnicodeText BinaryGender where
     toUnicodeText Male = "\x2640\xfe0f"
     toUnicodeText Female = "\x2642\xfe0f"
     fromUnicodeText "\x2640\xfe0f" = Just Male
     fromUnicodeText "\x2642\xfe0f" = Just Female
     fromUnicodeText _ = Nothing
+
+-- | A data type that, besides 'Male' and 'Female' can also represent a 'Transgender'.
+data Trigender
+  = BinaryGender BinaryGender  -- ^ Specify a /binary/ gender which is /female/ or /male/.
+  | Transgender  -- ^ A value that specifies a /transgender/, this is denoted with ⚧️.
+  deriving (Data, Eq, Generic, Ord, Read, Show)
+
+instance Bounded Trigender where
+  minBound = BinaryGender minBound
+  maxBound = Transgender
+
+instance Enum Trigender where
+  fromEnum (BinaryGender g) = fromEnum g
+  fromEnum Transgender = 2
+  toEnum 2 = Transgender
+  toEnum x = BinaryGender (toEnum x)
+
+instance Arbitrary Trigender where
+    arbitrary = arbitraryBoundedEnum
+
+instance Hashable Trigender
+
+instance NFData Trigender
+
+instance UnicodeText Trigender where
+    toUnicodeText (BinaryGender g) = toUnicodeText g
+    toUnicodeText Transgender = "\x26a7\xfe0f"
+    fromUnicodeText "\x26a7\xfe0f" = Just Transgender
+    fromUnicodeText x = BinaryGender <$> fromUnicodeText x

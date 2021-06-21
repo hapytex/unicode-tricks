@@ -10,7 +10,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  testUnicodeCharacter @ Gender
-  testUnicodeText @ Gender
-  testHashable @ Gender
-  testMirrorVertically @ Gender
+  testUnicodeText @ BinaryGender
+  testUnicodeText @ Trigender
+  testHashable @ BinaryGender
+  testHashable @ Trigender

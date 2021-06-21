@@ -14,8 +14,6 @@ spec = do
   testUnicodeCharacter @ Clock
   testUnicodeText @ SkinColorModifier
   testUnicodeText @ Clock
-  testUnicodeText @ Gender
   testBounded @Clock
   testHashable @ SkinColorModifier
   testHashable @ Clock
-  testHashable @ Gender

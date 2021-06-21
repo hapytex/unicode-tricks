@@ -105,7 +105,7 @@ test-suite             utricks
     , Data.Char.EmojiSpec
     , Data.Char.Emoji.BloodTypeSpec
     , Data.Char.Emoji.FlagSpec
-    , Data.Char.Emoji.Gender
+    , Data.Char.Emoji.GenderSpec
     , Data.Char.Emoji.MoonSpec
     , Data.Char.Emoji.ZodiacSpec
     , Data.Char.FrameSpec
