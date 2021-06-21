@@ -1,10 +1,22 @@
 {-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe #-}
 
+{-|
+Module      : Data.Char.Emoji.Clock
+Description : A module that defines emoji that display a clock.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+For several emoji, one can specify the color of the skin of the person(s)
+of the emoji. This module defines the skin color modifiers together with
+its values on the Fitzpatrick scale.
+-}
+
 module Data.Char.Emoji.SkinColor (
     -- * Skin color modifier
-    SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), fromFitzPatrick
+    SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), fromFitzpatrick
     -- * Pattern synonyms for the 'SkinColorModifier' elements
-  , pattern FitzPatrickI, pattern FitzPatrickII, pattern FitzPatrickIII, pattern FitzPatrickIV, pattern FitzPatrickV, pattern FitzPatrickVI
+  , pattern FitzpatrickI, pattern FitzpatrickII, pattern FitzpatrickIII, pattern FitzpatrickIV, pattern FitzpatrickV, pattern FitzpatrickVI
 
   ) where
 
@@ -48,44 +60,44 @@ instance UnicodeText SkinColorModifier
 
 -- | The 'SkinColorModifier' that corresponds to type one of the /Fitzpatrick
 -- scale/.
-pattern FitzPatrickI :: SkinColorModifier
-pattern FitzPatrickI = Light
+pattern FitzpatrickI :: SkinColorModifier
+pattern FitzpatrickI = Light
 
 -- | The 'SkinColorModifier' that corresponds to type two of the /Fitzpatrick
 -- scale/.
-pattern FitzPatrickII :: SkinColorModifier
-pattern FitzPatrickII = Light
+pattern FitzpatrickII :: SkinColorModifier
+pattern FitzpatrickII = Light
 
 -- | The 'SkinColorModifier' that corresponds to type three of the /Fitzpatrick
 -- scale/.
-pattern FitzPatrickIII :: SkinColorModifier
-pattern FitzPatrickIII = MediumLight
+pattern FitzpatrickIII :: SkinColorModifier
+pattern FitzpatrickIII = MediumLight
 
 -- | The 'SkinColorModifier' that corresponds to type four of the /Fitzpatrick
 -- scale/.
-pattern FitzPatrickIV :: SkinColorModifier
-pattern FitzPatrickIV = Medium
+pattern FitzpatrickIV :: SkinColorModifier
+pattern FitzpatrickIV = Medium
 
 -- | The 'SkinColorModifier' that corresponds to type five of the /Fitzpatrick
 -- scale/.
-pattern FitzPatrickV :: SkinColorModifier
-pattern FitzPatrickV = MediumDark
+pattern FitzpatrickV :: SkinColorModifier
+pattern FitzpatrickV = MediumDark
 
 -- | The 'SkinColorModifier' that corresponds to type six of the /Fitzpatrick
 -- scale/.
-pattern FitzPatrickVI :: SkinColorModifier
-pattern FitzPatrickVI = Dark
+pattern FitzpatrickVI :: SkinColorModifier
+pattern FitzpatrickVI = Dark
 
 -- | Convert the given /Fitzpatrick skin type/ to the corresponding
 -- 'SkinColorModifier' wrapped in a 'Just', if no such 'SkinColorModifier'
 -- exists, 'Nothing' is returned.
-fromFitzPatrick :: Integral i
+fromFitzpatrick :: Integral i
   => i  -- ^ The given /Fitzpatrick skin type/.
   -> Maybe SkinColorModifier  -- ^ The corresponding 'SkinColorModifier' wrapped in a 'Just'; 'Nothing' if no such modifier exists.
-fromFitzPatrick 1 = Just Light
-fromFitzPatrick 2 = Just Light
-fromFitzPatrick 3 = Just MediumLight
-fromFitzPatrick 4 = Just Medium
-fromFitzPatrick 5 = Just MediumDark
-fromFitzPatrick 6 = Just Dark
-fromFitzPatrick _ = Nothing
+fromFitzpatrick 1 = Just Light
+fromFitzpatrick 2 = Just Light
+fromFitzpatrick 3 = Just MediumLight
+fromFitzpatrick 4 = Just Medium
+fromFitzpatrick 5 = Just MediumDark
+fromFitzpatrick 6 = Just Dark
+fromFitzpatrick _ = Nothing
