@@ -24,7 +24,7 @@ Currently the package contains the following modules:
  - **`Data.Char.Dice`**: a module to render die unicode characters;
  - **`Data.Char.Domino`**: a module to render domino unicode characters;
  - **`Data.Char.Egyptian`**: a module that defines pattern synonyms for ancient Egyptian hieroglyphs;
- - **`Data.Char.Emoji`**: functions to render *emoji* characters (flags, objects, persons, etc.);
+ - **`Data.Char.Emoji.*`**: modules that provide functions to render *emoji* characters (flags, objects, persons, etc.);
  - **`Data.Char.Enclosed`**: functions to convert alphanumerical characters to characters where these are enclosed by circles, squares, parenthesis, etc.;
  - **`Data.Char.Frame`**: typesetting frame elements. Lines of the frames can be `Light` or `Heavy`, and there are additional options to use arcs for corners;
  - **`Data.Char.Math.*`**: a set of modules to render mathematical symbols and text, for example in *Fraktur*, *Blackboard bold*, etc.
