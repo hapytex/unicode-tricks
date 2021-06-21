@@ -15,6 +15,8 @@ emoji where the moon has a face.
 module Data.Char.Emoji.Moon (
     -- * Moon phase emoji
     MoonPhase(NewMoon, WaxingCrescent, FirstQuarter, WaxingGibbous, FullMoon, WaningGibbous, ThirdQuarter, WaningCrescent)
+    -- * Moon faces emoji
+  , MoonFace(NewMoonFace, FirstQuarterFace, FullMoonFace, ThirdQuarterFace)
   ) where
 
 import Control.DeepSeq(NFData)
@@ -60,3 +62,36 @@ instance UnicodeCharacter MoonPhase where
     fromUnicodeChar' = mapToEnum _moonPhaseOffset
 
 instance UnicodeText MoonPhase
+
+-- | A data type that defines the four different moon faces (not to be confused with
+-- phases). This data type is an instance of the 'UnicodeCharacter' type class
+-- to convert these to the corresponding Unicode character.
+data MoonFace
+  = NewMoonFace  -- ^ The /new moon/, the first phase of the moon faces represented by 🌚.
+  | FirstQuarterFace  -- ^ The /first quarter/, the second phase of the moon faces represented by 🌛.
+  | FullMoonFace  -- ^ The /full moon/, the third phase of the moon faces represented by 🌝.
+  | ThirdQuarterFace  -- ^ The /third quarter/, the fourth phase of the moon faces represented by 🌜.
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Arbitrary MoonFace where
+    arbitrary = arbitraryBoundedEnum
+
+instance Hashable MoonFace
+
+instance MirrorVertical MoonFace where
+  mirrorVertical = toEnum . (3 -) . fromEnum
+
+instance NFData MoonFace
+
+instance UnicodeCharacter MoonFace where
+    toUnicodeChar NewMoonFace = '\x1f31a'
+    toUnicodeChar FirstQuarterFace = '\x1f31b'
+    toUnicodeChar FullMoonFace = '\x1F31d'
+    toUnicodeChar ThirdQuarterFace = '\x1f31c'
+    fromUnicodeChar '\x1f31a' = Just NewMoonFace
+    fromUnicodeChar '\x1f31b' = Just FirstQuarterFace
+    fromUnicodeChar '\x1f31d' = Just FullMoonFace
+    fromUnicodeChar '\x1f31c' = Just ThirdQuarterFace
+    fromUnicodeChar _ = Nothing
+
+instance UnicodeText MoonFace
