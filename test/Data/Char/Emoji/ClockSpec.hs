@@ -10,6 +10,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  testUnicodeCharacter @ SkinColorModifier
-  testUnicodeText @ SkinColorModifier
-  testHashable @ SkinColorModifier
+  testBounded @ Clock
+  testUnicodeCharacter @ Clock
+  testUnicodeText @ Clock
+  testHashable @ Clock
