@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}
 
 {-|
 Module      : Data.Char.Emoji.Moon
