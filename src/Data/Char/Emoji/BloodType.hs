@@ -14,7 +14,7 @@ module Data.Char.Emoji.BloodType (
     -- * Blood type emoji
     BloodType(O, B, A, AB)
     -- * Drop of blood emoji
-    pattern DropOfBlood
+  , pattern DropOfBlood
   ) where
 
 import Control.DeepSeq(NFData)

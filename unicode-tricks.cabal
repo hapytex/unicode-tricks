@@ -39,6 +39,7 @@ library
     , Data.Char.Emoji.Flag
     , Data.Char.Emoji.Gender
     , Data.Char.Emoji.Moon
+    , Data.Char.Emoji.Science
     , Data.Char.Emoji.SkinColor
     , Data.Char.Emoji.Zodiac
     , Data.Char.Enclosed
@@ -109,6 +110,7 @@ test-suite             utricks
     , Data.Char.Emoji.FlagSpec
     , Data.Char.Emoji.GenderSpec
     , Data.Char.Emoji.MoonSpec
+    , Data.Char.Emoji.ScienceSpec
     , Data.Char.Emoji.SkinColorSpec
     , Data.Char.Emoji.ZodiacSpec
     , Data.Char.FrameSpec
