@@ -38,6 +38,7 @@ library
     , Data.Char.Emoji.Core
     , Data.Char.Emoji.Flag
     , Data.Char.Emoji.Gender
+    , Data.Char.Emoji.Hand
     , Data.Char.Emoji.Moon
     , Data.Char.Emoji.Science
     , Data.Char.Emoji.SkinColor
@@ -109,6 +110,7 @@ test-suite             utricks
     , Data.Char.Emoji.ClockSpec
     , Data.Char.Emoji.FlagSpec
     , Data.Char.Emoji.GenderSpec
+    , Data.Char.Emoji.HandSpec
     , Data.Char.Emoji.MoonSpec
     , Data.Char.Emoji.ScienceSpec
     , Data.Char.Emoji.SkinColorSpec

@@ -15,9 +15,10 @@ its values on the Fitzpatrick scale.
 module Data.Char.Emoji.SkinColor (
     -- * Skin color modifier
     SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), OptionalSkinColor, fromFitzpatrick
+    -- * Create emoji with a 'SkinColorModifier'
+  , withSkinModifier, withOptionalSkinModifier
     -- * Pattern synonyms for the 'SkinColorModifier' elements
   , pattern FitzpatrickI, pattern FitzpatrickII, pattern FitzpatrickIII, pattern FitzpatrickIV, pattern FitzpatrickV, pattern FitzpatrickVI
-
   ) where
 
 import Control.DeepSeq(NFData)
@@ -25,6 +26,7 @@ import Control.DeepSeq(NFData)
 import Data.Char.Core(UnicodeCharacter(fromUnicodeChar, fromUnicodeChar', toUnicodeChar), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
+import Data.Text(Text, snoc)
 
 import GHC.Generics(Generic)
 
@@ -55,6 +57,20 @@ instance UnicodeCharacter SkinColorModifier where
     toUnicodeChar = mapFromEnum _skinColorOffset
     fromUnicodeChar = mapToEnumSafe _skinColorOffset
     fromUnicodeChar' = mapToEnum _skinColorOffset
+
+-- | Append the given 'Text' object with the Unicode character to modify its skin color.
+withSkinModifier
+  :: Text  -- ^ The given 'Text' object where we want to specify the skin color.
+  -> SkinColorModifier  -- ^ The given'SkinColorModifier' to apply.
+  -> Text  -- ^ The given 'Text' object combined with the given 'SkinColorModifier'.
+withSkinModifier t = snoc t . toUnicodeChar
+
+-- | Append the given 'Text' object with the Unicode character to modify its skin color. If 'Nothing', then no modification is applied.
+withOptionalSkinModifier
+  :: Text  -- ^ The given 'Text' object where we want to specify the skin color.
+  -> OptionalSkinColor  -- ^ The given'OptionalSkinColor' to apply.
+  -> Text  -- ^ The given 'Text' object combined with the given 'SkinColorModifier'.
+withOptionalSkinModifier t = maybe t (withSkinModifier t)
 
 instance UnicodeText SkinColorModifier
 
