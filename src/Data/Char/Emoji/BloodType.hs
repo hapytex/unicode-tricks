@@ -31,6 +31,7 @@ import GHC.Generics(Generic)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
+-- | A emoji that depicts a drop of blood. This looks like 🩸.
 pattern DropOfBlood :: Char
 pattern DropOfBlood = '\x1fa78'
 
