@@ -14,7 +14,7 @@ its values on the Fitzpatrick scale.
 
 module Data.Char.Emoji.SkinColor (
     -- * Skin color modifier
-    SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), fromFitzpatrick
+    SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), OptionalSkinColor, fromFitzpatrick
     -- * Pattern synonyms for the 'SkinColorModifier' elements
   , pattern FitzpatrickI, pattern FitzpatrickII, pattern FitzpatrickIII, pattern FitzpatrickIV, pattern FitzpatrickV, pattern FitzpatrickVI
 
@@ -101,3 +101,6 @@ fromFitzpatrick 4 = Just Medium
 fromFitzpatrick 5 = Just MediumDark
 fromFitzpatrick 6 = Just Dark
 fromFitzpatrick _ = Nothing
+
+-- | For emoji often the skin color is optional: in case there is no skin color specified, the emoji have often a /yellow/ skin color.
+type OptionalSkinColor = Maybe SkinColorModifier
