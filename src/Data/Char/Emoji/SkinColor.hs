@@ -14,16 +14,16 @@ its values on the Fitzpatrick scale.
 
 module Data.Char.Emoji.SkinColor (
     -- * Skin color modifier
-    SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), OptionalSkinColor, fromFitzpatrick
+    SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), OptionalSkinColorModifier, fromFitzpatrick
     -- * Create emoji with a 'SkinColorModifier'
-  , withSkinModifier, withOptionalSkinModifier
+  , WithSkinColorModifierUnicodeText(withSkinModifier, withOptionalSkinModifier), withSkinModifier', withOptionalSkinModifier'
     -- * Pattern synonyms for the 'SkinColorModifier' elements
   , pattern FitzpatrickI, pattern FitzpatrickII, pattern FitzpatrickIII, pattern FitzpatrickIV, pattern FitzpatrickV, pattern FitzpatrickVI
   ) where
 
 import Control.DeepSeq(NFData)
 
-import Data.Char.Core(UnicodeCharacter(fromUnicodeChar, fromUnicodeChar', toUnicodeChar), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(fromUnicodeChar, fromUnicodeChar', toUnicodeChar), UnicodeText(toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 import Data.Text(Text, snoc)
@@ -59,20 +59,39 @@ instance UnicodeCharacter SkinColorModifier where
     fromUnicodeChar' = mapToEnum _skinColorOffset
 
 -- | Append the given 'Text' object with the Unicode character to modify its skin color.
-withSkinModifier
+withSkinModifier'
   :: Text  -- ^ The given 'Text' object where we want to specify the skin color.
   -> SkinColorModifier  -- ^ The given'SkinColorModifier' to apply.
   -> Text  -- ^ The given 'Text' object combined with the given 'SkinColorModifier'.
-withSkinModifier t = snoc t . toUnicodeChar
+withSkinModifier' t = snoc t . toUnicodeChar
 
 -- | Append the given 'Text' object with the Unicode character to modify its skin color. If 'Nothing', then no modification is applied.
-withOptionalSkinModifier
+withOptionalSkinModifier'
   :: Text  -- ^ The given 'Text' object where we want to specify the skin color.
-  -> OptionalSkinColor  -- ^ The given'OptionalSkinColor' to apply.
+  -> OptionalSkinColorModifier  -- ^ The given'OptionalSkinColor' to apply.
   -> Text  -- ^ The given 'Text' object combined with the given 'SkinColorModifier'.
-withOptionalSkinModifier t = maybe t (withSkinModifier t)
+withOptionalSkinModifier' t = maybe t (withSkinModifier' t)
 
 instance UnicodeText SkinColorModifier
+
+-- | A typeclass where one can specify that the object can be rendered with a given /skin color modifier/.
+class UnicodeText a => WithSkinColorModifierUnicodeText a where
+    -- | Apply the given 'SkinColorModifier' to the item and obtain a 'Text' object where the item
+    -- has been modified with the 'SkinColorModifier'.
+    withSkinModifier
+      :: a  -- ^ The given item to render to a unicode 'Text' object.
+      -> SkinColorModifier  -- ^ The given skin color modifier to apply.
+      -> Text -- ^ The corresponding 'Text' where we applied the given 'SkinColorModifier'.
+    withSkinModifier = withSkinModifier' . toUnicodeText
+
+    -- | Apply the given 'SkinColorModifier' to the item given it is not 'Nothing' such that
+    -- the object is rendered with the given /skin color modifier/.
+    withOptionalSkinModifier
+      :: a  -- ^ The given item to render to a unicode 'Text' object.
+      -> OptionalSkinColorModifier  -- ^ The given optional skin color modifier.
+      -> Text -- ^ The corresponding 'Text' where we applied the given 'SkinColorModifier'.
+    withOptionalSkinModifier = withOptionalSkinModifier' . toUnicodeText
+    {-# MINIMAL #-}
 
 -- | The 'SkinColorModifier' that corresponds to type one of the /Fitzpatrick
 -- scale/.
@@ -119,4 +138,4 @@ fromFitzpatrick 6 = Just Dark
 fromFitzpatrick _ = Nothing
 
 -- | For emoji often the skin color is optional: in case there is no skin color specified, the emoji have often a /yellow/ skin color.
-type OptionalSkinColor = Maybe SkinColorModifier
+type OptionalSkinColorModifier = Maybe SkinColorModifier

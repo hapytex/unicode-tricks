@@ -11,6 +11,7 @@ module Data.Char.Emoji.Hand (
 import Control.DeepSeq(NFData)
 
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
+import Data.Char.Emoji.SkinColor(WithSkinColorModifierUnicodeText)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 
@@ -68,6 +69,8 @@ instance UnicodeCharacter HandGesture where
   fromUnicodeChar _ = Nothing
 
 instance UnicodeText HandGesture
+
+instance WithSkinColorModifierUnicodeText HandGesture
 
 -- TODO: victory hand
 
