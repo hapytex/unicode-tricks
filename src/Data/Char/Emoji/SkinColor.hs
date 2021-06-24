@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe #-}
+{-# LANGUAGE DeriveTraversable, DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe #-}
 
 {-|
 Module      : Data.Char.Emoji.Clock
@@ -26,11 +26,12 @@ import Control.DeepSeq(NFData)
 import Data.Char.Core(UnicodeCharacter(fromUnicodeChar, fromUnicodeChar', toUnicodeChar), UnicodeText(toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
+import Data.Hashable.Lifted(Hashable1)
 import Data.Text(Text, snoc)
 
-import GHC.Generics(Generic)
+import GHC.Generics(Generic, Generic1)
 
-import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
+import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1, arbitraryBoundedEnum)
 
 _skinColorOffset :: Int
 _skinColorOffset = 0x1f3fb
@@ -58,6 +59,8 @@ instance UnicodeCharacter SkinColorModifier where
     fromUnicodeChar = mapToEnumSafe _skinColorOffset
     fromUnicodeChar' = mapToEnum _skinColorOffset
 
+instance UnicodeText SkinColorModifier
+
 -- | Append the given 'Text' object with the Unicode character to modify its skin color.
 withSkinModifier'
   :: Text  -- ^ The given 'Text' object where we want to specify the skin color.
@@ -65,14 +68,34 @@ withSkinModifier'
   -> Text  -- ^ The given 'Text' object combined with the given 'SkinColorModifier'.
 withSkinModifier' t = snoc t . toUnicodeChar
 
+data SkinModified a = SkinModified a SkinColorModifier
+  deriving (Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
+
+instance Arbitrary1 SkinModified where
+  liftArbitrary arb = SkinModified <$> arb <*> arbitrary
+
+instance Arbitrary a => Arbitrary (SkinModified a) where
+  arbitrary = arbitrary1
+
+instance Bounded a => Bounded (SkinModified a) where
+  minBound = SkinModified minBound minBound
+  maxBound = SkinModified maxBound maxBound
+
+instance Enum a => Enum (SkinModified a) where
+  fromEnum (SkinModified a m) = 5 * fromEnum a + fromEnum m
+  toEnum n = SkinModified (toEnum q) (toEnum r)
+    where ~(q, r) = quotRem n 5
+
+instance Hashable a => Hashable (SkinModified a)
+
+instance Hashable1 SkinModified
+
 -- | Append the given 'Text' object with the Unicode character to modify its skin color. If 'Nothing', then no modification is applied.
 withOptionalSkinModifier'
   :: Text  -- ^ The given 'Text' object where we want to specify the skin color.
   -> OptionalSkinColorModifier  -- ^ The given'OptionalSkinColor' to apply.
   -> Text  -- ^ The given 'Text' object combined with the given 'SkinColorModifier'.
 withOptionalSkinModifier' t = maybe t (withSkinModifier' t)
-
-instance UnicodeText SkinColorModifier
 
 -- | A typeclass where one can specify that the object can be rendered with a given /skin color modifier/.
 class UnicodeText a => WithSkinColorModifierUnicodeText a where
