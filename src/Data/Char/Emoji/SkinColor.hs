@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe #-}
+{-# LANGUAGE DeriveTraversable, DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe, TupleSections #-}
 
 {-|
 Module      : Data.Char.Emoji.Clock
@@ -14,7 +14,7 @@ its values on the Fitzpatrick scale.
 
 module Data.Char.Emoji.SkinColor (
     -- * Skin color modifier
-    SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), OptionalSkinColorModifier, fromFitzpatrick
+    SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), OptionalSkinColorModifier, fromFitzpatrick, isSkinColorModifier
     -- * Create emoji with a 'SkinColorModifier'
   , WithSkinColorModifierUnicodeText(withSkinModifier, withOptionalSkinModifier), withSkinModifier', withOptionalSkinModifier'
     -- * Pattern synonyms for the 'SkinColorModifier' elements
@@ -23,11 +23,12 @@ module Data.Char.Emoji.SkinColor (
 
 import Control.DeepSeq(NFData)
 
-import Data.Char.Core(UnicodeCharacter(fromUnicodeChar, fromUnicodeChar', toUnicodeChar), UnicodeText(toUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char(ord)
+import Data.Char.Core(UnicodeCharacter(fromUnicodeChar, fromUnicodeChar', toUnicodeChar), UnicodeText(toUnicodeText, fromUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 import Data.Hashable.Lifted(Hashable1)
-import Data.Text(Text, snoc)
+import Data.Text(Text, snoc, unsnoc)
 
 import GHC.Generics(Generic, Generic1)
 
@@ -35,6 +36,16 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary)
 
 _skinColorOffset :: Int
 _skinColorOffset = 0x1f3fb
+
+_skinColorLimit :: Int
+_skinColorLimit = 0x1f3ff
+
+-- | Check if the given 'Char'acter is a skin color modifier.
+isSkinColorModifier
+  :: Char  -- ^ The given 'Char'acter to check.
+  -> Bool  -- ^ 'True' if the given 'Char'acter is a skin color modifier, 'False' otherwise.
+isSkinColorModifier c = _skinColorOffset <= oc && oc <= _skinColorLimit
+  where oc = ord c
 
 -- | Some emoji deal with people. One can change the color of the skin with the
 -- 'SkinColorModifier'. For the skin color, the <https://en.wikipedia.org/wiki/Fitzpatrick_scale /Fitzpatrick scale/> is used.
@@ -68,6 +79,47 @@ withSkinModifier'
   -> Text  -- ^ The given 'Text' object combined with the given 'SkinColorModifier'.
 withSkinModifier' t = snoc t . toUnicodeChar
 
+-- | Append the given 'Text' object with the Unicode character to modify its skin color. If 'Nothing', then no modification is applied.
+withOptionalSkinModifier'
+  :: Text  -- ^ The given 'Text' object where we want to specify the skin color.
+  -> OptionalSkinColorModifier  -- ^ The given'OptionalSkinColor' to apply.
+  -> Text  -- ^ The given 'Text' object combined with the given 'SkinColorModifier'.
+withOptionalSkinModifier' t = maybe t (withSkinModifier' t)
+
+withoutOptionalSkinModifier'
+  :: Text
+  -> (Text, OptionalSkinColorModifier)
+withoutOptionalSkinModifier' t
+  | Just (t', s) <- unsnoc t, isSkinColorModifier s = (t', Just (fromUnicodeChar' s))
+  | otherwise = (t, Nothing)
+
+-- | A typeclass where one can specify that the object can be rendered with a given /skin color modifier/.
+class UnicodeText a => WithSkinColorModifierUnicodeText a where
+    -- | Apply the given 'SkinColorModifier' to the item and obtain a 'Text' object where the item
+    -- has been modified with the 'SkinColorModifier'.
+    withSkinModifier
+      :: a  -- ^ The given item to render to a unicode 'Text' object.
+      -> SkinColorModifier  -- ^ The given skin color modifier to apply.
+      -> Text -- ^ The corresponding 'Text' where we applied the given 'SkinColorModifier'.
+    withSkinModifier = withSkinModifier' . toUnicodeText
+
+    -- | Apply the given 'SkinColorModifier' to the item given it is not 'Nothing' such that
+    -- the object is rendered with the given /skin color modifier/.
+    withOptionalSkinModifier
+      :: a  -- ^ The given item to render to a unicode 'Text' object.
+      -> OptionalSkinColorModifier  -- ^ The given optional skin color modifier.
+      -> Text -- ^ The corresponding 'Text' where we applied the given 'SkinColorModifier'.
+    withOptionalSkinModifier = withOptionalSkinModifier' . toUnicodeText
+
+    -- | Convert the given Text to an item with an 'OptionalSkinColorModifier' that might
+    -- have been applied.
+    withoutOptionalSkinModifier
+      :: Text  -- ^ The given 'Text' object that should be decoded.
+      -> Maybe (a, OptionalSkinColorModifier)  -- ^ An optional 2-tuple with the item that has been read, and an optional 'SkinColorModifier'.
+    withoutOptionalSkinModifier t = (, m) <$> fromUnicodeText t'
+        where ~(t', m) = withoutOptionalSkinModifier' t
+    {-# MINIMAL #-}
+
 data SkinModified a = SkinModified a SkinColorModifier
   deriving (Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
 
@@ -90,32 +142,11 @@ instance Hashable a => Hashable (SkinModified a)
 
 instance Hashable1 SkinModified
 
--- | Append the given 'Text' object with the Unicode character to modify its skin color. If 'Nothing', then no modification is applied.
-withOptionalSkinModifier'
-  :: Text  -- ^ The given 'Text' object where we want to specify the skin color.
-  -> OptionalSkinColorModifier  -- ^ The given'OptionalSkinColor' to apply.
-  -> Text  -- ^ The given 'Text' object combined with the given 'SkinColorModifier'.
-withOptionalSkinModifier' t = maybe t (withSkinModifier' t)
-
--- | A typeclass where one can specify that the object can be rendered with a given /skin color modifier/.
-class UnicodeText a => WithSkinColorModifierUnicodeText a where
-    -- | Apply the given 'SkinColorModifier' to the item and obtain a 'Text' object where the item
-    -- has been modified with the 'SkinColorModifier'.
-    withSkinModifier
-      :: a  -- ^ The given item to render to a unicode 'Text' object.
-      -> SkinColorModifier  -- ^ The given skin color modifier to apply.
-      -> Text -- ^ The corresponding 'Text' where we applied the given 'SkinColorModifier'.
-    withSkinModifier = withSkinModifier' . toUnicodeText
-
-    -- | Apply the given 'SkinColorModifier' to the item given it is not 'Nothing' such that
-    -- the object is rendered with the given /skin color modifier/.
-    withOptionalSkinModifier
-      :: a  -- ^ The given item to render to a unicode 'Text' object.
-      -> OptionalSkinColorModifier  -- ^ The given optional skin color modifier.
-      -> Text -- ^ The corresponding 'Text' where we applied the given 'SkinColorModifier'.
-    withOptionalSkinModifier = withOptionalSkinModifier' . toUnicodeText
-    {-# MINIMAL #-}
-
+instance WithSkinColorModifierUnicodeText a => UnicodeText (SkinModified a) where
+  toUnicodeText (SkinModified x m) = withSkinModifier x m
+  fromUnicodeText t
+    | Just (x, Just m) <- withoutOptionalSkinModifier t = Just (SkinModified x m)
+    | otherwise = Nothing
 -- | The 'SkinColorModifier' that corresponds to type one of the /Fitzpatrick
 -- scale/.
 pattern FitzpatrickI :: SkinColorModifier
