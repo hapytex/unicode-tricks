@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveTraversable, DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe, TupleSections #-}
 
 {-|
-Module      : Data.Char.Emoji.Clock
+Module      : Data.Char.Emoji.SkinColor
 Description : A module that defines emoji that display a clock.
 Maintainer  : hapytexeu+gh@gmail.com
 Stability   : experimental
@@ -16,7 +16,7 @@ module Data.Char.Emoji.SkinColor (
     -- * Skin color modifier
     SkinColorModifier(Light, MediumLight, Medium, MediumDark, Dark), OptionalSkinColorModifier, fromFitzpatrick, isSkinColorModifier
     -- * Create emoji with a 'SkinColorModifier'
-  , WithSkinColorModifierUnicodeText(withSkinModifier, withOptionalSkinModifier), withSkinModifier', withOptionalSkinModifier'
+  , WithSkinColorModifierUnicodeText(withSkinModifier, withOptionalSkinModifier, withoutOptionalSkinModifier), withSkinModifier', withOptionalSkinModifier', withoutOptionalSkinModifier'
     -- * Pattern synonyms for the 'SkinColorModifier' elements
   , pattern FitzpatrickI, pattern FitzpatrickII, pattern FitzpatrickIII, pattern FitzpatrickIV, pattern FitzpatrickV, pattern FitzpatrickVI
   ) where
@@ -82,13 +82,14 @@ withSkinModifier' t = snoc t . toUnicodeChar
 -- | Append the given 'Text' object with the Unicode character to modify its skin color. If 'Nothing', then no modification is applied.
 withOptionalSkinModifier'
   :: Text  -- ^ The given 'Text' object where we want to specify the skin color.
-  -> OptionalSkinColorModifier  -- ^ The given'OptionalSkinColor' to apply.
+  -> OptionalSkinColorModifier  -- ^ The given'OptionalSkinColorModifier' to apply.
   -> Text  -- ^ The given 'Text' object combined with the given 'SkinColorModifier'.
 withOptionalSkinModifier' t = maybe t (withSkinModifier' t)
 
+-- | Convert the given 'Text' object to a wrapped 'Text' object with an 'OptionalSkinColorModifier'.
 withoutOptionalSkinModifier'
-  :: Text
-  -> (Text, OptionalSkinColorModifier)
+  :: Text  -- ^ The given 'Text' to decompose.
+  -> (Text, OptionalSkinColorModifier)  -- ^ A 2-tuple where the first item is the remaining 'Text' and where the second item is an optioanl 'SkinColorModifier'.
 withoutOptionalSkinModifier' t
   | Just (t', s) <- unsnoc t, isSkinColorModifier s = (t', Just (fromUnicodeChar' s))
   | otherwise = (t, Nothing)

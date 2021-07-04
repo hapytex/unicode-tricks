@@ -1,8 +1,18 @@
 {-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe #-}
 
+{-|
+Module      : Data.Char.Emoji.Hand
+Description : A module that provides Emojis about hands and fingers.
+Maintainer  : hapytexeu+gh@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+
+-}
+
 module Data.Char.Emoji.Hand (
-    HandGesture(
-        WavingHand, RaisedBackOfHand, RaisedHandWithFingersSplayed, RaisedHand, VulcanSalute, OkHandSign
+    SingleCharHandGesture(
+        WavingHand, RaisedBackOfHand, RaisedHand, VulcanSalute, OkHandSign
       , PinchedFingers, PinchingHand, CrossedFingers, LoveYouGesture, SignOfTheHorns, CallMeHand
     ),
     pattern FingersCrossed, pattern SpockHand, pattern HornsSign
@@ -19,14 +29,14 @@ import GHC.Generics(Generic)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
-data HandGesture
-  = WavingHand
-  | RaisedBackOfHand
-  | RaisedHandWithFingersSplayed
-  | RaisedHand
-  | VulcanSalute
-  | OkHandSign
-  | PinchedFingers
+-- | A datatype that constructs /hand gestures/ that correspond with a /single/ 'Char'acter.
+data SingleCharHandGesture
+  = WavingHand  -- ^ A waving hand, this is denoted with 👋.
+  | RaisedBackOfHand  -- ^ The raised back of a hand, this is denoted with 🤚.
+  | RaisedHand  -- ^ A raised hand, this is denoted with ✋.
+  | VulcanSalute  -- ^ The /Vulcan/ salute, this is denoted with 🖖.
+  | OkHandSign  -- ^ The okay hand sign, this is denoted with 👌.
+  | PinchedFingers  -- ^
   | PinchingHand
   | CrossedFingers
   | LoveYouGesture
@@ -34,17 +44,16 @@ data HandGesture
   | CallMeHand
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
-instance Arbitrary HandGesture where
+instance Arbitrary SingleCharHandGesture where
   arbitrary = arbitraryBoundedEnum
 
-instance Hashable HandGesture
+instance Hashable SingleCharHandGesture
 
-instance NFData HandGesture
+instance NFData SingleCharHandGesture
 
-instance UnicodeCharacter HandGesture where
+instance UnicodeCharacter SingleCharHandGesture where
   toUnicodeChar WavingHand = '\x1f44b'
   toUnicodeChar RaisedBackOfHand = '\x1f91a'
-  toUnicodeChar RaisedHandWithFingersSplayed = '\x1f590'
   toUnicodeChar RaisedHand = '\x270b'
   toUnicodeChar VulcanSalute = '\x1f596'
   toUnicodeChar OkHandSign = '\x1f44c'
@@ -56,7 +65,6 @@ instance UnicodeCharacter HandGesture where
   toUnicodeChar CallMeHand = '\x1f919'
   fromUnicodeChar '\x1f44b' = Just WavingHand
   fromUnicodeChar '\x1f91a' = Just RaisedBackOfHand
-  fromUnicodeChar '\x1f590' = Just RaisedHandWithFingersSplayed
   fromUnicodeChar '\x270b' = Just RaisedHand
   fromUnicodeChar '\x1f596' = Just VulcanSalute
   fromUnicodeChar '\x1f44c' = Just OkHandSign
@@ -68,18 +76,19 @@ instance UnicodeCharacter HandGesture where
   fromUnicodeChar '\x1f919' = Just CallMeHand
   fromUnicodeChar _ = Nothing
 
-instance UnicodeText HandGesture
+instance UnicodeText SingleCharHandGesture
 
-instance WithSkinColorModifierUnicodeText HandGesture
+instance WithSkinColorModifierUnicodeText SingleCharHandGesture
 
--- TODO: victory hand
+data MultiCharHandGesture
+  = RaisedHandWithFingersSplayed
+  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
-
-pattern FingersCrossed :: HandGesture
+pattern FingersCrossed :: SingleCharHandGesture
 pattern FingersCrossed = CrossedFingers
 
-pattern SpockHand :: HandGesture
+pattern SpockHand :: SingleCharHandGesture
 pattern SpockHand = VulcanSalute
 
-pattern HornsSign :: HandGesture
+pattern HornsSign :: SingleCharHandGesture
 pattern HornsSign = SignOfTheHorns
