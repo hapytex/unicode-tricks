@@ -1,19 +1,16 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Data.Char.EmojiSpec
+module Data.Char.Emoji.ClockSpec
   ( spec
   ) where
 
 import Data.Char.CoreTest
-import Data.Char.Emoji
+import Data.Char.Emoji.Clock
 import Test.Hspec
 
 spec :: Spec
 spec = do
-  testUnicodeCharacter @ SkinColorModifier
+  testBounded @ Clock
   testUnicodeCharacter @ Clock
-  testUnicodeText @ SkinColorModifier
   testUnicodeText @ Clock
-  testBounded @Clock
-  testHashable @ SkinColorModifier
   testHashable @ Clock

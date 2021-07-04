@@ -28,7 +28,7 @@ import GHC.Generics(Generic)
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
 -- | A data type to specify the /gender/ of a person, animal, etc. used in an
--- emoji. The 'Gender' items are an instance of 'UnicodeText' that maps to the
+-- emoji. The 'Data.Char.Emoji.BinaryGender' items are an instance of 'UnicodeText' that maps to the
 -- /female/ and /male/ emoji. Often the corresponding codepoints are used
 -- to annotate something as male/female.
 data BinaryGender

@@ -13,6 +13,8 @@ The Unicode standard defines four emoji for the 'O', 'B', 'A', and 'AB' blood ty
 module Data.Char.Emoji.BloodType (
     -- * Blood type emoji
     BloodType(O, B, A, AB)
+    -- * Drop of blood emoji
+  , pattern DropOfBlood
   ) where
 
 import Control.DeepSeq(NFData)
@@ -28,6 +30,10 @@ import Data.Text(unpack)
 import GHC.Generics(Generic)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
+
+-- | A emoji that depicts a drop of blood. This looks like 🩸.
+pattern DropOfBlood :: Char
+pattern DropOfBlood = '\x1fa78'
 
 -- | A 'BloodType' object used to convert to its unicode equivalent. The
 -- 'BloodType' is also seen as a 2-bit value with the leftmost bit representing
