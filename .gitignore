@@ -25,9 +25,13 @@ cabal.project.local~
 .ghc.environment.*
 *.sw?
 *.lock
-
 *.dot
 
+# Benchmarks
+benchmark.html
+benchmarks.html
+
+# Samples
 samples
 samples/
 samples/*
