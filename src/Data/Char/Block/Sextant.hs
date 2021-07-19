@@ -16,7 +16,7 @@ module Data.Char.Block.Sextant(
     -- * A unicode character that is (partially) filled sextant.
   , filled
     -- * Convert a 'Char'acter to a (partially) filled sextant.
-  -- , fromSextant, fromSextant'
+  , fromSextant, fromSextant'
   ) where
 
 import Control.DeepSeq(NFData, NFData1)
@@ -29,7 +29,6 @@ import Data.Data(Data)
 import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
 import Data.Hashable(Hashable)
 import Data.Hashable.Lifted(Hashable1)
-import Data.Maybe(fromJust)
 #if __GLASGOW_HASKELL__ < 803
 import Data.Semigroup((<>))
 #endif
@@ -88,18 +87,24 @@ instance UnicodeCharacter (Sextant Bool) where
 
 instance UnicodeText (Sextant Bool)
 
+-- | Convert the given 'Char' to the corresponding 'Sextant' object wrapped
+-- in a 'Just' data constructor. If the given 'Char' is not a sextant character,
+-- 'Nothing' is returned.
 fromSextant
-  :: Char
-  -> Maybe (Sextant Bool)
+  :: Char  -- ^ The 'Char' we wish to convert to a 'Sextant' object.
+  -> Maybe (Sextant Bool)  -- ^ The corresponding 'Sextant' object wrapped in a 'Just'; 'Nothing' if the given 'Char' is not a sextant character.
 fromSextant ci
   | c1 || c2 = Just (fromSextant' ci)
   | otherwise = Nothing
   where c1 = '\x1FB00' <= ci && ci <= '\x1fb3b'
-        c2 = ci == EmptyBlock || ci == LeftHalfBlock || ci == RightHalfBlock || ci == FullBlock
+        c2 = ci `elem` [EmptyBlock, LeftHalfBlock, RightHalfBlock, FullBlock]
 
+-- | Convert the given 'Char' to the corresponding 'Sextant' object wrapped
+-- If the given 'Char' is not a sextant character, it is unspecified what
+-- will happen.
 fromSextant'
-  :: Char
-  -> Sextant Bool
+  :: Char  -- ^ The 'Char' we wish to convert to a 'Sextant' object.
+  -> Sextant Bool  -- ^ The corresponding 'Sextant'; unspecified behavior if the given 'Char' is not a sextant character.
 fromSextant' EmptyBlock = Sextant EmptyRow EmptyRow EmptyRow
 fromSextant' LeftHalfBlock = Sextant LeftRow LeftRow LeftRow
 fromSextant' RightHalfBlock = Sextant RightRow RightRow RightRow
@@ -108,13 +113,17 @@ fromSextant' ch = Sextant u m l
   where ci = ord ch .&. 0x3f
         ch'
           | ci >= 0x28 = ci + 3
-          | ci >= 0x13 = ci + 2
+          | ci > 0x13 = ci + 2
           | otherwise = ci + 1
         u = toRow' (ch' .&. 3)
-        m = toRow' ((shiftR ch' 2) .&. 3)
+        m = toRow' (shiftR ch' 2 .&. 3)
         l = toRow' (shiftR ch' 4)
 
-filled :: Sextant Bool -> Char
+-- | Convert the given 'Sextant' of 'Bool's to a 'Char' where raster items of the 'Sextant'
+-- are written in black, and the rest in white.
+filled
+  :: Sextant Bool  -- ^ The given 'Sextant' of 'Bool's to convert to a 'Char'.
+  -> Char  -- ^ The corresponding 'Char'acter that presents the sextant.
 filled (Sextant u m d) = go (shiftL (rowValue d) 4 .|. shiftL (rowValue m) 2 .|. rowValue u)
   where go 0x00 = EmptyBlock
         go 0x15 = LeftHalfBlock
