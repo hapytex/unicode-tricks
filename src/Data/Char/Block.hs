@@ -41,15 +41,19 @@ import GHC.Generics(Generic, Generic1)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), Arbitrary1(liftArbitrary), arbitrary1)
 
+-- | A pattern synonym for the /block/ 'Char'acter that will render a full block.
 pattern FullBlock :: Char
 pattern FullBlock = '\x2588'
 
+-- | A pattern synonym for a /block/ 'Char'acter that will render an empty block, this is equivalent to a space.
 pattern EmptyBlock :: Char
 pattern EmptyBlock = ' '
 
+-- | A pattern synonym for a /block/ 'Char'acter that will render a block where the /left/ half of the block is filled.
 pattern LeftHalfBlock :: Char
 pattern LeftHalfBlock = '\x258c'
 
+-- | A pattern synonym for a /block/ 'Char'acter that will render a block where the /right/ half of the block is filled.
 pattern RightHalfBlock :: Char
 pattern RightHalfBlock = '\x2590'
 
@@ -61,15 +65,19 @@ data Row a = Row {
   , right :: a  -- ^ The right part of the row of the block.
   } deriving (Bounded, Data, Eq, Foldable, Functor, Generic, Generic1, Ord, Read, Show, Traversable)
 
+-- | A pattern synonym for a 'Row' where both the left and right subpart are 'True'.
 pattern FullRow :: Row Bool
 pattern FullRow = Row True True
 
+-- | A pattern synonym for a 'Row' where both the left and right subpart are 'False'.
 pattern EmptyRow :: Row Bool
 pattern EmptyRow = Row False False
 
+-- | A pattern synonym for a 'Row' where the left part is set to 'True', and the right part is set to 'False'.
 pattern LeftRow :: Row Bool
 pattern LeftRow = Row True False
 
+-- | A pattern synonym for a 'Row' where the left part is set to 'False', and the right part is set to 'True'.
 pattern RightRow :: Row Bool
 pattern RightRow = Row False True
 
