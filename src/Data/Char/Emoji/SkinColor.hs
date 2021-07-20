@@ -77,7 +77,9 @@ withSkinModifier'
   :: Text  -- ^ The given 'Text' object where we want to specify the skin color.
   -> SkinColorModifier  -- ^ The given'SkinColorModifier' to apply.
   -> Text  -- ^ The given 'Text' object combined with the given 'SkinColorModifier'.
-withSkinModifier' t = snoc t . toUnicodeChar
+withSkinModifier' t
+  | Just (t', '\xfe0f') <- unsnoc t = snoc t' . toUnicodeChar
+  | otherwise = snoc t . toUnicodeChar
 
 -- | Append the given 'Text' object with the Unicode character to modify its skin color. If 'Nothing', then no modification is applied.
 withOptionalSkinModifier'
@@ -148,6 +150,7 @@ instance WithSkinColorModifierUnicodeText a => UnicodeText (SkinModified a) wher
   fromUnicodeText t
     | Just (x, Just m) <- withoutOptionalSkinModifier t = Just (SkinModified x m)
     | otherwise = Nothing
+
 -- | The 'SkinColorModifier' that corresponds to type one of the /Fitzpatrick
 -- scale/.
 pattern FitzpatrickI :: SkinColorModifier

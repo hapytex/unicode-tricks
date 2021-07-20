@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, OverloadedStrings, PatternSynonyms, Safe #-}
 
 {-|
 Module      : Data.Char.Emoji.Hand
@@ -21,7 +21,7 @@ module Data.Char.Emoji.Hand (
 
 import Control.DeepSeq(NFData)
 
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText(toUnicodeText, fromUnicodeText))
 import Data.Char.Emoji.SkinColor(WithSkinColorModifierUnicodeText)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
@@ -84,6 +84,20 @@ instance WithSkinColorModifierUnicodeText SingleCharHandGesture
 data MultiCharHandGesture
   = RaisedHandWithFingersSplayed
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+instance Arbitrary MultiCharHandGesture where
+  arbitrary = arbitraryBoundedEnum
+
+instance Hashable MultiCharHandGesture
+
+instance NFData MultiCharHandGesture
+
+instance UnicodeText MultiCharHandGesture where
+  toUnicodeText RaisedHandWithFingersSplayed = "\x1f590\xfe0f"
+  fromUnicodeText "\x1f590\xfe0f" = Just RaisedHandWithFingersSplayed
+  fromUnicodeText _ = Nothing
+
+instance WithSkinColorModifierUnicodeText MultiCharHandGesture
 
 -- | A pattern synonym for 'CrossedFingers'.
 pattern FingersCrossed :: SingleCharHandGesture

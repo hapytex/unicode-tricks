@@ -10,9 +10,11 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  testUnicodeCharacter @ HandGesture
+  testUnicodeCharacter @ SingleCharHandGesture
+  testUnicodeText @ SingleCharHandGesture
+  testHashable @ SingleCharHandGesture
   -- testUnicodeCharacter @ MoonFace
   -- testUnicodeText @ MoonPhase
   -- testUnicodeText @ MoonFace
-  testHashable @ HandGesture
+  -- testHashable @ HandGesture
   -- testHashable @ MoonFace
