@@ -84,11 +84,14 @@ data MultiCharHandGesture
   = RaisedHandWithFingersSplayed
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
+-- | A pattern synonym for 'CrossedFingers'.
 pattern FingersCrossed :: SingleCharHandGesture
 pattern FingersCrossed = CrossedFingers
 
+-- | A pattern synonym for the 'VulcanSalute'.
 pattern SpockHand :: SingleCharHandGesture
 pattern SpockHand = VulcanSalute
 
+-- | A pattern synonym for 'SignOfTheHorns'.
 pattern HornsSign :: SingleCharHandGesture
 pattern HornsSign = SignOfTheHorns
