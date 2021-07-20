@@ -7,7 +7,8 @@ Maintainer  : hapytexeu+gh@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-
+Unicode has emoji's for hands. In this module we make it more convenient
+to render hand gestures with a specific skin color.
 -}
 
 module Data.Char.Emoji.Hand (
@@ -36,12 +37,12 @@ data SingleCharHandGesture
   | RaisedHand  -- ^ A raised hand, this is denoted with ✋.
   | VulcanSalute  -- ^ The /Vulcan/ salute, this is denoted with 🖖.
   | OkHandSign  -- ^ The okay hand sign, this is denoted with 👌.
-  | PinchedFingers  -- ^
-  | PinchingHand
-  | CrossedFingers
-  | LoveYouGesture
-  | SignOfTheHorns
-  | CallMeHand
+  | PinchedFingers  -- ^  The /pinched fingers/ gesture, this is denoted with 🤌.
+  | PinchingHand  -- ^ The /pinching hand/ gesture, this is denoted with 🤏.
+  | CrossedFingers  -- ^ The /crossed fingers/ gesture, this is denoted with 🤞.
+  | LoveYouGesture  -- ^ The /love you/ gesture, this is denoted with 🤟.
+  | SignOfTheHorns  -- ^ The sign of the horns, this is denoted with 🤘.
+  | CallMeHand  -- ^ The call me hand sign, this is denoted with 🤙.
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary SingleCharHandGesture where
