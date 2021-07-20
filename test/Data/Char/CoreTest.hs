@@ -111,8 +111,8 @@ mapValidItem = forAll (suchThat (arbitrary :: Gen Char) (isJust . fromUnicodeCha
 equivalentFromChar :: forall a . (Eq a, UnicodeCharacter a) => Property
 equivalentFromChar = forAll (suchThat (arbitrary :: Gen Char) (isJust . fromUnicodeChar @ a)) (equivalentMapping @ a)
 
-mapOverText :: (Eq a, UnicodeText a) => a -> a -> Bool
-mapOverText _ c = Just c == fromUnicodeText (toUnicodeText c)
+mapOverText :: forall a . (Eq a, UnicodeText a) => a -> Bool
+mapOverText c = Just c == fromUnicodeText (toUnicodeText c)
 
 hashEquality :: (Eq a, Hashable a) => a -> a -> Bool
 hashEquality ca cb = hash ca == hash cb || ca /= cb

@@ -22,6 +22,7 @@ library
   exposed-modules:
       Data.Char.BallotBox
     , Data.Char.Block
+    , Data.Char.Block.Sextant
     , Data.Char.Braille
     , Data.Char.Brackets
     , Data.Char.Card
@@ -96,6 +97,7 @@ test-suite             utricks
       Data.Char.BallotBoxSpec
     , Data.Char.BracketsSpec
     , Data.Char.BrailleSpec
+    , Data.Char.Block.SextantSpec
     , Data.Char.BlockSpec
     , Data.Char.CardSpec
     , Data.Char.ChessSpec
