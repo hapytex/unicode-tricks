@@ -59,5 +59,5 @@ instance UnicodeText ScienceEmoji where
   fromUnicodeText "\x1f9ea" = Just TestTube
   fromUnicodeText "\x1f9eb" = Just PetriDish
   fromUnicodeText t
-    | [c] <- unpack t, '\x1f9ea' <= c && c <= '\x1f9ec' = Just (toEnum ((ord c) - 0x1f9e9))
+    | [c] <- unpack t, '\x1f9ea' <= c && c <= '\x1f9ec' = Just (toEnum (ord c - 0x1f9e9))
     | otherwise = Nothing
