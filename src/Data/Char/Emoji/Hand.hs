@@ -16,6 +16,7 @@ module Data.Char.Emoji.Hand (
         WavingHand, RaisedBackOfHand, RaisedHand, VulcanSalute, OkHandSign
       , PinchedFingers, PinchingHand, CrossedFingers, LoveYouGesture, SignOfTheHorns, CallMeHand
     ),
+    MultiCharHandGesture,
     pattern FingersCrossed, pattern SpockHand, pattern HornsSign
   ) where
 
