@@ -97,6 +97,7 @@ instance UnicodeText SingleCharHandGesture
 
 instance WithSkinColorModifierUnicodeText SingleCharHandGesture
 
+-- | Emoji with hands that map on a /sequence/ of characters instead of one character.
 data MultiCharHandGesture
   = RaisedHandWithFingersSplayed
   | VictoryHand
