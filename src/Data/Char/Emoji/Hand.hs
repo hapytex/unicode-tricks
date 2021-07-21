@@ -42,7 +42,12 @@ data SingleCharHandGesture
   | CrossedFingers  -- ^ The /crossed fingers/ gesture, this is denoted with 🤞.
   | LoveYouGesture  -- ^ The /love you/ gesture, this is denoted with 🤟.
   | SignOfTheHorns  -- ^ The sign of the horns, this is denoted with 🤘.
-  | CallMeHand  -- ^ The call me hand sign, this is denoted with 🤙.
+  | CallMeHand  -- ^ The /call me/ hand sign, this is denoted with 🤙.
+  | MiddleFinger  -- ^ A middle finger pointing up, this is denoted with 🖕.
+  | ThumbsUp  -- ^ An emoji where the thumb is pointing upwards, this is denoted with 👍.
+  | ThumbsDown  -- ^ An emoji where the thumb is pointing downwards, this is denoted with 👎.
+  | RaisedFist  -- ^ An emoji where the fist is rased, this is denoted with ✊.
+  | FistedHand  -- ^ An emoji of a fisted hand, this is denoted with 👊.
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary SingleCharHandGesture where
@@ -64,6 +69,11 @@ instance UnicodeCharacter SingleCharHandGesture where
   toUnicodeChar LoveYouGesture = '\x1f91f'
   toUnicodeChar SignOfTheHorns = '\x1f918'
   toUnicodeChar CallMeHand = '\x1f919'
+  toUnicodeChar MiddleFinger = '\x1f595'
+  toUnicodeChar ThumbsUp = '\x1f44d'
+  toUnicodeChar ThumbsDown = '\x1f44e'
+  toUnicodeChar RaisedFist = '\x270a'
+  toUnicodeChar FistedHand = '\x1f44a'
   fromUnicodeChar '\x1f44b' = Just WavingHand
   fromUnicodeChar '\x1f91a' = Just RaisedBackOfHand
   fromUnicodeChar '\x270b' = Just RaisedHand
@@ -75,6 +85,11 @@ instance UnicodeCharacter SingleCharHandGesture where
   fromUnicodeChar '\x1f91f' = Just LoveYouGesture
   fromUnicodeChar '\x1f918' = Just SignOfTheHorns
   fromUnicodeChar '\x1f919' = Just CallMeHand
+  fromUnicodeChar '\x1f595' = Just MiddleFinger
+  fromUnicodeChar '\x1f44d' = Just ThumbsUp
+  fromUnicodeChar '\x1f44e' = Just ThumbsDown
+  fromUnicodeChar '\x270a' = Just RaisedFist
+  fromUnicodeChar '\x1f44a' = Just FistedHand
   fromUnicodeChar _ = Nothing
 
 instance UnicodeText SingleCharHandGesture
@@ -83,6 +98,7 @@ instance WithSkinColorModifierUnicodeText SingleCharHandGesture
 
 data MultiCharHandGesture
   = RaisedHandWithFingersSplayed
+  | VictoryHand
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary MultiCharHandGesture where
@@ -94,7 +110,9 @@ instance NFData MultiCharHandGesture
 
 instance UnicodeText MultiCharHandGesture where
   toUnicodeText RaisedHandWithFingersSplayed = "\x1f590\xfe0f"
+  toUnicodeText VictoryHand = "\x270c\xfe0f"
   fromUnicodeText "\x1f590\xfe0f" = Just RaisedHandWithFingersSplayed
+  fromUnicodeText "\x270c\xfe0f" = Just VictoryHand
   fromUnicodeText _ = Nothing
 
 instance WithSkinColorModifierUnicodeText MultiCharHandGesture

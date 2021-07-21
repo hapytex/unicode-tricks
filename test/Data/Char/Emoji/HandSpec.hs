@@ -14,7 +14,7 @@ spec = do
   testUnicodeText @ SingleCharHandGesture
   testHashable @ SingleCharHandGesture
   -- testUnicodeCharacter @ MoonFace
-  -- testUnicodeText @ MoonPhase
   -- testUnicodeText @ MoonFace
-  -- testHashable @ HandGesture
   -- testHashable @ MoonFace
+  testUnicodeText @ MultiCharHandGesture
+  testHashable @ MultiCharHandGesture
