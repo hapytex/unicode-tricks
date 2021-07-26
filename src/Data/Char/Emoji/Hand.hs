@@ -99,8 +99,8 @@ instance WithSkinColorModifierUnicodeText SingleCharHandGesture
 
 -- | Emoji with hands that map on a /sequence/ of characters instead of one character.
 data MultiCharHandGesture
-  = RaisedHandWithFingersSplayed
-  | VictoryHand
+  = RaisedHandWithFingersSplayed  -- ^ The raised hand with fingers splayed emoji, this is denoted as 🖐️.
+  | VictoryHand  -- ^ The /victory hand/ emoji, this is denoted as ✌️.
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary MultiCharHandGesture where
