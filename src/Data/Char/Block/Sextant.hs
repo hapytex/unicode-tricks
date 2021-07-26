@@ -102,7 +102,7 @@ fromSextant
   :: Char  -- ^ The 'Char' we wish to convert to a 'Sextant' object.
   -> Maybe (Sextant Bool)  -- ^ The corresponding 'Sextant' object wrapped in a 'Just'; 'Nothing' if the given 'Char' is not a sextant character.
 fromSextant ci
-  | isSextant = Just (fromSextant' ci)
+  | isSextant ci = Just (fromSextant' ci)
   | otherwise = Nothing
 
 -- | Convert the given 'Char' to the corresponding 'Sextant' object wrapped
