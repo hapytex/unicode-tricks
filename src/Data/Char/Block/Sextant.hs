@@ -12,7 +12,7 @@ Unicode has 3-by-2 blocks, this module aims to make it more convenient to render
 
 module Data.Char.Block.Sextant(
     -- * Datastructures to store the state of the sextant.
-    Sextant(Sextant, upper, middle, lower)
+    Sextant(Sextant, upper, middle, lower), isSextant
     -- * A unicode character that is (partially) filled sextant.
   , filled
     -- * Convert a 'Char'acter to a (partially) filled sextant.
@@ -87,6 +87,14 @@ instance UnicodeCharacter (Sextant Bool) where
 
 instance UnicodeText (Sextant Bool)
 
+-- | Check if the given 'Char'acter is a 'Char'acter that maps on a 'Sextant' value.
+isSextant
+  :: Char  -- ^ The given 'Char'acter to test.
+  -> Bool  -- ^ 'True' if the given 'Char'acter is a /sextant/ 'Char'acter; otherwise 'False'.
+isSextant ci = c1 || c2
+  where c1 = '\x1FB00' <= ci && ci <= '\x1fb3b'
+        c2 = ci `elem` [EmptyBlock, LeftHalfBlock, RightHalfBlock, FullBlock]
+
 -- | Convert the given 'Char' to the corresponding 'Sextant' object wrapped
 -- in a 'Just' data constructor. If the given 'Char' is not a sextant character,
 -- 'Nothing' is returned.
@@ -94,10 +102,8 @@ fromSextant
   :: Char  -- ^ The 'Char' we wish to convert to a 'Sextant' object.
   -> Maybe (Sextant Bool)  -- ^ The corresponding 'Sextant' object wrapped in a 'Just'; 'Nothing' if the given 'Char' is not a sextant character.
 fromSextant ci
-  | c1 || c2 = Just (fromSextant' ci)
+  | isSextant = Just (fromSextant' ci)
   | otherwise = Nothing
-  where c1 = '\x1FB00' <= ci && ci <= '\x1fb3b'
-        c2 = ci `elem` [EmptyBlock, LeftHalfBlock, RightHalfBlock, FullBlock]
 
 -- | Convert the given 'Char' to the corresponding 'Sextant' object wrapped
 -- If the given 'Char' is not a sextant character, it is unspecified what
