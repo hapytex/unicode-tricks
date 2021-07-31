@@ -100,7 +100,7 @@ testUnicodeCharText = describe (instanceTexts' @a ["UnicodeCharacter", "UnicodeT
   it "equivalent range checks" $ property (unicodeCharTextInRange @a)
 
 unicodeCharTextInRange :: forall a . (UnicodeCharacter a, UnicodeText a) => Char -> Bool
-unicodeCharTextInRange c = isInCharRange c == isInTextRange tc
+unicodeCharTextInRange c = isInCharRange @a c == isInTextRange @a tc
   where tc = singleton c
 
 testHashable :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, Hashable a) => SpecWith ()
