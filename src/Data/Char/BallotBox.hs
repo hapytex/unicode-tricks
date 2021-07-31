@@ -69,4 +69,4 @@ instance UnicodeCharacter BallotBox where
     isInCharRange = isBallotBox
 
 instance UnicodeText BallotBox where
-    isInTextRange = generateIsInTextRange' @ BallotBox
+    isInTextRange = generateIsInTextRange' @BallotBox
