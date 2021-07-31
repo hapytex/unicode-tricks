@@ -10,6 +10,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter @ MayanLiteral
-    testUnicodeText @ MayanLiteral
-    testHashable @ MayanLiteral
+    testUnicodeCharacter @MayanLiteral
+    testUnicodeText @MayanLiteral
+    testUnicodeCharText @MayanLiteral
+    testHashable @MayanLiteral

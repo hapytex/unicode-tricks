@@ -10,6 +10,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter @ DieValue
-    testUnicodeText @ DieValue
-    testHashable @ DieValue
+    testUnicodeCharacter @DieValue
+    testUnicodeText @DieValue
+    testUnicodeCharText @DieValue
+    testHashable @DieValue

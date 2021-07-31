@@ -10,6 +10,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter @ Currency
-    testUnicodeText @ Currency
-    testHashable @ Currency
+    testUnicodeCharacter @Currency
+    testUnicodeText @Currency
+    testUnicodeCharText @Currency
+    testHashable @Currency

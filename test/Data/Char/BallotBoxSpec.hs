@@ -10,6 +10,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter @ BallotBox
-    testUnicodeText @ BallotBox
+    testUnicodeCharacter @BallotBox
+    testUnicodeText @BallotBox
+    testUnicodeCharText @BallotBox
     testHashable @BallotBox

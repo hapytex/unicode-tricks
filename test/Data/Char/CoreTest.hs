@@ -4,6 +4,7 @@ module Data.Char.CoreTest (
     testBounded
   , testUnicodeCharacter
   , testUnicodeText
+  , testUnicodeCharText
   , testHashable
   , testMirrorHorizontally
   , testMirrorVertically

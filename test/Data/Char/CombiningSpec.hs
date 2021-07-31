@@ -21,5 +21,6 @@ spec = do
   describe "combiningCharacter" $
     it "combiningCharacter and combiningToUnicode are each others inverse" $ property $
       \c -> combiningCharacter (combiningToUnicode c) == Just c
-  testUnicodeCharacter @ CombiningCharacter
-  testUnicodeText @ CombiningCharacter
+  testUnicodeCharacter @CombiningCharacter
+  testUnicodeText @CombiningCharacter
+  testUnicodeCharText @CombiningCharacter
