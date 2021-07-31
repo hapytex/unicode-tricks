@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe, TypeApplication #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Emoji.Zodiac
