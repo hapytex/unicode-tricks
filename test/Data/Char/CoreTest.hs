@@ -14,7 +14,7 @@ import Data.Char.Core
 import Data.Hashable(Hashable(hash))
 import Data.List(intercalate)
 import Data.Maybe(isJust)
-import Data.Text(Text, singleton)
+import Data.Text(Text, pack, singleton)
 import Data.Typeable(Typeable, typeOf)
 
 import Test.Hspec
@@ -92,7 +92,7 @@ testUnicodeText :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeTex
 testUnicodeText = describe (instanceText "UnicodeText" ++ instanceName (show (typeOf (undefined :: a)))) $ do
   it "equivalent over text" $ property (mapOverText @ a)
   it "check isInTextRange method 1" (property (isInTextRangeCheck1 @ a))
-  -- it "check isInTextRange method 2" (property (isInTextRangeCheck2 @ a))
+  it "check isInTextRange method 2" (forAll (pack <$> arbitrary) (isInTextRangeCheck2 @ a))
 
 testHashable :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, Hashable a) => SpecWith ()
 testHashable = describe (instanceText "Hashable" ++ instanceName (show (typeOf (undefined :: a)))) $ it "hashing law" $ (property (hashEquality @a))
