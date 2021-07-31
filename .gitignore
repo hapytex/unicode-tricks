@@ -70,3 +70,6 @@ tmp/**
 
 # hlints
 .hlint-*
+
+# todos
+todo

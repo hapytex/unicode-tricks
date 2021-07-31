@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Card
@@ -60,7 +60,7 @@ import Control.DeepSeq(NFData)
 
 import Data.Bits(shiftL, (.|.))
 import Data.Char(chr)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange', mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 
@@ -185,8 +185,10 @@ instance UnicodeCharacter CardSuit where
     toUnicodeChar = mapFromEnum _suitOffset
     fromUnicodeChar = mapToEnumSafe _suitOffset
     fromUnicodeChar' = mapToEnum _suitOffset
+    isInCharRange c = '\x2660' <= c && c <= '\x2663'
 
-instance UnicodeText CardSuit
+instance UnicodeText CardSuit where
+  isInTextRange = generateIsInTextRange' @CardSuit
 
 -- | The unicode character that represents the /back/ of the card.
 back :: Char
