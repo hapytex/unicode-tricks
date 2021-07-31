@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Block.Sextant
@@ -23,7 +23,7 @@ import Control.DeepSeq(NFData, NFData1)
 
 import Data.Bits((.|.), (.&.), shiftL, shiftR)
 import Data.Char(chr, ord)
-import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
+import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange')
 import Data.Char.Block(Row, pattern EmptyRow, pattern LeftRow, pattern RightRow, pattern FullRow, pattern EmptyBlock, pattern LeftHalfBlock, pattern RightHalfBlock, pattern FullBlock, rowValue, toRow')
 import Data.Data(Data)
 import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
@@ -84,8 +84,10 @@ instance UnicodeCharacter (Sextant Bool) where
     toUnicodeChar = filled
     fromUnicodeChar = fromSextant
     fromUnicodeChar' = fromSextant'
+    isInCharRange = isSextant
 
-instance UnicodeText (Sextant Bool)
+instance UnicodeText (Sextant Bool) where
+  isInTextRange = generateIsInTextRange' @(Sextant Bool)
 
 -- | Check if the given 'Char'acter is a 'Char'acter that maps on a 'Sextant' value.
 isSextant

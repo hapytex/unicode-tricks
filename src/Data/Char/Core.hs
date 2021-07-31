@@ -1,4 +1,4 @@
-{-# LANGUAGE BangPatterns, CPP, ConstraintKinds, DefaultSignatures, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, Safe, ScopedTypeVariables #-}
+{-# LANGUAGE AllowAmbiguousTypes, BangPatterns, CPP, ConstraintKinds, DefaultSignatures, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, Safe, ScopedTypeVariables, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Core
@@ -36,8 +36,9 @@ module Data.Char.Core (
   , liftLowercase,      liftLowercase'
   , liftUpperLowercase, liftUpperLowercase'
     -- * Convert objects from and to Unicode 'Char'acters
-  , UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeChar
-  , UnicodeText(toUnicodeText, fromUnicodeText, fromUnicodeText')
+  , UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeChar
+  , UnicodeText(toUnicodeText, fromUnicodeText, fromUnicodeText', isInTextRange)
+  , generateIsInTextRange, generateIsInTextRange'
     -- * Mirroring items horizontally and/or vertically
   , MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical)
     -- * Ways to display numbers
@@ -48,6 +49,8 @@ module Data.Char.Core (
   , chr, isAlpha, isAlphaNum, isAscii, ord
   ) where
 
+import Prelude hiding (null)
+
 import Control.DeepSeq(NFData, NFData1)
 
 import Data.Bits((.&.))
@@ -57,11 +60,11 @@ import Data.Default(Default(def))
 import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
 import Data.Hashable(Hashable)
 import Data.Hashable.Lifted(Hashable1)
-import Data.Maybe(fromJust)
+import Data.Maybe(fromJust, isJust)
 #if __GLASGOW_HASKELL__ < 803
 import Data.Semigroup((<>))
 #endif
-import Data.Text(Text, cons, pack, singleton, snoc, unpack)
+import Data.Text(Text, cons, null, pack, singleton, snoc, uncons, unpack)
 
 import GHC.Generics(Generic, Generic1)
 
@@ -284,7 +287,7 @@ isAsciiAlpha x = isAscii x && isAlpha x
 isAsciiAlphaNum :: Char -> Bool
 isAsciiAlphaNum x = isAscii x && isAlphaNum x
 
--- | Checks if a charcter is a basic /greek alphabetic/ character or a Greek-like symbol.
+-- | Checks if a character is a basic /greek alphabetic/ character or a Greek-like symbol.
 -- The characters @ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∇ϴαβγδεζηθικλμνξοπρςστυφχψω∂ϵϑϰϕϱϖ@ satisfy this predicate.
 isGreek :: Char -> Bool
 isGreek 'ϑ' = True -- U+03D1 GREEK THETA SYMBOL
@@ -487,6 +490,12 @@ class UnicodeCharacter a where
       :: Char  -- ^ The given 'Char'acter to convert to an element.
       -> a  -- ^ The given element that is equivalent to the given 'Char'acter.
     fromUnicodeChar' = fromJust . fromUnicodeChar
+
+    -- | Check if the given 'Char'acter maps on an item of @a@.
+    isInCharRange
+      :: Char  -- ^ The given 'Char'acter to test.
+      -> Bool  -- ^ 'True' if the given 'Char'acter has a corresponding value for @a@; 'False' otherwise.
+    isInCharRange = isJust . (fromUnicodeChar @a)
     {-# MINIMAL toUnicodeChar, fromUnicodeChar #-}
 
 -- | A class from which boejcts can be derived that map to and from a /sequence/
@@ -516,6 +525,27 @@ class UnicodeText a where
       :: Text  -- ^ The given 'Text' to convert to an object.
       -> a  -- ^ The given equivalent object. If there is no equivalent object, the behavior is unspecified.
     fromUnicodeText' = fromJust . fromUnicodeText
+
+    -- | Determine if the given 'Text' value maps on a value of type @a@.
+    isInTextRange
+      :: Text  -- ^ The given 'Text' object to test.
+      -> Bool  -- ^ 'True' if there is a counterpart of type @a@; 'False' otherwise.
+    isInTextRange = isJust . (fromUnicodeText @a)
+
+-- | Convert a given 'isInCharRange' check into a 'isInTextRange' check.
+generateIsInTextRange
+  :: (Char -> Bool)  -- ^ The given 'isInCharRange' check.
+  -> Text  -- ^ The 'Text' object to check.
+  -> Bool  -- ^ 'True' if the given 'Text' object has a single character for which the 'isInCharRange' check succeeds, 'False' otherwise.
+generateIsInTextRange f = go . uncons
+  where go (Just (c, t)) = null t && f c
+        go Nothing = False
+
+-- | Generate an 'isInTextRange' check with the 'isInCharRange' check for the instance of 'UnicodeCharacter' of that type.
+generateIsInTextRange' :: forall a . UnicodeCharacter a
+  => Text  -- ^ The given 'Text' object to check.
+  -> Bool  -- ^ 'True' if the given 'Text' object has a single character for which the 'isInCharRange' check succeeds, 'False' otherwise.
+generateIsInTextRange' = generateIsInTextRange (isInCharRange @a)
 
 -- | A type class that specifies that the items can be mirrored in the /horizontal/ direction (such that up is now down).
 -- The mirror is /not/ per se /pixel perfect/. For example the mirror of 🂁 is 🁵, so the dots of the bottom pat

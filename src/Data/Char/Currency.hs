@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Currency
@@ -39,7 +39,7 @@ module Data.Char.Currency (
 
 import Control.DeepSeq(NFData)
 
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange')
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 
@@ -246,8 +246,10 @@ instance UnicodeCharacter Currency where
   fromUnicodeChar '\x1e2ff' = Just WanchoNgun
   fromUnicodeChar '\x1ecb0' = Just IndicSiyaqRupeeMark
   fromUnicodeChar _ = Nothing
+  isInCharRange = isCurrency
 
-instance UnicodeText Currency
+instance UnicodeText Currency where
+  isInTextRange = generateIsInTextRange' @Currency
 
 -- | Check if the given 'Char'acter is a currency character.
 isCurrency
