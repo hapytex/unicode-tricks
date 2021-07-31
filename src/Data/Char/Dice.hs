@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Dice
@@ -73,7 +73,7 @@ instance UnicodeCharacter DieValue where
     toUnicodeChar = mapFromEnum _dieOffset
     fromUnicodeChar = mapToEnumSafe _dieOffset
     fromUnicodeChar' = mapToEnum _dieOffset
-    isInCharRange = '\x2680' <= c && c <= '\x2685'
+    isInCharRange c = '\x2680' <= c && c <= '\x2685'
 
 instance UnicodeText DieValue where
   isInTextRange = generateIsInTextRange' @DieValue
