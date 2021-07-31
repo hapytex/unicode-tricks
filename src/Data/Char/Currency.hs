@@ -248,7 +248,7 @@ instance UnicodeCharacter Currency where
   fromUnicodeChar _ = Nothing
   isInCharRange = isCurrency
 
-instance UnicodeText Currency
+instance UnicodeText Currency where
   isInTextRange = generateIsInTextRange' @Currency
 
 -- | Check if the given 'Char'acter is a currency character.
