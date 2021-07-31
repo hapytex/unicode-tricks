@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.BallotBox
@@ -19,7 +19,7 @@ module Data.Char.BallotBox (
 
 import Control.DeepSeq(NFData)
 
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange', mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 
@@ -68,4 +68,5 @@ instance UnicodeCharacter BallotBox where
     fromUnicodeChar' = mapToEnum _ballotOffset
     isInCharRange = isBallotBox
 
-instance UnicodeText BallotBox
+instance UnicodeText BallotBox where
+    isInTextRange = generateIsInTextRange' @ BallotBox
