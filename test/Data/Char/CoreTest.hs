@@ -67,11 +67,11 @@ doubleCallHorizontallyVertically3 x = mirrorVertical (mirrorHorizontal (mirrorHo
 
 testUnicodeCharacter :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeCharacter a) => SpecWith ()
 testUnicodeCharacter = instanceText' @a "UnicodeCharacter" $ do
-    it "equivalent over character" $ property (mapOverChar @ a)
-    it "equivalent over item" $ property (mapOverItem @ a)
-    it "equivalent from valid chars over item" (mapValidItem @ a)
-    it "fromUnicodeChar and fromUnicodeChar' are equivalent" (equivalentFromChar @ a)
-    it "check isInCharRange method" (property (isInCharRangeCheck @ a))
+    it "equivalent over character" $ property (mapOverChar @a)
+    it "equivalent over item" $ property (mapOverItem @a)
+    it "equivalent from valid chars over item" (mapValidItem @a)
+    it "fromUnicodeChar and fromUnicodeChar' are equivalent" (equivalentFromChar @a)
+    it "check isInCharRange method" (property (isInCharRangeCheck @a))
 
 testBounded :: forall a . (Arbitrary a, Bounded a, Ord a, Show a, Typeable a) => SpecWith ()
 testBounded = instanceText' @a "Bounded" $ do
@@ -86,13 +86,21 @@ checkUpperbound x = x <= maxBound
 
 -- testBounded :: forall a . (Arbitrary a, Ord a, Show a) => SpecWith ()
 -- testBounded = describe (instanceText' "Bounded") $ do
---  it "equivalent over character" (property (mapOverChar @ a))
+--  it "equivalent over character" (property (mapOverChar @a))
 
 testUnicodeText :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeText a) => SpecWith ()
 testUnicodeText = describe (instanceText "UnicodeText" ++ instanceName (show (typeOf (undefined :: a)))) $ do
-  it "equivalent over text" $ property (mapOverText @ a)
-  it "check isInTextRange method 1" (property (isInTextRangeCheck1 @ a))
-  it "check isInTextRange method 2" (forAll (pack <$> arbitrary) (isInTextRangeCheck2 @ a))
+  it "equivalent over text" $ property (mapOverText @a)
+  it "check isInTextRange method 1" (property (isInTextRangeCheck1 @a))
+  it "check isInTextRange method 2" (forAll (pack <$> arbitrary) (isInTextRangeCheck2 @a))
+
+testUnicodeCharText :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeCharacter a, UnicodeText a) => SpecWith ()
+testUnicodeCharText = describe (instanceTexts' @a ["UnicodeCharacter", "UnicodeText"]) $ do
+  it "equivalent range checks" $ property (unicodeCharTextInRange @a)
+
+unicodeCharTextInRange :: forall a . (UnicodeCharacter a, UnicodeText a) => Char -> Bool
+unicodeCharTextInRange c = isInCharRange c == isInTextRange tc
+  where tc = singleton c
 
 testHashable :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, Hashable a) => SpecWith ()
 testHashable = describe (instanceText "Hashable" ++ instanceName (show (typeOf (undefined :: a)))) $ it "hashing law" $ (property (hashEquality @a))
@@ -105,26 +113,26 @@ mapOverChar :: forall a . (Eq a, UnicodeCharacter a) => a -> Bool
 mapOverChar c = Just c == fromUnicodeChar (toUnicodeChar c)
 
 isInCharRangeCheck :: forall a . UnicodeCharacter a => Char -> Bool
-isInCharRangeCheck c = (isInCharRange @a) c == isJust ((fromUnicodeChar @ a) c)
+isInCharRangeCheck c = (isInCharRange @a) c == isJust ((fromUnicodeChar @a) c)
 
 isInTextRangeCheck1 :: forall a . UnicodeText a => Char -> Bool
-isInTextRangeCheck1 c = (isInTextRange @a) tc == isJust ((fromUnicodeText @ a) tc)
+isInTextRangeCheck1 c = (isInTextRange @a) tc == isJust ((fromUnicodeText @a) tc)
   where tc = singleton c
 
 isInTextRangeCheck2 :: forall a . UnicodeText a => Text -> Bool
-isInTextRangeCheck2 tc = (isInTextRange @a) tc == isJust ((fromUnicodeText @ a) tc)
+isInTextRangeCheck2 tc = (isInTextRange @a) tc == isJust ((fromUnicodeText @a) tc)
 
 mapOverItem :: forall a . UnicodeCharacter a => Char -> Bool
-mapOverItem c = maybe True ((c ==) . toUnicodeChar @ a) (fromUnicodeChar @ a c)
+mapOverItem c = maybe True ((c ==) . toUnicodeChar @a) (fromUnicodeChar @a c)
 
 equivalentMapping :: forall a . (Eq a, UnicodeCharacter a) => Char -> Bool
-equivalentMapping c = (maybe True (fromUnicodeChar' @ a c ==)) (fromUnicodeChar @ a c)
+equivalentMapping c = (maybe True (fromUnicodeChar' @a c ==)) (fromUnicodeChar @a c)
 
 mapValidItem :: forall a . UnicodeCharacter a => Property
-mapValidItem = forAll (suchThat (arbitrary :: Gen Char) (isJust . fromUnicodeChar @ a)) (mapOverItem @ a)
+mapValidItem = forAll (suchThat (arbitrary :: Gen Char) (isJust . fromUnicodeChar @a)) (mapOverItem @a)
 
 equivalentFromChar :: forall a . (Eq a, UnicodeCharacter a) => Property
-equivalentFromChar = forAll (suchThat (arbitrary :: Gen Char) (isJust . fromUnicodeChar @ a)) (equivalentMapping @ a)
+equivalentFromChar = forAll (suchThat (arbitrary :: Gen Char) (isJust . fromUnicodeChar @a)) (equivalentMapping @a)
 
 mapOverText :: forall a . (Eq a, UnicodeText a) => a -> Bool
 mapOverText c = Just c == fromUnicodeText (toUnicodeText c)
