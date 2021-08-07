@@ -136,6 +136,7 @@ instance UnicodeCharacter Clock where
         | c < '\x1f55c' = Just (Clock (ord c - 0x1f54f) False)
         | c < '\x1f568' = Just (Clock (mod (ord c - 0x1f55b) 12) True)
         | otherwise = Nothing
+    isInCharRange c = '\x1f550' <= c && c <= '\x1f567'
 
 
 -- | The 'SkinColorModifier' that corresponds to type one of the /Fitzpatrick
@@ -186,4 +187,5 @@ fromFitzPatrick _ = Nothing
 instance UnicodeText SkinColorModifier where
   isInTextRange = generateIsInTextRange' @SkinColorModifier
 
-instance UnicodeText Clock
+instance UnicodeText Clock where
+  isInTextRange = generateIsInTextRange' @Clock
