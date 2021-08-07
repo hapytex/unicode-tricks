@@ -26,7 +26,7 @@ import Control.DeepSeq(NFData, NFData1)
 import Control.Monad((>=>))
 
 import Data.Char(chr, ord)
-import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), Orientation(Horizontal, Vertical), Oriented(Oriented), generateIsInTextRange')
+import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, Orientation(Horizontal, Vertical), Oriented(Oriented))
 import Data.Char.Dice(DieValue)
 import Data.Data(Data)
 import Data.Function(on)
@@ -200,7 +200,6 @@ instance UnicodeCharacter (Oriented (Domino (Maybe DieValue))) where
     toUnicodeChar = domino
     fromUnicodeChar = fromDomino
     fromUnicodeChar' = fromDomino'
-    isInCharRange c = '\x1f030' <= c && c <= '\x1f093'
 
 instance MirrorHorizontal (Oriented (Domino a)) where
   mirrorHorizontal (Oriented (Domino a b) Vertical) = Oriented (Domino b a) Vertical
@@ -215,7 +214,6 @@ instance MirrorVertical (Oriented (Domino a)) where
 instance UnicodeCharacter (Oriented (Domino DieValue)) where
     toUnicodeChar = domino'
     fromUnicodeChar = fromDomino >=> traverse toSimple
---    isInCharRange = '\x1f039' <= c && c <= '\x1f03e'  TODO
 
 instance UnicodeText (Oriented (Domino (Maybe DieValue)))
 instance UnicodeText (Oriented (Domino DieValue))
