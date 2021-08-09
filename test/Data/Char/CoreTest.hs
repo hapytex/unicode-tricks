@@ -95,7 +95,7 @@ testUnicodeText = describe (instanceText "UnicodeText" ++ instanceName (show (ty
   it "check isInTextRange method 1" (property (isInTextRangeCheck1 @a))
   it "check isInTextRange method 2" (forAll (pack <$> arbitrary) (isInTextRangeCheck2 @a))
 
-testUnicodeCharText :: forall a . (Arbitrary a, Eq a, Show a, Typeable a, UnicodeCharacter a, UnicodeText a) => SpecWith ()
+testUnicodeCharText :: forall a . (Typeable a, UnicodeCharacter a, UnicodeText a) => SpecWith ()
 testUnicodeCharText = instanceTexts' @a ["UnicodeCharacter", "UnicodeText"] $ do
   it "equivalent range checks" $ property (unicodeCharTextInRange @a)
 

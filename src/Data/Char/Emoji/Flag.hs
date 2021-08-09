@@ -54,7 +54,7 @@ import Control.DeepSeq(NFData)
 
 import Data.Bits((.|.))
 import Data.Char(chr, ord, toLower, toUpper)
-import Data.Char.Core(UnicodeText(fromUnicodeText, toUnicodeText), mapToEnumSafe)
+import Data.Char.Core(UnicodeText(fromUnicodeText, toUnicodeText, isInTextRange), mapToEnumSafe)
 import Data.Char.Enclosed(regionalIndicatorUppercase')
 import Data.Data(Data)
 import Data.Function(on)
@@ -2037,6 +2037,11 @@ instance Enum SubFlag where
 instance UnicodeText Flag where
     toUnicodeText (Flag ca cb) = iso3166Alpha2ToFlag' ca cb
     fromUnicodeText = fromFlag
+    isInTextRange c
+      | [ca, cb] <- unpack c, Just a <- shft ca, Just b <- shft cb = _validFlagEmoji a b
+      | otherwise = False
+      where shft = mapToEnumSafe _flagCharOffset
+
 
 instance UnicodeText SubFlag where
     toUnicodeText (SubFlag (Flag ca cb) cc cd ce) = pack ('\x1f3f4' : go' ca : go' cb : map go [cc, cd, ce, '\DEL'])
@@ -2049,6 +2054,10 @@ instance UnicodeText SubFlag where
               go '\xe0073' '\xe0063' '\xe0074' = Just SCT
               go '\xe0077' '\xe006c' '\xe0073' = Just WLS
               go _ _ _ = Nothing
+    isInTextRange "\x1f3f4\xe0067\xe0062\xe0065\xe006e\xe0067\xe007f" = True
+    isInTextRange "\x1f3f4\xe0067\xe0062\xe0073\xe0063\xe0074\xe007f" = True
+    isInTextRange "\x1f3f4\xe0067\xe0062\xe0077\xe006c\xe0073\xe007f" = True
+    isInTextRange _ = False
 
 -- | A data type to represent additional non-regional flags defined by the Unicode standard.
 data ExtraFlag
@@ -2087,3 +2096,12 @@ instance UnicodeText ExtraFlag where
   fromUnicodeText "\x1f3f3\xfe0f\x200d\x26a7\xfe0f" = Just TransgenderFlag
   fromUnicodeText "\x1f3f4\x200d\x2620\xfe0f" = Just PirateFlag
   fromUnicodeText _ = Nothing
+  isInTextRange "\x1f3c1" = True
+  isInTextRange "\x1f6a9" = True
+  isInTextRange "\x1f38c" = True
+  isInTextRange "\x1f3f4" = True
+  isInTextRange "\x1f3f3\xfe0f" = True
+  isInTextRange "\x1f3f3\xfe0f\x200d\x1f308" = True
+  isInTextRange "\x1f3f3\xfe0f\x200d\x26a7\xfe0f" = True
+  isInTextRange "\x1f3f4\x200d\x2620\xfe0f" = True
+  isInTextRange _ = False
