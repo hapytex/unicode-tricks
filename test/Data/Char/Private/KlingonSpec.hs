@@ -10,6 +10,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter @ Klingon
-    testUnicodeText @ Klingon
-    testHashable @ Klingon
+    testUnicodeCharacter @Klingon
+    testUnicodeText @Klingon
+    testUnicodeCharText @Klingon
+    testHashable @Klingon

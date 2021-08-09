@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Domino
@@ -26,7 +26,7 @@ import Control.DeepSeq(NFData, NFData1)
 import Control.Monad((>=>))
 
 import Data.Char(chr, ord)
-import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, Orientation(Horizontal, Vertical), Oriented(Oriented))
+import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), Orientation(Horizontal, Vertical), Oriented(Oriented), generateIsInTextRange')
 import Data.Char.Dice(DieValue)
 import Data.Data(Data)
 import Data.Function(on)
@@ -200,6 +200,7 @@ instance UnicodeCharacter (Oriented (Domino (Maybe DieValue))) where
     toUnicodeChar = domino
     fromUnicodeChar = fromDomino
     fromUnicodeChar' = fromDomino'
+    isInCharRange c = '\x1f030' <= c && c <= '\x1f093'
 
 instance MirrorHorizontal (Oriented (Domino a)) where
   mirrorHorizontal (Oriented (Domino a b) Vertical) = Oriented (Domino b a) Vertical
@@ -214,6 +215,16 @@ instance MirrorVertical (Oriented (Domino a)) where
 instance UnicodeCharacter (Oriented (Domino DieValue)) where
     toUnicodeChar = domino'
     fromUnicodeChar = fromDomino >=> traverse toSimple
+    isInCharRange c = '\x1f030' <= c && c <= '\x1f093' && go
+      where x = ord c
+            go | '\x1f031' <= c && c <= '\x1f038' = False
+               | '\x1f063' <= c && c <= '\x1f06a' = False
+               | x `mod` 7 == 3 && c <= '\x1f062' = False
+               | x `mod` 7 == 4 && c >= '\x1f062' = False
+               | otherwise = True
 
-instance UnicodeText (Oriented (Domino (Maybe DieValue)))
-instance UnicodeText (Oriented (Domino DieValue))
+instance UnicodeText (Oriented (Domino (Maybe DieValue))) where
+  isInTextRange = generateIsInTextRange' @(Oriented (Domino (Maybe DieValue)))
+
+instance UnicodeText (Oriented (Domino DieValue)) where
+  isInTextRange = generateIsInTextRange' @(Oriented (Domino DieValue))

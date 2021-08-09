@@ -10,11 +10,13 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  testUnicodeCharacter @ MoonPhase
-  testUnicodeCharacter @ MoonFace
-  testUnicodeText @ MoonPhase
-  testUnicodeText @ MoonFace
-  testHashable @ MoonPhase
-  testHashable @ MoonFace
-  testMirrorVertically @ MoonPhase
-  testMirrorVertically @ MoonFace
+  testUnicodeCharacter @MoonPhase
+  testUnicodeCharacter @MoonFace
+  testUnicodeText @MoonPhase
+  testUnicodeText @MoonFace
+  testUnicodeCharText @MoonPhase
+  testUnicodeCharText @MoonFace
+  testHashable @MoonPhase
+  testHashable @MoonFace
+  testMirrorVertically @MoonPhase
+  testMirrorVertically @MoonFace

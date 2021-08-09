@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Emoji.Zodiac
@@ -23,7 +23,7 @@ module Data.Char.Emoji.Zodiac (
 
 import Control.DeepSeq(NFData)
 
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange', mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 
@@ -63,8 +63,10 @@ instance UnicodeCharacter Zodiac where
     toUnicodeChar = mapFromEnum _zodiacOffset
     fromUnicodeChar = mapToEnumSafe _zodiacOffset
     fromUnicodeChar' = mapToEnum _zodiacOffset
+    isInCharRange c = '\x2648' <= c && c <= '\x2654'
 
-instance UnicodeText Zodiac
+instance UnicodeText Zodiac where
+    isInTextRange = generateIsInTextRange' @Zodiac
 
 -- | The English name for the 'Aries' zodiac sign.
 pattern Ram :: Zodiac

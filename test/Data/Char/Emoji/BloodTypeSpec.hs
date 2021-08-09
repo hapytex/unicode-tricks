@@ -10,5 +10,5 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  testUnicodeText @ BloodType
-  testHashable @ BloodType
+  testUnicodeText @BloodType
+  testHashable @BloodType

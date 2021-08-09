@@ -752,15 +752,21 @@ instance UnicodeCharacter Char where
     toUnicodeChar = id
     fromUnicodeChar = Just
     fromUnicodeChar' = id
+    isInCharRange = const True
 
 instance UnicodeText [Char] where
     toUnicodeText = pack
     fromUnicodeText = Just . unpack
     fromUnicodeText' = unpack
+    isInTextRange = const True
 
-instance UnicodeText Char
+instance UnicodeText Char where
+  isInTextRange cs
+    | Just (_, c) <- uncons cs = null c
+    | otherwise = False
 
 instance UnicodeText Text where
     toUnicodeText = id
     fromUnicodeText = Just
     fromUnicodeText' = id
+    isInTextRange = const True

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, OverloadedStrings, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, OverloadedStrings, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Emoji
@@ -31,7 +31,7 @@ import Control.DeepSeq(NFData)
 import Data.Bits((.|.), shiftL, shiftR)
 import Data.Bool(bool)
 import Data.Char(chr, ord)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange', mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Char.Emoji.Core
 import Data.Char.Emoji.BloodType
 import Data.Char.Emoji.Flag
@@ -125,6 +125,7 @@ instance UnicodeCharacter SkinColorModifier where
     toUnicodeChar = mapFromEnum _skinColorOffset
     fromUnicodeChar = mapToEnumSafe _skinColorOffset
     fromUnicodeChar' = mapToEnum _skinColorOffset
+    isInCharRange c = '\x1f3fb' <= c && c <= '\x1f3ff'
 
 
 instance UnicodeCharacter Clock where
@@ -135,6 +136,7 @@ instance UnicodeCharacter Clock where
         | c < '\x1f55c' = Just (Clock (ord c - 0x1f54f) False)
         | c < '\x1f568' = Just (Clock (mod (ord c - 0x1f55b) 12) True)
         | otherwise = Nothing
+    isInCharRange c = '\x1f550' <= c && c <= '\x1f567'
 
 
 -- | The 'SkinColorModifier' that corresponds to type one of the /Fitzpatrick
@@ -182,5 +184,8 @@ fromFitzPatrick 6 = Just Dark
 fromFitzPatrick _ = Nothing
 
 
-instance UnicodeText SkinColorModifier
-instance UnicodeText Clock
+instance UnicodeText SkinColorModifier where
+  isInTextRange = generateIsInTextRange' @SkinColorModifier
+
+instance UnicodeText Clock where
+  isInTextRange = generateIsInTextRange' @Clock

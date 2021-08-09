@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, OverloadedStrings, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, OverloadedStrings, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Emoji.Gender
@@ -19,7 +19,7 @@ module Data.Char.Emoji.Gender (
 
 import Control.DeepSeq(NFData)
 
-import Data.Char.Core(UnicodeText(toUnicodeText, fromUnicodeText))
+import Data.Char.Core(UnicodeText(toUnicodeText, fromUnicodeText, isInTextRange))
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 
@@ -49,6 +49,9 @@ instance UnicodeText BinaryGender where
     fromUnicodeText "\x2640\xfe0f" = Just Male
     fromUnicodeText "\x2642\xfe0f" = Just Female
     fromUnicodeText _ = Nothing
+    isInTextRange "\x2640\xfe0f" = True
+    isInTextRange "\x2642\xfe0f" = True
+    isInTextRange _ = False
 
 -- | A data type that, besides 'Male' and 'Female' can also represent a 'Transgender'.
 data Trigender
@@ -78,3 +81,5 @@ instance UnicodeText Trigender where
     toUnicodeText Transgender = "\x26a7\xfe0f"
     fromUnicodeText "\x26a7\xfe0f" = Just Transgender
     fromUnicodeText x = Binary <$> fromUnicodeText x
+    isInTextRange "\x26a7\xfe0f" = True
+    isInTextRange c = isInTextRange @BinaryGender c

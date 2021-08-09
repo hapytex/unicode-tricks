@@ -10,6 +10,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter @ (Sextant Bool)
-    testUnicodeText @ (Sextant Bool)
-    testHashable @ (Sextant Bool)
+    testUnicodeCharacter @(Sextant Bool)
+    testUnicodeText @(Sextant Bool)
+    testUnicodeCharText @(Sextant Bool)
+    testHashable @(Sextant Bool)

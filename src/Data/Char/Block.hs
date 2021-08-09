@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Block
@@ -27,7 +27,7 @@ import Control.DeepSeq(NFData, NFData1)
 
 import Data.Bits((.|.))
 import Data.Bool(bool)
-import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
+import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange')
 import Data.Data(Data)
 import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
 import Data.Hashable(Hashable)
@@ -225,5 +225,7 @@ filled (Block (Row False True ) (Row True  True )) = '\x259f'
 instance UnicodeCharacter (Block Bool) where
     toUnicodeChar = filled
     fromUnicodeChar = fromBlock
+    isInCharRange c = ('\x2596' <= c && c <= '\x259f') || c `elem` " \x2588\x258c\x2590"
 
-instance UnicodeText (Block Bool)
+instance UnicodeText (Block Bool) where
+    isInTextRange = generateIsInTextRange' @(Block Bool)

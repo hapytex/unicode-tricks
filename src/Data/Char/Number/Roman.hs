@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Number.Roman
@@ -29,7 +29,7 @@ import Control.DeepSeq(NFData)
 
 import Data.Bits((.|.))
 import Data.Char(chr)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, LetterCase, Ligate, ligateF, mapFromEnum, mapToEnum, mapToEnumSafe, splitLetterCase)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange', LetterCase, Ligate, ligateF, mapFromEnum, mapToEnum, mapToEnumSafe, splitLetterCase)
 import Data.Data(Data)
 import Data.Default(Default(def))
 import Data.Hashable(Hashable)
@@ -60,11 +60,13 @@ instance Hashable RomanStyle
 instance NFData RomanStyle
 
 instance UnicodeCharacter RomanLiteral where
-    toUnicodeChar = mapFromEnum _romanUppercaseOffset
-    fromUnicodeChar = mapToEnumSafe _romanUppercaseOffset
-    fromUnicodeChar' = mapToEnum _romanUppercaseOffset
+  toUnicodeChar = mapFromEnum _romanUppercaseOffset
+  fromUnicodeChar = mapToEnumSafe _romanUppercaseOffset
+  fromUnicodeChar' = mapToEnum _romanUppercaseOffset
+  isInCharRange c = '\x2160' <= c && c <= '\x216f'
 
-instance UnicodeText RomanLiteral
+instance UnicodeText RomanLiteral where
+  isInTextRange = generateIsInTextRange' @RomanLiteral
 
 -- | Roman numerals for which a unicode character exists.
 data RomanLiteral

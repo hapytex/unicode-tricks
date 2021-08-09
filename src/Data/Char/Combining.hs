@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances, FunctionalDependencies, PatternSynonyms, Safe #-}
+{-# LANGUAGE FlexibleInstances, FunctionalDependencies, PatternSynonyms, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Combining
@@ -141,7 +141,7 @@ module Data.Char.Combining (
   ,  pattern MendeKikakuiNumberThousands                   , pattern MendeKikakuiNumberTenThousands                , pattern MendeKikakuiNumberHundredThousands            , pattern MendeKikakuiNumberMillions
   ) where
 
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange')
 import Data.List.NonEmpty(NonEmpty((:|)), (<|), toList)
 import Data.String(IsString(fromString))
 import Data.Text(Text, cons, pack, singleton)
@@ -6791,5 +6791,7 @@ instance UnicodeCharacter CombiningCharacter where
     toUnicodeChar = combiningToUnicode
     fromUnicodeChar = combiningCharacter
     fromUnicodeChar' = combiningCharacter'
+    isInCharRange = isCombiningCharacter
 
-instance UnicodeText CombiningCharacter
+instance UnicodeText CombiningCharacter where
+  isInTextRange = generateIsInTextRange' @CombiningCharacter

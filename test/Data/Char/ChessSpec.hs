@@ -11,9 +11,9 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  testHashable @ ChessColorBinary
-  testHashable @ ChessColor
-  testHashable @ ChessPieceType
-  testHashable @ Rotate45
-  testHashable @ ChessHybridType
-  testHashable @ ChessPiece
+  testHashable @ChessColorBinary
+  testHashable @ChessColor
+  testHashable @ChessPieceType
+  testHashable @Rotate45
+  testHashable @ChessHybridType
+  testHashable @ChessPiece

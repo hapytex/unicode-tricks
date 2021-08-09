@@ -10,6 +10,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  testUnicodeCharacter @ Zodiac
-  testUnicodeText @ Zodiac
-  testHashable @ Zodiac
+  testUnicodeCharacter @Zodiac
+  testUnicodeText @Zodiac
+  testUnicodeCharText @Zodiac
+  testHashable @Zodiac
