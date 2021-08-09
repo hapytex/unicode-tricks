@@ -525,6 +525,7 @@ instance UnicodeCharacter (Parts Weight) where
     toUnicodeChar = weighted
     fromUnicodeChar = fromWeighted
     fromUnicodeChar' = fromWeighted'
+    isInCharRange ' ' = True
     isInCharRange c = ('\x2500' <= c && c <= '\x2503') || ('\x250c' <= c && c <= '\x254b')
 
 instance UnicodeCharacter (Parts Bool) where
