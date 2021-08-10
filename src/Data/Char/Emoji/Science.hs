@@ -19,7 +19,7 @@ module Data.Char.Emoji.Science (
 import Control.DeepSeq(NFData)
 
 import Data.Char(chr, ord)
-import Data.Char.Core(UnicodeText(toUnicodeText, fromUnicodeText))
+import Data.Char.Core(UnicodeText(toUnicodeText, fromUnicodeText, isInTextRange))
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 import Data.Text(singleton, unpack)
@@ -61,3 +61,13 @@ instance UnicodeText ScienceEmoji where
   fromUnicodeText t
     | [c] <- unpack t, '\x1f9ea' <= c && c <= '\x1f9ec' = Just (toEnum (ord c - 0x1f9e9))
     | otherwise = Nothing
+  isInTextRange "\x2697\xfe0f" = True
+  isInTextRange "\x1f52c" = True
+  isInTextRange "\x1f52d" = True
+  isInTextRange "\x1f4e1" = True
+  isInTextRange "\x1f9ea" = True
+  isInTextRange "\x1f9eb" = True
+  isInTextRange t
+    | [c] <- unpack t = '\x1f9ea' <= c && c <= '\x1f9ec'
+    | otherwise = False
+

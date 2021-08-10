@@ -531,7 +531,6 @@ class UnicodeText a where
       :: Text  -- ^ The given 'Text' object to test.
       -> Bool  -- ^ 'True' if there is a counterpart of type @a@; 'False' otherwise.
     isInTextRange = isJust . (fromUnicodeText @a)
-    {-# MINIMAL isInTextRange #-}
 
 -- | Convert a given 'isInCharRange' check into a 'isInTextRange' check.
 generateIsInTextRange

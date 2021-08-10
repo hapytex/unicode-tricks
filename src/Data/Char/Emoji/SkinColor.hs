@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe, TupleSections, TypeApplications #-}
+{-# LANGUAGE DeriveTraversable, DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe, ScopedTypeVariables, TupleSections, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Emoji.SkinColor
@@ -152,6 +152,9 @@ instance WithSkinColorModifierUnicodeText a => UnicodeText (SkinModified a) wher
   fromUnicodeText t
     | Just (x, Just m) <- withoutOptionalSkinModifier t = Just (SkinModified x m)
     | otherwise = Nothing
+  isInTextRange t
+    | Just (_, Just _) <- withoutOptionalSkinModifier @a t = True
+    | otherwise = False
 
 -- | The 'SkinColorModifier' that corresponds to type one of the /Fitzpatrick
 -- scale/.
