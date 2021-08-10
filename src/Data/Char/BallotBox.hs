@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.BallotBox
@@ -19,7 +19,7 @@ module Data.Char.BallotBox (
 
 import Control.DeepSeq(NFData)
 
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange', mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 
@@ -29,6 +29,12 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
 _ballotOffset :: Int
 _ballotOffset = 0x2610
+
+-- | Check if the given 'Char'acter is a character that maps on a 'BallotBox' object.
+isBallotBox
+  :: Char  -- ^ The given 'Char'acter to check.
+  -> Bool  -- ^ 'True' if the given 'Char'acter corresponds to a 'BallotBox' object; 'False' otherwise.
+isBallotBox c = '\x2610' <= c && c <= '\x2612'
 
 -- | A datatype that represents the different types of ballot boxes.
 data BallotBox
@@ -60,5 +66,7 @@ instance UnicodeCharacter BallotBox where
     toUnicodeChar = mapFromEnum _ballotOffset
     fromUnicodeChar = mapToEnumSafe _ballotOffset
     fromUnicodeChar' = mapToEnum _ballotOffset
+    isInCharRange = isBallotBox
 
-instance UnicodeText BallotBox
+instance UnicodeText BallotBox where
+    isInTextRange = generateIsInTextRange' @BallotBox

@@ -20,7 +20,7 @@ module Data.Char.Emoji.BloodType (
 import Control.DeepSeq(NFData)
 
 import Data.Bits(Bits((.&.), (.|.), bit, bitSize, bitSizeMaybe, complement, isSigned, popCount, rotate, shift, testBit, xor))
-import Data.Char.Core(UnicodeText(fromUnicodeText, toUnicodeText))
+import Data.Char.Core(UnicodeText(fromUnicodeText, toUnicodeText, isInTextRange))
 import Data.Char.Emoji.Core(pattern EmojiSuffix)
 import Data.Data(Data)
 import Data.Function(on)
@@ -99,3 +99,8 @@ instance UnicodeText BloodType where
               go '\x1f171' = Just B
               go '\x1f17e' = Just O
               go _ = Nothing
+    isInTextRange "\x1f170\xfe0f" = True
+    isInTextRange "\x1f171\xfe0f" = True
+    isInTextRange "\x1f17e\xfe0f" = True
+    isInTextRange "\x1f18e" = True
+    isInTextRange _ = False

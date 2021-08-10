@@ -24,18 +24,19 @@ spec = do
       \c -> isReserved c /= isNotReserved c
     it "No overlap with isAscii" $ property $
       \c -> not (isReserved c) || not (isAscii c)
-  testUnicodeCharacter @ Char
-  testUnicodeText @ Char
-  testUnicodeText @ String
-  testHashable @ Char
-  testHashable @ String
-  testHashable @ LetterCase
-  testHashable @ PlusStyle
-  testHashable @ Orientation
-  testHashable @ (Oriented Bool)
-  testHashable @ Rotate90
-  testHashable @ (Rotated Bool)
-  testHashable @ Emphasis
-  testHashable @ ItalicType
-  testHashable @ FontStyle
-  testHashable @ Ligate
+  testUnicodeCharacter @Char
+  testUnicodeText @Char
+  testUnicodeText @String
+  testUnicodeCharText @Char
+  testHashable @Char
+  testHashable @String
+  testHashable @LetterCase
+  testHashable @PlusStyle
+  testHashable @Orientation
+  testHashable @(Oriented Bool)
+  testHashable @Rotate90
+  testHashable @(Rotated Bool)
+  testHashable @Emphasis
+  testHashable @ItalicType
+  testHashable @FontStyle
+  testHashable @Ligate

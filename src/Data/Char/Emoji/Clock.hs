@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, OverloadedStrings, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, OverloadedStrings, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Emoji.Clock
@@ -20,7 +20,7 @@ import Control.DeepSeq(NFData)
 import Data.Bits((.|.), shiftL, shiftR)
 import Data.Bool(bool)
 import Data.Char(chr, ord)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange')
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 
@@ -90,6 +90,7 @@ instance UnicodeCharacter Clock where
         | c < '\x1f55c' = Just (Clock (ord c - 0x1f54f) False)
         | c < '\x1f568' = Just (Clock (mod (ord c - 0x1f55b) 12) True)
         | otherwise = Nothing
+    isInCharRange c = '\x1f550' <= c && c <= '\x1f567'
 
-
-instance UnicodeText Clock
+instance UnicodeText Clock where
+  isInTextRange = generateIsInTextRange' @Clock

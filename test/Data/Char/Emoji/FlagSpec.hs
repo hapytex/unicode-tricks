@@ -10,12 +10,12 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  testUnicodeText @ Flag
-  testUnicodeText @ SubFlag
-  testUnicodeText @ ExtraFlag
-  testBounded @ Flag
-  testBounded @ SubFlag
-  testBounded @ ExtraFlag
-  testHashable @ Flag
-  testHashable @ SubFlag
-  testHashable @ ExtraFlag
+  testUnicodeText @Flag
+  testUnicodeText @SubFlag
+  testUnicodeText @ExtraFlag
+  testBounded @Flag
+  testBounded @SubFlag
+  testBounded @ExtraFlag
+  testHashable @Flag
+  testHashable @SubFlag
+  testHashable @ExtraFlag

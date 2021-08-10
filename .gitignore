@@ -67,3 +67,9 @@ tmp
 tmp/
 tmp/*
 tmp/**
+
+# hlints
+.hlint-*
+
+# todos
+todo

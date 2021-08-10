@@ -18,7 +18,7 @@ spec = describe "Brackets" $ do
     it "if it is an opening bracket, it is a member of brackets" (property checkIfOpenBracketWithMembership)
     it "if it is a closing bracket, it is a member of brackets" (property checkIfCloseBracketWithMembership)
     it "check if all brackets are unique" (length brackets == length (nub brackets))
-    testHashable @ BracketType
+    testHashable @BracketType
 
 
 mappingOpposite :: Char -> Bool

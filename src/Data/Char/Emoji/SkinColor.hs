@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveTraversable, DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe, TupleSections #-}
+{-# LANGUAGE DeriveTraversable, DeriveDataTypeable, DeriveGeneric, PatternSynonyms, Safe, TupleSections, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Emoji.SkinColor
@@ -24,7 +24,7 @@ module Data.Char.Emoji.SkinColor (
 import Control.DeepSeq(NFData)
 
 import Data.Char(ord)
-import Data.Char.Core(UnicodeCharacter(fromUnicodeChar, fromUnicodeChar', toUnicodeChar), UnicodeText(toUnicodeText, fromUnicodeText), mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(fromUnicodeChar, fromUnicodeChar', toUnicodeChar, isInCharRange), UnicodeText(toUnicodeText, fromUnicodeText, isInTextRange), generateIsInTextRange', mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 import Data.Hashable.Lifted(Hashable1)
@@ -69,8 +69,10 @@ instance UnicodeCharacter SkinColorModifier where
     toUnicodeChar = mapFromEnum _skinColorOffset
     fromUnicodeChar = mapToEnumSafe _skinColorOffset
     fromUnicodeChar' = mapToEnum _skinColorOffset
+    isInCharRange c = '\x1f3fb' <= c && c <= '\x1f3ff'
 
-instance UnicodeText SkinColorModifier
+instance UnicodeText SkinColorModifier where
+  isInTextRange = generateIsInTextRange' @SkinColorModifier
 
 -- | Append the given 'Text' object with the Unicode character to modify its skin color.
 withSkinModifier'

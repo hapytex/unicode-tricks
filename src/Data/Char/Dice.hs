@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Dice
@@ -24,7 +24,7 @@ import Control.DeepSeq(NFData)
 
 import Data.Bits((.|.))
 import Data.Char(chr)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange', mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 
@@ -73,5 +73,7 @@ instance UnicodeCharacter DieValue where
     toUnicodeChar = mapFromEnum _dieOffset
     fromUnicodeChar = mapToEnumSafe _dieOffset
     fromUnicodeChar' = mapToEnum _dieOffset
+    isInCharRange c = '\x2680' <= c && c <= '\x2685'
 
-instance UnicodeText DieValue
+instance UnicodeText DieValue where
+  isInTextRange = generateIsInTextRange' @DieValue

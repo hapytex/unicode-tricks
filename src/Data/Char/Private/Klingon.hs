@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Private.Klingon
@@ -24,7 +24,7 @@ module Data.Char.Private.Klingon (
 import Control.DeepSeq(NFData)
 
 import Data.Char(chr, ord)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange')
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 
@@ -102,6 +102,8 @@ instance UnicodeCharacter Klingon where
       | c < '\xf8fa' = toEnum (ci - 0xf8d6)
       | otherwise = toEnum (ci - 0xf8d9)
       where ci = ord c
+    isInCharRange c = ('\xf8d0' <= c && c <= '\xf8e9') || ('\xf8f0' <= c && c <= '\xf8f9') || ('\xf8fd' <= c && c <= '\xf8ff')
 
 
-instance UnicodeText Klingon
+instance UnicodeText Klingon where
+  isInTextRange = generateIsInTextRange' @Klingon

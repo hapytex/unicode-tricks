@@ -22,7 +22,7 @@ module Data.Char.Number.Mayan (
 
 import Control.DeepSeq(NFData)
 
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange', mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 import Data.Text(Text, pack)
@@ -66,11 +66,13 @@ instance Arbitrary MayanLiteral where
 instance Hashable MayanLiteral
 
 instance UnicodeCharacter MayanLiteral where
-    toUnicodeChar = mapFromEnum _mayanOffset
-    fromUnicodeChar = mapToEnumSafe _mayanOffset
-    fromUnicodeChar' = mapToEnum _mayanOffset
+  toUnicodeChar = mapFromEnum _mayanOffset
+  fromUnicodeChar = mapToEnumSafe _mayanOffset
+  fromUnicodeChar' = mapToEnum _mayanOffset
+  isInCharRange c = '\x1d2e0' <= c && c <= '\x1d2f3'
 
-instance UnicodeText MayanLiteral
+instance UnicodeText MayanLiteral where
+  isInTextRange = generateIsInTextRange' @MayanLiteral
 
 -- | Convert the given 'Integral' number to a 'Text' object that writes the Mayan number to to bottom.
 -- This function will return a 'Nothing' in case the number is negative (since it can not be presented

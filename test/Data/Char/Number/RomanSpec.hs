@@ -10,7 +10,8 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter @ RomanLiteral
-    testUnicodeText @ RomanLiteral
-    testHashable @ RomanLiteral
-    testHashable @ RomanStyle
+    testUnicodeCharacter @RomanLiteral
+    testUnicodeText @RomanLiteral
+    testUnicodeCharText @RomanLiteral
+    testHashable @RomanLiteral
+    testHashable @RomanStyle

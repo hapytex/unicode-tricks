@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Emoji.Moon
@@ -21,7 +21,7 @@ module Data.Char.Emoji.Moon (
 
 import Control.DeepSeq(NFData)
 
-import Data.Char.Core(MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText, mapFromEnum, mapToEnum, mapToEnumSafe)
+import Data.Char.Core(MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange', mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
 
@@ -57,11 +57,13 @@ instance MirrorVertical MoonPhase where
 instance NFData MoonPhase
 
 instance UnicodeCharacter MoonPhase where
-    toUnicodeChar = mapFromEnum _moonPhaseOffset
-    fromUnicodeChar = mapToEnumSafe _moonPhaseOffset
-    fromUnicodeChar' = mapToEnum _moonPhaseOffset
+  toUnicodeChar = mapFromEnum _moonPhaseOffset
+  fromUnicodeChar = mapToEnumSafe _moonPhaseOffset
+  fromUnicodeChar' = mapToEnum _moonPhaseOffset
+  isInCharRange c = '\x1f311' <= c && c <= '\x1f318'
 
-instance UnicodeText MoonPhase
+instance UnicodeText MoonPhase where
+  isInTextRange = generateIsInTextRange' @MoonPhase
 
 -- | A data type that defines the four different moon faces (not to be confused with
 -- phases). This data type is an instance of the 'UnicodeCharacter' type class
@@ -84,14 +86,16 @@ instance MirrorVertical MoonFace where
 instance NFData MoonFace
 
 instance UnicodeCharacter MoonFace where
-    toUnicodeChar NewMoonFace = '\x1f31a'
-    toUnicodeChar FirstQuarterFace = '\x1f31b'
-    toUnicodeChar FullMoonFace = '\x1F31d'
-    toUnicodeChar ThirdQuarterFace = '\x1f31c'
-    fromUnicodeChar '\x1f31a' = Just NewMoonFace
-    fromUnicodeChar '\x1f31b' = Just FirstQuarterFace
-    fromUnicodeChar '\x1f31d' = Just FullMoonFace
-    fromUnicodeChar '\x1f31c' = Just ThirdQuarterFace
-    fromUnicodeChar _ = Nothing
+  toUnicodeChar NewMoonFace = '\x1f31a'
+  toUnicodeChar FirstQuarterFace = '\x1f31b'
+  toUnicodeChar FullMoonFace = '\x1F31d'
+  toUnicodeChar ThirdQuarterFace = '\x1f31c'
+  fromUnicodeChar '\x1f31a' = Just NewMoonFace
+  fromUnicodeChar '\x1f31b' = Just FirstQuarterFace
+  fromUnicodeChar '\x1f31d' = Just FullMoonFace
+  fromUnicodeChar '\x1f31c' = Just ThirdQuarterFace
+  fromUnicodeChar _ = Nothing
+  isInCharRange c = '\x1f31a' <= c && c <= '\x1f31d'
 
-instance UnicodeText MoonFace
+instance UnicodeText MoonFace where
+  isInTextRange = generateIsInTextRange' @MoonFace

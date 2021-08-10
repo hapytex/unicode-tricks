@@ -10,9 +10,10 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    testUnicodeCharacter @ (Block Bool)
-    testUnicodeText @ (Block Bool)
-    testHashable @ (Row Bool)
-    testHashable @ (Block Bool)
-    testMirrorHorizontallyVertically @ (Block Bool)
-    testMirrorVertically @ (Row Bool)
+    testUnicodeCharacter @(Block Bool)
+    testUnicodeText @(Block Bool)
+    testUnicodeCharText @(Block Bool)
+    testHashable @(Row Bool)
+    testHashable @(Block Bool)
+    testMirrorHorizontallyVertically @(Block Bool)
+    testMirrorVertically @(Row Bool)

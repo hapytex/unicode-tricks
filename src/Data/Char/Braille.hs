@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, Safe #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Braille
@@ -28,7 +28,7 @@ import Data.Bits((.&.), (.|.), shiftL, shiftR, testBit)
 import Data.Bool(bool)
 import Data.Char(chr, ord)
 import Data.Char.Block(Row(Row))
-import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
+import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange')
 import Data.Data(Data)
 import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
 import Data.Hashable(Hashable)
@@ -192,11 +192,16 @@ instance UnicodeCharacter (Braille Bool) where
     toUnicodeChar = braille
     fromUnicodeChar = fromBraille
     fromUnicodeChar' = fromBraille'
+    isInCharRange c = '\x2800' <= c && c <= '\x28ff'
 
 instance UnicodeCharacter (Braille6 Bool) where
     toUnicodeChar = braille6
     fromUnicodeChar = fromBraille6
     fromUnicodeChar' = fromBraille6'
+    isInCharRange c = '\x2800' <= c && c <= '\x283f'
 
-instance UnicodeText (Braille Bool)
-instance UnicodeText (Braille6 Bool)
+instance UnicodeText (Braille Bool) where
+  isInTextRange = generateIsInTextRange' @(Braille Bool)
+
+instance UnicodeText (Braille6 Bool) where
+  isInTextRange = generateIsInTextRange' @(Braille6 Bool)

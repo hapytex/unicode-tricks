@@ -10,7 +10,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  testUnicodeText @ BinaryGender
-  testUnicodeText @ Trigender
-  testHashable @ BinaryGender
-  testHashable @ Trigender
+  testUnicodeText @BinaryGender
+  testUnicodeText @Trigender
+  testHashable @BinaryGender
+  testHashable @Trigender

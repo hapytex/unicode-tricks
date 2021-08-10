@@ -12,4 +12,5 @@ spec :: Spec
 spec = do
   testUnicodeCharacter @ SkinColorModifier
   testUnicodeText @ SkinColorModifier
+  testUnicodeCharText @SkinColorModifier
   testHashable @ SkinColorModifier

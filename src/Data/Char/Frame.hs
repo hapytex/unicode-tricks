@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, DeriveTraversable, FlexibleInstances, PatternSynonyms, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Frame
@@ -31,7 +31,7 @@ module Data.Char.Frame(
 import Control.DeepSeq(NFData, NFData1)
 
 import Data.Bool(bool)
-import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar'), UnicodeText)
+import Data.Char.Core(MirrorHorizontal(mirrorHorizontal), MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange')
 import Data.Data(Data)
 import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
 import Data.Hashable(Hashable)
@@ -525,11 +525,33 @@ instance UnicodeCharacter (Parts Weight) where
     toUnicodeChar = weighted
     fromUnicodeChar = fromWeighted
     fromUnicodeChar' = fromWeighted'
+    isInCharRange ' ' = True
+    isInCharRange c = ('\x2500' <= c && c <= '\x2503') || ('\x250c' <= c && c <= '\x254b')
 
 instance UnicodeCharacter (Parts Bool) where
-    toUnicodeChar = simple
-    fromUnicodeChar = fromLight
-    fromUnicodeChar' = fromLight'
+  toUnicodeChar = simple
+  fromUnicodeChar = fromLight
+  fromUnicodeChar' = fromLight'
+  isInCharRange ' ' = True
+  isInCharRange '\x2500' = True
+  isInCharRange '\x2502' = True
+  isInCharRange '\x250c' = True
+  isInCharRange '\x2510' = True
+  isInCharRange '\x2514' = True
+  isInCharRange '\x2518' = True
+  isInCharRange '\x251c' = True
+  isInCharRange '\x2524' = True
+  isInCharRange '\x252c' = True
+  isInCharRange '\x2534' = True
+  isInCharRange '\x253c' = True
+  isInCharRange '\x2574' = True
+  isInCharRange '\x2575' = True
+  isInCharRange '\x2576' = True
+  isInCharRange '\x2577' =  True
+  isInCharRange _ = False
 
-instance UnicodeText (Parts Weight)
-instance UnicodeText (Parts Bool)
+instance UnicodeText (Parts Weight) where
+  isInTextRange = generateIsInTextRange' @(Parts Weight)
+
+instance UnicodeText (Parts Bool) where
+  isInTextRange = generateIsInTextRange' @(Parts Bool)
