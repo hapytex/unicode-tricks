@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, OverloadedStrings, PatternSynonyms, Safe #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, OverloadedStrings, PatternSynonyms, Safe, TypeApplications #-}
 
 {-|
 Module      : Data.Char.Emoji.Hand
@@ -22,7 +22,7 @@ module Data.Char.Emoji.Hand (
 
 import Control.DeepSeq(NFData)
 
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar), UnicodeText(toUnicodeText, fromUnicodeText))
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, isInCharRange), UnicodeText(toUnicodeText, fromUnicodeText, isInTextRange), generateIsInTextRange')
 import Data.Char.Emoji.SkinColor(WithSkinColorModifierUnicodeText)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
@@ -92,8 +92,27 @@ instance UnicodeCharacter SingleCharHandGesture where
   fromUnicodeChar '\x270a' = Just RaisedFist
   fromUnicodeChar '\x1f44a' = Just FistedHand
   fromUnicodeChar _ = Nothing
+  isInCharRange '\x1f44b' = True
+  isInCharRange '\x1f91a' = True
+  isInCharRange '\x270b' = True
+  isInCharRange '\x1f596' = True
+  isInCharRange '\x1f44c' = True
+  isInCharRange '\x1f90c' = True
+  isInCharRange '\x1f90f' = True
+  isInCharRange '\x1f91e' = True
+  isInCharRange '\x1f91f' = True
+  isInCharRange '\x1f918' = True
+  isInCharRange '\x1f919' = True
+  isInCharRange '\x1f595' = True
+  isInCharRange '\x1f44d' = True
+  isInCharRange '\x1f44e' = True
+  isInCharRange '\x270a' = True
+  isInCharRange '\x1f44a' = True
+  isInCharRange _ = False
 
-instance UnicodeText SingleCharHandGesture
+
+instance UnicodeText SingleCharHandGesture where
+  isInTextRange = generateIsInTextRange' @SingleCharHandGesture
 
 instance WithSkinColorModifierUnicodeText SingleCharHandGesture
 
@@ -116,6 +135,9 @@ instance UnicodeText MultiCharHandGesture where
   fromUnicodeText "\x1f590\xfe0f" = Just RaisedHandWithFingersSplayed
   fromUnicodeText "\x270c\xfe0f" = Just VictoryHand
   fromUnicodeText _ = Nothing
+  isInTextRange "\x1f590\xfe0f" = True
+  isInTextRange "\x270c\xfe0f" = True
+  isInTextRange _ = False
 
 instance WithSkinColorModifierUnicodeText MultiCharHandGesture
 
