@@ -11,7 +11,7 @@ Unicode has three codepoints that refer to characters of monkeys where the first
 -}
 
 module Data.Char.Emoji.NoEvilMonkey (
-    NoEvilMonkey(See, Hear, Speak)
+    NoEvilMonkey(SeeNoEvilMonkey, HearNoEvilMonkey, SpeakNoEvilMonkey)
   ) where
 
 import Control.DeepSeq(NFData)
@@ -29,9 +29,9 @@ _noEvilMonkeyOffset = 0x1f648
 
 -- | A data constructors that lists the three different /no-evil/ monkeys.
 data NoEvilMonkey
-  = See  -- ^ The /see-no-evil monkey/, denoted with 🙈.
-  | Hear  -- ^ The /hear-no-evil monkey/, denoted with 🙉.
-  | Speak  -- ^ The /speak-no-evil monkey/, denoted with 🙊.
+  = SeeNoEvilMonkey  -- ^ The /see-no-evil monkey/, denoted with 🙈.
+  | HearNoEvilMonkey  -- ^ The /hear-no-evil monkey/, denoted with 🙉.
+  | SpeakNoEvilMonkey  -- ^ The /speak-no-evil monkey/, denoted with 🙊.
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Hashable NoEvilMonkey
