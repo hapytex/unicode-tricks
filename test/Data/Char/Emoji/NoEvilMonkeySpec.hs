@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Data.Char.NoEvilMonkeySpec
+module Data.Char.Emoji.NoEvilMonkeySpec
   ( spec
   ) where
 
