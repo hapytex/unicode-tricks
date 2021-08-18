@@ -35,10 +35,15 @@ library
     , Data.Char.Domino
     , Data.Char.Emoji
     , Data.Char.Emoji.BloodType
+    , Data.Char.Emoji.Clock
     , Data.Char.Emoji.Core
     , Data.Char.Emoji.Flag
     , Data.Char.Emoji.Gender
+    , Data.Char.Emoji.Hand
     , Data.Char.Emoji.Moon
+    , Data.Char.Emoji.NoEvilMonkey
+    , Data.Char.Emoji.Science
+    , Data.Char.Emoji.SkinColor
     , Data.Char.Emoji.Zodiac
     , Data.Char.Enclosed
     , Data.Char.Egyptian
@@ -76,7 +81,7 @@ library
     , deepseq >=1.4.3.0
     , hashable >=1.2.7.0
     , QuickCheck >=2.10.0 && <2.14.3
-    , text >=1.1 && <1.3
+    , text >=1.2.3.0 && <1.3
   default-language:    Haskell2010
   default-extensions:
       Safe
@@ -104,11 +109,15 @@ test-suite             utricks
     , Data.Char.CurrencySpec
     , Data.Char.DiceSpec
     , Data.Char.DominoSpec
-    , Data.Char.EmojiSpec
     , Data.Char.Emoji.BloodTypeSpec
+    , Data.Char.Emoji.ClockSpec
     , Data.Char.Emoji.FlagSpec
     , Data.Char.Emoji.GenderSpec
+    , Data.Char.Emoji.HandSpec
     , Data.Char.Emoji.MoonSpec
+    , Data.Char.Emoji.NoEvilMonkeySpec
+    , Data.Char.Emoji.ScienceSpec
+    , Data.Char.Emoji.SkinColorSpec
     , Data.Char.Emoji.ZodiacSpec
     , Data.Char.FrameSpec
     , Data.Char.MathSpec
