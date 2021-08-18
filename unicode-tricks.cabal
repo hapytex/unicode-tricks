@@ -41,6 +41,7 @@ library
     , Data.Char.Emoji.Gender
     , Data.Char.Emoji.Hand
     , Data.Char.Emoji.Moon
+    , Data.Char.Emoji.NoEvilMonkey
     , Data.Char.Emoji.Science
     , Data.Char.Emoji.SkinColor
     , Data.Char.Emoji.Zodiac
@@ -114,6 +115,7 @@ test-suite             utricks
     , Data.Char.Emoji.GenderSpec
     , Data.Char.Emoji.HandSpec
     , Data.Char.Emoji.MoonSpec
+    , Data.Char.Emoji.NoEvilMonkeySpec
     , Data.Char.Emoji.ScienceSpec
     , Data.Char.Emoji.SkinColorSpec
     , Data.Char.Emoji.ZodiacSpec
