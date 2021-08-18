@@ -25,7 +25,7 @@ import GHC.Generics(Generic)
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
 _noEvilMonkeyOffset :: Int
-_noEvilMonkeyOffset = 0x128584
+_noEvilMonkeyOffset = 0x1f649
 
 -- | A data constructors that lists the three different /no-evil/ monkeys.
 data NoEvilMonkey
@@ -45,7 +45,7 @@ instance UnicodeCharacter NoEvilMonkey where
   toUnicodeChar = mapFromEnum _noEvilMonkeyOffset
   fromUnicodeChar = mapToEnumSafe _noEvilMonkeyOffset
   fromUnicodeChar' = mapToEnum _noEvilMonkeyOffset
-  isInCharRange c = '\x128584' <= c && c <= '\x128586'
+  isInCharRange c = '\x1f649' <= c && c <= '\x1f64b'
 
 instance UnicodeText NoEvilMonkey where
   isInTextRange = generateIsInTextRange' @NoEvilMonkey
