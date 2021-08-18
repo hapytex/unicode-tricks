@@ -42,10 +42,10 @@ instance Arbitrary NoEvilMonkey where
     arbitrary = arbitraryBoundedEnum
 
 instance UnicodeCharacter NoEvilMonkey where
-    toUnicodeChar = mapFromEnum _noEvilMonkeyOffset
-    fromUnicodeChar = mapToEnumSafe _noEvilMonkeyOffset
-    fromUnicodeChar' = mapToEnum _noEvilMonkeyOffset
-    isInCharRange c = '\128584' <= c && c <= '\128586'
+  toUnicodeChar = mapFromEnum _noEvilMonkeyOffset
+  fromUnicodeChar = mapToEnumSafe _noEvilMonkeyOffset
+  fromUnicodeChar' = mapToEnum _noEvilMonkeyOffset
+  isInCharRange c = '\x128584' <= c && c <= '\x128586'
 
 instance UnicodeText NoEvilMonkey where
   isInTextRange = generateIsInTextRange' @NoEvilMonkey
