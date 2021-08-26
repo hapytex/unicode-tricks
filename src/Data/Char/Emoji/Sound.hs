@@ -73,7 +73,7 @@ instance UnicodeCharacter Bell where
   toUnicodeChar NoBell = '\x1f515'
   toUnicodeChar Bell = '\x1f514'
   fromUnicodeChar' '\x1f515' = NoBell
-  fromUnicodeChar' '\x1f514' = Bell
+  fromUnicodeChar' _ = Bell
   fromUnicodeChar '\x1f515' = Just NoBell
   fromUnicodeChar '\x1f514' = Just Bell
   fromUnicodeChar _ = Nothing
@@ -102,7 +102,7 @@ instance UnicodeCharacter Instrument where
   toUnicodeChar PostalHorn = '\x1f4ef'
   fromUnicodeChar' '\x1f4e2' = Loudspeaker
   fromUnicodeChar' '\x1f4e3' = Megaphone
-  fromUnicodeChar' '\x1f4ef' = PostalHorn
+  fromUnicodeChar' _ = PostalHorn
   fromUnicodeChar '\x1f4e2' = Just Loudspeaker
   fromUnicodeChar '\x1f4e3' = Just Megaphone
   fromUnicodeChar '\x1f4ef' = Just PostalHorn
