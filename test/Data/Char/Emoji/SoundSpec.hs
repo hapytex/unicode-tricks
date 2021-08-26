@@ -18,9 +18,7 @@ spec = do
   testUnicodeCharacter @Bell
   testUnicodeText @Bell
   testHashable @Bell
-  {-
-  testBounded @Sound
-  testUnicodeCharacter @Sound
-  testUnicodeText @Sound
-  testHashable @Sound
-  -}
+  testBounded @Instrument
+  testUnicodeCharacter @Instrument
+  testUnicodeText @Instrument
+  testHashable @Instrument
