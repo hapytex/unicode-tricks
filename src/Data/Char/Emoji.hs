@@ -20,6 +20,7 @@ module Data.Char.Emoji (
   , module Data.Char.Emoji.Moon
   , module Data.Char.Emoji.Science
   , module Data.Char.Emoji.SkinColor
+  , module Data.Char.Emoji.Sound
   , module Data.Char.Emoji.Zodiac
   ) where
 
@@ -31,4 +32,5 @@ import Data.Char.Emoji.Gender
 import Data.Char.Emoji.Moon
 import Data.Char.Emoji.Science
 import Data.Char.Emoji.SkinColor
+import Data.Char.Emoji.Sound
 import Data.Char.Emoji.Zodiac
