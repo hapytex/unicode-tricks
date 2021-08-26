@@ -11,7 +11,12 @@ The emoji have nine sound emoji. This modules defines data constructors for thes
 define a sensical 'Ord' relation for example to specify the volume of sound.
 -}
 
-module Data.Char.Emoji.Sound where
+module Data.Char.Emoji.Sound (
+  -- * Emoji that deal with sound.
+    Volume(SilentVolume, LowVolume, MediumVolume, LoudVolume)
+  , Bell(NoBell, Bell)
+  , Instrument(Loudspeaker, Megaphone, PostalHorn)
+  ) where
 
 import Control.DeepSeq(NFData)
 
@@ -26,7 +31,7 @@ import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 _volumeOffset :: Int
 _volumeOffset = 0x1f507
 
--- ^ There are four emoji that specify the volume of sound.
+-- | There are four emoji that specify the volume of sound.
 data Volume
   = SilentVolume  -- ^ The volume of the sound is set to /silence/, this is denoted with 🔇.
   | LowVolume  -- ^ The volume of the sound is /low/, this is denoted with 🔈.
@@ -77,7 +82,7 @@ instance UnicodeCharacter Bell where
 instance UnicodeText Bell where
   isInTextRange = generateIsInTextRange' @Bell
 
--- ^ Three emoji that deal with amplifying sound.
+-- | Three emoji that deal with amplifying sound.
 data Instrument
   = Loudspeaker  -- ^ The /loudspeaker/ emoji, denoted with 📢.
   | Megaphone  -- ^ The /megaphone/ emoji, denoted with 📣.
