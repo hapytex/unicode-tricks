@@ -25,7 +25,7 @@ module Data.Char.Number.Duodecimal (
 import Data.Bits((.|.))
 import Data.Char(chr)
 import Data.Char.Core(PlusStyle, positionalNumberSystem)
-import Data.Default(def)
+import Data.Default.Class(def)
 import Data.Text(Text)
 
 -- | The character used to denote 10: @ↀ@.

@@ -17,7 +17,7 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
-resolver: lts-15.6
+resolver: lts-18.5
 save-hackage-creds: false
 
 # User packages to be built.
