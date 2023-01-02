@@ -19,11 +19,13 @@ it prints the fraction with the help of the 'Data.Char.Small' module.
 module Data.Char.Number.VulgarFraction (
     -- * Render to a vulgar fraction
     ratioToVulgar, toVulgar
+    -- * Try to parse a vulgar fraction
+  , fromVulgar, fromVulgarToRatio
     -- * Render to a vulgar fraction, with a fallback to using small characters
   , ratioToVulgarFallback, toVulgarFallback
   ) where
 
-import Data.Ratio(Ratio, numerator, denominator)
+import Data.Ratio(Ratio, numerator, denominator, (%))
 import Data.Text(Text, cons, singleton)
 
 import Data.Char.Small(asSub', ratioPartsToUnicode')
@@ -78,3 +80,40 @@ toVulgarFallback :: (Integral i, Integral j)
 toVulgarFallback i j = maybe (go i j) singleton (toVulgar i j)
   where go 1 d | d > 0 = cons '\x215f' ( asSub' d)
         go n d = ratioPartsToUnicode' n d
+
+-- | Try to convert a given 'Char', if it is a /vulgar fraction/, to a 2-tuple with the numerator and denominator. Returns 'Nothing' if the 'Char'
+-- is not a vulgar fraction character.
+fromVulgar :: (Integral i, Integral j)
+  => Char  -- ^ The character to decode.
+  -> Maybe (i, j)  -- ^ The numerator and denominator wrapped in a 'Just' if the character is a vulgar fraction, 'Nothing' otherwise.
+fromVulgar '\x00bc' = Just (1, 4)
+fromVulgar '\x00bd' = Just (1, 2)
+fromVulgar '\x00be' = Just (3, 4)
+fromVulgar '\x2150' = Just (1, 7)
+fromVulgar '\x2151' = Just (1, 9)
+fromVulgar '\x2152' = Just (1, 10)
+fromVulgar '\x2153' = Just (1, 3)
+fromVulgar '\x2154' = Just (2, 3)
+fromVulgar '\x2155' = Just (1, 5)
+fromVulgar '\x2156' = Just (2, 5)
+fromVulgar '\x2157' = Just (3, 5)
+fromVulgar '\x2158' = Just (4, 5)
+fromVulgar '\x2159' = Just (1, 6)
+fromVulgar '\x215a' = Just (5, 6)
+fromVulgar '\x215b' = Just (1, 8)
+fromVulgar '\x215c' = Just (3, 8)
+fromVulgar '\x215d' = Just (5, 8)
+fromVulgar '\x215e' = Just (7, 8)
+fromVulgar '\x2189' = Just (0, 3)  -- used in baseball
+fromVulgar _ = Nothing
+
+-- | Try to convert the given 'Char', if it is a /vulgar fraction/, to a 'Ratio' object. Returns 'Nothing' if the 'Char' is not a vulgar fraction character.
+fromVulgarToRatio :: Integral i
+  => Char  -- ^ The character to decode.
+  -> Maybe (Ratio i)  -- ^ The corresponding 'Ratio' wrapped in a 'Just' if the ratio is a vulgar fraction, 'Nothing' otherwise.
+fromVulgarToRatio = fmap (uncurry (%)) . fromVulgar
+
+fromVulgarFallback :: (Integral i, Integral j)
+  => Text
+  -> Maybe (i, j)
+fromVulgarFallback = undefined

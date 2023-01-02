@@ -18,6 +18,8 @@ to a 'Text' that specifies this number in subscript and superscript.
 module Data.Char.Small (
   -- * Convert characters to their subscript and superscript counterpart
     toSub, toSup
+  -- * Convert superscript and subscript back their normal character
+  , fromSubSup
   -- * Numbers as subscript and superscript.
   , asSub, asSub', asSubPlus
   , asSup, asSup', asSupPlus
@@ -25,6 +27,7 @@ module Data.Char.Small (
   , ratioToUnicode, ratioToUnicode', ratioPartsToUnicode, ratioPartsToUnicode'
   ) where
 
+import Data.Bits((.&.), (.|.))
 import Data.Char(chr, isDigit, ord)
 import Data.Char.Core(PlusStyle(WithPlus, WithoutPlus), positionalNumberSystem10)
 import Data.Default(Default(def))
@@ -68,15 +71,49 @@ toSub 'o' = Just '\x2092'
 toSub 'x' = Just '\x2093'
 toSub '\x259' = Just '\x2094'
 toSub 'h' = Just '\x2095'
-toSub 'k' = Just '\x2095'
-toSub 'l' = Just '\x2095'
-toSub 'm' = Just '\x2095'
-toSub 'n' = Just '\x2095'
-toSub 'p' = Just '\x2095'
-toSub 's' = Just '\x2095'
-toSub 't' = Just '\x2095'
+toSub 'k' = Just '\x2096'
+toSub 'l' = Just '\x2097'
+toSub 'm' = Just '\x2098'
+toSub 'n' = Just '\x2099'
+toSub 'p' = Just '\x209a'
+toSub 's' = Just '\x209b'
+toSub 't' = Just '\x209c'
 toSub c | isDigit c = Just (_digitToSub (ord c - ord '0'))
         | otherwise = Nothing
+
+_fromSubSup :: Int -> Char
+_fromSubSup 0xa = '+'
+_fromSubSup 0xb = '-'
+_fromSubSup 0xc = '='
+_fromSubSup 0xd = '('
+_fromSubSup 0xe = ')'
+_fromSubSup _ = undefined
+
+fromSubSup :: Char -> Char
+fromSubSup '\x2070' = '0'
+fromSubSup '\xb2' = '2'
+fromSubSup '\xb3' = '3'
+fromSubSup '\xb9' = '1'
+fromSubSup '\x2071' = 'i'
+fromSubSup '\x207f' = 'n'
+fromSubSup '\x2090' = 'a'
+fromSubSup '\x2091' = 'e'
+fromSubSup '\x2092' = 'o'
+fromSubSup '\x2093' = 'x'
+fromSubSup '\x2094' = '\x259'
+fromSubSup '\x2095' = 'h'
+fromSubSup '\x2096' = 'k'
+fromSubSup '\x2097' = 'l'
+fromSubSup '\x2098' = 'm'
+fromSubSup '\x2099' = 'n'
+fromSubSup '\x209a' = 'p'
+fromSubSup '\x209b' = 's'
+fromSubSup '\x209c' = 't'
+fromSubSup x
+  | '\x207a' <= x && x<= '\x208e' && 0x0a <= m && m <= 0x0e = _fromSubSup m
+  | '\x2074' <= x && x <= '\x2089' = chr (0x30 .|. (ord x .&. 0xf))
+  | otherwise = x
+  where m = ord x .&. 0xf
 
 _value :: Integral i => (Int -> Char) -> i -> Text
 _value f = go
