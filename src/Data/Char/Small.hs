@@ -167,7 +167,7 @@ ratioPartsToUnicode' :: (Integral i, Integral j)
 ratioPartsToUnicode' = ratioPartsToUnicode def
 
 -- | Try to convert the given text that contains a fraction to the numerator and denominator. This does *not* take /vulgar fractions/
--- into account. You can process these with 'Dat.Char.Numbers.VulgarFraction.fromVulgarFallback'.
+-- into account. You can process these with 'Dat.Char.Number.VulgarFraction.fromVulgarFallback'.
 unicodeToRatioParts :: (Read i, Read j)
   => Text  -- ^ The 'Text' we try to decode.
   -> Maybe (i, j)  -- ^ A 2-tuple with the numerator and denominator wrapped in a 'Just' if the fraction can be parsed, 'Nothing' otherwise.
@@ -175,7 +175,7 @@ unicodeToRatioParts t = (,) <$> _parseInt (unpack n) <*> _parseInt (drop 1 (unpa
   where ~(n, d) = T.break _isFrac (T.map fromSubSup t)
 
 -- | Try to convert the given text that contains a fraction to a 'Ratio'. This does *not* take /vulgar fractions/
--- into account. You can process these with 'Dat.Char.Numbers.VulgarFraction.fromVulgarFallbackToRatio'.
+-- into account. You can process these with 'Dat.Char.Number.VulgarFraction.fromVulgarFallbackToRatio'.
 unicodeToRatio :: (Integral i, Read i)
   => Text  -- ^ The 'Text' we try to decode.
   -> Maybe (Ratio i)  -- ^ The fraction wrapped in a 'Just'; 'Nothing' if the fraction can not be parsed.
