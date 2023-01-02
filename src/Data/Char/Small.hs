@@ -92,7 +92,7 @@ _fromSubSup 0xb = '-'
 _fromSubSup 0xc = '='
 _fromSubSup 0xd = '('
 _fromSubSup 0xe = ')'
-_fromSubSup _ = undefined
+_fromSubSup _ = error "Should not happen!"
 
 -- | Convert subscripts and superscripts back to the original counterpart, so @'⁵'@ back to @'5'@. For non-subscript or -superscript
 -- characters, it returns the original character.
