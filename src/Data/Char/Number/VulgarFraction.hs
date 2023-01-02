@@ -119,7 +119,7 @@ fromVulgarToRatio :: Integral i
   -> Maybe (Ratio i)  -- ^ The corresponding 'Ratio' wrapped in a 'Just' if the ratio is a vulgar fraction, 'Nothing' otherwise.
 fromVulgarToRatio = fmap (uncurry (%)) . fromVulgar
 
--- | Try to parse the text as a /vulgar fraction/ and fallback on the 'unicodetoRatioParts' function to parse it as a fraction.
+-- | Try to parse the text as a /vulgar fraction/ and fallback on the 'unicodeToRatioParts' function to parse it as a fraction.
 fromVulgarFallback :: (Read i, Integral i, Read j, Integral j)
   => Text  -- ^ The 'Text' we try to decode as a (vulgar) fraction.
   -> Maybe (i, j)  -- ^ A 2-tuple with the numerator and denominator wrapped in a 'Just' if the 'Text' can be parsed, 'Nothing' otherwise.
@@ -130,7 +130,7 @@ fromVulgarFallback d = _attm0 d' <|> _attm1 d' <|> unicodeToRatioParts d
         _attm1 ('\x215f':ds) = (1,) <$> readMaybe (map fromSubSup ds)
         _attm1 _ = Nothing
 
--- | Try to parse the text as a /vulgar fraction/ and fallback on the 'unicodetoRatioParts' function to parse it as a fraction.
+-- | Try to parse the text as a /vulgar fraction/ and fallback on the 'unicodeToRatioParts' function to parse it as a fraction.
 fromVulgarFallbackToRatio :: (Read i, Integral i)
   => Text  -- ^ The 'Text' we try to decode as a (vulgar) fraction.
   -> Maybe (Ratio i)  -- ^ The parsed 'Ratio' wrapped in a 'Just' if the 'Text' can be parsed, 'Nothing' otherwise.
