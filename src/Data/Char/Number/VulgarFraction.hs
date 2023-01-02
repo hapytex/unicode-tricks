@@ -1,4 +1,4 @@
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE Safe, TupleSections #-}
 
 {-|
 Module      : Data.Char.Number.VulgarFraction
@@ -19,14 +19,22 @@ it prints the fraction with the help of the 'Data.Char.Small' module.
 module Data.Char.Number.VulgarFraction (
     -- * Render to a vulgar fraction
     ratioToVulgar, toVulgar
+    -- * Try to parse a vulgar fraction
+  , fromVulgar, fromVulgarToRatio
     -- * Render to a vulgar fraction, with a fallback to using small characters
   , ratioToVulgarFallback, toVulgarFallback
+    -- * Convert 'Text' to a vulgar fraction or fallback on a 'Text' that contains a numerator and denominator as a sequence of characters
+  , fromVulgarFallback, fromVulgarFallbackToRatio
   ) where
 
-import Data.Ratio(Ratio, numerator, denominator)
-import Data.Text(Text, cons, singleton)
+import Control.Applicative((<|>))
 
-import Data.Char.Small(asSub', ratioPartsToUnicode')
+import Data.Ratio(Ratio, numerator, denominator, (%))
+import Data.Text(Text, cons, singleton, unpack)
+
+import Text.Read(readMaybe)
+
+import Data.Char.Small(asSub', fromSubSup, ratioPartsToUnicode', unicodeToRatioParts)
 
 -- | Convert the given 'Ratio' item to a vulgar fraction character, if such character exists; 'Nothing' otherwise.
 ratioToVulgar :: Integral i
@@ -78,3 +86,52 @@ toVulgarFallback :: (Integral i, Integral j)
 toVulgarFallback i j = maybe (go i j) singleton (toVulgar i j)
   where go 1 d | d > 0 = cons '\x215f' ( asSub' d)
         go n d = ratioPartsToUnicode' n d
+
+-- | Try to convert a given 'Char', if it is a /vulgar fraction/, to a 2-tuple with the numerator and denominator. Returns 'Nothing' if the 'Char'
+-- is not a vulgar fraction character.
+fromVulgar :: (Integral i, Integral j)
+  => Char  -- ^ The character to decode.
+  -> Maybe (i, j)  -- ^ The numerator and denominator wrapped in a 'Just' if the character is a vulgar fraction, 'Nothing' otherwise.
+fromVulgar '\x00bc' = Just (1, 4)
+fromVulgar '\x00bd' = Just (1, 2)
+fromVulgar '\x00be' = Just (3, 4)
+fromVulgar '\x2150' = Just (1, 7)
+fromVulgar '\x2151' = Just (1, 9)
+fromVulgar '\x2152' = Just (1, 10)
+fromVulgar '\x2153' = Just (1, 3)
+fromVulgar '\x2154' = Just (2, 3)
+fromVulgar '\x2155' = Just (1, 5)
+fromVulgar '\x2156' = Just (2, 5)
+fromVulgar '\x2157' = Just (3, 5)
+fromVulgar '\x2158' = Just (4, 5)
+fromVulgar '\x2159' = Just (1, 6)
+fromVulgar '\x215a' = Just (5, 6)
+fromVulgar '\x215b' = Just (1, 8)
+fromVulgar '\x215c' = Just (3, 8)
+fromVulgar '\x215d' = Just (5, 8)
+fromVulgar '\x215e' = Just (7, 8)
+fromVulgar '\x2189' = Just (0, 3)  -- used in baseball
+fromVulgar _ = Nothing
+
+-- | Try to convert the given 'Char', if it is a /vulgar fraction/, to a 'Ratio' object. Returns 'Nothing' if the 'Char' is not a vulgar fraction character.
+fromVulgarToRatio :: Integral i
+  => Char  -- ^ The character to decode.
+  -> Maybe (Ratio i)  -- ^ The corresponding 'Ratio' wrapped in a 'Just' if the ratio is a vulgar fraction, 'Nothing' otherwise.
+fromVulgarToRatio = fmap (uncurry (%)) . fromVulgar
+
+-- | Try to parse the text as a /vulgar fraction/ and fallback on the 'unicodeToRatioParts' function to parse it as a fraction.
+fromVulgarFallback :: (Read i, Integral i, Read j, Integral j)
+  => Text  -- ^ The 'Text' we try to decode as a (vulgar) fraction.
+  -> Maybe (i, j)  -- ^ A 2-tuple with the numerator and denominator wrapped in a 'Just' if the 'Text' can be parsed, 'Nothing' otherwise.
+fromVulgarFallback d = _attm0 d' <|> _attm1 d' <|> unicodeToRatioParts d
+  where d' = unpack d
+        _attm0 [d0] = fromVulgar d0
+        _attm0 _ = Nothing
+        _attm1 ('\x215f':ds) = (1,) <$> readMaybe (map fromSubSup ds)
+        _attm1 _ = Nothing
+
+-- | Try to parse the text as a /vulgar fraction/ and fallback on the 'unicodeToRatioParts' function to parse it as a fraction.
+fromVulgarFallbackToRatio :: (Read i, Integral i)
+  => Text  -- ^ The 'Text' we try to decode as a (vulgar) fraction.
+  -> Maybe (Ratio i)  -- ^ The parsed 'Ratio' wrapped in a 'Just' if the 'Text' can be parsed, 'Nothing' otherwise.
+fromVulgarFallbackToRatio = fmap (uncurry (%)) . fromVulgarFallback
