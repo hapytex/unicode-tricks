@@ -10,7 +10,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  testBounded @ Clock
-  testUnicodeCharacter @ Clock
-  testUnicodeText @ Clock
-  testHashable @ Clock
+  testBounded @Clock
+  testUnicodeCharacter @Clock
+  testUnicodeText @Clock
+  testHashable @Clock
