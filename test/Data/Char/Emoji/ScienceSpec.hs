@@ -10,5 +10,5 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  testUnicodeText @ ScienceEmoji
-  testHashable @ ScienceEmoji
+  testUnicodeText @ScienceEmoji
+  testHashable @ScienceEmoji
