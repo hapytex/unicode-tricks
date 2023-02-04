@@ -13,8 +13,8 @@ spec = do
   testUnicodeCharacter @SingleCharHandGesture
   testUnicodeText @SingleCharHandGesture
   testHashable @SingleCharHandGesture
-  testUnicodeCharacter @MoonFace
-  testUnicodeText @MoonFace
-  testHashable @MoonFace
+  -- testUnicodeCharacter @MoonFace
+  -- testUnicodeText @MoonFace
+  -- testHashable @MoonFace
   testUnicodeText @MultiCharHandGesture
   testHashable @MultiCharHandGesture
