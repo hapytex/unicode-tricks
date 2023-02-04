@@ -54,7 +54,7 @@ data MoonPhase
 moonPhaseForDay
   :: Day  -- ^ The 'Day' for which we want to deterime the moon phase.
   -> MoonPhase  -- ^ The corresponding 'MoonPhase' icon
-moonPhaseForDay d = toEnum (round ((fromIntegral (toModifiedJulianDay d - 57812) + 0.845625) / 3.69125) `mod` 8)
+moonPhaseForDay d = toEnum (round (((fromIntegral (toModifiedJulianDay d - 57812) :: Double) + 0.845625) / 3.69125) `mod` 8)
 
 instance Arbitrary MoonPhase where
     arbitrary = arbitraryBoundedEnum
