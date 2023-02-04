@@ -17,6 +17,7 @@ module Data.Char.Emoji.Moon (
     MoonPhase(NewMoon, WaxingCrescent, FirstQuarter, WaxingGibbous, FullMoon, WaningGibbous, ThirdQuarter, WaningCrescent)
     -- * Moon faces emoji
   , MoonFace(NewMoonFace, FirstQuarterFace, FullMoonFace, ThirdQuarterFace)
+  , moonPhaseForDay
   ) where
 
 import Control.DeepSeq(NFData)
@@ -24,6 +25,7 @@ import Control.DeepSeq(NFData)
 import Data.Char.Core(MirrorVertical(mirrorVertical), UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange', mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
 import Data.Hashable(Hashable)
+import Data.Time.Calendar(Day(toModifiedJulianDay))
 
 import GHC.Generics(Generic)
 
@@ -45,6 +47,14 @@ data MoonPhase
   | ThirdQuarter  -- ^ The /third quarter/, the seventh phase of the moon represented by 🌗.
   | WaningCrescent  -- ^ The /waning crescent/, the eighth phase of the moon represented by 🌘.
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+
+
+-- | Determine the corresponding MoonPhase emoji for a given day. The algorithm is based on
+-- upon a subsystems publication <https://www.subsystems.us/uploads/9/8/9/4/98948044/moonphase.pdf>
+moonPhaseForDay
+  :: Day  -- ^ The 'Day' for which we want to deterime the moon phase.
+  -> MoonPhase  -- ^ The corresponding 'MoonPhase' icon
+moonPhaseForDay d = toEnum (round ((fromIntegral (toModifiedJulianDay d - 57812) + 0.845625) / 3.69125) `mod` 8)
 
 instance Arbitrary MoonPhase where
     arbitrary = arbitraryBoundedEnum
