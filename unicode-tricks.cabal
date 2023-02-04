@@ -44,6 +44,7 @@ library
     , Data.Char.Emoji.NoEvilMonkey
     , Data.Char.Emoji.Science
     , Data.Char.Emoji.SkinColor
+    , Data.Char.Emoji.Sound
     , Data.Char.Emoji.Zodiac
     , Data.Char.Enclosed
     , Data.Char.Egyptian
@@ -119,6 +120,7 @@ test-suite             utricks
     , Data.Char.Emoji.NoEvilMonkeySpec
     , Data.Char.Emoji.ScienceSpec
     , Data.Char.Emoji.SkinColorSpec
+    , Data.Char.Emoji.SoundSpec
     , Data.Char.Emoji.ZodiacSpec
     , Data.Char.FrameSpec
     , Data.Char.MathSpec
