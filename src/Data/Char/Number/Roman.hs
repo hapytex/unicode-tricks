@@ -31,7 +31,7 @@ import Data.Bits((.|.))
 import Data.Char(chr)
 import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange', LetterCase, Ligate, ligateF, mapFromEnum, mapToEnum, mapToEnumSafe, splitLetterCase)
 import Data.Data(Data)
-import Data.Default(Default(def))
+import Data.Default.Class(Default(def))
 import Data.Hashable(Hashable)
 import Data.Text(Text, cons, empty)
 

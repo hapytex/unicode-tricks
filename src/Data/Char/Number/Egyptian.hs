@@ -34,7 +34,7 @@ module Data.Char.Number.Egyptian (
 
 import Data.Char(chr, ord)
 import Data.Char.Core(Ligate, PlusStyle, signValueSystem, splitLigate)
-import Data.Default(def)
+import Data.Default.Class(def)
 import qualified Data.Text as T
 import Data.Text(Text, singleton, empty)
 
@@ -295,7 +295,7 @@ _toTranslate 0 = singleStroke
 _toTranslate 1 = cattleHobble
 _toTranslate 2 = coilOfRope
 _toTranslate 3 = waterLily
-_toTranslate 4 = bentFinger 
+_toTranslate 4 = bentFinger
 _toTranslate 5 = tadpole
 _toTranslate _ = heh
 
@@ -312,7 +312,7 @@ _withLigate 5 k = T.replicate k (singleton tadpole)
 _withLigate n k | n < 5 = singleton ( _ligateDigit k (_toTranslate n))
                 | otherwise = T.replicate (10^(n-6) *k) (singleton heh)
 
--- | Obtain 
+-- | Obtain
 digits :: Ligate -> Int -> Int -> Text
 digits = splitLigate _withLigate _noLigate
 

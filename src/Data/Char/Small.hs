@@ -32,7 +32,7 @@ module Data.Char.Small (
 import Data.Bits((.&.), (.|.))
 import Data.Char(chr, isDigit, ord)
 import Data.Char.Core(PlusStyle(WithPlus, WithoutPlus), positionalNumberSystem10)
-import Data.Default(Default(def))
+import Data.Default.Class(Default(def))
 import Data.Ratio(Ratio, denominator, numerator, (%))
 #if __GLASGOW_HASKELL__ < 803
 import Data.Semigroup((<>))
