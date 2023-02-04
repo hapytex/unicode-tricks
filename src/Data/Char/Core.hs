@@ -54,7 +54,7 @@ import Prelude hiding (null)
 import Control.DeepSeq(NFData, NFData1)
 
 import Data.Bits((.&.))
-import Data.Char(chr, isAlpha, isAlphaNum, isAscii, ord)
+import Data.Char(chr, isAlpha, isAlphaNum, isAscii, isAsciiLower, isAsciiUpper, ord)
 import Data.Data(Data)
 import Data.Default.Class(Default(def))
 import Data.Functor.Classes(Eq1(liftEq), Ord1(liftCompare))
@@ -632,7 +632,7 @@ liftUppercase
   -> Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The corresponding character wrapped in a 'Just' if the given character is in the @A-Z@ range; 'Nothing' otherwise.
 liftUppercase d = go
-    where go c | 'A' <= c && c <= 'Z' = Just (chr (d' + ord c))
+    where go c | isAsciiUpper c = Just (chr (d' + ord c))
                | otherwise = Nothing
           !d' = d - 65
 
@@ -652,7 +652,7 @@ liftLowercase
   -> Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The corresponding character wrapped in a 'Just' if the given character is in the @a-z@ range; 'Nothing' otherwise.
 liftLowercase d = go
-    where go c | 'a' <= c && c <= 'z' = Just (chr (d' + ord c))
+    where go c | isAsciiLower c = Just (chr (d' + ord c))
                | otherwise = Nothing
           !d' = d - 97
 
@@ -673,8 +673,8 @@ liftUpperLowercase
   -> Char  -- ^ The given character to convert.
   -> Maybe Char  -- ^ The corresponding character wrapped in a 'Just' if the given character is in the @A-Z,a-z@ range; 'Nothing' otherwise.
 liftUpperLowercase du dl = go
-    where go c | 'a' <= c && c <= 'z' = Just (chr (dl' + c'))
-               | 'A' <= c && c <= 'Z' = Just (chr (du' + c'))
+    where go c | isAsciiLower c = Just (chr (dl' + c'))
+               | isAsciiUpper c = Just (chr (du' + c'))
                | otherwise = Nothing
                where c' = ord c
           !du' = du - 65
@@ -688,7 +688,7 @@ liftUpperLowercase'
   -> Char  -- ^ The given character to convert.
   -> Char  -- ^ The corresponding character if the given character is in the @A-Z,a-z@ range; unspecified otherwise.
 liftUpperLowercase' du dl = go
-    where go c | 'A' <= c && c <= 'Z' = chr (du' + c')
+    where go c | isAsciiUpper c = chr (du' + c')
                | otherwise = chr (dl' + c')
                where c' = ord c
           du' = du - 65

@@ -26,6 +26,7 @@ import Control.DeepSeq(NFData)
 import Data.Char(ord)
 import Data.Char.Core(UnicodeCharacter(fromUnicodeChar, fromUnicodeChar', toUnicodeChar, isInCharRange), UnicodeText(toUnicodeText, fromUnicodeText, isInTextRange), generateIsInTextRange', mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
+import Data.Functor.Classes(Eq1(liftEq))
 import Data.Hashable(Hashable)
 import Data.Hashable.Lifted(Hashable1)
 import Data.Text(Text, snoc, unsnoc)
@@ -144,6 +145,11 @@ instance Enum a => Enum (SkinModified a) where
     where ~(q, r) = quotRem n 5
 
 instance Hashable a => Hashable (SkinModified a)
+
+instance Eq1 SkinModified where
+  liftEq eq = go
+    where go (SkinModified xa sa) (SkinModified xb sb) = eq xa xb && sa == sb
+
 
 instance Hashable1 SkinModified
 

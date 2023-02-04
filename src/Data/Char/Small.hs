@@ -18,22 +18,30 @@ to a 'Text' that specifies this number in subscript and superscript.
 module Data.Char.Small (
   -- * Convert characters to their subscript and superscript counterpart
     toSub, toSup
+  -- * Convert superscript and subscript back their normal character
+  , fromSubSup
   -- * Numbers as subscript and superscript.
   , asSub, asSub', asSubPlus
   , asSup, asSup', asSupPlus
   -- * Ratio formatting
   , ratioToUnicode, ratioToUnicode', ratioPartsToUnicode, ratioPartsToUnicode'
+  -- * Ratio parsing
+  , unicodeToRatio, unicodeToRatioParts
   ) where
 
+import Data.Bits((.&.), (.|.))
 import Data.Char(chr, isDigit, ord)
 import Data.Char.Core(PlusStyle(WithPlus, WithoutPlus), positionalNumberSystem10)
 import Data.Default.Class(Default(def))
-import Data.Ratio(Ratio, denominator, numerator)
+import Data.Ratio(Ratio, denominator, numerator, (%))
 #if __GLASGOW_HASKELL__ < 803
 import Data.Semigroup((<>))
 #endif
 
-import Data.Text(Text, cons, snoc, singleton)
+import qualified Data.Text as T
+import Data.Text(Text, cons, snoc, singleton, unpack)
+
+import Text.Read(readMaybe)
 
 -- | Convert a set of characters to their superscript counterpart, given that
 -- characters exists.
@@ -68,15 +76,53 @@ toSub 'o' = Just '\x2092'
 toSub 'x' = Just '\x2093'
 toSub '\x259' = Just '\x2094'
 toSub 'h' = Just '\x2095'
-toSub 'k' = Just '\x2095'
-toSub 'l' = Just '\x2095'
-toSub 'm' = Just '\x2095'
-toSub 'n' = Just '\x2095'
-toSub 'p' = Just '\x2095'
-toSub 's' = Just '\x2095'
-toSub 't' = Just '\x2095'
+toSub 'k' = Just '\x2096'
+toSub 'l' = Just '\x2097'
+toSub 'm' = Just '\x2098'
+toSub 'n' = Just '\x2099'
+toSub 'p' = Just '\x209a'
+toSub 's' = Just '\x209b'
+toSub 't' = Just '\x209c'
 toSub c | isDigit c = Just (_digitToSub (ord c - ord '0'))
         | otherwise = Nothing
+
+_fromSubSup :: Int -> Char
+_fromSubSup 0xa = '+'
+_fromSubSup 0xb = '-'
+_fromSubSup 0xc = '='
+_fromSubSup 0xd = '('
+_fromSubSup 0xe = ')'
+_fromSubSup _ = error "Should not happen!"
+
+-- | Convert subscripts and superscripts back to the original counterpart, so @'⁵'@ back to @'5'@. For non-subscript or -superscript
+-- characters, it returns the original character.
+fromSubSup
+  :: Char  -- ^ A character to un-subscript or un-superscript, for example @'⁵'@.
+  -> Char  -- ^ The corresponding original character, for example @'5'@.
+fromSubSup '\x2070' = '0'
+fromSubSup '\xb2' = '2'
+fromSubSup '\xb3' = '3'
+fromSubSup '\xb9' = '1'
+fromSubSup '\x2071' = 'i'
+fromSubSup '\x207f' = 'n'
+fromSubSup '\x2090' = 'a'
+fromSubSup '\x2091' = 'e'
+fromSubSup '\x2092' = 'o'
+fromSubSup '\x2093' = 'x'
+fromSubSup '\x2094' = '\x259'
+fromSubSup '\x2095' = 'h'
+fromSubSup '\x2096' = 'k'
+fromSubSup '\x2097' = 'l'
+fromSubSup '\x2098' = 'm'
+fromSubSup '\x2099' = 'n'
+fromSubSup '\x209a' = 'p'
+fromSubSup '\x209b' = 's'
+fromSubSup '\x209c' = 't'
+fromSubSup x
+  | '\x207a' <= x && x<= '\x208e' && 0x0a <= m && m <= 0x0e = _fromSubSup m
+  | '\x2074' <= x && x <= '\x2089' = chr (0x30 .|. (ord x .&. 0xf))
+  | otherwise = x
+  where m = ord x .&. 0xf
 
 _value :: Integral i => (Int -> Char) -> i -> Text
 _value f = go
@@ -110,7 +156,6 @@ ratioPartsToUnicode ps num den
   | den < 0 = ratioPartsToUnicode ps (-num) (-den)
   | otherwise = asSup ps num <> cons '\x2044' (asSub' den)
 
-
 -- | Converting the given numerator and denominator to a fraction
 -- where the numerator is written in superscript, and the denominator
 -- in subscript. If the denominator is negative, the item is rendered
@@ -119,7 +164,22 @@ ratioPartsToUnicode' :: (Integral i, Integral j)
   => i  -- ^ The given numerator.
   -> j  -- ^ The given denominator.
   -> Text  -- ^ A 'Text' object that presents the fraction with superscript and subscript.
-ratioPartsToUnicode' = ratioPartsToUnicode WithoutPlus
+ratioPartsToUnicode' = ratioPartsToUnicode def
+
+-- | Try to convert the given text that contains a fraction to the numerator and denominator. This does *not* take /vulgar fractions/
+-- into account. You can process these with 'Dat.Char.Number.VulgarFraction.fromVulgarFallback'.
+unicodeToRatioParts :: (Read i, Read j)
+  => Text  -- ^ The 'Text' we try to decode.
+  -> Maybe (i, j)  -- ^ A 2-tuple with the numerator and denominator wrapped in a 'Just' if the fraction can be parsed, 'Nothing' otherwise.
+unicodeToRatioParts t = (,) <$> _parseInt (unpack n) <*> _parseInt (drop 1 (unpack d))
+  where ~(n, d) = T.break _isFrac (T.map fromSubSup t)
+
+-- | Try to convert the given text that contains a fraction to a 'Ratio'. This does *not* take /vulgar fractions/
+-- into account. You can process these with 'Dat.Char.Number.VulgarFraction.fromVulgarFallbackToRatio'.
+unicodeToRatio :: (Integral i, Read i)
+  => Text  -- ^ The 'Text' we try to decode.
+  -> Maybe (Ratio i)  -- ^ The fraction wrapped in a 'Just'; 'Nothing' if the fraction can not be parsed.
+unicodeToRatio = fmap (uncurry (%)) . unicodeToRatioParts
 
 -- | Convert the given 'Ratio' object to a sequence of characters with the
 -- numerator in superscript and the denominator in subscript. The given
@@ -191,3 +251,12 @@ _digitToSup 0 = '\x2070'
 _digitToSup 1 = '\xb9'
 _digitToSup n | n <= 3 = chr (176+n)
               | otherwise = chr (8304+n)
+
+_parseInt :: Read i => String -> Maybe i
+_parseInt ('+':d) = readMaybe d
+_parseInt d = readMaybe d
+
+_isFrac :: Char -> Bool
+_isFrac '/' = True
+_isFrac '\x2044' = True
+_isFrac _ = False
