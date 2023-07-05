@@ -66,6 +66,7 @@ library
     , Data.Char.Number.Mayan
     , Data.Char.Number.Roman
     , Data.Char.Number.Segmented
+    , Data.Char.Number.Tally
     , Data.Char.Number.VulgarFraction
     , Data.Char.Private
     , Data.Char.Private.Klingon
