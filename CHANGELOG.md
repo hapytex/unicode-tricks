@@ -2,6 +2,14 @@
 
 For a full list of changes, see the history on [GitHub](https://github.com/hapytex/unicode-tricks).
 
+## Version 0.12.1.0
+
+Version bump, using `QuickCheck-1.14.3` and `text-2.0`.
+
+## Version 0.12.0.0
+
+Splitting the emoji module in separate modules.
+
 ## Version 0.11.0.0
 
 Most data types now are instance of the `NFData` typeclass, there are typeclasses to mirror horizontally and vertically, and there is module

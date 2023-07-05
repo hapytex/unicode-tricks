@@ -157,14 +157,14 @@ _value f = go
 
 _prefixSign :: Integral i => Char -> (Int -> Char) -> i -> Text
 _prefixSign c f v
-  | v < 0 = cons c (f' (- v))
+  | v < 0 = cons c (f' (-v))
   | otherwise = f' v
   where
     f' = _value f
 
 _prefixSignPlus :: Integral i => Char -> Char -> (Int -> Char) -> i -> Text
 _prefixSignPlus cp cn f v
-  | v < 0 = c' cn (- v)
+  | v < 0 = c' cn (-v)
   | otherwise = c' cp v
   where
     c' = (. _value f) . cons
@@ -184,7 +184,7 @@ ratioPartsToUnicode ::
   -- | A 'Text' object that presents the fraction with superscript and subscript.
   Text
 ratioPartsToUnicode ps num den
-  | den < 0 = ratioPartsToUnicode ps (- num) (- den)
+  | den < 0 = ratioPartsToUnicode ps (-num) (-den)
   | otherwise = asSup ps num <> cons '\x2044' (asSub' den)
 
 -- | Converting the given numerator and denominator to a fraction

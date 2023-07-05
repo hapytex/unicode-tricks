@@ -163,6 +163,6 @@ filled (Sextant u m d) = go (shiftL (rowValue d) 4 .|. shiftL (rowValue m) 2 .|.
     go 0x2a = RightHalfBlock
     go 0x3f = FullBlock
     go i
-      | i >= 0x2a = chr (0x1fb00 .|. (i -0x03))
-      | i >= 0x15 = chr (0x1fb00 .|. (i -0x02))
-      | otherwise = chr (0x1fb00 .|. (i -0x01))
+      | i >= 0x2a = chr (0x1fb00 .|. (i - 0x03))
+      | i >= 0x15 = chr (0x1fb00 .|. (i - 0x02))
+      | otherwise = chr (0x1fb00 .|. (i - 0x01))

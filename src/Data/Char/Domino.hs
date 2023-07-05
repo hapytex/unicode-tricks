@@ -146,7 +146,7 @@ _fromDomino n = on Domino go a b
   where
     (a, b) = quotRem n 7
     go 0 = Nothing
-    go k = Just (toEnum (k -1))
+    go k = Just (toEnum (k - 1))
 
 -- | Convert the given 'Char'acter to an 'Oriented' 'ComplexDomino' object. If
 -- the given 'Char'acter is not a valid domino character, the result is

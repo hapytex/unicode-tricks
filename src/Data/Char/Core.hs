@@ -421,7 +421,7 @@ withSign ::
   -- | A 'Text' object that represents the given number, with the given sign numbers in the given 'PlusStyle'.
   Text
 withSign f cp cn ps n
-  | n < 0 = cons cn (f (- n))
+  | n < 0 = cons cn (f (-n))
   | WithPlus <- ps = cons cp (f n)
   | otherwise = f n
 

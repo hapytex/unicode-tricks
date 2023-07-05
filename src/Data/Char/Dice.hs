@@ -66,7 +66,7 @@ toDieValue ::
   -- | A 'DieValue' wrapped in a 'Just' if the given integral value is greater than zero, and less than seven, otherwise 'Nothing'.
   Maybe DieValue
 toDieValue i
-  | i > 0 && i <= 6 = Just (toEnum (fromIntegral i -1))
+  | i > 0 && i <= 6 = Just (toEnum (fromIntegral i - 1))
   | otherwise = Nothing
 
 instance Arbitrary DieValue where

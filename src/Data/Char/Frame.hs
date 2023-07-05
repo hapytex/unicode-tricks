@@ -171,27 +171,33 @@ instance Semigroup a => Semigroup (Parts a) where
 
 #if MIN_VERSION_base(4,11,0)
 instance Monoid a => Monoid (Horizontal a) where
-#else
-instance (Monoid a, Semigroup a) => Monoid (Horizontal a) where
-#endif
   mempty = Horizontal mempty mempty
   mappend = (<>)
+#else
+instance (Monoid a, Semigroup a) => Monoid (Horizontal a) where
+  mempty = Horizontal mempty mempty
+  mappend = (<>)
+#endif
 
 #if MIN_VERSION_base(4,11,0)
 instance Monoid a => Monoid (Vertical a) where
-#else
-instance (Monoid a, Semigroup a) => Monoid (Vertical a) where
-#endif
   mempty = Vertical mempty mempty
   mappend = (<>)
+#else
+instance (Monoid a, Semigroup a) => Monoid (Vertical a) where
+  mempty = Vertical mempty mempty
+  mappend = (<>)
+#endif
 
 #if MIN_VERSION_base(4,11,0)
 instance Monoid a => Monoid (Parts a) where
-#else
-instance (Monoid a, Semigroup a) => Monoid (Parts a) where
-#endif
   mempty = Parts mempty mempty
   mappend = (<>)
+#else
+instance (Monoid a, Semigroup a) => Monoid (Parts a) where
+  mempty = Parts mempty mempty
+  mappend = (<>)
+#endif
 
 instance Arbitrary Weight where
   arbitrary = arbitraryBoundedEnum

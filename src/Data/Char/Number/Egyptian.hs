@@ -468,7 +468,7 @@ nfr = '\x13124'
 _normalizeCount :: Int -> Int -> Int
 _normalizeCount n
   | n < 6 = id
-  | otherwise = (*) (10 ^ (n -6))
+  | otherwise = (*) (10 ^ (n - 6))
 
 _toTranslate :: Int -> Char
 _toTranslate 0 = singleStroke
@@ -480,7 +480,7 @@ _toTranslate 5 = tadpole
 _toTranslate _ = heh
 
 _ligateDigit :: Int -> Char -> Char
-_ligateDigit k = chr . (+) (k -1) . ord
+_ligateDigit k = chr . (+) (k - 1) . ord
 
 _noLigate :: Int -> Int -> Text
 _noLigate _ 0 = empty
@@ -491,7 +491,7 @@ _withLigate _ 0 = empty
 _withLigate 5 k = T.replicate k (singleton tadpole)
 _withLigate n k
   | n < 5 = singleton (_ligateDigit k (_toTranslate n))
-  | otherwise = T.replicate (10 ^ (n -6) * k) (singleton heh)
+  | otherwise = T.replicate (10 ^ (n - 6) * k) (singleton heh)
 
 -- | Obtain
 digits :: Ligate -> Int -> Int -> Text

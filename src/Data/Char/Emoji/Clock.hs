@@ -92,14 +92,14 @@ clock h b
   | b && h' == 12 = Clock 0 True
   | otherwise = Clock h' b
   where
-    h' = mod (h -1) 12 + 1
+    h' = mod (h - 1) 12 + 1
 
 instance Arbitrary Clock where
   arbitrary = arbitraryBoundedEnum
 
 instance UnicodeCharacter Clock where
   toUnicodeChar (Clock h False) = chr (0x1f54f + h)
-  toUnicodeChar (Clock h True) = chr (0x1f55c + mod (h -1) 12)
+  toUnicodeChar (Clock h True) = chr (0x1f55c + mod (h - 1) 12)
   fromUnicodeChar c
     | c < '\x1f550' = Nothing
     | c < '\x1f55c' = Just (Clock (ord c - 0x1f54f) False)
