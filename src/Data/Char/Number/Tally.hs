@@ -7,21 +7,12 @@ Maintainer  : hapytexeu+gh@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-This module aims to convert Roman numerals to a String of unicode characters that
-represent the corresponding Roman number.
-
-One can convert numbers to Roman numerals in upper case and lower case, and in 'Additive' and 'Subtractive' style.
+This module aims to convert numbers to (Western) tally marks and vice versa.
 -}
 
-module Data.Char.Number.Roman (
-    -- * Data types to represent Roman numerals
-    TallyLiteral(I, II, III, IV, V, VI, VII, VIII, IX, X, XI, XII, L, C, D, M)
-    -- * Convert a number to Roman literals
-  , toLiterals
-  , romanLiteral, romanLiteral'
-    -- * Convert a number to text
-  , romanNumeral, romanNumeral', romanNumeralCase
-  , romanNumber,  romanNumber',  romanNumberCase
+module Data.Char.Number.Tally (
+    -- * Data types to represent tally marks
+    TallyLiteral(I, V)
   ) where
 
 import Control.DeepSeq(NFData)
@@ -33,178 +24,92 @@ import Data.Data(Data)
 import Data.Default.Class(Default(def))
 import Data.Hashable(Hashable)
 import Data.Text(Text, cons, empty)
+import Data.List(genericReplicate)
 
 import GHC.Generics(Generic)
 
 import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
 
--- | The style to convert a number to a Roman numeral. The 'UnicodeCharacter'
--- instance maps on the uppercase Roman literals.
-data RomanStyle
-  = Additive  -- ^ The additive style converts four to ⅠⅠⅠⅠ.
-  | Subtractive  -- ^ The subtractive style converts four to ⅠⅤ.
-  deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
+_tallyOffset :: Int
+_tallyOffset = 0x1d377
 
-instance Arbitrary RomanStyle where
-    arbitrary = arbitraryBoundedEnum
-
-instance Arbitrary RomanLiteral where
-    arbitrary = arbitraryBoundedEnum
-
-instance Default RomanStyle where
-    def = Subtractive
-
-instance Hashable RomanStyle
-
-instance NFData RomanStyle
-
-instance UnicodeCharacter RomanLiteral where
-  toUnicodeChar = mapFromEnum _romanUppercaseOffset
-  fromUnicodeChar = mapToEnumSafe _romanUppercaseOffset
-  fromUnicodeChar' = mapToEnum _romanUppercaseOffset
-  isInCharRange c = '\x2160' <= c && c <= '\x216f'
-
-instance UnicodeText RomanLiteral where
-  isInTextRange = generateIsInTextRange' @RomanLiteral
-
--- | Roman numerals for which a unicode character exists.
-data RomanLiteral
-  = I  -- ^ The unicode character for the Roman numeral /one/: Ⅰ.
-  | II  -- ^ The unicode character for the Roman numeral /two/: Ⅱ.
-  | III  -- ^ The unicode character for the Roman numeral /three/: Ⅲ.
-  | IV  -- ^ The unicode character for the Roman numeral /four/: Ⅳ.
-  | V  -- ^ The unicode character for the Roman numeral /five/: Ⅴ.
-  | VI  -- ^ The unicode character for the Roman numeral /six/: Ⅵ.
-  | VII  -- ^ The unicode character for the Roman numeral /seven/: Ⅶ.
-  | VIII  -- ^ The unicode character for the Roman numeral /eight/: Ⅷ.
-  | IX  -- ^ The unicode character for the Roman numeral /nine/: Ⅸ.
-  | X  -- ^ The unicode character for the Roman numeral /ten/: Ⅹ.
-  | XI  -- ^ The unicode character for the Roman numeral /eleven/: Ⅺ.
-  | XII  -- ^ The unicode character for the Roman numeral /twelve/: Ⅻ.
-  | L  -- ^ The unicode character for the Roman numeral /fifty/: Ⅼ.
-  | C  -- ^ The unicode character for the Roman numeral /hundred/: Ⅽ.
-  | D  -- ^ The unicode character for the Roman numeral /five hundred/: Ⅾ.
-  | M  -- ^ The unicode character for the Roman numeral /thousand/: Ⅿ.
+-- | A tally literal that is either a one (𝍷), or five grouped together (𝍸).
+data TallyLiteral
+  = I  -- ^ The unicode character for the tally numeral /one/: 𝍷.
+  | V  -- ^ The unicode character for the tally numeral /five/: 𝍸.
   deriving (Bounded, Data, Enum, Eq, Generic, Show, Read)
 
-instance Hashable RomanLiteral
 
-instance NFData RomanLiteral
+instance Arbitrary TallyLiteral where
+    arbitrary = arbitraryBoundedEnum
 
-_literals :: Integral i => RomanStyle -> [(i, [RomanLiteral] -> [RomanLiteral])]
-_literals Additive = [
-    (1000, (M:))
-  , (500, (D:))
-  , (100, (C:))
-  , (50, (L:))
-  , (10, (X:))
-  , (5, (V:))
-  , (1, (I:))
-  ]
-_literals Subtractive = [
-    (1000, (M:))
-  , (900, ([C,M]++))
-  , (500, (D:))
-  , (400, ([C,D]++))
-  , (100, (C:))
-  , (90, ([X,C]++))
-  , (50, (L:))
-  , (40, ([X,L]++))
-  , (10, (X:))
-  , (9, ([I,X]++))
-  , (5, (V:))
-  , (4, ([I,V]++))
-  , (1, (I:))
-  ]
+instance UnicodeCharacter TallyLiteral where
+  toUnicodeChar = mapFromEnum _tallyOffset
+  fromUnicodeChar = mapToEnumSafe _tallyOffset
+  fromUnicodeChar' = mapToEnum _tallyOffset
+  isInCharRange c = '\x2160' <= c && c <= '\x216f'
 
-_ligate :: [RomanLiteral] -> [RomanLiteral]
-_ligate [] = []
-_ligate (r:rs) = go r rs
-    where go x [] = [x]
-          go x (y:ys) = f x y ys
-          f I I = go II
-          f II I = skip III
-          f I V = skip IV
-          f V I = go VI
-          f VI I = go VII
-          f VII I = skip VIII
-          f X I = go XI
-          f I X = skip IX
-          f XI I = go XII
-          f x y = (x :) . go y
-          skip = (. _ligate) . (:)
+instance UnicodeText TallyLiteral where
+  isInTextRange = generateIsInTextRange' @TallyLiteral
 
--- | Convert the given number with the given 'RomanStyle' and 'Ligate' style
--- to a sequence of 'RomanLiteral's, given the number can be represented
--- with Roman numerals (is strictly larger than zero).
+instance Hashable TallyLiteral
+
+instance NFData TallyLiteral
+
+
 toLiterals :: Integral i
-  => RomanStyle  -- ^ Specifies if the Numeral is 'Additive' or 'Subtractive' style.
-  -> Ligate  -- ^ Specifies if characters like @ⅠⅤ@ are joined to @Ⅳ@.
   -> i  -- ^ The given number to convert.
-  -> Maybe [RomanLiteral]  -- ^ A list of 'RomanLiteral's if the given number can be specified
+  -> Maybe [TallyLiteral]  -- ^ A list of 'TallyLiteral's if the given number can be specified
                           -- with Roman numerals, 'Nothing' otherwise.
-toLiterals s c k
-    | k > 0 = ligateF _ligate c (go k (_literals s))
+toLiterals k
+    | k > 0 = Just (genericReplicate k0 V ++ genericReplicate k1 I)
     | otherwise = Nothing
-    where go 0 _ = Just []
-          go _ [] = Nothing
-          go n va@((m, l):vs)
-              | n >= m = l <$> go (n-m) va
-              | otherwise = go n vs
+    where ~(k0, k1) = k `divMod` 5
 
-_romanUppercaseOffset :: Int
-_romanUppercaseOffset = 0x2160
-
-_romanLowercaseOffset :: Int
-_romanLowercaseOffset = 0x2170
-
-_romanLiteral :: Int -> RomanLiteral -> Char
-_romanLiteral = (chr .) . (. fromEnum) . (.|.)
-
--- | Convert the given 'RomanLiteral' object to a unicode character in
+-- | Convert the given 'TallyLiteral' object to a unicode character in
 -- /upper case/.
 romanLiteral
-  :: RomanLiteral  -- ^ The given 'RomanLiteral' to convert.
-  -> Char  -- ^ A unicode character that represents the given 'RomanLiteral'.
-romanLiteral = _romanLiteral _romanUppercaseOffset
+  :: TallyLiteral  -- ^ The given 'TallyLiteral' to convert.
+  -> Char  -- ^ A unicode character that represents the given 'TallyLiteral'.
+romanLiteral = _romanLiteral _tallyOffset
 
--- | Convert the given 'RomanLiteral' object to a unicode character in
+-- | Convert the given 'TallyLiteral' object to a unicode character in
 -- /lower case/.
 romanLiteral'
-  :: RomanLiteral  -- ^ The given 'RomanLiteral' to convert.
-  -> Char  -- ^ A unicode character that represents the given 'RomanLiteral'.
+  :: TallyLiteral  -- ^ The given 'TallyLiteral' to convert.
+  -> Char  -- ^ A unicode character that represents the given 'TallyLiteral'.
 romanLiteral' = _romanLiteral _romanLowercaseOffset
 
-_romanNumeral :: (RomanLiteral -> Char) -> [RomanLiteral] -> Text
+_romanNumeral :: (TallyLiteral -> Char) -> [TallyLiteral] -> Text
 _romanNumeral = (`foldr` empty) . (cons .)
 
--- | Convert a sequence of 'RomanLiteral' objects to a 'Text' object that
+-- | Convert a sequence of 'TallyLiteral' objects to a 'Text' object that
 -- contains a sequence of corresponding Unicode characters which are Roman
 -- numberals in /upper case/.
 romanNumeral
-  :: [RomanLiteral]  -- ^ The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.
-  -> Text  -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.
+  :: [TallyLiteral]  -- ^ The given list of 'TallyLiteral' objects to convert to a Unicode equivalent.
+  -> Text  -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'TallyLiteral's.
 romanNumeral = _romanNumeral romanLiteral
 
 
--- | Convert a sequence of 'RomanLiteral' objects to a 'Text' object that
+-- | Convert a sequence of 'TallyLiteral' objects to a 'Text' object that
 -- contains a sequence of corresponding Unicode characters which are Roman
 -- numberals in /lower case/.
 romanNumeral'
-  :: [RomanLiteral]  -- ^ The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.
-  -> Text  -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.
+  :: [TallyLiteral]  -- ^ The given list of 'TallyLiteral' objects to convert to a Unicode equivalent.
+  -> Text  -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'TallyLiteral's.
 romanNumeral' = _romanNumeral romanLiteral'
 
--- | Convert a sequence of 'RomanLiteral' objects to a 'Text' object that
+-- | Convert a sequence of 'TallyLiteral' objects to a 'Text' object that
 -- contains a sequence of corresponding Unicode characters which are Roman
 -- numberals in /upper case/ or /lower case/ depending on the 'LetterCase' value.
 romanNumeralCase
   :: LetterCase  -- ^ The given 'LetterCase' to apply.
-  -> [RomanLiteral]  -- ^ The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.
-  -> Text  -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.
+  -> [TallyLiteral]  -- ^ The given list of 'TallyLiteral' objects to convert to a Unicode equivalent.
+  -> Text  -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'TallyLiteral's.
 romanNumeralCase = splitLetterCase romanNumeral romanNumeral'
 
-_romanNumber :: Integral i => ([RomanLiteral] -> a) -> RomanStyle -> Ligate -> i -> Maybe a
+_romanNumber :: Integral i => ([TallyLiteral] -> a) -> RomanStyle -> Ligate -> i -> Maybe a
 _romanNumber f r c = fmap f . toLiterals r c
 
 -- | Convert a given number to a 'Text' wrapped in a 'Just' data constructor,
