@@ -1,116 +1,286 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, Safe, TypeApplications #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE Safe #-}
+{-# LANGUAGE TypeApplications #-}
 
-{-|
-Module      : Data.Char.Currency
-Description : The module exposes a type that defines the different currencies for which there is a Unicode equivalent.
-Maintainer  : hapytexeu+gh@gmail.com
-Stability   : experimental
-Portability : POSIX
+-- |
+-- Module      : Data.Char.Currency
+-- Description : The module exposes a type that defines the different currencies for which there is a Unicode equivalent.
+-- Maintainer  : hapytexeu+gh@gmail.com
+-- Stability   : experimental
+-- Portability : POSIX
+--
+-- Unicode has multiple code blocks where it defines currencies. This module aims to expose a data structure that makes
+-- it more convenient to work with currency characters.
+module Data.Char.Currency
+  ( -- * Defining currencies
+    Currency
+      ( Dollar,
+        Cent,
+        Pound,
+        Currency,
+        Yen,
+        ArmenianDram,
+        Afghani,
+        NkoDorome,
+        NkoTaman,
+        BengaliRupeeMark,
+        BengaliRupee,
+        BengaliGandaMark,
+        GujaratiRupee,
+        TamilRupee,
+        ThaiSymbolBaht,
+        KhmerSymbolRiel,
+        EuroCurrency,
+        Colon,
+        Cruzeiro,
+        FrenchFranc,
+        Lira,
+        Mill,
+        Naira,
+        Peseta,
+        Rupee,
+        Won,
+        NewSheqel,
+        Dong,
+        Euro,
+        Kip,
+        Tugrik,
+        Drachma,
+        GermanPenny,
+        Peso,
+        Guarani,
+        Austral,
+        Hryvnia,
+        Cedi,
+        LivreTournois,
+        Spesmilo,
+        Tenge,
+        IndianRupee,
+        TurkishLira,
+        NordicMark,
+        Manat,
+        Ruble,
+        Lari,
+        Bitcoin,
+        NorthIndicRupeeMark,
+        Rial,
+        SmallDollar,
+        FullwidthDollar,
+        FullwidthCent,
+        FullwidthPound,
+        FullwidthYen,
+        FullwidthWon,
+        TamilKaacu,
+        TamilPanam,
+        TamilPon,
+        TamilVaraakan,
+        WanchoNgun,
+        IndicSiyaqRupeeMark
+      ),
 
-Unicode has multiple code blocks where it defines currencies. This module aims to expose a data structure that makes
-it more convenient to work with currency characters.
--}
-
-module Data.Char.Currency (
-    -- * Defining currencies
-    Currency(
-                     Dollar,                Cent,               Pound,            Currency,                 Yen,         ArmenianDram,             Afghani
-      ,           NkoDorome,            NkoTaman,    BengaliRupeeMark,        BengaliRupee,    BengaliGandaMark,        GujaratiRupee,          TamilRupee
-      ,      ThaiSymbolBaht,     KhmerSymbolRiel,        EuroCurrency,               Colon,            Cruzeiro,          FrenchFranc,                Lira
-      ,                Mill,               Naira,              Peseta,               Rupee,                 Won,            NewSheqel,                Dong
-      ,                Euro,                 Kip,              Tugrik,             Drachma,         GermanPenny,                 Peso,             Guarani
-      ,             Austral,             Hryvnia,                Cedi,       LivreTournois,            Spesmilo,                Tenge,         IndianRupee
-      ,         TurkishLira,          NordicMark,               Manat,               Ruble,                Lari,              Bitcoin, NorthIndicRupeeMark
-      ,                Rial,         SmallDollar,     FullwidthDollar,       FullwidthCent,      FullwidthPound,         FullwidthYen,        FullwidthWon
-      ,          TamilKaacu,          TamilPanam,            TamilPon,       TamilVaraakan,          WanchoNgun,  IndicSiyaqRupeeMark
-    )
     -- * Currencies as 'Char' objects
-  ,              dollar,                cent,               pound,            currency,                 yen,        armenianDram,             afghani,           nkoDorome
-  ,            nkoTaman,    bengaliRupeeMark,        bengaliRupee,    bengaliGandaMark,       gujaratiRupee,          tamilRupee,      thaiSymbolBaht,     khmerSymbolRiel
-  ,        euroCurrency,               colon,            cruzeiro,         frenchFranc,                lira,                mill,               naira,              peseta
-  ,               rupee,                 won,           newSheqel,                dong,                euro,                 kip,              tugrik,             drachma
-  ,         germanPenny,                peso,             guarani,             austral,             hryvnia,                cedi,       livreTournois,            spesmilo
-  ,               tenge,         indianRupee,         turkishLira,          nordicMark,               manat,               ruble,                lari,             bitcoin
-  , northIndicRupeeMark,                rial,         smallDollar,     fullwidthDollar,       fullwidthCent,      fullwidthPound,        fullwidthYen,        fullwidthWon
-  ,          tamilKaacu,          tamilPanam,            tamilPon,       tamilVaraakan,          wanchoNgun, indicSiyaqRupeeMark
+    dollar,
+    cent,
+    pound,
+    currency,
+    yen,
+    armenianDram,
+    afghani,
+    nkoDorome,
+    nkoTaman,
+    bengaliRupeeMark,
+    bengaliRupee,
+    bengaliGandaMark,
+    gujaratiRupee,
+    tamilRupee,
+    thaiSymbolBaht,
+    khmerSymbolRiel,
+    euroCurrency,
+    colon,
+    cruzeiro,
+    frenchFranc,
+    lira,
+    mill,
+    naira,
+    peseta,
+    rupee,
+    won,
+    newSheqel,
+    dong,
+    euro,
+    kip,
+    tugrik,
+    drachma,
+    germanPenny,
+    peso,
+    guarani,
+    austral,
+    hryvnia,
+    cedi,
+    livreTournois,
+    spesmilo,
+    tenge,
+    indianRupee,
+    turkishLira,
+    nordicMark,
+    manat,
+    ruble,
+    lari,
+    bitcoin,
+    northIndicRupeeMark,
+    rial,
+    smallDollar,
+    fullwidthDollar,
+    fullwidthCent,
+    fullwidthPound,
+    fullwidthYen,
+    fullwidthWon,
+    tamilKaacu,
+    tamilPanam,
+    tamilPon,
+    tamilVaraakan,
+    wanchoNgun,
+    indicSiyaqRupeeMark,
+
     -- * Check if a character is a currency
-  , isCurrency
-  ) where
+    isCurrency,
+  )
+where
 
-import Control.DeepSeq(NFData)
-
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange')
-import Data.Data(Data)
-import Data.Hashable(Hashable)
-
-import GHC.Generics(Generic)
-
-import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
+import Control.DeepSeq (NFData)
+import Data.Char.Core (UnicodeCharacter (fromUnicodeChar, isInCharRange, toUnicodeChar), UnicodeText (isInTextRange), generateIsInTextRange')
+import Data.Data (Data)
+import Data.Hashable (Hashable)
+import GHC.Generics (Generic)
+import Test.QuickCheck.Arbitrary (Arbitrary (arbitrary), arbitraryBoundedEnum)
 
 -- | A datatype to present the currencies that have a unicode character.
 data Currency
-  = Dollar  -- ^ A currency that is rendered as @$@.
-  | Cent  -- ^ A currency that is rendered as @¢@.
-  | Pound  -- ^ A currency that is rendered as @£@.
-  | Currency  -- ^ A currency that is rendered as @¤@.
-  | Yen  -- ^ A currency that is rendered as @¥@.
-  | ArmenianDram  -- ^ A currency that is rendered as @֏@.
-  | Afghani  -- ^ A currency that is rendered as @؋@.
-  | NkoDorome  -- ^ A currency that is rendered as @߾@.
-  | NkoTaman  -- ^ A currency that is rendered as @߿@.
-  | BengaliRupeeMark  -- ^ A currency that is rendered as @৲@.
-  | BengaliRupee  -- ^ A currency that is rendered as @৳@.
-  | BengaliGandaMark  -- ^ A currency that is rendered as @৻@.
-  | GujaratiRupee  -- ^ A currency that is rendered as @૱@.
-  | TamilRupee  -- ^ A currency that is rendered as @௹@.
-  | ThaiSymbolBaht  -- ^ A currency that is rendered as @฿@.
-  | KhmerSymbolRiel  -- ^ A currency that is rendered as @៛@.
-  | EuroCurrency  -- ^ A currency that is rendered as @₠@.
-  | Colon  -- ^ A currency that is rendered as @₡@.
-  | Cruzeiro  -- ^ A currency that is rendered as @₢@.
-  | FrenchFranc  -- ^ A currency that is rendered as @₣@.
-  | Lira  -- ^ A currency that is rendered as @₤@.
-  | Mill  -- ^ A currency that is rendered as @₥@.
-  | Naira  -- ^ A currency that is rendered as @₦@.
-  | Peseta  -- ^ A currency that is rendered as @₧@.
-  | Rupee  -- ^ A currency that is rendered as @₨@.
-  | Won  -- ^ A currency that is rendered as @₩@.
-  | NewSheqel  -- ^ A currency that is rendered as @₪@.
-  | Dong  -- ^ A currency that is rendered as @₫@.
-  | Euro  -- ^ A currency that is rendered as @€@.
-  | Kip  -- ^ A currency that is rendered as @₭@.
-  | Tugrik  -- ^ A currency that is rendered as @₮@.
-  | Drachma  -- ^ A currency that is rendered as @₯@.
-  | GermanPenny  -- ^ A currency that is rendered as @₰@.
-  | Peso  -- ^ A currency that is rendered as @₱@.
-  | Guarani  -- ^ A currency that is rendered as @₲@.
-  | Austral  -- ^ A currency that is rendered as @₳@.
-  | Hryvnia  -- ^ A currency that is rendered as @₴@.
-  | Cedi  -- ^ A currency that is rendered as @₵@.
-  | LivreTournois  -- ^ A currency that is rendered as @₶@.
-  | Spesmilo  -- ^ A currency that is rendered as @₷@.
-  | Tenge  -- ^ A currency that is rendered as @₸@.
-  | IndianRupee  -- ^ A currency that is rendered as @₹@.
-  | TurkishLira  -- ^ A currency that is rendered as @₺@.
-  | NordicMark  -- ^ A currency that is rendered as @₻@.
-  | Manat  -- ^ A currency that is rendered as @₼@.
-  | Ruble  -- ^ A currency that is rendered as @₽@.
-  | Lari  -- ^ A currency that is rendered as @₾@.
-  | Bitcoin  -- ^ A currency that is rendered as @₿@.
-  | NorthIndicRupeeMark  -- ^ A currency that is rendered as @꠸@.
-  | Rial  -- ^ A currency that is rendered as @﷼@.
-  | SmallDollar  -- ^ A currency that is rendered as @﹩@.
-  | FullwidthDollar  -- ^ A currency that is rendered as @＄@.
-  | FullwidthCent  -- ^ A currency that is rendered as @￠@.
-  | FullwidthPound  -- ^ A currency that is rendered as @￡@.
-  | FullwidthYen  -- ^ A currency that is rendered as @￥@.
-  | FullwidthWon  -- ^ A currency that is rendered as @￦@.
-  | TamilKaacu  -- ^ A currency that is rendered as @𑿝@.
-  | TamilPanam  -- ^ A currency that is rendered as @𑿞@.
-  | TamilPon  -- ^ A currency that is rendered as @𑿟@.
-  | TamilVaraakan  -- ^ A currency that is rendered as @𑿠@.
-  | WanchoNgun  -- ^ A currency that is rendered as @𞋿@.
-  | IndicSiyaqRupeeMark  -- ^ A currency that is rendered as @𞲰@.
+  = -- | A currency that is rendered as @$@.
+    Dollar
+  | -- | A currency that is rendered as @¢@.
+    Cent
+  | -- | A currency that is rendered as @£@.
+    Pound
+  | -- | A currency that is rendered as @¤@.
+    Currency
+  | -- | A currency that is rendered as @¥@.
+    Yen
+  | -- | A currency that is rendered as @֏@.
+    ArmenianDram
+  | -- | A currency that is rendered as @؋@.
+    Afghani
+  | -- | A currency that is rendered as @߾@.
+    NkoDorome
+  | -- | A currency that is rendered as @߿@.
+    NkoTaman
+  | -- | A currency that is rendered as @৲@.
+    BengaliRupeeMark
+  | -- | A currency that is rendered as @৳@.
+    BengaliRupee
+  | -- | A currency that is rendered as @৻@.
+    BengaliGandaMark
+  | -- | A currency that is rendered as @૱@.
+    GujaratiRupee
+  | -- | A currency that is rendered as @௹@.
+    TamilRupee
+  | -- | A currency that is rendered as @฿@.
+    ThaiSymbolBaht
+  | -- | A currency that is rendered as @៛@.
+    KhmerSymbolRiel
+  | -- | A currency that is rendered as @₠@.
+    EuroCurrency
+  | -- | A currency that is rendered as @₡@.
+    Colon
+  | -- | A currency that is rendered as @₢@.
+    Cruzeiro
+  | -- | A currency that is rendered as @₣@.
+    FrenchFranc
+  | -- | A currency that is rendered as @₤@.
+    Lira
+  | -- | A currency that is rendered as @₥@.
+    Mill
+  | -- | A currency that is rendered as @₦@.
+    Naira
+  | -- | A currency that is rendered as @₧@.
+    Peseta
+  | -- | A currency that is rendered as @₨@.
+    Rupee
+  | -- | A currency that is rendered as @₩@.
+    Won
+  | -- | A currency that is rendered as @₪@.
+    NewSheqel
+  | -- | A currency that is rendered as @₫@.
+    Dong
+  | -- | A currency that is rendered as @€@.
+    Euro
+  | -- | A currency that is rendered as @₭@.
+    Kip
+  | -- | A currency that is rendered as @₮@.
+    Tugrik
+  | -- | A currency that is rendered as @₯@.
+    Drachma
+  | -- | A currency that is rendered as @₰@.
+    GermanPenny
+  | -- | A currency that is rendered as @₱@.
+    Peso
+  | -- | A currency that is rendered as @₲@.
+    Guarani
+  | -- | A currency that is rendered as @₳@.
+    Austral
+  | -- | A currency that is rendered as @₴@.
+    Hryvnia
+  | -- | A currency that is rendered as @₵@.
+    Cedi
+  | -- | A currency that is rendered as @₶@.
+    LivreTournois
+  | -- | A currency that is rendered as @₷@.
+    Spesmilo
+  | -- | A currency that is rendered as @₸@.
+    Tenge
+  | -- | A currency that is rendered as @₹@.
+    IndianRupee
+  | -- | A currency that is rendered as @₺@.
+    TurkishLira
+  | -- | A currency that is rendered as @₻@.
+    NordicMark
+  | -- | A currency that is rendered as @₼@.
+    Manat
+  | -- | A currency that is rendered as @₽@.
+    Ruble
+  | -- | A currency that is rendered as @₾@.
+    Lari
+  | -- | A currency that is rendered as @₿@.
+    Bitcoin
+  | -- | A currency that is rendered as @꠸@.
+    NorthIndicRupeeMark
+  | -- | A currency that is rendered as @﷼@.
+    Rial
+  | -- | A currency that is rendered as @﹩@.
+    SmallDollar
+  | -- | A currency that is rendered as @＄@.
+    FullwidthDollar
+  | -- | A currency that is rendered as @￠@.
+    FullwidthCent
+  | -- | A currency that is rendered as @￡@.
+    FullwidthPound
+  | -- | A currency that is rendered as @￥@.
+    FullwidthYen
+  | -- | A currency that is rendered as @￦@.
+    FullwidthWon
+  | -- | A currency that is rendered as @𑿝@.
+    TamilKaacu
+  | -- | A currency that is rendered as @𑿞@.
+    TamilPanam
+  | -- | A currency that is rendered as @𑿟@.
+    TamilPon
+  | -- | A currency that is rendered as @𑿠@.
+    TamilVaraakan
+  | -- | A currency that is rendered as @𞋿@.
+    WanchoNgun
+  | -- | A currency that is rendered as @𞲰@.
+    IndicSiyaqRupeeMark
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary Currency where
@@ -252,9 +422,11 @@ instance UnicodeText Currency where
   isInTextRange = generateIsInTextRange' @Currency
 
 -- | Check if the given 'Char'acter is a currency character.
-isCurrency
-  :: Char  -- ^ The given character to test.
-  -> Bool  -- ^ 'True' if the given character is a currency character; 'False' otherwise.
+isCurrency ::
+  -- | The given character to test.
+  Char ->
+  -- | 'True' if the given character is a currency character; 'False' otherwise.
+  Bool
 isCurrency x
   | '\x20a0' <= x && x <= '\x20bf' = True
   | '\xa2' <= x && x <= '\xa5' = True
@@ -279,310 +451,373 @@ isCurrency '\x1e2ff' = True
 isCurrency _ = False
 
 -- | The character used to render a /dollar sign/ presented as @$@.
-dollar
-  :: Char  -- ^ A character that corresponds with the /dollar sign/.
+dollar ::
+  -- | A character that corresponds with the /dollar sign/.
+  Char
 dollar = '\x24'
 
 -- | The character used to render a /cent sign/ presented as @¢@.
-cent
-  :: Char  -- ^ A character that corresponds with the /cent sign/.
+cent ::
+  -- | A character that corresponds with the /cent sign/.
+  Char
 cent = '\xa2'
 
 -- | The character used to render a /pound sign/ presented as @£@.
-pound
-  :: Char  -- ^ A character that corresponds with the /pound sign/.
+pound ::
+  -- | A character that corresponds with the /pound sign/.
+  Char
 pound = '\xa3'
 
 -- | The character used to render a /currency sign/ presented as @¤@.
-currency  :: Char  -- ^ A character that corresponds with the /currency sign/.
+currency ::
+  -- | A character that corresponds with the /currency sign/.
+  Char
 currency = '\xa4'
 
 -- | The character used to render a /yen sign/ presented as @¥@.
-yen
-  :: Char  -- ^ A character that corresponds with the /yen sign/.
+yen ::
+  -- | A character that corresponds with the /yen sign/.
+  Char
 yen = '\xa5'
 
 -- | The character used to render a /armenian dram sign/ presented as @֏@.
-armenianDram
-  :: Char  -- ^ A character that corresponds with the /armenian dram sign/.
+armenianDram ::
+  -- | A character that corresponds with the /armenian dram sign/.
+  Char
 armenianDram = '\x58f'
 
 -- | The character used to render a /afghani sign/ presented as @؋@.
-afghani
-  :: Char  -- ^ A character that corresponds with the /afghani sign/.
+afghani ::
+  -- | A character that corresponds with the /afghani sign/.
+  Char
 afghani = '\x60b'
 
 -- | The character used to render a /nko dorome sign/ presented as @߾@.
-nkoDorome
-  :: Char  -- ^ A character that corresponds with the /nko dorome sign/.
+nkoDorome ::
+  -- | A character that corresponds with the /nko dorome sign/.
+  Char
 nkoDorome = '\x7fe'
 
 -- | The character used to render a /nko taman sign/ presented as @߿@.
-nkoTaman
-  :: Char  -- ^ A character that corresponds with the /nko taman sign/.
+nkoTaman ::
+  -- | A character that corresponds with the /nko taman sign/.
+  Char
 nkoTaman = '\x7ff'
 
 -- | The character used to render a /bengali rupee mark/ presented as @৲@.
-bengaliRupeeMark
-  :: Char  -- ^ A character that corresponds with the /bengali rupee mark/.
+bengaliRupeeMark ::
+  -- | A character that corresponds with the /bengali rupee mark/.
+  Char
 bengaliRupeeMark = '\x9f2'
 
 -- | The character used to render a /bengali rupee sign/ presented as @৳@.
-bengaliRupee
-  :: Char  -- ^ A character that corresponds with the /bengali rupee sign/.
+bengaliRupee ::
+  -- | A character that corresponds with the /bengali rupee sign/.
+  Char
 bengaliRupee = '\x9f3'
 
 -- | The character used to render a /bengali ganda mark/ presented as @৻@.
-bengaliGandaMark
-  :: Char  -- ^ A character that corresponds with the /bengali ganda mark/.
+bengaliGandaMark ::
+  -- | A character that corresponds with the /bengali ganda mark/.
+  Char
 bengaliGandaMark = '\x9fb'
 
 -- | The character used to render a /gujarati rupee sign/ presented as @૱@.
-gujaratiRupee
-  :: Char  -- ^ A character that corresponds with the /gujarati rupee sign/.
+gujaratiRupee ::
+  -- | A character that corresponds with the /gujarati rupee sign/.
+  Char
 gujaratiRupee = '\xaf1'
 
 -- | The character used to render a /tamil rupee sign/ presented as @௹@.
-tamilRupee
-  :: Char  -- ^ A character that corresponds with the /tamil rupee sign/.
+tamilRupee ::
+  -- | A character that corresponds with the /tamil rupee sign/.
+  Char
 tamilRupee = '\xbf9'
 
 -- | The character used to render a /thai currency symbol baht/ presented as @฿@.
-thaiSymbolBaht
-  :: Char  -- ^ A character that corresponds with the /thai currency symbol baht/.
+thaiSymbolBaht ::
+  -- | A character that corresponds with the /thai currency symbol baht/.
+  Char
 thaiSymbolBaht = '\xe3f'
 
 -- | The character used to render a /khmer currency symbol riel/ presented as @៛@.
-khmerSymbolRiel
-  :: Char  -- ^ A character that corresponds with the /khmer currency symbol riel/.
+khmerSymbolRiel ::
+  -- | A character that corresponds with the /khmer currency symbol riel/.
+  Char
 khmerSymbolRiel = '\x17db'
 
 -- | The character used to render a /euro-currency sign/ presented as @₠@.
-euroCurrency
-  :: Char  -- ^ A character that corresponds with the /euro-currency sign/.
+euroCurrency ::
+  -- | A character that corresponds with the /euro-currency sign/.
+  Char
 euroCurrency = '\x20a0'
 
 -- | The character used to render a /colon sign/ presented as @₡@.
-colon
-  :: Char  -- ^ A character that corresponds with the /colon sign/.
+colon ::
+  -- | A character that corresponds with the /colon sign/.
+  Char
 colon = '\x20a1'
 
 -- | The character used to render a /cruzeiro sign/ presented as @₢@.
-cruzeiro
-  :: Char  -- ^ A character that corresponds with the /cruzeiro sign/.
+cruzeiro ::
+  -- | A character that corresponds with the /cruzeiro sign/.
+  Char
 cruzeiro = '\x20a2'
 
 -- | The character used to render a /french franc sign/ presented as @₣@.
-frenchFranc
-  :: Char  -- ^ A character that corresponds with the /french franc sign/.
+frenchFranc ::
+  -- | A character that corresponds with the /french franc sign/.
+  Char
 frenchFranc = '\x20a3'
 
 -- | The character used to render a /lira sign/ presented as @₤@.
-lira
-  :: Char  -- ^ A character that corresponds with the /lira sign/.
+lira ::
+  -- | A character that corresponds with the /lira sign/.
+  Char
 lira = '\x20a4'
 
 -- | The character used to render a /mill sign/ presented as @₥@.
-mill
-  :: Char  -- ^ A character that corresponds with the /mill sign/.
+mill ::
+  -- | A character that corresponds with the /mill sign/.
+  Char
 mill = '\x20a5'
 
 -- | The character used to render a /naira sign/ presented as @₦@.
-naira
-  :: Char  -- ^ A character that corresponds with the /naira sign/.
+naira ::
+  -- | A character that corresponds with the /naira sign/.
+  Char
 naira = '\x20a6'
 
 -- | The character used to render a /peseta sign/ presented as @₧@.
-peseta
-  :: Char  -- ^ A character that corresponds with the /peseta sign/.
+peseta ::
+  -- | A character that corresponds with the /peseta sign/.
+  Char
 peseta = '\x20a7'
 
 -- | The character used to render a /rupee sign/ presented as @₨@.
-rupee
-  :: Char  -- ^ A character that corresponds with the /rupee sign/.
+rupee ::
+  -- | A character that corresponds with the /rupee sign/.
+  Char
 rupee = '\x20a8'
 
 -- | The character used to render a /won sign/ presented as @₩@.
-won
-  :: Char  -- ^ A character that corresponds with the /won sign/.
+won ::
+  -- | A character that corresponds with the /won sign/.
+  Char
 won = '\x20a9'
 
 -- | The character used to render a /new sheqel sign/ presented as @₪@.
-newSheqel
-  :: Char  -- ^ A character that corresponds with the /new sheqel sign/.
+newSheqel ::
+  -- | A character that corresponds with the /new sheqel sign/.
+  Char
 newSheqel = '\x20aa'
 
 -- | The character used to render a /dong sign/ presented as @₫@.
-dong
-  :: Char  -- ^ A character that corresponds with the /dong sign/.
+dong ::
+  -- | A character that corresponds with the /dong sign/.
+  Char
 dong = '\x20ab'
 
 -- | The character used to render a /euro sign/ presented as @€@.
-euro
-  :: Char  -- ^ A character that corresponds with the /euro sign/.
+euro ::
+  -- | A character that corresponds with the /euro sign/.
+  Char
 euro = '\x20ac'
 
 -- | The character used to render a /kip sign/ presented as @₭@.
-kip
-  :: Char  -- ^ A character that corresponds with the /kip sign/.
+kip ::
+  -- | A character that corresponds with the /kip sign/.
+  Char
 kip = '\x20ad'
 
 -- | The character used to render a /tugrik sign/ presented as @₮@.
-tugrik
-  :: Char  -- ^ A character that corresponds with the /tugrik sign/.
+tugrik ::
+  -- | A character that corresponds with the /tugrik sign/.
+  Char
 tugrik = '\x20ae'
 
 -- | The character used to render a /drachma sign/ presented as @₯@.
-drachma
-  :: Char  -- ^ A character that corresponds with the /drachma sign/.
+drachma ::
+  -- | A character that corresponds with the /drachma sign/.
+  Char
 drachma = '\x20af'
 
 -- | The character used to render a /german penny sign/ presented as @₰@.
-germanPenny
-  :: Char  -- ^ A character that corresponds with the /german penny sign/.
+germanPenny ::
+  -- | A character that corresponds with the /german penny sign/.
+  Char
 germanPenny = '\x20b0'
 
 -- | The character used to render a /peso sign/ presented as @₱@.
-peso
-  :: Char  -- ^ A character that corresponds with the /peso sign/.
+peso ::
+  -- | A character that corresponds with the /peso sign/.
+  Char
 peso = '\x20b1'
 
 -- | The character used to render a /guarani sign/ presented as @₲@.
-guarani
-  :: Char  -- ^ A character that corresponds with the /guarani sign/.
+guarani ::
+  -- | A character that corresponds with the /guarani sign/.
+  Char
 guarani = '\x20b2'
 
 -- | The character used to render a /austral sign/ presented as @₳@.
-austral
-  :: Char  -- ^ A character that corresponds with the /austral sign/.
+austral ::
+  -- | A character that corresponds with the /austral sign/.
+  Char
 austral = '\x20b3'
 
 -- | The character used to render a /hryvnia sign/ presented as @₴@.
-hryvnia
-  :: Char  -- ^ A character that corresponds with the /hryvnia sign/.
+hryvnia ::
+  -- | A character that corresponds with the /hryvnia sign/.
+  Char
 hryvnia = '\x20b4'
 
 -- | The character used to render a /cedi sign/ presented as @₵@.
-cedi
-  :: Char  -- ^ A character that corresponds with the /cedi sign/.
+cedi ::
+  -- | A character that corresponds with the /cedi sign/.
+  Char
 cedi = '\x20b5'
 
 -- | The character used to render a /livre tournois sign/ presented as @₶@.
-livreTournois
-  :: Char  -- ^ A character that corresponds with the /livre tournois sign/.
+livreTournois ::
+  -- | A character that corresponds with the /livre tournois sign/.
+  Char
 livreTournois = '\x20b6'
 
 -- | The character used to render a /spesmilo sign/ presented as @₷@.
-spesmilo
-  :: Char  -- ^ A character that corresponds with the /spesmilo sign/.
+spesmilo ::
+  -- | A character that corresponds with the /spesmilo sign/.
+  Char
 spesmilo = '\x20b7'
 
 -- | The character used to render a /tenge sign/ presented as @₸@.
-tenge
-  :: Char  -- ^ A character that corresponds with the /tenge sign/.
+tenge ::
+  -- | A character that corresponds with the /tenge sign/.
+  Char
 tenge = '\x20b8'
 
 -- | The character used to render a /indian rupee sign/ presented as @₹@.
-indianRupee
-  :: Char  -- ^ A character that corresponds with the /indian rupee sign/.
+indianRupee ::
+  -- | A character that corresponds with the /indian rupee sign/.
+  Char
 indianRupee = '\x20b9'
 
 -- | The character used to render a /turkish lira sign/ presented as @₺@.
-turkishLira
-  :: Char  -- ^ A character that corresponds with the /turkish lira sign/.
+turkishLira ::
+  -- | A character that corresponds with the /turkish lira sign/.
+  Char
 turkishLira = '\x20ba'
 
 -- | The character used to render a /nordic mark sign/ presented as @₻@.
-nordicMark
-  :: Char  -- ^ A character that corresponds with the /nordic mark sign/.
+nordicMark ::
+  -- | A character that corresponds with the /nordic mark sign/.
+  Char
 nordicMark = '\x20bb'
 
 -- | The character used to render a /manat sign/ presented as @₼@.
-manat
-  :: Char  -- ^ A character that corresponds with the /manat sign/.
+manat ::
+  -- | A character that corresponds with the /manat sign/.
+  Char
 manat = '\x20bc'
 
 -- | The character used to render a /ruble sign/ presented as @₽@.
-ruble
-  :: Char  -- ^ A character that corresponds with the /ruble sign/.
+ruble ::
+  -- | A character that corresponds with the /ruble sign/.
+  Char
 ruble = '\x20bd'
 
 -- | The character used to render a /lari sign/ presented as @₾@.
-lari
-  :: Char  -- ^ A character that corresponds with the /lari sign/.
+lari ::
+  -- | A character that corresponds with the /lari sign/.
+  Char
 lari = '\x20be'
 
 -- | The character used to render a /bitcoin sign/ presented as @₿@.
-bitcoin
-  :: Char  -- ^ A character that corresponds with the /bitcoin sign/.
+bitcoin ::
+  -- | A character that corresponds with the /bitcoin sign/.
+  Char
 bitcoin = '\x20bf'
 
 -- | The character used to render a /north indic rupee mark/ presented as @꠸@.
-northIndicRupeeMark
-  :: Char  -- ^ A character that corresponds with the /north indic rupee mark/.
+northIndicRupeeMark ::
+  -- | A character that corresponds with the /north indic rupee mark/.
+  Char
 northIndicRupeeMark = '\xa838'
 
 -- | The character used to render a /rial sign/ presented as @﷼@.
-rial
-  :: Char  -- ^ A character that corresponds with the /rial sign/.
+rial ::
+  -- | A character that corresponds with the /rial sign/.
+  Char
 rial = '\xfdfc'
 
 -- | The character used to render a /small dollar sign/ presented as @﹩@.
-smallDollar
-  :: Char  -- ^ A character that corresponds with the /small dollar sign/.
+smallDollar ::
+  -- | A character that corresponds with the /small dollar sign/.
+  Char
 smallDollar = '\xfe69'
 
 -- | The character used to render a /fullwidth dollar sign/ presented as @＄@.
-fullwidthDollar
-  :: Char  -- ^ A character that corresponds with the /fullwidth dollar sign/.
+fullwidthDollar ::
+  -- | A character that corresponds with the /fullwidth dollar sign/.
+  Char
 fullwidthDollar = '\xff04'
 
 -- | The character used to render a /fullwidth cent sign/ presented as @￠@.
-fullwidthCent
-  :: Char  -- ^ A character that corresponds with the /fullwidth cent sign/.
+fullwidthCent ::
+  -- | A character that corresponds with the /fullwidth cent sign/.
+  Char
 fullwidthCent = '\xffe0'
 
 -- | The character used to render a /fullwidth pound sign/ presented as @￡@.
-fullwidthPound
-  :: Char  -- ^ A character that corresponds with the /fullwidth pound sign/.
+fullwidthPound ::
+  -- | A character that corresponds with the /fullwidth pound sign/.
+  Char
 fullwidthPound = '\xffe1'
 
 -- | The character used to render a /fullwidth yen sign/ presented as @￥@.
-fullwidthYen
-  :: Char  -- ^ A character that corresponds with the /fullwidth yen sign/.
+fullwidthYen ::
+  -- | A character that corresponds with the /fullwidth yen sign/.
+  Char
 fullwidthYen = '\xffe5'
 
 -- | The character used to render a /fullwidth won sign/ presented as @￦@.
-fullwidthWon
-  :: Char  -- ^ A character that corresponds with the /fullwidth won sign/.
+fullwidthWon ::
+  -- | A character that corresponds with the /fullwidth won sign/.
+  Char
 fullwidthWon = '\xffe6'
 
 -- | The character used to render a /tamil sign kaacu/ presented as @𑿝@.
-tamilKaacu
-  :: Char  -- ^ A character that corresponds with the /tamil sign kaacu/.
+tamilKaacu ::
+  -- | A character that corresponds with the /tamil sign kaacu/.
+  Char
 tamilKaacu = '\x11fdd'
 
 -- | The character used to render a /tamil sign panam/ presented as @𑿞@.
-tamilPanam
-  :: Char  -- ^ A character that corresponds with the /tamil sign panam/.
+tamilPanam ::
+  -- | A character that corresponds with the /tamil sign panam/.
+  Char
 tamilPanam = '\x11fde'
 
 -- | The character used to render a /tamil sign pon/ presented as @𑿟@.
-tamilPon
-  :: Char  -- ^ A character that corresponds with the /tamil sign pon/.
+tamilPon ::
+  -- | A character that corresponds with the /tamil sign pon/.
+  Char
 tamilPon = '\x11fdf'
 
 -- | The character used to render a /tamil sign varaakan/ presented as @𑿠@.
-tamilVaraakan
-  :: Char  -- ^ A character that corresponds with the /tamil sign varaakan/.
+tamilVaraakan ::
+  -- | A character that corresponds with the /tamil sign varaakan/.
+  Char
 tamilVaraakan = '\x11fe0'
 
 -- | The character used to render a /wancho ngun sign/ presented as @𞋿@.
-wanchoNgun
-  :: Char  -- ^ A character that corresponds with the /wancho ngun sign/.
+wanchoNgun ::
+  -- | A character that corresponds with the /wancho ngun sign/.
+  Char
 wanchoNgun = '\x1e2ff'
 
 -- | The character used to render a /indic siyaq rupee mark/ presented as @𞲰@.
-indicSiyaqRupeeMark
-  :: Char  -- ^ A character that corresponds with the /indic siyaq rupee mark/.
+indicSiyaqRupeeMark ::
+  -- | A character that corresponds with the /indic siyaq rupee mark/.
+  Char
 indicSiyaqRupeeMark = '\x1ecb0'

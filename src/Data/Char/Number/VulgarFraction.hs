@@ -1,60 +1,73 @@
-{-# LANGUAGE Safe, TupleSections #-}
+{-# LANGUAGE Safe #-}
+{-# LANGUAGE TupleSections #-}
 
-{-|
-Module      : Data.Char.Number.VulgarFraction
-Description : A module used to render vulgar fractions with Unicode.
-Maintainer  : hapytexeu+gh@gmail.com
-Stability   : experimental
-Portability : POSIX
+-- |
+-- Module      : Data.Char.Number.VulgarFraction
+-- Description : A module used to render vulgar fractions with Unicode.
+-- Maintainer  : hapytexeu+gh@gmail.com
+-- Stability   : experimental
+-- Portability : POSIX
+--
+-- Uncode has two blocks where vulgar fractions are defined: <https://www.unicode.org/charts/PDF/U0080.pdf C1 controls and latin supplement 1> and
+-- <https://www.unicode.org/charts/PDF/U2150.pdf Number forms>. These are fractions that are commenly used.
+--
+-- The module exports function 'toVulgar' and 'ratioToVulgar' to convert the ratio to a 'Char' with that fraction if that exists. The
+-- functon 'ratioToVulgarFallback' and 'ratioToVulgarFallback' are used to try to find a vulgar fraction character, and if that fails,
+-- it prints the fraction with the help of the 'Data.Char.Small' module.
+module Data.Char.Number.VulgarFraction
+  ( -- * Render to a vulgar fraction
+    ratioToVulgar,
+    toVulgar,
 
-Uncode has two blocks where vulgar fractions are defined: <https://www.unicode.org/charts/PDF/U0080.pdf C1 controls and latin supplement 1> and
-<https://www.unicode.org/charts/PDF/U2150.pdf Number forms>. These are fractions that are commenly used.
-
-The module exports function 'toVulgar' and 'ratioToVulgar' to convert the ratio to a 'Char' with that fraction if that exists. The
-functon 'ratioToVulgarFallback' and 'ratioToVulgarFallback' are used to try to find a vulgar fraction character, and if that fails,
-it prints the fraction with the help of the 'Data.Char.Small' module.
--}
-
-
-module Data.Char.Number.VulgarFraction (
-    -- * Render to a vulgar fraction
-    ratioToVulgar, toVulgar
     -- * Try to parse a vulgar fraction
-  , fromVulgar, fromVulgarToRatio
+    fromVulgar,
+    fromVulgarToRatio,
+
     -- * Render to a vulgar fraction, with a fallback to using small characters
-  , ratioToVulgarFallback, toVulgarFallback
+    ratioToVulgarFallback,
+    toVulgarFallback,
+
     -- * Convert 'Text' to a vulgar fraction or fallback on a 'Text' that contains a numerator and denominator as a sequence of characters
-  , fromVulgarFallback, fromVulgarFallbackToRatio
-  ) where
+    fromVulgarFallback,
+    fromVulgarFallbackToRatio,
+  )
+where
 
-import Control.Applicative((<|>))
-
-import Data.Ratio(Ratio, numerator, denominator, (%))
-import Data.Text(Text, cons, singleton, unpack)
-
-import Text.Read(readMaybe)
-
-import Data.Char.Small(asSub', fromSubSup, ratioPartsToUnicode', unicodeToRatioParts)
+import Control.Applicative ((<|>))
+import Data.Char.Small (asSub', fromSubSup, ratioPartsToUnicode', unicodeToRatioParts)
+import Data.Ratio (Ratio, denominator, numerator, (%))
+import Data.Text (Text, cons, singleton, unpack)
+import Text.Read (readMaybe)
 
 -- | Convert the given 'Ratio' item to a vulgar fraction character, if such character exists; 'Nothing' otherwise.
-ratioToVulgar :: Integral i
-  => Ratio i  -- ^ The 'Ratio' for which we try to find the corresponding 'Char'acter.
-  -> Maybe Char -- ^ The corresponding 'Char'acter wrapped in a 'Just' if such character exists; 'Nothing' otherwise.
+ratioToVulgar ::
+  Integral i =>
+  -- | The 'Ratio' for which we try to find the corresponding 'Char'acter.
+  Ratio i ->
+  -- | The corresponding 'Char'acter wrapped in a 'Just' if such character exists; 'Nothing' otherwise.
+  Maybe Char
 ratioToVulgar r = toVulgar (numerator r) (denominator r)
 
 -- | Convert the given 'Ratio' to a singleton 'Text' with the vulgar fraction character,
 -- if such character exists; it will make ue of the 'ratioPartsToUnicode'' to generate a 'Text'
 -- object (with multiple 'Char'acters) that looks like a fraction.
-ratioToVulgarFallback :: Integral i
-  => Ratio i  -- ^ The given 'Ratio' to convert.
-  -> Text  -- ^ A 'Text' object with a single 'Char'acter if a vulgar fraction character exists; otherwise a 'Text' object created by 'ratioPartsToUnicode''.
+ratioToVulgarFallback ::
+  Integral i =>
+  -- | The given 'Ratio' to convert.
+  Ratio i ->
+  -- | A 'Text' object with a single 'Char'acter if a vulgar fraction character exists; otherwise a 'Text' object created by 'ratioPartsToUnicode''.
+  Text
 ratioToVulgarFallback nd = toVulgarFallback (numerator nd) (denominator nd)
 
 -- | Convert the given /numerator/ den /denominator/ to a vulgar fraction character, if such character exists; 'Nothing' otherwise.
-toVulgar :: (Integral i, Integral j)
-  => i  -- ^ The given numerator.
-  -> j  -- ^ The given denominator.
-  -> Maybe Char -- ^ The corresponding 'Char'acter wrapped in a 'Just' if such character exists; 'Nothing' otherwise.
+toVulgar ::
+  (Integral i, Integral j) =>
+  -- | The given numerator.
+  i ->
+  -- | The given denominator.
+  j ->
+  -- | The corresponding 'Char'acter wrapped in a 'Just' if such character exists; 'Nothing' otherwise.
+  Maybe Char
 toVulgar 1 4 = Just '\x00bc'
 toVulgar 1 2 = Just '\x00bd'
 toVulgar 3 4 = Just '\x00be'
@@ -73,25 +86,33 @@ toVulgar 1 8 = Just '\x215b'
 toVulgar 3 8 = Just '\x215c'
 toVulgar 5 8 = Just '\x215d'
 toVulgar 7 8 = Just '\x215e'
-toVulgar 0 3 = Just '\x2189'  -- used in baseball
+toVulgar 0 3 = Just '\x2189' -- used in baseball
 toVulgar _ _ = Nothing
 
 -- | Convert the given numerator and denominator to a singleton 'Text' with the vulgar fraction character,
 -- if such character exists; it will make ue of the 'ratioPartsToUnicode'' to generate a 'Text'
 -- object (with multiple 'Char'acters) that looks like a fraction.
-toVulgarFallback :: (Integral i, Integral j)
-  => i  -- ^ The given /numerator/.
-  -> j  -- ^ The given /denominator/.
-  -> Text  -- ^ A 'Text' object with a single 'Char'acter if a vulgar fraction character exists; otherwise a 'Text' object created by 'ratioPartsToUnicode''.
+toVulgarFallback ::
+  (Integral i, Integral j) =>
+  -- | The given /numerator/.
+  i ->
+  -- | The given /denominator/.
+  j ->
+  -- | A 'Text' object with a single 'Char'acter if a vulgar fraction character exists; otherwise a 'Text' object created by 'ratioPartsToUnicode''.
+  Text
 toVulgarFallback i j = maybe (go i j) singleton (toVulgar i j)
-  where go 1 d | d > 0 = cons '\x215f' ( asSub' d)
-        go n d = ratioPartsToUnicode' n d
+  where
+    go 1 d | d > 0 = cons '\x215f' (asSub' d)
+    go n d = ratioPartsToUnicode' n d
 
 -- | Try to convert a given 'Char', if it is a /vulgar fraction/, to a 2-tuple with the numerator and denominator. Returns 'Nothing' if the 'Char'
 -- is not a vulgar fraction character.
-fromVulgar :: (Integral i, Integral j)
-  => Char  -- ^ The character to decode.
-  -> Maybe (i, j)  -- ^ The numerator and denominator wrapped in a 'Just' if the character is a vulgar fraction, 'Nothing' otherwise.
+fromVulgar ::
+  (Integral i, Integral j) =>
+  -- | The character to decode.
+  Char ->
+  -- | The numerator and denominator wrapped in a 'Just' if the character is a vulgar fraction, 'Nothing' otherwise.
+  Maybe (i, j)
 fromVulgar '\x00bc' = Just (1, 4)
 fromVulgar '\x00bd' = Just (1, 2)
 fromVulgar '\x00be' = Just (3, 4)
@@ -110,28 +131,38 @@ fromVulgar '\x215b' = Just (1, 8)
 fromVulgar '\x215c' = Just (3, 8)
 fromVulgar '\x215d' = Just (5, 8)
 fromVulgar '\x215e' = Just (7, 8)
-fromVulgar '\x2189' = Just (0, 3)  -- used in baseball
+fromVulgar '\x2189' = Just (0, 3) -- used in baseball
 fromVulgar _ = Nothing
 
 -- | Try to convert the given 'Char', if it is a /vulgar fraction/, to a 'Ratio' object. Returns 'Nothing' if the 'Char' is not a vulgar fraction character.
-fromVulgarToRatio :: Integral i
-  => Char  -- ^ The character to decode.
-  -> Maybe (Ratio i)  -- ^ The corresponding 'Ratio' wrapped in a 'Just' if the ratio is a vulgar fraction, 'Nothing' otherwise.
+fromVulgarToRatio ::
+  Integral i =>
+  -- | The character to decode.
+  Char ->
+  -- | The corresponding 'Ratio' wrapped in a 'Just' if the ratio is a vulgar fraction, 'Nothing' otherwise.
+  Maybe (Ratio i)
 fromVulgarToRatio = fmap (uncurry (%)) . fromVulgar
 
 -- | Try to parse the text as a /vulgar fraction/ and fallback on the 'unicodeToRatioParts' function to parse it as a fraction.
-fromVulgarFallback :: (Read i, Integral i, Read j, Integral j)
-  => Text  -- ^ The 'Text' we try to decode as a (vulgar) fraction.
-  -> Maybe (i, j)  -- ^ A 2-tuple with the numerator and denominator wrapped in a 'Just' if the 'Text' can be parsed, 'Nothing' otherwise.
+fromVulgarFallback ::
+  (Read i, Integral i, Read j, Integral j) =>
+  -- | The 'Text' we try to decode as a (vulgar) fraction.
+  Text ->
+  -- | A 2-tuple with the numerator and denominator wrapped in a 'Just' if the 'Text' can be parsed, 'Nothing' otherwise.
+  Maybe (i, j)
 fromVulgarFallback d = _attm0 d' <|> _attm1 d' <|> unicodeToRatioParts d
-  where d' = unpack d
-        _attm0 [d0] = fromVulgar d0
-        _attm0 _ = Nothing
-        _attm1 ('\x215f':ds) = (1,) <$> readMaybe (map fromSubSup ds)
-        _attm1 _ = Nothing
+  where
+    d' = unpack d
+    _attm0 [d0] = fromVulgar d0
+    _attm0 _ = Nothing
+    _attm1 ('\x215f' : ds) = (1,) <$> readMaybe (map fromSubSup ds)
+    _attm1 _ = Nothing
 
 -- | Try to parse the text as a /vulgar fraction/ and fallback on the 'unicodeToRatioParts' function to parse it as a fraction.
-fromVulgarFallbackToRatio :: (Read i, Integral i)
-  => Text  -- ^ The 'Text' we try to decode as a (vulgar) fraction.
-  -> Maybe (Ratio i)  -- ^ The parsed 'Ratio' wrapped in a 'Just' if the 'Text' can be parsed, 'Nothing' otherwise.
+fromVulgarFallbackToRatio ::
+  (Read i, Integral i) =>
+  -- | The 'Text' we try to decode as a (vulgar) fraction.
+  Text ->
+  -- | The parsed 'Ratio' wrapped in a 'Just' if the 'Text' can be parsed, 'Nothing' otherwise.
+  Maybe (Ratio i)
 fromVulgarFallbackToRatio = fmap (uncurry (%)) . fromVulgarFallback

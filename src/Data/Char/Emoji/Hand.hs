@@ -1,54 +1,82 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, OverloadedStrings, PatternSynonyms, Safe, TypeApplications #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE Safe #-}
+{-# LANGUAGE TypeApplications #-}
 
-{-|
-Module      : Data.Char.Emoji.Hand
-Description : A module that provides Emojis about hands and fingers.
-Maintainer  : hapytexeu+gh@gmail.com
-Stability   : experimental
-Portability : POSIX
-
-Unicode has emoji's for hands. In this module we make it more convenient
-to render hand gestures with a specific skin color.
--}
-
-module Data.Char.Emoji.Hand (
-    SingleCharHandGesture(
-        WavingHand, RaisedBackOfHand, RaisedHand, VulcanSalute, OkHandSign
-      , PinchedFingers, PinchingHand, CrossedFingers, LoveYouGesture, SignOfTheHorns, CallMeHand
-    ),
+-- |
+-- Module      : Data.Char.Emoji.Hand
+-- Description : A module that provides Emojis about hands and fingers.
+-- Maintainer  : hapytexeu+gh@gmail.com
+-- Stability   : experimental
+-- Portability : POSIX
+--
+-- Unicode has emoji's for hands. In this module we make it more convenient
+-- to render hand gestures with a specific skin color.
+module Data.Char.Emoji.Hand
+  ( SingleCharHandGesture
+      ( WavingHand,
+        RaisedBackOfHand,
+        RaisedHand,
+        VulcanSalute,
+        OkHandSign,
+        PinchedFingers,
+        PinchingHand,
+        CrossedFingers,
+        LoveYouGesture,
+        SignOfTheHorns,
+        CallMeHand
+      ),
     MultiCharHandGesture,
-    pattern FingersCrossed, pattern SpockHand, pattern HornsSign
-  ) where
+    pattern FingersCrossed,
+    pattern SpockHand,
+    pattern HornsSign,
+  )
+where
 
-import Control.DeepSeq(NFData)
-
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, isInCharRange), UnicodeText(toUnicodeText, fromUnicodeText, isInTextRange), generateIsInTextRange')
-import Data.Char.Emoji.SkinColor(WithSkinColorModifierUnicodeText)
-import Data.Data(Data)
-import Data.Hashable(Hashable)
-
-import GHC.Generics(Generic)
-
-import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
+import Control.DeepSeq (NFData)
+import Data.Char.Core (UnicodeCharacter (fromUnicodeChar, isInCharRange, toUnicodeChar), UnicodeText (fromUnicodeText, isInTextRange, toUnicodeText), generateIsInTextRange')
+import Data.Char.Emoji.SkinColor (WithSkinColorModifierUnicodeText)
+import Data.Data (Data)
+import Data.Hashable (Hashable)
+import GHC.Generics (Generic)
+import Test.QuickCheck.Arbitrary (Arbitrary (arbitrary), arbitraryBoundedEnum)
 
 -- | A datatype that constructs /hand gestures/ that correspond with a /single/ 'Char'acter.
 data SingleCharHandGesture
-  = WavingHand  -- ^ A waving hand, this is denoted with 👋.
-  | RaisedBackOfHand  -- ^ The raised back of a hand, this is denoted with 🤚.
-  | RaisedHand  -- ^ A raised hand, this is denoted with ✋.
-  | VulcanSalute  -- ^ The /Vulcan/ salute, this is denoted with 🖖.
-  | OkHandSign  -- ^ The okay hand sign, this is denoted with 👌.
-  | PinchedFingers  -- ^  The /pinched fingers/ gesture, this is denoted with 🤌.
-  | PinchingHand  -- ^ The /pinching hand/ gesture, this is denoted with 🤏.
-  | CrossedFingers  -- ^ The /crossed fingers/ gesture, this is denoted with 🤞.
-  | LoveYouGesture  -- ^ The /love you/ gesture, this is denoted with 🤟.
-  | SignOfTheHorns  -- ^ The sign of the horns, this is denoted with 🤘.
-  | CallMeHand  -- ^ The /call me/ hand sign, this is denoted with 🤙.
-  | MiddleFinger  -- ^ A middle finger pointing up, this is denoted with 🖕.
-  | ThumbsUp  -- ^ An emoji where the thumb is pointing upwards, this is denoted with 👍.
-  | ThumbsDown  -- ^ An emoji where the thumb is pointing downwards, this is denoted with 👎.
-  | RaisedFist  -- ^ An emoji where the fist is rased, this is denoted with ✊.
-  | FistedHand  -- ^ An emoji of a fisted hand, this is denoted with 👊.
+  = -- | A waving hand, this is denoted with 👋.
+    WavingHand
+  | -- | The raised back of a hand, this is denoted with 🤚.
+    RaisedBackOfHand
+  | -- | A raised hand, this is denoted with ✋.
+    RaisedHand
+  | -- | The /Vulcan/ salute, this is denoted with 🖖.
+    VulcanSalute
+  | -- | The okay hand sign, this is denoted with 👌.
+    OkHandSign
+  | -- |  The /pinched fingers/ gesture, this is denoted with 🤌.
+    PinchedFingers
+  | -- | The /pinching hand/ gesture, this is denoted with 🤏.
+    PinchingHand
+  | -- | The /crossed fingers/ gesture, this is denoted with 🤞.
+    CrossedFingers
+  | -- | The /love you/ gesture, this is denoted with 🤟.
+    LoveYouGesture
+  | -- | The sign of the horns, this is denoted with 🤘.
+    SignOfTheHorns
+  | -- | The /call me/ hand sign, this is denoted with 🤙.
+    CallMeHand
+  | -- | A middle finger pointing up, this is denoted with 🖕.
+    MiddleFinger
+  | -- | An emoji where the thumb is pointing upwards, this is denoted with 👍.
+    ThumbsUp
+  | -- | An emoji where the thumb is pointing downwards, this is denoted with 👎.
+    ThumbsDown
+  | -- | An emoji where the fist is rased, this is denoted with ✊.
+    RaisedFist
+  | -- | An emoji of a fisted hand, this is denoted with 👊.
+    FistedHand
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary SingleCharHandGesture where
@@ -110,7 +138,6 @@ instance UnicodeCharacter SingleCharHandGesture where
   isInCharRange '\x1f44a' = True
   isInCharRange _ = False
 
-
 instance UnicodeText SingleCharHandGesture where
   isInTextRange = generateIsInTextRange' @SingleCharHandGesture
 
@@ -118,8 +145,10 @@ instance WithSkinColorModifierUnicodeText SingleCharHandGesture
 
 -- | Emoji with hands that map on a /sequence/ of characters instead of one character.
 data MultiCharHandGesture
-  = RaisedHandWithFingersSplayed  -- ^ The raised hand with fingers splayed emoji, this is denoted as 🖐️.
-  | VictoryHand  -- ^ The /victory hand/ emoji, this is denoted as ✌️.
+  = -- | The raised hand with fingers splayed emoji, this is denoted as 🖐️.
+    RaisedHandWithFingersSplayed
+  | -- | The /victory hand/ emoji, this is denoted as ✌️.
+    VictoryHand
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary MultiCharHandGesture where
