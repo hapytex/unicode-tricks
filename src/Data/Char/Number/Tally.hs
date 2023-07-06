@@ -47,7 +47,7 @@ instance UnicodeCharacter TallyLiteral where
   toUnicodeChar = mapFromEnum _tallyOffset
   fromUnicodeChar = mapToEnumSafe _tallyOffset
   fromUnicodeChar' = mapToEnum _tallyOffset
-  isInCharRange c = '\x2160' <= c && c <= '\x216f'
+  isInCharRange c = '\x1d377' <= c && c <= '\x1d378'
 
 instance UnicodeText TallyLiteral where
   isInTextRange = generateIsInTextRange' @TallyLiteral
@@ -57,91 +57,19 @@ instance Hashable TallyLiteral
 instance NFData TallyLiteral
 
 
+-- | Convert a given /positive/ natural number to a sequence of
 toLiterals :: Integral i
-  -> i  -- ^ The given number to convert.
-  -> Maybe [TallyLiteral]  -- ^ A list of 'TallyLiteral's if the given number can be specified
-                          -- with Roman numerals, 'Nothing' otherwise.
+  => i  -- ^ The given number to convert.
+  -> Maybe [TallyLiteral]  -- ^ A list of 'TallyLiteral's if the given number can be specified with tally marks, 'Nothing' otherwise.
 toLiterals k
     | k > 0 = Just (genericReplicate k0 V ++ genericReplicate k1 I)
     | otherwise = Nothing
     where ~(k0, k1) = k `divMod` 5
 
--- | Convert the given 'TallyLiteral' object to a unicode character in
--- /upper case/.
-romanLiteral
-  :: TallyLiteral  -- ^ The given 'TallyLiteral' to convert.
-  -> Char  -- ^ A unicode character that represents the given 'TallyLiteral'.
-romanLiteral = _romanLiteral _tallyOffset
-
--- | Convert the given 'TallyLiteral' object to a unicode character in
--- /lower case/.
-romanLiteral'
-  :: TallyLiteral  -- ^ The given 'TallyLiteral' to convert.
-  -> Char  -- ^ A unicode character that represents the given 'TallyLiteral'.
-romanLiteral' = _romanLiteral _romanLowercaseOffset
-
-_romanNumeral :: (TallyLiteral -> Char) -> [TallyLiteral] -> Text
-_romanNumeral = (`foldr` empty) . (cons .)
-
--- | Convert a sequence of 'TallyLiteral' objects to a 'Text' object that
--- contains a sequence of corresponding Unicode characters which are Roman
--- numberals in /upper case/.
-romanNumeral
-  :: [TallyLiteral]  -- ^ The given list of 'TallyLiteral' objects to convert to a Unicode equivalent.
-  -> Text  -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'TallyLiteral's.
-romanNumeral = _romanNumeral romanLiteral
-
-
--- | Convert a sequence of 'TallyLiteral' objects to a 'Text' object that
--- contains a sequence of corresponding Unicode characters which are Roman
--- numberals in /lower case/.
-romanNumeral'
-  :: [TallyLiteral]  -- ^ The given list of 'TallyLiteral' objects to convert to a Unicode equivalent.
-  -> Text  -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'TallyLiteral's.
-romanNumeral' = _romanNumeral romanLiteral'
-
--- | Convert a sequence of 'TallyLiteral' objects to a 'Text' object that
--- contains a sequence of corresponding Unicode characters which are Roman
--- numberals in /upper case/ or /lower case/ depending on the 'LetterCase' value.
-romanNumeralCase
-  :: LetterCase  -- ^ The given 'LetterCase' to apply.
-  -> [TallyLiteral]  -- ^ The given list of 'TallyLiteral' objects to convert to a Unicode equivalent.
-  -> Text  -- ^ A 'Text' object that contains a sequence of unicode characters that represents the 'TallyLiteral's.
-romanNumeralCase = splitLetterCase romanNumeral romanNumeral'
-
-_romanNumber :: Integral i => ([TallyLiteral] -> a) -> RomanStyle -> Ligate -> i -> Maybe a
-_romanNumber f r c = fmap f . toLiterals r c
-
 -- | Convert a given number to a 'Text' wrapped in a 'Just' data constructor,
 -- given the number, given it can be represented. 'Nothing' in case it can not
 -- be represented. The number is written in Roman numerals in /upper case/.
-romanNumber :: Integral i
-  => RomanStyle  -- ^ Specifies if the Numeral is 'Additive' or 'Subtractive' style.
-  -> Ligate  -- ^ Specifies if characters like @ⅠⅤ@ are joined to @Ⅳ@.
-  -> i  -- ^ The given number to convert.
-  -> Maybe Text  -- ^ A 'Text' if the given number can be specified with Roman
+-- tallyMarks :: Integral i
+--   -> i  -- ^ The given number to convert.
+--   -> Maybe Text  -- ^ A 'Text' if the given number can be specified with Roman
                 -- numerals wrapped in a 'Just', 'Nothing' otherwise.
-romanNumber = _romanNumber romanNumeral
-
--- | Convert a given number to a 'Text' wrapped in a 'Just' data constructor,
--- given the number, given it can be represented. 'Nothing' in case it can not
--- be represented. The number is written in Roman numerals in /lower case/.
-romanNumber' :: Integral i
-  => RomanStyle  -- ^ Specifies if the Numeral is 'Additive' or 'Subtractive' style.
-  -> Ligate  -- ^ Specifies if characters like @ⅠⅤ@ are joined to @Ⅳ@.
-  -> i  -- ^ The given number to convert.
-  -> Maybe Text  -- ^ A 'Text' if the given number can be specified with Roman
-                -- numerals wrapped in a 'Just', 'Nothing' otherwise.
-romanNumber' = _romanNumber romanNumeral'
-
--- | Convert a given number to a 'Text' wrapped in a 'Just' data constructor,
--- given the number, given it can be represented. 'Nothing' in case it can not
--- be represented. The number is written in Roman numerals in /upper case/ or
--- /lower case/ depending on the 'LetterCase' value.
-romanNumberCase :: Integral i
-  => LetterCase
-  -> RomanStyle
-  -> Ligate
-  -> i
-  -> Maybe Text
-romanNumberCase = splitLetterCase romanNumber romanNumber'

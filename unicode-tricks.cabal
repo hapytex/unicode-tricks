@@ -125,6 +125,7 @@ test-suite             utricks
     , Data.Char.MathSpec
     , Data.Char.Number.MayanSpec
     , Data.Char.Number.RomanSpec
+    , Data.Char.Number.TallySpec
     , Data.Char.Private.KlingonSpec
     , Data.Char.TagSpec
   build-depends:
