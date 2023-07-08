@@ -34,6 +34,7 @@ Currently the package contains the following modules:
  - **`Data.Char.Number.Mayan`**: a module to render [Mayan numerals](https://en.wikipedia.org/wiki/Maya_numerals);
  - **`Data.Char.Number.Roman`**: a module to render [Roman numerals](https://en.wikipedia.org/wiki/Roman_numerals);
  - **`Data.Char.Number.Segmented`**: a module to render numbers on a [seven-segment display](https://en.wikipedia.org/wiki/Seven-segment_display);
+ - **`Data.Char.Number.Tally`**: a module to render [(Western) tally marks](https://en.wikipedia.org/wiki/Tally_marks);
  - **`Data.Char.Number.VulgarFraction`**: a module to use *vulgar fractions* defined in the Unicode standard;
  - **`Data.Char.Private`**: characters belonging to the *private usage area*;
  - **`Data.Char.Private.Klingon`**: Klingon script characters;
