@@ -1,71 +1,314 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, PatternSynonyms, OverloadedStrings, Safe #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE Safe #-}
 
-{-|
-Module      : Data.Char.Emoji.Core
-Description : A module that defines the /flag/ Emoji.
-Maintainer  : hapytexeu+gh@gmail.com
-Stability   : experimental
-Portability : POSIX
+-- |
+-- Module      : Data.Char.Emoji.Core
+-- Description : A module that defines the /flag/ Emoji.
+-- Maintainer  : hapytexeu+gh@gmail.com
+-- Stability   : experimental
+-- Portability : POSIX
+--
+-- A module that defines the /flag/ emoji. There are basically three types of flags:
+-- flags for nations, flags for subnations (like England, Scotland and Wales); and
+-- 'ExtraFlag's that contain a list of flags used for occassions and political purposes.
+module Data.Char.Emoji.Flag
+  ( -- * Flag emoji
+    Flag,
+    flag,
+    flag',
+    flagChars,
+    iso3166Alpha2ToFlag,
+    iso3166Alpha2ToFlag',
+    validFlagEmoji,
 
-A module that defines the /flag/ emoji. There are basically three types of flags:
-flags for nations, flags for subnations (like England, Scotland and Wales); and
-'ExtraFlag's that contain a list of flags used for occassions and political purposes.
--}
-
-module Data.Char.Emoji.Flag (
-    -- * Flag emoji
-    Flag, flag, flag', flagChars
-  , iso3166Alpha2ToFlag, iso3166Alpha2ToFlag', validFlagEmoji
     -- * Subregional flag emoji
-  , SubFlag
-  , ExtraFlag(ChequeredFlag, TriangularFlagOnPost, CrossedFlags, BlackFlag, WavingWhiteFlag, RainbowFlag, TransgenderFlag, PirateFlag)
+    SubFlag,
+    ExtraFlag (ChequeredFlag, TriangularFlagOnPost, CrossedFlags, BlackFlag, WavingWhiteFlag, RainbowFlag, TransgenderFlag, PirateFlag),
+
     -- * Pattern symbols for 'Flag's
-  , pattern AC, pattern AD, pattern AE, pattern AF, pattern AG, pattern AI, pattern AL, pattern AM, pattern AO, pattern AQ, pattern AR
-  , pattern AS, pattern AT, pattern AU, pattern AW, pattern AX, pattern AZ, pattern BA, pattern BB, pattern BD, pattern BE, pattern BF
-  , pattern BG, pattern BH, pattern BI, pattern BJ, pattern BL, pattern BM, pattern BN, pattern BO, pattern BQ, pattern BR, pattern BS
-  , pattern BT, pattern BV, pattern BW, pattern BY, pattern BZ, pattern CA, pattern CC, pattern CD, pattern CF, pattern CG, pattern CH
-  , pattern CI, pattern CK, pattern CL, pattern CM, pattern CN, pattern CO, pattern CP, pattern CR, pattern CU, pattern CV, pattern CW
-  , pattern CX, pattern CY, pattern CZ, pattern DE, pattern DG, pattern DJ, pattern DK, pattern DM, pattern DO, pattern DZ, pattern EA
-  , pattern EC, pattern EE, pattern EG, pattern EH, pattern ER, pattern ES, pattern ET, pattern EU, pattern FI, pattern FJ, pattern FK
-  , pattern FM, pattern FO, pattern FR, pattern GA, pattern GB, pattern GD, pattern GE, pattern GF, pattern GG, pattern GH, pattern GI
-  , pattern GL, pattern GM, pattern GN, pattern GP, pattern GQ, pattern GR, pattern GS, pattern GT, pattern GU, pattern GW, pattern GY
-  , pattern HK, pattern HM, pattern HN, pattern HR, pattern HT, pattern HU, pattern IC, pattern ID, pattern IE, pattern IL, pattern IM
-  , pattern IN, pattern IO, pattern IQ, pattern IR, pattern IS, pattern IT, pattern JE, pattern JM, pattern JO, pattern JP, pattern KE
-  , pattern KG, pattern KH, pattern KI, pattern KM, pattern KN, pattern KP, pattern KR, pattern KW, pattern KY, pattern KZ, pattern LA
-  , pattern LB, pattern LC, pattern LI, pattern LK, pattern LR, pattern LS, pattern LT, pattern LU, pattern LV, pattern LY, pattern MA
-  , pattern MC, pattern MD, pattern ME, pattern MF, pattern MG, pattern MH, pattern MK, pattern ML, pattern MM, pattern MN, pattern MO
-  , pattern MP, pattern MQ, pattern MR, pattern MS, pattern MT, pattern MU, pattern MV, pattern MW, pattern MX, pattern MY, pattern MZ
-  , pattern NA, pattern NC, pattern NE, pattern NF, pattern NG, pattern NI, pattern NL, pattern NO, pattern NP, pattern NR, pattern NU
-  , pattern NZ, pattern OM, pattern PA, pattern PE, pattern PF, pattern PG, pattern PH, pattern PK, pattern PL, pattern PM, pattern PN
-  , pattern PR, pattern PS, pattern PT, pattern PW, pattern PY, pattern QA, pattern RE, pattern RO, pattern RS, pattern RU, pattern RW
-  , pattern SA, pattern SB, pattern SC, pattern SD, pattern SE, pattern SG, pattern SH, pattern SI, pattern SJ, pattern SK, pattern SL
-  , pattern SM, pattern SN, pattern SO, pattern SR, pattern SS, pattern ST, pattern SV, pattern SX, pattern SY, pattern SZ, pattern TA
-  , pattern TC, pattern TD, pattern TF, pattern TG, pattern TH, pattern TJ, pattern TK, pattern TL, pattern TM, pattern TN, pattern TO
-  , pattern TR, pattern TT, pattern TV, pattern TW, pattern TZ, pattern UA, pattern UG, pattern UM, pattern UN, pattern US, pattern UY
-  , pattern UZ, pattern VA, pattern VC, pattern VE, pattern VG, pattern VI, pattern VN, pattern VU, pattern WF, pattern WS, pattern XK
-  , pattern YE, pattern YT, pattern ZA, pattern ZM, pattern ZW
+    pattern AC,
+    pattern AD,
+    pattern AE,
+    pattern AF,
+    pattern AG,
+    pattern AI,
+    pattern AL,
+    pattern AM,
+    pattern AO,
+    pattern AQ,
+    pattern AR,
+    pattern AS,
+    pattern AT,
+    pattern AU,
+    pattern AW,
+    pattern AX,
+    pattern AZ,
+    pattern BA,
+    pattern BB,
+    pattern BD,
+    pattern BE,
+    pattern BF,
+    pattern BG,
+    pattern BH,
+    pattern BI,
+    pattern BJ,
+    pattern BL,
+    pattern BM,
+    pattern BN,
+    pattern BO,
+    pattern BQ,
+    pattern BR,
+    pattern BS,
+    pattern BT,
+    pattern BV,
+    pattern BW,
+    pattern BY,
+    pattern BZ,
+    pattern CA,
+    pattern CC,
+    pattern CD,
+    pattern CF,
+    pattern CG,
+    pattern CH,
+    pattern CI,
+    pattern CK,
+    pattern CL,
+    pattern CM,
+    pattern CN,
+    pattern CO,
+    pattern CP,
+    pattern CR,
+    pattern CU,
+    pattern CV,
+    pattern CW,
+    pattern CX,
+    pattern CY,
+    pattern CZ,
+    pattern DE,
+    pattern DG,
+    pattern DJ,
+    pattern DK,
+    pattern DM,
+    pattern DO,
+    pattern DZ,
+    pattern EA,
+    pattern EC,
+    pattern EE,
+    pattern EG,
+    pattern EH,
+    pattern ER,
+    pattern ES,
+    pattern ET,
+    pattern EU,
+    pattern FI,
+    pattern FJ,
+    pattern FK,
+    pattern FM,
+    pattern FO,
+    pattern FR,
+    pattern GA,
+    pattern GB,
+    pattern GD,
+    pattern GE,
+    pattern GF,
+    pattern GG,
+    pattern GH,
+    pattern GI,
+    pattern GL,
+    pattern GM,
+    pattern GN,
+    pattern GP,
+    pattern GQ,
+    pattern GR,
+    pattern GS,
+    pattern GT,
+    pattern GU,
+    pattern GW,
+    pattern GY,
+    pattern HK,
+    pattern HM,
+    pattern HN,
+    pattern HR,
+    pattern HT,
+    pattern HU,
+    pattern IC,
+    pattern ID,
+    pattern IE,
+    pattern IL,
+    pattern IM,
+    pattern IN,
+    pattern IO,
+    pattern IQ,
+    pattern IR,
+    pattern IS,
+    pattern IT,
+    pattern JE,
+    pattern JM,
+    pattern JO,
+    pattern JP,
+    pattern KE,
+    pattern KG,
+    pattern KH,
+    pattern KI,
+    pattern KM,
+    pattern KN,
+    pattern KP,
+    pattern KR,
+    pattern KW,
+    pattern KY,
+    pattern KZ,
+    pattern LA,
+    pattern LB,
+    pattern LC,
+    pattern LI,
+    pattern LK,
+    pattern LR,
+    pattern LS,
+    pattern LT,
+    pattern LU,
+    pattern LV,
+    pattern LY,
+    pattern MA,
+    pattern MC,
+    pattern MD,
+    pattern ME,
+    pattern MF,
+    pattern MG,
+    pattern MH,
+    pattern MK,
+    pattern ML,
+    pattern MM,
+    pattern MN,
+    pattern MO,
+    pattern MP,
+    pattern MQ,
+    pattern MR,
+    pattern MS,
+    pattern MT,
+    pattern MU,
+    pattern MV,
+    pattern MW,
+    pattern MX,
+    pattern MY,
+    pattern MZ,
+    pattern NA,
+    pattern NC,
+    pattern NE,
+    pattern NF,
+    pattern NG,
+    pattern NI,
+    pattern NL,
+    pattern NO,
+    pattern NP,
+    pattern NR,
+    pattern NU,
+    pattern NZ,
+    pattern OM,
+    pattern PA,
+    pattern PE,
+    pattern PF,
+    pattern PG,
+    pattern PH,
+    pattern PK,
+    pattern PL,
+    pattern PM,
+    pattern PN,
+    pattern PR,
+    pattern PS,
+    pattern PT,
+    pattern PW,
+    pattern PY,
+    pattern QA,
+    pattern RE,
+    pattern RO,
+    pattern RS,
+    pattern RU,
+    pattern RW,
+    pattern SA,
+    pattern SB,
+    pattern SC,
+    pattern SD,
+    pattern SE,
+    pattern SG,
+    pattern SH,
+    pattern SI,
+    pattern SJ,
+    pattern SK,
+    pattern SL,
+    pattern SM,
+    pattern SN,
+    pattern SO,
+    pattern SR,
+    pattern SS,
+    pattern ST,
+    pattern SV,
+    pattern SX,
+    pattern SY,
+    pattern SZ,
+    pattern TA,
+    pattern TC,
+    pattern TD,
+    pattern TF,
+    pattern TG,
+    pattern TH,
+    pattern TJ,
+    pattern TK,
+    pattern TL,
+    pattern TM,
+    pattern TN,
+    pattern TO,
+    pattern TR,
+    pattern TT,
+    pattern TV,
+    pattern TW,
+    pattern TZ,
+    pattern UA,
+    pattern UG,
+    pattern UM,
+    pattern UN,
+    pattern US,
+    pattern UY,
+    pattern UZ,
+    pattern VA,
+    pattern VC,
+    pattern VE,
+    pattern VG,
+    pattern VI,
+    pattern VN,
+    pattern VU,
+    pattern WF,
+    pattern WS,
+    pattern XK,
+    pattern YE,
+    pattern YT,
+    pattern ZA,
+    pattern ZM,
+    pattern ZW,
+
     -- * Pattern synonyms for 'SubFlag's
-  , pattern ENG, pattern SCT, pattern WLS
-  ) where
+    pattern ENG,
+    pattern SCT,
+    pattern WLS,
+  )
+where
 
-import Prelude hiding (LT, GT)
-
-import Control.DeepSeq(NFData)
-
-import Data.Bits((.|.))
-import Data.Char(chr, ord, toLower, toUpper)
-import Data.Char.Core(UnicodeText(fromUnicodeText, toUnicodeText, isInTextRange), mapToEnumSafe)
-import Data.Char.Enclosed(regionalIndicatorUppercase')
-import Data.Data(Data)
-import Data.Function(on)
-import Data.Hashable(Hashable)
-import Data.Maybe(fromJust)
-import Data.Text(Text, pack, unpack)
-
-import GHC.Enum(fromEnumError, toEnumError)
-import GHC.Generics(Generic)
-
-import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
+import Control.DeepSeq (NFData)
+import Data.Bits ((.|.))
+import Data.Char (chr, ord, toLower, toUpper)
+import Data.Char.Core (UnicodeText (fromUnicodeText, isInTextRange, toUnicodeText), mapToEnumSafe)
+import Data.Char.Enclosed (regionalIndicatorUppercase')
+import Data.Data (Data)
+import Data.Function (on)
+import Data.Hashable (Hashable)
+import Data.Maybe (fromJust)
+import Data.Text (Text, pack, unpack)
+import GHC.Enum (fromEnumError, toEnumError)
+import GHC.Generics (Generic)
+import Test.QuickCheck.Arbitrary (Arbitrary (arbitrary), arbitraryBoundedEnum)
+import Prelude hiding (GT, LT)
 
 _flagCharOffset :: Int
 _flagCharOffset = 0x1f1a5
@@ -91,8 +334,8 @@ instance NFData Flag
 data SubFlag = SubFlag Flag Char Char Char deriving (Data, Eq, Generic, Ord, Read, Show)
 
 instance Bounded Flag where
-    minBound = AC
-    maxBound = ZW
+  minBound = AC
+  maxBound = ZW
 
 instance Hashable SubFlag
 
@@ -107,15 +350,19 @@ instance NFData SubFlag
 -- standard without deprecated regions like the Soviet Union (SU) and Yugoslavia
 -- (YU). Furthermore there are Emoji for the flags of Antarctica (AQ), the
 -- European Union (EU) and the United Nations (UN).
-flag
-  :: Char  -- ^ The first character of the ISO 3166 Alpha-2 standard.
-  -> Char  -- ^ The second character of the ISO 3166 Alpha-2 standard.
-  -> Maybe Flag  -- ^ A 'Flag' object wrapped in a 'Just' data constructor, given such flag exists; 'Nothing' otherwise.
+flag ::
+  -- | The first character of the ISO 3166 Alpha-2 standard.
+  Char ->
+  -- | The second character of the ISO 3166 Alpha-2 standard.
+  Char ->
+  -- | A 'Flag' object wrapped in a 'Just' data constructor, given such flag exists; 'Nothing' otherwise.
+  Maybe Flag
 flag ca cb
-    | _validFlagEmoji a b = Just (Flag a b)
-    | otherwise = Nothing
-    where a = toUpper ca
-          b = toUpper cb
+  | _validFlagEmoji a b = Just (Flag a b)
+  | otherwise = Nothing
+  where
+    a = toUpper ca
+    b = toUpper cb
 
 -- | Convert the given two characters that represent a flag according to the ISO
 -- 3166 Alpha-2 standard to a 'Flag'. If the flag does not exists, then the
@@ -126,17 +373,22 @@ flag ca cb
 -- standard without deprecated regions like the Soviet Union (SU) and Yugoslavia
 -- (YU). Furthermore there are Emoji for the flags of Antarctica (AQ), the
 -- European Union (EU) and the United Nations (UN).
-flag'
-  :: Char  -- ^ The first character of the ISO 3166 Alpha-2 standard.
-  -> Char  -- ^ The second character of the ISO 3166 Alpha-2 standard.
-  -> Flag  -- ^ The equivalent 'Flag' object.
+flag' ::
+  -- | The first character of the ISO 3166 Alpha-2 standard.
+  Char ->
+  -- | The second character of the ISO 3166 Alpha-2 standard.
+  Char ->
+  -- | The equivalent 'Flag' object.
+  Flag
 flag' ca = fromJust . flag ca
 
 -- | Obtain the two-characters that specify the given 'Flag'. These two
 -- characters are always upper case (@A-Z@).
-flagChars
-  :: Flag  -- ^ The given 'Flag' to convert to a 2-tuple of 'Char'acters.
-  -> (Char, Char)  -- ^ A 2-tuple that contains upper case 'Char'acters for the given 'Flag'.
+flagChars ::
+  -- | The given 'Flag' to convert to a 2-tuple of 'Char'acters.
+  Flag ->
+  -- | A 2-tuple that contains upper case 'Char'acters for the given 'Flag'.
+  (Char, Char)
 flagChars (Flag ca cb) = (ca, cb)
 
 -- | The 'Flag' pattern used for /Ascension Island/ denoted with /AC/.
@@ -1184,9 +1436,8 @@ pattern WLS :: SubFlag
 pattern WLS = SubFlag GB 'w' 'l' 's'
 
 instance Bounded SubFlag where
-    minBound = ENG
-    maxBound = WLS
-
+  minBound = ENG
+  maxBound = WLS
 
 -- | Convert the given two 'Char'acters of the ISO3166-1 Alpha-2 standard to an
 -- Emoji that renders the flag of the corresponding country or terroitory.
@@ -1194,10 +1445,13 @@ instance Bounded SubFlag where
 -- flag. The European Union (EU), Antarctica (AQ) and United Nations (UN)
 -- are included as marcoregion flags. This function does not check if the
 -- two characters map to a valid flag token.
-iso3166Alpha2ToFlag'
-  :: Char  -- ^ The first 'Char'acter of the ISO3166 Alpha-2 code.
-  -> Char  -- ^ The second 'Char'acter of the ISO3166 Alpha-2 code.
-  -> Text  -- ^ A 'Text' object that consists of two characters, where the two characters form a flag emoji, if the given flag exists.
+iso3166Alpha2ToFlag' ::
+  -- | The first 'Char'acter of the ISO3166 Alpha-2 code.
+  Char ->
+  -- | The second 'Char'acter of the ISO3166 Alpha-2 code.
+  Char ->
+  -- | A 'Text' object that consists of two characters, where the two characters form a flag emoji, if the given flag exists.
+  Text
 iso3166Alpha2ToFlag' ca cb = pack (map (regionalIndicatorUppercase' . toUpper) [ca, cb])
 
 -- | Convert the given two 'Char'acters of the ISO3166-1 Alpha-2 standard to an
@@ -1206,10 +1460,13 @@ iso3166Alpha2ToFlag' ca cb = pack (map (regionalIndicatorUppercase' . toUpper) [
 -- (Soviet Union) and YU (Yugoslavia) have no flag. The European Union (EU),
 -- Antarctica (AQ) and United Nations (UN) are included as marcoregion flags.
 -- If the flag does not exists, 'Nothing' is returned.
-iso3166Alpha2ToFlag
-  :: Char  -- ^ The first 'Char'acter of the ISO3166 Alpha-2 code.
-  -> Char  -- ^ The second 'Char'acter of the ISO3166 Alpha-2 code.
-  -> Maybe Text  -- ^ A 'Text' object that consists of two characters, where the two characters form a flag emoji wrapped in a 'Just', if the given flag exists; 'Nothing' otherwise.
+iso3166Alpha2ToFlag ::
+  -- | The first 'Char'acter of the ISO3166 Alpha-2 code.
+  Char ->
+  -- | The second 'Char'acter of the ISO3166 Alpha-2 code.
+  Char ->
+  -- | A 'Text' object that consists of two characters, where the two characters form a flag emoji wrapped in a 'Just', if the given flag exists; 'Nothing' otherwise.
+  Maybe Text
 iso3166Alpha2ToFlag ca cb
   | validFlagEmoji ca cb = Just (iso3166Alpha2ToFlag' ca cb)
   | otherwise = Nothing
@@ -1218,19 +1475,23 @@ iso3166Alpha2ToFlag ca cb
 -- a 'Just' data constructor if it exists; 'Nothing' otherwise.
 fromFlag :: Text -> Maybe Flag
 fromFlag t
-    | [a', b'] <- unpack t, Just a <- shft a', Just b <- shft b', _validFlagEmoji a b = Just (Flag a b)
-    | otherwise = Nothing
-    where shft = mapToEnumSafe _flagCharOffset
+  | [a', b'] <- unpack t, Just a <- shft a', Just b <- shft b', _validFlagEmoji a b = Just (Flag a b)
+  | otherwise = Nothing
+  where
+    shft = mapToEnumSafe _flagCharOffset
 
 -- | Check if for the given two 'Char'acters, a flag emoji exists. The two
 -- character combinations for which a flag exist are defined in the ISO3166-1
 -- Alpha-2 standard where deprecated reagions, such as SU and YU have no flag,
 -- and the European Union (EU), Antarctica (AQ), and the United Nations (UN)
 -- have a flag. The characters can be upper case (@A-Z@) or lower case (@a-z@).
-validFlagEmoji
-  :: Char  -- ^ The first 'Char'acter of the ISO3166 Alpha-2 code.
-  -> Char  -- ^ The second 'Char'acter of the ISO3166 Alpha-2 code.
-  -> Bool  -- ^ 'True' if a flag emoji exists for the given characters; 'False' otherwise.
+validFlagEmoji ::
+  -- | The first 'Char'acter of the ISO3166 Alpha-2 code.
+  Char ->
+  -- | The second 'Char'acter of the ISO3166 Alpha-2 code.
+  Char ->
+  -- | 'True' if a flag emoji exists for the given characters; 'False' otherwise.
+  Bool
 validFlagEmoji = on _validFlagEmoji toUpper
 
 _validFlagEmoji :: Char -> Char -> Bool
@@ -1495,580 +1756,590 @@ _validFlagEmoji 'Z' 'W' = True
 _validFlagEmoji _ _ = False
 
 instance Arbitrary Flag where
-    arbitrary = arbitraryBoundedEnum
+  arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary SubFlag where
-    arbitrary = arbitraryBoundedEnum
+  arbitrary = arbitraryBoundedEnum
 
 instance Enum Flag where
-    fromEnum AC = 0
-    fromEnum AD = 1
-    fromEnum AE = 2
-    fromEnum AF = 3
-    fromEnum AG = 4
-    fromEnum AI = 5
-    fromEnum AL = 6
-    fromEnum AM = 7
-    fromEnum AO = 8
-    fromEnum AQ = 9
-    fromEnum AR = 10
-    fromEnum AS = 11
-    fromEnum AT = 12
-    fromEnum AU = 13
-    fromEnum AW = 14
-    fromEnum AX = 15
-    fromEnum AZ = 16
-    fromEnum BA = 17
-    fromEnum BB = 18
-    fromEnum BD = 19
-    fromEnum BE = 20
-    fromEnum BF = 21
-    fromEnum BG = 22
-    fromEnum BH = 23
-    fromEnum BI = 24
-    fromEnum BJ = 25
-    fromEnum BL = 26
-    fromEnum BM = 27
-    fromEnum BN = 28
-    fromEnum BO = 29
-    fromEnum BQ = 30
-    fromEnum BR = 31
-    fromEnum BS = 32
-    fromEnum BT = 33
-    fromEnum BV = 34
-    fromEnum BW = 35
-    fromEnum BY = 36
-    fromEnum BZ = 37
-    fromEnum CA = 38
-    fromEnum CC = 39
-    fromEnum CD = 40
-    fromEnum CF = 41
-    fromEnum CG = 42
-    fromEnum CH = 43
-    fromEnum CI = 44
-    fromEnum CK = 45
-    fromEnum CL = 46
-    fromEnum CM = 47
-    fromEnum CN = 48
-    fromEnum CO = 49
-    fromEnum CP = 50
-    fromEnum CR = 51
-    fromEnum CU = 52
-    fromEnum CV = 53
-    fromEnum CW = 54
-    fromEnum CX = 55
-    fromEnum CY = 56
-    fromEnum CZ = 57
-    fromEnum DE = 58
-    fromEnum DG = 59
-    fromEnum DJ = 60
-    fromEnum DK = 61
-    fromEnum DM = 62
-    fromEnum DO = 63
-    fromEnum DZ = 64
-    fromEnum EA = 65
-    fromEnum EC = 66
-    fromEnum EE = 67
-    fromEnum EG = 68
-    fromEnum EH = 69
-    fromEnum ER = 70
-    fromEnum ES = 71
-    fromEnum ET = 72
-    fromEnum EU = 73
-    fromEnum FI = 74
-    fromEnum FJ = 75
-    fromEnum FK = 76
-    fromEnum FM = 77
-    fromEnum FO = 78
-    fromEnum FR = 79
-    fromEnum GA = 80
-    fromEnum GB = 81
-    fromEnum GD = 82
-    fromEnum GE = 83
-    fromEnum GF = 84
-    fromEnum GG = 85
-    fromEnum GH = 86
-    fromEnum GI = 87
-    fromEnum GL = 88
-    fromEnum GM = 89
-    fromEnum GN = 90
-    fromEnum GP = 91
-    fromEnum GQ = 92
-    fromEnum GR = 93
-    fromEnum GS = 94
-    fromEnum GT = 95
-    fromEnum GU = 96
-    fromEnum GW = 97
-    fromEnum GY = 98
-    fromEnum HK = 99
-    fromEnum HM = 100
-    fromEnum HN = 101
-    fromEnum HR = 102
-    fromEnum HT = 103
-    fromEnum HU = 104
-    fromEnum IC = 105
-    fromEnum ID = 106
-    fromEnum IE = 107
-    fromEnum IL = 108
-    fromEnum IM = 109
-    fromEnum IN = 110
-    fromEnum IO = 111
-    fromEnum IQ = 112
-    fromEnum IR = 113
-    fromEnum IS = 114
-    fromEnum IT = 115
-    fromEnum JE = 116
-    fromEnum JM = 117
-    fromEnum JO = 118
-    fromEnum JP = 119
-    fromEnum KE = 120
-    fromEnum KG = 121
-    fromEnum KH = 122
-    fromEnum KI = 123
-    fromEnum KM = 124
-    fromEnum KN = 125
-    fromEnum KP = 126
-    fromEnum KR = 127
-    fromEnum KW = 128
-    fromEnum KY = 129
-    fromEnum KZ = 130
-    fromEnum LA = 131
-    fromEnum LB = 132
-    fromEnum LC = 133
-    fromEnum LI = 134
-    fromEnum LK = 135
-    fromEnum LR = 136
-    fromEnum LS = 137
-    fromEnum LT = 138
-    fromEnum LU = 139
-    fromEnum LV = 140
-    fromEnum LY = 141
-    fromEnum MA = 142
-    fromEnum MC = 143
-    fromEnum MD = 144
-    fromEnum ME = 145
-    fromEnum MF = 146
-    fromEnum MG = 147
-    fromEnum MH = 148
-    fromEnum MK = 149
-    fromEnum ML = 150
-    fromEnum MM = 151
-    fromEnum MN = 152
-    fromEnum MO = 153
-    fromEnum MP = 154
-    fromEnum MQ = 155
-    fromEnum MR = 156
-    fromEnum MS = 157
-    fromEnum MT = 158
-    fromEnum MU = 159
-    fromEnum MV = 160
-    fromEnum MW = 161
-    fromEnum MX = 162
-    fromEnum MY = 163
-    fromEnum MZ = 164
-    fromEnum NA = 165
-    fromEnum NC = 166
-    fromEnum NE = 167
-    fromEnum NF = 168
-    fromEnum NG = 169
-    fromEnum NI = 170
-    fromEnum NL = 171
-    fromEnum NO = 172
-    fromEnum NP = 173
-    fromEnum NR = 174
-    fromEnum NU = 175
-    fromEnum NZ = 176
-    fromEnum OM = 177
-    fromEnum PA = 178
-    fromEnum PE = 179
-    fromEnum PF = 180
-    fromEnum PG = 181
-    fromEnum PH = 182
-    fromEnum PK = 183
-    fromEnum PL = 184
-    fromEnum PM = 185
-    fromEnum PN = 186
-    fromEnum PR = 187
-    fromEnum PS = 188
-    fromEnum PT = 189
-    fromEnum PW = 190
-    fromEnum PY = 191
-    fromEnum QA = 192
-    fromEnum RE = 193
-    fromEnum RO = 194
-    fromEnum RS = 195
-    fromEnum RU = 196
-    fromEnum RW = 197
-    fromEnum SA = 198
-    fromEnum SB = 199
-    fromEnum SC = 200
-    fromEnum SD = 201
-    fromEnum SE = 202
-    fromEnum SG = 203
-    fromEnum SH = 204
-    fromEnum SI = 205
-    fromEnum SJ = 206
-    fromEnum SK = 207
-    fromEnum SL = 208
-    fromEnum SM = 209
-    fromEnum SN = 210
-    fromEnum SO = 211
-    fromEnum SR = 212
-    fromEnum SS = 213
-    fromEnum ST = 214
-    fromEnum SV = 215
-    fromEnum SX = 216
-    fromEnum SY = 217
-    fromEnum SZ = 218
-    fromEnum TA = 219
-    fromEnum TC = 220
-    fromEnum TD = 221
-    fromEnum TF = 222
-    fromEnum TG = 223
-    fromEnum TH = 224
-    fromEnum TJ = 225
-    fromEnum TK = 226
-    fromEnum TL = 227
-    fromEnum TM = 228
-    fromEnum TN = 229
-    fromEnum TO = 230
-    fromEnum TR = 231
-    fromEnum TT = 232
-    fromEnum TV = 233
-    fromEnum TW = 234
-    fromEnum TZ = 235
-    fromEnum UA = 236
-    fromEnum UG = 237
-    fromEnum UM = 238
-    fromEnum UN = 239
-    fromEnum US = 240
-    fromEnum UY = 241
-    fromEnum UZ = 242
-    fromEnum VA = 243
-    fromEnum VC = 244
-    fromEnum VE = 245
-    fromEnum VG = 246
-    fromEnum VI = 247
-    fromEnum VN = 248
-    fromEnum VU = 249
-    fromEnum WF = 250
-    fromEnum WS = 251
-    fromEnum XK = 252
-    fromEnum YE = 253
-    fromEnum YT = 254
-    fromEnum ZA = 255
-    fromEnum ZM = 256
-    fromEnum ZW = 257
-    fromEnum f = fromEnumError "Flag" f
-    toEnum 0 = AC
-    toEnum 1 = AD
-    toEnum 2 = AE
-    toEnum 3 = AF
-    toEnum 4 = AG
-    toEnum 5 = AI
-    toEnum 6 = AL
-    toEnum 7 = AM
-    toEnum 8 = AO
-    toEnum 9 = AQ
-    toEnum 10 = AR
-    toEnum 11 = AS
-    toEnum 12 = AT
-    toEnum 13 = AU
-    toEnum 14 = AW
-    toEnum 15 = AX
-    toEnum 16 = AZ
-    toEnum 17 = BA
-    toEnum 18 = BB
-    toEnum 19 = BD
-    toEnum 20 = BE
-    toEnum 21 = BF
-    toEnum 22 = BG
-    toEnum 23 = BH
-    toEnum 24 = BI
-    toEnum 25 = BJ
-    toEnum 26 = BL
-    toEnum 27 = BM
-    toEnum 28 = BN
-    toEnum 29 = BO
-    toEnum 30 = BQ
-    toEnum 31 = BR
-    toEnum 32 = BS
-    toEnum 33 = BT
-    toEnum 34 = BV
-    toEnum 35 = BW
-    toEnum 36 = BY
-    toEnum 37 = BZ
-    toEnum 38 = CA
-    toEnum 39 = CC
-    toEnum 40 = CD
-    toEnum 41 = CF
-    toEnum 42 = CG
-    toEnum 43 = CH
-    toEnum 44 = CI
-    toEnum 45 = CK
-    toEnum 46 = CL
-    toEnum 47 = CM
-    toEnum 48 = CN
-    toEnum 49 = CO
-    toEnum 50 = CP
-    toEnum 51 = CR
-    toEnum 52 = CU
-    toEnum 53 = CV
-    toEnum 54 = CW
-    toEnum 55 = CX
-    toEnum 56 = CY
-    toEnum 57 = CZ
-    toEnum 58 = DE
-    toEnum 59 = DG
-    toEnum 60 = DJ
-    toEnum 61 = DK
-    toEnum 62 = DM
-    toEnum 63 = DO
-    toEnum 64 = DZ
-    toEnum 65 = EA
-    toEnum 66 = EC
-    toEnum 67 = EE
-    toEnum 68 = EG
-    toEnum 69 = EH
-    toEnum 70 = ER
-    toEnum 71 = ES
-    toEnum 72 = ET
-    toEnum 73 = EU
-    toEnum 74 = FI
-    toEnum 75 = FJ
-    toEnum 76 = FK
-    toEnum 77 = FM
-    toEnum 78 = FO
-    toEnum 79 = FR
-    toEnum 80 = GA
-    toEnum 81 = GB
-    toEnum 82 = GD
-    toEnum 83 = GE
-    toEnum 84 = GF
-    toEnum 85 = GG
-    toEnum 86 = GH
-    toEnum 87 = GI
-    toEnum 88 = GL
-    toEnum 89 = GM
-    toEnum 90 = GN
-    toEnum 91 = GP
-    toEnum 92 = GQ
-    toEnum 93 = GR
-    toEnum 94 = GS
-    toEnum 95 = GT
-    toEnum 96 = GU
-    toEnum 97 = GW
-    toEnum 98 = GY
-    toEnum 99 = HK
-    toEnum 100 = HM
-    toEnum 101 = HN
-    toEnum 102 = HR
-    toEnum 103 = HT
-    toEnum 104 = HU
-    toEnum 105 = IC
-    toEnum 106 = ID
-    toEnum 107 = IE
-    toEnum 108 = IL
-    toEnum 109 = IM
-    toEnum 110 = IN
-    toEnum 111 = IO
-    toEnum 112 = IQ
-    toEnum 113 = IR
-    toEnum 114 = IS
-    toEnum 115 = IT
-    toEnum 116 = JE
-    toEnum 117 = JM
-    toEnum 118 = JO
-    toEnum 119 = JP
-    toEnum 120 = KE
-    toEnum 121 = KG
-    toEnum 122 = KH
-    toEnum 123 = KI
-    toEnum 124 = KM
-    toEnum 125 = KN
-    toEnum 126 = KP
-    toEnum 127 = KR
-    toEnum 128 = KW
-    toEnum 129 = KY
-    toEnum 130 = KZ
-    toEnum 131 = LA
-    toEnum 132 = LB
-    toEnum 133 = LC
-    toEnum 134 = LI
-    toEnum 135 = LK
-    toEnum 136 = LR
-    toEnum 137 = LS
-    toEnum 138 = LT
-    toEnum 139 = LU
-    toEnum 140 = LV
-    toEnum 141 = LY
-    toEnum 142 = MA
-    toEnum 143 = MC
-    toEnum 144 = MD
-    toEnum 145 = ME
-    toEnum 146 = MF
-    toEnum 147 = MG
-    toEnum 148 = MH
-    toEnum 149 = MK
-    toEnum 150 = ML
-    toEnum 151 = MM
-    toEnum 152 = MN
-    toEnum 153 = MO
-    toEnum 154 = MP
-    toEnum 155 = MQ
-    toEnum 156 = MR
-    toEnum 157 = MS
-    toEnum 158 = MT
-    toEnum 159 = MU
-    toEnum 160 = MV
-    toEnum 161 = MW
-    toEnum 162 = MX
-    toEnum 163 = MY
-    toEnum 164 = MZ
-    toEnum 165 = NA
-    toEnum 166 = NC
-    toEnum 167 = NE
-    toEnum 168 = NF
-    toEnum 169 = NG
-    toEnum 170 = NI
-    toEnum 171 = NL
-    toEnum 172 = NO
-    toEnum 173 = NP
-    toEnum 174 = NR
-    toEnum 175 = NU
-    toEnum 176 = NZ
-    toEnum 177 = OM
-    toEnum 178 = PA
-    toEnum 179 = PE
-    toEnum 180 = PF
-    toEnum 181 = PG
-    toEnum 182 = PH
-    toEnum 183 = PK
-    toEnum 184 = PL
-    toEnum 185 = PM
-    toEnum 186 = PN
-    toEnum 187 = PR
-    toEnum 188 = PS
-    toEnum 189 = PT
-    toEnum 190 = PW
-    toEnum 191 = PY
-    toEnum 192 = QA
-    toEnum 193 = RE
-    toEnum 194 = RO
-    toEnum 195 = RS
-    toEnum 196 = RU
-    toEnum 197 = RW
-    toEnum 198 = SA
-    toEnum 199 = SB
-    toEnum 200 = SC
-    toEnum 201 = SD
-    toEnum 202 = SE
-    toEnum 203 = SG
-    toEnum 204 = SH
-    toEnum 205 = SI
-    toEnum 206 = SJ
-    toEnum 207 = SK
-    toEnum 208 = SL
-    toEnum 209 = SM
-    toEnum 210 = SN
-    toEnum 211 = SO
-    toEnum 212 = SR
-    toEnum 213 = SS
-    toEnum 214 = ST
-    toEnum 215 = SV
-    toEnum 216 = SX
-    toEnum 217 = SY
-    toEnum 218 = SZ
-    toEnum 219 = TA
-    toEnum 220 = TC
-    toEnum 221 = TD
-    toEnum 222 = TF
-    toEnum 223 = TG
-    toEnum 224 = TH
-    toEnum 225 = TJ
-    toEnum 226 = TK
-    toEnum 227 = TL
-    toEnum 228 = TM
-    toEnum 229 = TN
-    toEnum 230 = TO
-    toEnum 231 = TR
-    toEnum 232 = TT
-    toEnum 233 = TV
-    toEnum 234 = TW
-    toEnum 235 = TZ
-    toEnum 236 = UA
-    toEnum 237 = UG
-    toEnum 238 = UM
-    toEnum 239 = UN
-    toEnum 240 = US
-    toEnum 241 = UY
-    toEnum 242 = UZ
-    toEnum 243 = VA
-    toEnum 244 = VC
-    toEnum 245 = VE
-    toEnum 246 = VG
-    toEnum 247 = VI
-    toEnum 248 = VN
-    toEnum 249 = VU
-    toEnum 250 = WF
-    toEnum 251 = WS
-    toEnum 252 = XK
-    toEnum 253 = YE
-    toEnum 254 = YT
-    toEnum 255 = ZA
-    toEnum 256 = ZM
-    toEnum 257 = ZW
-    toEnum i = toEnumError "Flag" i (minBound :: Flag, maxBound)
-    enumFrom = (`enumFromTo` maxBound)
-    enumFromThen x y = enumFromThenTo x y maxBound
+  fromEnum AC = 0
+  fromEnum AD = 1
+  fromEnum AE = 2
+  fromEnum AF = 3
+  fromEnum AG = 4
+  fromEnum AI = 5
+  fromEnum AL = 6
+  fromEnum AM = 7
+  fromEnum AO = 8
+  fromEnum AQ = 9
+  fromEnum AR = 10
+  fromEnum AS = 11
+  fromEnum AT = 12
+  fromEnum AU = 13
+  fromEnum AW = 14
+  fromEnum AX = 15
+  fromEnum AZ = 16
+  fromEnum BA = 17
+  fromEnum BB = 18
+  fromEnum BD = 19
+  fromEnum BE = 20
+  fromEnum BF = 21
+  fromEnum BG = 22
+  fromEnum BH = 23
+  fromEnum BI = 24
+  fromEnum BJ = 25
+  fromEnum BL = 26
+  fromEnum BM = 27
+  fromEnum BN = 28
+  fromEnum BO = 29
+  fromEnum BQ = 30
+  fromEnum BR = 31
+  fromEnum BS = 32
+  fromEnum BT = 33
+  fromEnum BV = 34
+  fromEnum BW = 35
+  fromEnum BY = 36
+  fromEnum BZ = 37
+  fromEnum CA = 38
+  fromEnum CC = 39
+  fromEnum CD = 40
+  fromEnum CF = 41
+  fromEnum CG = 42
+  fromEnum CH = 43
+  fromEnum CI = 44
+  fromEnum CK = 45
+  fromEnum CL = 46
+  fromEnum CM = 47
+  fromEnum CN = 48
+  fromEnum CO = 49
+  fromEnum CP = 50
+  fromEnum CR = 51
+  fromEnum CU = 52
+  fromEnum CV = 53
+  fromEnum CW = 54
+  fromEnum CX = 55
+  fromEnum CY = 56
+  fromEnum CZ = 57
+  fromEnum DE = 58
+  fromEnum DG = 59
+  fromEnum DJ = 60
+  fromEnum DK = 61
+  fromEnum DM = 62
+  fromEnum DO = 63
+  fromEnum DZ = 64
+  fromEnum EA = 65
+  fromEnum EC = 66
+  fromEnum EE = 67
+  fromEnum EG = 68
+  fromEnum EH = 69
+  fromEnum ER = 70
+  fromEnum ES = 71
+  fromEnum ET = 72
+  fromEnum EU = 73
+  fromEnum FI = 74
+  fromEnum FJ = 75
+  fromEnum FK = 76
+  fromEnum FM = 77
+  fromEnum FO = 78
+  fromEnum FR = 79
+  fromEnum GA = 80
+  fromEnum GB = 81
+  fromEnum GD = 82
+  fromEnum GE = 83
+  fromEnum GF = 84
+  fromEnum GG = 85
+  fromEnum GH = 86
+  fromEnum GI = 87
+  fromEnum GL = 88
+  fromEnum GM = 89
+  fromEnum GN = 90
+  fromEnum GP = 91
+  fromEnum GQ = 92
+  fromEnum GR = 93
+  fromEnum GS = 94
+  fromEnum GT = 95
+  fromEnum GU = 96
+  fromEnum GW = 97
+  fromEnum GY = 98
+  fromEnum HK = 99
+  fromEnum HM = 100
+  fromEnum HN = 101
+  fromEnum HR = 102
+  fromEnum HT = 103
+  fromEnum HU = 104
+  fromEnum IC = 105
+  fromEnum ID = 106
+  fromEnum IE = 107
+  fromEnum IL = 108
+  fromEnum IM = 109
+  fromEnum IN = 110
+  fromEnum IO = 111
+  fromEnum IQ = 112
+  fromEnum IR = 113
+  fromEnum IS = 114
+  fromEnum IT = 115
+  fromEnum JE = 116
+  fromEnum JM = 117
+  fromEnum JO = 118
+  fromEnum JP = 119
+  fromEnum KE = 120
+  fromEnum KG = 121
+  fromEnum KH = 122
+  fromEnum KI = 123
+  fromEnum KM = 124
+  fromEnum KN = 125
+  fromEnum KP = 126
+  fromEnum KR = 127
+  fromEnum KW = 128
+  fromEnum KY = 129
+  fromEnum KZ = 130
+  fromEnum LA = 131
+  fromEnum LB = 132
+  fromEnum LC = 133
+  fromEnum LI = 134
+  fromEnum LK = 135
+  fromEnum LR = 136
+  fromEnum LS = 137
+  fromEnum LT = 138
+  fromEnum LU = 139
+  fromEnum LV = 140
+  fromEnum LY = 141
+  fromEnum MA = 142
+  fromEnum MC = 143
+  fromEnum MD = 144
+  fromEnum ME = 145
+  fromEnum MF = 146
+  fromEnum MG = 147
+  fromEnum MH = 148
+  fromEnum MK = 149
+  fromEnum ML = 150
+  fromEnum MM = 151
+  fromEnum MN = 152
+  fromEnum MO = 153
+  fromEnum MP = 154
+  fromEnum MQ = 155
+  fromEnum MR = 156
+  fromEnum MS = 157
+  fromEnum MT = 158
+  fromEnum MU = 159
+  fromEnum MV = 160
+  fromEnum MW = 161
+  fromEnum MX = 162
+  fromEnum MY = 163
+  fromEnum MZ = 164
+  fromEnum NA = 165
+  fromEnum NC = 166
+  fromEnum NE = 167
+  fromEnum NF = 168
+  fromEnum NG = 169
+  fromEnum NI = 170
+  fromEnum NL = 171
+  fromEnum NO = 172
+  fromEnum NP = 173
+  fromEnum NR = 174
+  fromEnum NU = 175
+  fromEnum NZ = 176
+  fromEnum OM = 177
+  fromEnum PA = 178
+  fromEnum PE = 179
+  fromEnum PF = 180
+  fromEnum PG = 181
+  fromEnum PH = 182
+  fromEnum PK = 183
+  fromEnum PL = 184
+  fromEnum PM = 185
+  fromEnum PN = 186
+  fromEnum PR = 187
+  fromEnum PS = 188
+  fromEnum PT = 189
+  fromEnum PW = 190
+  fromEnum PY = 191
+  fromEnum QA = 192
+  fromEnum RE = 193
+  fromEnum RO = 194
+  fromEnum RS = 195
+  fromEnum RU = 196
+  fromEnum RW = 197
+  fromEnum SA = 198
+  fromEnum SB = 199
+  fromEnum SC = 200
+  fromEnum SD = 201
+  fromEnum SE = 202
+  fromEnum SG = 203
+  fromEnum SH = 204
+  fromEnum SI = 205
+  fromEnum SJ = 206
+  fromEnum SK = 207
+  fromEnum SL = 208
+  fromEnum SM = 209
+  fromEnum SN = 210
+  fromEnum SO = 211
+  fromEnum SR = 212
+  fromEnum SS = 213
+  fromEnum ST = 214
+  fromEnum SV = 215
+  fromEnum SX = 216
+  fromEnum SY = 217
+  fromEnum SZ = 218
+  fromEnum TA = 219
+  fromEnum TC = 220
+  fromEnum TD = 221
+  fromEnum TF = 222
+  fromEnum TG = 223
+  fromEnum TH = 224
+  fromEnum TJ = 225
+  fromEnum TK = 226
+  fromEnum TL = 227
+  fromEnum TM = 228
+  fromEnum TN = 229
+  fromEnum TO = 230
+  fromEnum TR = 231
+  fromEnum TT = 232
+  fromEnum TV = 233
+  fromEnum TW = 234
+  fromEnum TZ = 235
+  fromEnum UA = 236
+  fromEnum UG = 237
+  fromEnum UM = 238
+  fromEnum UN = 239
+  fromEnum US = 240
+  fromEnum UY = 241
+  fromEnum UZ = 242
+  fromEnum VA = 243
+  fromEnum VC = 244
+  fromEnum VE = 245
+  fromEnum VG = 246
+  fromEnum VI = 247
+  fromEnum VN = 248
+  fromEnum VU = 249
+  fromEnum WF = 250
+  fromEnum WS = 251
+  fromEnum XK = 252
+  fromEnum YE = 253
+  fromEnum YT = 254
+  fromEnum ZA = 255
+  fromEnum ZM = 256
+  fromEnum ZW = 257
+  fromEnum f = fromEnumError "Flag" f
+  toEnum 0 = AC
+  toEnum 1 = AD
+  toEnum 2 = AE
+  toEnum 3 = AF
+  toEnum 4 = AG
+  toEnum 5 = AI
+  toEnum 6 = AL
+  toEnum 7 = AM
+  toEnum 8 = AO
+  toEnum 9 = AQ
+  toEnum 10 = AR
+  toEnum 11 = AS
+  toEnum 12 = AT
+  toEnum 13 = AU
+  toEnum 14 = AW
+  toEnum 15 = AX
+  toEnum 16 = AZ
+  toEnum 17 = BA
+  toEnum 18 = BB
+  toEnum 19 = BD
+  toEnum 20 = BE
+  toEnum 21 = BF
+  toEnum 22 = BG
+  toEnum 23 = BH
+  toEnum 24 = BI
+  toEnum 25 = BJ
+  toEnum 26 = BL
+  toEnum 27 = BM
+  toEnum 28 = BN
+  toEnum 29 = BO
+  toEnum 30 = BQ
+  toEnum 31 = BR
+  toEnum 32 = BS
+  toEnum 33 = BT
+  toEnum 34 = BV
+  toEnum 35 = BW
+  toEnum 36 = BY
+  toEnum 37 = BZ
+  toEnum 38 = CA
+  toEnum 39 = CC
+  toEnum 40 = CD
+  toEnum 41 = CF
+  toEnum 42 = CG
+  toEnum 43 = CH
+  toEnum 44 = CI
+  toEnum 45 = CK
+  toEnum 46 = CL
+  toEnum 47 = CM
+  toEnum 48 = CN
+  toEnum 49 = CO
+  toEnum 50 = CP
+  toEnum 51 = CR
+  toEnum 52 = CU
+  toEnum 53 = CV
+  toEnum 54 = CW
+  toEnum 55 = CX
+  toEnum 56 = CY
+  toEnum 57 = CZ
+  toEnum 58 = DE
+  toEnum 59 = DG
+  toEnum 60 = DJ
+  toEnum 61 = DK
+  toEnum 62 = DM
+  toEnum 63 = DO
+  toEnum 64 = DZ
+  toEnum 65 = EA
+  toEnum 66 = EC
+  toEnum 67 = EE
+  toEnum 68 = EG
+  toEnum 69 = EH
+  toEnum 70 = ER
+  toEnum 71 = ES
+  toEnum 72 = ET
+  toEnum 73 = EU
+  toEnum 74 = FI
+  toEnum 75 = FJ
+  toEnum 76 = FK
+  toEnum 77 = FM
+  toEnum 78 = FO
+  toEnum 79 = FR
+  toEnum 80 = GA
+  toEnum 81 = GB
+  toEnum 82 = GD
+  toEnum 83 = GE
+  toEnum 84 = GF
+  toEnum 85 = GG
+  toEnum 86 = GH
+  toEnum 87 = GI
+  toEnum 88 = GL
+  toEnum 89 = GM
+  toEnum 90 = GN
+  toEnum 91 = GP
+  toEnum 92 = GQ
+  toEnum 93 = GR
+  toEnum 94 = GS
+  toEnum 95 = GT
+  toEnum 96 = GU
+  toEnum 97 = GW
+  toEnum 98 = GY
+  toEnum 99 = HK
+  toEnum 100 = HM
+  toEnum 101 = HN
+  toEnum 102 = HR
+  toEnum 103 = HT
+  toEnum 104 = HU
+  toEnum 105 = IC
+  toEnum 106 = ID
+  toEnum 107 = IE
+  toEnum 108 = IL
+  toEnum 109 = IM
+  toEnum 110 = IN
+  toEnum 111 = IO
+  toEnum 112 = IQ
+  toEnum 113 = IR
+  toEnum 114 = IS
+  toEnum 115 = IT
+  toEnum 116 = JE
+  toEnum 117 = JM
+  toEnum 118 = JO
+  toEnum 119 = JP
+  toEnum 120 = KE
+  toEnum 121 = KG
+  toEnum 122 = KH
+  toEnum 123 = KI
+  toEnum 124 = KM
+  toEnum 125 = KN
+  toEnum 126 = KP
+  toEnum 127 = KR
+  toEnum 128 = KW
+  toEnum 129 = KY
+  toEnum 130 = KZ
+  toEnum 131 = LA
+  toEnum 132 = LB
+  toEnum 133 = LC
+  toEnum 134 = LI
+  toEnum 135 = LK
+  toEnum 136 = LR
+  toEnum 137 = LS
+  toEnum 138 = LT
+  toEnum 139 = LU
+  toEnum 140 = LV
+  toEnum 141 = LY
+  toEnum 142 = MA
+  toEnum 143 = MC
+  toEnum 144 = MD
+  toEnum 145 = ME
+  toEnum 146 = MF
+  toEnum 147 = MG
+  toEnum 148 = MH
+  toEnum 149 = MK
+  toEnum 150 = ML
+  toEnum 151 = MM
+  toEnum 152 = MN
+  toEnum 153 = MO
+  toEnum 154 = MP
+  toEnum 155 = MQ
+  toEnum 156 = MR
+  toEnum 157 = MS
+  toEnum 158 = MT
+  toEnum 159 = MU
+  toEnum 160 = MV
+  toEnum 161 = MW
+  toEnum 162 = MX
+  toEnum 163 = MY
+  toEnum 164 = MZ
+  toEnum 165 = NA
+  toEnum 166 = NC
+  toEnum 167 = NE
+  toEnum 168 = NF
+  toEnum 169 = NG
+  toEnum 170 = NI
+  toEnum 171 = NL
+  toEnum 172 = NO
+  toEnum 173 = NP
+  toEnum 174 = NR
+  toEnum 175 = NU
+  toEnum 176 = NZ
+  toEnum 177 = OM
+  toEnum 178 = PA
+  toEnum 179 = PE
+  toEnum 180 = PF
+  toEnum 181 = PG
+  toEnum 182 = PH
+  toEnum 183 = PK
+  toEnum 184 = PL
+  toEnum 185 = PM
+  toEnum 186 = PN
+  toEnum 187 = PR
+  toEnum 188 = PS
+  toEnum 189 = PT
+  toEnum 190 = PW
+  toEnum 191 = PY
+  toEnum 192 = QA
+  toEnum 193 = RE
+  toEnum 194 = RO
+  toEnum 195 = RS
+  toEnum 196 = RU
+  toEnum 197 = RW
+  toEnum 198 = SA
+  toEnum 199 = SB
+  toEnum 200 = SC
+  toEnum 201 = SD
+  toEnum 202 = SE
+  toEnum 203 = SG
+  toEnum 204 = SH
+  toEnum 205 = SI
+  toEnum 206 = SJ
+  toEnum 207 = SK
+  toEnum 208 = SL
+  toEnum 209 = SM
+  toEnum 210 = SN
+  toEnum 211 = SO
+  toEnum 212 = SR
+  toEnum 213 = SS
+  toEnum 214 = ST
+  toEnum 215 = SV
+  toEnum 216 = SX
+  toEnum 217 = SY
+  toEnum 218 = SZ
+  toEnum 219 = TA
+  toEnum 220 = TC
+  toEnum 221 = TD
+  toEnum 222 = TF
+  toEnum 223 = TG
+  toEnum 224 = TH
+  toEnum 225 = TJ
+  toEnum 226 = TK
+  toEnum 227 = TL
+  toEnum 228 = TM
+  toEnum 229 = TN
+  toEnum 230 = TO
+  toEnum 231 = TR
+  toEnum 232 = TT
+  toEnum 233 = TV
+  toEnum 234 = TW
+  toEnum 235 = TZ
+  toEnum 236 = UA
+  toEnum 237 = UG
+  toEnum 238 = UM
+  toEnum 239 = UN
+  toEnum 240 = US
+  toEnum 241 = UY
+  toEnum 242 = UZ
+  toEnum 243 = VA
+  toEnum 244 = VC
+  toEnum 245 = VE
+  toEnum 246 = VG
+  toEnum 247 = VI
+  toEnum 248 = VN
+  toEnum 249 = VU
+  toEnum 250 = WF
+  toEnum 251 = WS
+  toEnum 252 = XK
+  toEnum 253 = YE
+  toEnum 254 = YT
+  toEnum 255 = ZA
+  toEnum 256 = ZM
+  toEnum 257 = ZW
+  toEnum i = toEnumError "Flag" i (minBound :: Flag, maxBound)
+  enumFrom = (`enumFromTo` maxBound)
+  enumFromThen x y = enumFromThenTo x y maxBound
 
 instance Enum SubFlag where
-    fromEnum ENG = 0
-    fromEnum SCT = 1
-    fromEnum WLS = 2
-    fromEnum s = fromEnumError "SubFlag" s
-    toEnum 0 = ENG
-    toEnum 1 = SCT
-    toEnum 2 = WLS
-    toEnum i = toEnumError "SubFlag" i (minBound :: SubFlag, maxBound)
-    enumFrom = (`enumFromTo` maxBound)
-    enumFromThen x y = enumFromThenTo x y maxBound
+  fromEnum ENG = 0
+  fromEnum SCT = 1
+  fromEnum WLS = 2
+  fromEnum s = fromEnumError "SubFlag" s
+  toEnum 0 = ENG
+  toEnum 1 = SCT
+  toEnum 2 = WLS
+  toEnum i = toEnumError "SubFlag" i (minBound :: SubFlag, maxBound)
+  enumFrom = (`enumFromTo` maxBound)
+  enumFromThen x y = enumFromThenTo x y maxBound
 
 instance UnicodeText Flag where
-    toUnicodeText (Flag ca cb) = iso3166Alpha2ToFlag' ca cb
-    fromUnicodeText = fromFlag
-    isInTextRange c
-      | [ca, cb] <- unpack c, Just a <- shft ca, Just b <- shft cb = _validFlagEmoji a b
-      | otherwise = False
-      where shft = mapToEnumSafe _flagCharOffset
-
+  toUnicodeText (Flag ca cb) = iso3166Alpha2ToFlag' ca cb
+  fromUnicodeText = fromFlag
+  isInTextRange c
+    | [ca, cb] <- unpack c, Just a <- shft ca, Just b <- shft cb = _validFlagEmoji a b
+    | otherwise = False
+    where
+      shft = mapToEnumSafe _flagCharOffset
 
 instance UnicodeText SubFlag where
-    toUnicodeText (SubFlag (Flag ca cb) cc cd ce) = pack ('\x1f3f4' : go' ca : go' cb : map go [cc, cd, ce, '\DEL'])
-        where go = chr . (0xe0000 .|.) . ord
-              go' = go . toLower
-    fromUnicodeText t
-        | ['\x1f3f4', '\xe0067', '\xe0062', sa, sb, sc, '\xe007f'] <- unpack t = go sa sb sc
-        | otherwise = Nothing
-        where go '\xe0065' '\xe006e' '\xe0067' = Just ENG
-              go '\xe0073' '\xe0063' '\xe0074' = Just SCT
-              go '\xe0077' '\xe006c' '\xe0073' = Just WLS
-              go _ _ _ = Nothing
-    isInTextRange "\x1f3f4\xe0067\xe0062\xe0065\xe006e\xe0067\xe007f" = True
-    isInTextRange "\x1f3f4\xe0067\xe0062\xe0073\xe0063\xe0074\xe007f" = True
-    isInTextRange "\x1f3f4\xe0067\xe0062\xe0077\xe006c\xe0073\xe007f" = True
-    isInTextRange _ = False
+  toUnicodeText (SubFlag (Flag ca cb) cc cd ce) = pack ('\x1f3f4' : go' ca : go' cb : map go [cc, cd, ce, '\DEL'])
+    where
+      go = chr . (0xe0000 .|.) . ord
+      go' = go . toLower
+  fromUnicodeText t
+    | ['\x1f3f4', '\xe0067', '\xe0062', sa, sb, sc, '\xe007f'] <- unpack t = go sa sb sc
+    | otherwise = Nothing
+    where
+      go '\xe0065' '\xe006e' '\xe0067' = Just ENG
+      go '\xe0073' '\xe0063' '\xe0074' = Just SCT
+      go '\xe0077' '\xe006c' '\xe0073' = Just WLS
+      go _ _ _ = Nothing
+  isInTextRange "\x1f3f4\xe0067\xe0062\xe0065\xe006e\xe0067\xe007f" = True
+  isInTextRange "\x1f3f4\xe0067\xe0062\xe0073\xe0063\xe0074\xe007f" = True
+  isInTextRange "\x1f3f4\xe0067\xe0062\xe0077\xe006c\xe0073\xe007f" = True
+  isInTextRange _ = False
 
 -- | A data type to represent additional non-regional flags defined by the Unicode standard.
 data ExtraFlag
-  = ChequeredFlag  -- ^ A flag with black and white square like in a checkerboard pattern. These are often used to signal the start or end of a car race. This is rendered as 🏁.
-  | TriangularFlagOnPost  -- ^ A triangular flag that is often used for golf. This is rendered as 🚩.
-  | CrossedFlags  -- ^ This emoji depicts two /Japanese/ flags crossed at the base. Older versions of Samsung use two South Korean flags. This is rendered as 🎌.
-  | BlackFlag  -- ^ A waving black flag. This is rendered as 🏴.
-  | WavingWhiteFlag  -- ^ A waving white flag. This is often used as a sign of /surrender/. This is rendered as 🏳️.
-  | RainbowFlag  -- ^ A flag with six colors of the rainbow that usually include red, orange, yellow, green, blue and purple. This is rendered as 🏳️‍🌈.
-  | TransgenderFlag  -- ^ A flag with horizontal pale blue and pale pink stripes and a single white stripe in the middle. This is used as a /transgender/ pride flag. This is rendered as 🏳️‍⚧️.
-  | PirateFlag  -- ^ A /skull and crossbones/ displayed on a black flag. On pirate ships this is known as the Jolly Roger. This is rendered as 🏴‍☠️.
+  = -- | A flag with black and white square like in a checkerboard pattern. These are often used to signal the start or end of a car race. This is rendered as 🏁.
+    ChequeredFlag
+  | -- | A triangular flag that is often used for golf. This is rendered as 🚩.
+    TriangularFlagOnPost
+  | -- | This emoji depicts two /Japanese/ flags crossed at the base. Older versions of Samsung use two South Korean flags. This is rendered as 🎌.
+    CrossedFlags
+  | -- | A waving black flag. This is rendered as 🏴.
+    BlackFlag
+  | -- | A waving white flag. This is often used as a sign of /surrender/. This is rendered as 🏳️.
+    WavingWhiteFlag
+  | -- | A flag with six colors of the rainbow that usually include red, orange, yellow, green, blue and purple. This is rendered as 🏳️‍🌈.
+    RainbowFlag
+  | -- | A flag with horizontal pale blue and pale pink stripes and a single white stripe in the middle. This is used as a /transgender/ pride flag. This is rendered as 🏳️‍⚧️.
+    TransgenderFlag
+  | -- | A /skull and crossbones/ displayed on a black flag. On pirate ships this is known as the Jolly Roger. This is rendered as 🏴‍☠️.
+    PirateFlag
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary ExtraFlag where

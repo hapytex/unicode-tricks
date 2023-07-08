@@ -1,42 +1,47 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric, OverloadedStrings, Safe #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE Safe #-}
 
-{-|
-Module      : Data.Char.Emoji.Science
-Description : A module to render and parse emoji related to science.
-Maintainer  : hapytexeu+gh@gmail.com
-Stability   : experimental
-Portability : POSIX
+-- |
+-- Module      : Data.Char.Emoji.Science
+-- Description : A module to render and parse emoji related to science.
+-- Maintainer  : hapytexeu+gh@gmail.com
+-- Stability   : experimental
+-- Portability : POSIX
+--
+-- Unicode defines nine Emoji related to science. This module has a data type together with functions
+-- to convert this to and from a text fragment.
+module Data.Char.Emoji.Science
+  ( -- * Defining science emoji.
+    ScienceEmoji (Alembic, TestTube, PetriDish, DnaDoubleHelix, Microscope, Telescope, SatelliteAntenna),
+  )
+where
 
-Unicode defines nine Emoji related to science. This module has a data type together with functions
-to convert this to and from a text fragment.
--}
-
-module Data.Char.Emoji.Science (
-    -- * Defining science emoji.
-    ScienceEmoji(Alembic, TestTube, PetriDish, DnaDoubleHelix, Microscope, Telescope, SatelliteAntenna)
-  ) where
-
-import Control.DeepSeq(NFData)
-
-import Data.Char(chr, ord)
-import Data.Char.Core(UnicodeText(toUnicodeText, fromUnicodeText, isInTextRange))
-import Data.Data(Data)
-import Data.Hashable(Hashable)
-import Data.Text(singleton, unpack)
-
-import GHC.Generics(Generic)
-
-import Test.QuickCheck.Arbitrary(Arbitrary(arbitrary), arbitraryBoundedEnum)
+import Control.DeepSeq (NFData)
+import Data.Char (chr, ord)
+import Data.Char.Core (UnicodeText (fromUnicodeText, isInTextRange, toUnicodeText))
+import Data.Data (Data)
+import Data.Hashable (Hashable)
+import Data.Text (singleton, unpack)
+import GHC.Generics (Generic)
+import Test.QuickCheck.Arbitrary (Arbitrary (arbitrary), arbitraryBoundedEnum)
 
 -- | There are nine emoji that depict science.
 data ScienceEmoji
-  = Alembic  -- An /alembic/ is an apparatus for destillation. Normally this is depicted as ⚗️.
-  | TestTube  -- ^ A /test tube/ is used to conduct chemical experiments. Normally this is depicted as 🧪.
-  | PetriDish  -- ^ A /petri dish/ is used to culture microbes. Normally this is depicted as 🧫.
-  | DnaDoubleHelix  -- ^ A double helix of DNA is the genetic blueprint of life. Normally this is depicted as 🧬.
-  | Microscope  -- ^ A /microscope/ is used to magnify small objects. Normally this is depicted as 🔬.
-  | Telescope  -- ^ A /telescope/ is used to gaze at stars and planets in the night sky. Normally this is depicted as 🔭.
-  | SatelliteAntenna  -- ^ A /dish satellite/ is used to send and receive to or from communication satellites. This is normally depicited as 📡.
+  = Alembic -- An /alembic/ is an apparatus for destillation. Normally this is depicted as ⚗️.
+  | -- | A /test tube/ is used to conduct chemical experiments. Normally this is depicted as 🧪.
+    TestTube
+  | -- | A /petri dish/ is used to culture microbes. Normally this is depicted as 🧫.
+    PetriDish
+  | -- | A double helix of DNA is the genetic blueprint of life. Normally this is depicted as 🧬.
+    DnaDoubleHelix
+  | -- | A /microscope/ is used to magnify small objects. Normally this is depicted as 🔬.
+    Microscope
+  | -- | A /telescope/ is used to gaze at stars and planets in the night sky. Normally this is depicted as 🔭.
+    Telescope
+  | -- | A /dish satellite/ is used to send and receive to or from communication satellites. This is normally depicited as 📡.
+    SatelliteAntenna
   deriving (Bounded, Data, Enum, Eq, Generic, Ord, Read, Show)
 
 instance Arbitrary ScienceEmoji where
@@ -70,4 +75,3 @@ instance UnicodeText ScienceEmoji where
   isInTextRange t
     | [c] <- unpack t = '\x1f9ea' <= c && c <= '\x1f9ec'
     | otherwise = False
-

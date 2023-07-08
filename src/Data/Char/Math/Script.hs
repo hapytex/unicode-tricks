@@ -1,34 +1,40 @@
 {-# LANGUAGE Safe #-}
 
-{-|
-Module      : Data.Char.Math.Script
-Description : Script/calligraphy mathematical alphanumeric symbols
-Maintainer  : hapytexeu+gh@gmail.com
-Stability   : experimental
-Portability : POSIX
-
-See "Data.Char.Math" for further documentation.
--}
-
+-- |
+-- Module      : Data.Char.Math.Script
+-- Description : Script/calligraphy mathematical alphanumeric symbols
+-- Maintainer  : hapytexeu+gh@gmail.com
+-- Stability   : experimental
+-- Portability : POSIX
+--
+-- See "Data.Char.Math" for further documentation.
 module Data.Char.Math.Script
-  ( script,             script'
-  , scriptRegular,      scriptRegular'
-  , scriptBold,         scriptBold'
-  , calligraphy,        calligraphy'
-  , calligraphyRegular, calligraphyRegular'
-  , calligraphyBold,    calligraphyBold'
-  ) where
+  ( script,
+    script',
+    scriptRegular,
+    scriptRegular',
+    scriptBold,
+    scriptBold',
+    calligraphy,
+    calligraphy',
+    calligraphyRegular,
+    calligraphyRegular',
+    calligraphyBold,
+    calligraphyBold',
+  )
+where
 
-
-import Data.Char.Core(Emphasis, isAsciiAlpha, splitEmphasis)
+import Data.Char.Core (Emphasis, isAsciiAlpha, splitEmphasis)
 import Data.Char.Math.Internal
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
 -- symbol is /not/ written in boldface.
 -- If the symbol is not supported (see: "Data.Char.Math#characters_ranges"), the returned character is unspecified.
-scriptRegular'
-  :: Char  -- ^ The given character to convert.
-  -> Char  -- ^ The equivalent character that is formatted in calligraphy, not in bold.
+scriptRegular' ::
+  -- | The given character to convert.
+  Char ->
+  -- | The equivalent character that is formatted in calligraphy, not in bold.
+  Char
 scriptRegular' 'B' = '\x212c'
 scriptRegular' 'E' = '\x2130'
 scriptRegular' 'F' = '\x2131'
@@ -46,60 +52,74 @@ scriptRegular' c = _baseUpperLower 0x1d455 c
 -- wrapped in a 'Just' data constructor. This symbol is /not/ written in
 -- boldface.
 -- If the character is not supported (see: "Data.Char.Math#characters_ranges"), 'Nothing' is returned.
-scriptRegular
-  :: Char  -- ^ The given character to convert.
-  -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
-                -- in a 'Just' data constructor, 'Nothing' if there is no
-                -- equivalent /calligraphy/ character.
+scriptRegular ::
+  -- | The given character to convert.
+  Char ->
+  -- | The calligraphy symbol for the given character wrapped
+  -- in a 'Just' data constructor, 'Nothing' if there is no
+  -- equivalent /calligraphy/ character.
+  Maybe Char
 scriptRegular = _withCondition isAsciiAlpha scriptRegular'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
 -- symbol is written in boldface.
 -- If the symbol is not supported (see: "Data.Char.Math#characters_ranges"), the returned character is unspecified.
-scriptBold'
-  :: Char  -- ^ The given character to convert.
-  -> Char  -- ^ The equivalent character that is formatted in calligraphy, and in bold.
+scriptBold' ::
+  -- | The given character to convert.
+  Char ->
+  -- | The equivalent character that is formatted in calligraphy, and in bold.
+  Char
 scriptBold' = _baseUpperLower 0x1d489
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
 -- wrapped in a 'Just' data constructor. This symbol is written in
 -- boldface.
 -- If the character is not supported (see: "Data.Char.Math#characters_ranges"), 'Nothing' is returned.
-scriptBold
-  :: Char  -- ^ The given character to convert.
-  -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
-                -- in a 'Just' data constructor, 'Nothing' if there is no
-                -- equivalent /calligraphy/ character.
+scriptBold ::
+  -- | The given character to convert.
+  Char ->
+  -- | The calligraphy symbol for the given character wrapped
+  -- in a 'Just' data constructor, 'Nothing' if there is no
+  -- equivalent /calligraphy/ character.
+  Maybe Char
 scriptBold = _withCondition isAsciiAlpha scriptBold'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
 -- symbol is written in the given 'Emphasis' style.
 -- If the symbol is not supported (see: "Data.Char.Math#characters_ranges"), the returned character is unspecified.
-script'
-  :: Emphasis  -- ^ The given 'Emphasis' style to use.
-  -> Char  -- ^ The given character to convert.
-  -> Char  -- ^ The equivalent character that is formatted in calligraphy, and depending on the 'Emphasis' in bold or not.
+script' ::
+  -- | The given 'Emphasis' style to use.
+  Emphasis ->
+  -- | The given character to convert.
+  Char ->
+  -- | The equivalent character that is formatted in calligraphy, and depending on the 'Emphasis' in bold or not.
+  Char
 script' = splitEmphasis scriptRegular' scriptBold'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
 -- wrapped in a 'Just' data constructor. This symbol is /not/ written in
 -- the given 'Emphasis' style.
 -- If the character is not supported (see: "Data.Char.Math#characters_ranges"), 'Nothing' is returned.
-script
-  :: Emphasis  -- ^ The given 'Emphasis' style to use.
-  -> Char  -- ^ The given character to convert.
-  -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
-                -- in a 'Just' data constructor, 'Nothing' if there is no
-                -- equivalent /calligraphy/ character.
+script ::
+  -- | The given 'Emphasis' style to use.
+  Emphasis ->
+  -- | The given character to convert.
+  Char ->
+  -- | The calligraphy symbol for the given character wrapped
+  -- in a 'Just' data constructor, 'Nothing' if there is no
+  -- equivalent /calligraphy/ character.
+  Maybe Char
 script = splitEmphasis scriptRegular scriptBold
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
 -- symbol is /not/ written in boldface.
 -- If the symbol is not supported (see: "Data.Char.Math#characters_ranges"), the returned character is unspecified.
 -- This is an alias of 'scriptRegular''.
-calligraphyRegular'
-  :: Char  -- ^ The given character to convert.
-  -> Char  -- ^ The equivalent character that is formatted in calligraphy, not in bold.
+calligraphyRegular' ::
+  -- | The given character to convert.
+  Char ->
+  -- | The equivalent character that is formatted in calligraphy, not in bold.
+  Char
 calligraphyRegular' = scriptRegular'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
@@ -107,41 +127,50 @@ calligraphyRegular' = scriptRegular'
 -- boldface.
 -- If the character is not supported (see: "Data.Char.Math#characters_ranges"), 'Nothing' is returned.
 -- This is an alias of 'scriptRegular'.
-calligraphyRegular
-  :: Char  -- ^ The given character to convert.
-  -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
-                -- in a 'Just' data constructor, 'Nothing' if there is no
-                -- equivalent /calligraphy/ character.
+calligraphyRegular ::
+  -- | The given character to convert.
+  Char ->
+  -- | The calligraphy symbol for the given character wrapped
+  -- in a 'Just' data constructor, 'Nothing' if there is no
+  -- equivalent /calligraphy/ character.
+  Maybe Char
 calligraphyRegular = scriptRegular
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
 -- symbol is written in boldface.
 -- If the symbol is not supported (see: "Data.Char.Math#characters_ranges"), the returned character is unspecified.
 -- This is an alias of 'scriptBold''.
-calligraphyBold'
-  :: Char  -- ^ The given character to convert.
-  -> Char  -- ^ The equivalent character that is formatted in calligraphy, and in bold.
+calligraphyBold' ::
+  -- | The given character to convert.
+  Char ->
+  -- | The equivalent character that is formatted in calligraphy, and in bold.
+  Char
 calligraphyBold' = scriptBold'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
 -- wrapped in a 'Just' data constructor. This symbol is written in boldface.
 -- If the character is not supported (see: "Data.Char.Math#characters_ranges"), 'Nothing' is returned.
 -- This is an alias of 'scriptBold'.
-calligraphyBold
-  :: Char  -- ^ The given character to convert.
-  -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
-                -- in a 'Just' data constructor, 'Nothing' if there is no
-                -- equivalent /calligraphy/ character.
+calligraphyBold ::
+  -- | The given character to convert.
+  Char ->
+  -- | The calligraphy symbol for the given character wrapped
+  -- in a 'Just' data constructor, 'Nothing' if there is no
+  -- equivalent /calligraphy/ character.
+  Maybe Char
 calligraphyBold = scriptBold
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol. This
 -- symbol is written in the given 'Emphasis' style.
 -- If the symbol is not supported (see: "Data.Char.Math#characters_ranges"), the returned character is unspecified.
 -- This is an alias of 'script''.
-calligraphy'
-  :: Emphasis  -- ^ The given 'Emphasis' style to use.
-  -> Char  -- ^ The given character to convert.
-  -> Char  -- ^ The equivalent character that is formatted in calligraphy, and depending on the 'Emphasis' in bold or not.
+calligraphy' ::
+  -- | The given 'Emphasis' style to use.
+  Emphasis ->
+  -- | The given character to convert.
+  Char ->
+  -- | The equivalent character that is formatted in calligraphy, and depending on the 'Emphasis' in bold or not.
+  Char
 calligraphy' = script'
 
 -- | Convert the given character to its /script/ or /calligraphic/ symbol
@@ -149,10 +178,13 @@ calligraphy' = script'
 -- the given 'Emphasis' style.
 -- If the character is not supported (see: "Data.Char.Math#characters_ranges"), 'Nothing' is returned.
 -- This is an alias of 'script'.
-calligraphy
-  :: Emphasis  -- ^ The given 'Emphasis' style to use.
-  -> Char  -- ^ The given character to convert.
-  -> Maybe Char  -- ^ The calligraphy symbol for the given character wrapped
-                -- in a 'Just' data constructor, 'Nothing' if there is no
-                -- equivalent /calligraphy/ character.
+calligraphy ::
+  -- | The given 'Emphasis' style to use.
+  Emphasis ->
+  -- | The given character to convert.
+  Char ->
+  -- | The calligraphy symbol for the given character wrapped
+  -- in a 'Just' data constructor, 'Nothing' if there is no
+  -- equivalent /calligraphy/ character.
+  Maybe Char
 calligraphy = script
