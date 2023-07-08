@@ -1,5 +1,5 @@
 name:                unicode-tricks
-version:             0.12.2.0
+version:             0.13.0.0
 synopsis: Functions to work with unicode blocks more convenient.
 description:
   A package that makes rendering of frames, blocks, subscript and superscript
@@ -66,6 +66,7 @@ library
     , Data.Char.Number.Mayan
     , Data.Char.Number.Roman
     , Data.Char.Number.Segmented
+    , Data.Char.Number.Tally
     , Data.Char.Number.VulgarFraction
     , Data.Char.Private
     , Data.Char.Private.Klingon
@@ -124,6 +125,7 @@ test-suite             utricks
     , Data.Char.MathSpec
     , Data.Char.Number.MayanSpec
     , Data.Char.Number.RomanSpec
+    , Data.Char.Number.TallySpec
     , Data.Char.Private.KlingonSpec
     , Data.Char.TagSpec
   build-depends:
