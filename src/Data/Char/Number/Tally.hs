@@ -12,18 +12,18 @@ This module aims to convert numbers to (Western) tally marks and vice versa.
 
 module Data.Char.Number.Tally (
     -- * Data types to represent tally marks
-    TallyLiteral(I, V)
+    TallyLiteral(I, V),
+    -- * Convert a number to 'TallyLiteral's
+    toLiterals, toLiterals',
+    tallyNumber, tallyNumber'
   ) where
 
 import Control.DeepSeq(NFData)
 
-import Data.Bits((.|.))
-import Data.Char(chr)
-import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange', LetterCase, Ligate, ligateF, mapFromEnum, mapToEnum, mapToEnumSafe, splitLetterCase)
+import Data.Char.Core(UnicodeCharacter(toUnicodeChar, fromUnicodeChar, fromUnicodeChar', isInCharRange), UnicodeText(isInTextRange), generateIsInTextRange', mapFromEnum, mapToEnum, mapToEnumSafe)
 import Data.Data(Data)
-import Data.Default.Class(Default(def))
 import Data.Hashable(Hashable)
-import Data.Text(Text, cons, empty)
+import Data.Text(Text, pack)
 import Data.List(genericReplicate)
 
 import GHC.Generics(Generic)
@@ -57,19 +57,31 @@ instance Hashable TallyLiteral
 instance NFData TallyLiteral
 
 
--- | Convert a given /positive/ natural number to a sequence of
+-- | Convert a given /positive/ natural number to a sequence of 'TallyLiteral's.
 toLiterals :: Integral i
   => i  -- ^ The given number to convert.
   -> Maybe [TallyLiteral]  -- ^ A list of 'TallyLiteral's if the given number can be specified with tally marks, 'Nothing' otherwise.
 toLiterals k
-    | k > 0 = Just (genericReplicate k0 V ++ genericReplicate k1 I)
+    | k > 0 = Just (toLiterals' k)
     | otherwise = Nothing
+
+-- | Convert a given number to a sequence of 'TallyLiteral's, for negative numbers or zero, the behavior is unspecified.
+toLiterals' :: Integral i
+  => i  -- ^ The given number to convert.
+  -> [TallyLiteral]  -- ^ A list of 'TallyLiteral's that denotes the given number.
+toLiterals' k = genericReplicate k0 V ++ genericReplicate k1 I
     where ~(k0, k1) = k `divMod` 5
 
--- | Convert a given number to a 'Text' wrapped in a 'Just' data constructor,
--- given the number, given it can be represented. 'Nothing' in case it can not
--- be represented. The number is written in Roman numerals in /upper case/.
--- tallyMarks :: Integral i
---   -> i  -- ^ The given number to convert.
---   -> Maybe Text  -- ^ A 'Text' if the given number can be specified with Roman
-                -- numerals wrapped in a 'Just', 'Nothing' otherwise.
+-- | Convert a given /positive/ natural number to a 'Text' object with the tally marks for that number.
+tallyNumber :: Integral i
+  => i  -- ^ The given number to convert.
+  -> Maybe Text  -- ^ A 'Text' with the tally marks wrapped in a 'Just' if the number can be represented with tally marks; 'Nothing' otherwise.
+tallyNumber k
+    | k > 0 = Just (tallyNumber' k)
+    | otherwise = Nothing
+
+-- | Convert a given number to a 'Text' object with the tally marks for that number, for negative numbers or zero, the behavior is unspecified.
+tallyNumber' :: Integral i
+  => i  -- ^ The given number to convert.
+  -> Text  -- ^ The corresponding 'Text' that contains the number as /tally marks/.
+tallyNumber' = pack . map toUnicodeChar . toLiterals'
