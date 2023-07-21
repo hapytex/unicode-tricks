@@ -359,11 +359,13 @@ import Data.Char.Enclosed (regionalIndicatorUppercase')
 import Data.Data (Data)
 import Data.Function (on)
 import Data.Hashable (Hashable)
-import Data.Maybe (fromJust)
+import Data.List (elemIndex)
+import Data.Maybe (fromJust, fromMaybe, listToMaybe)
 import Data.Text (Text, pack, unpack)
 import GHC.Enum (fromEnumError, toEnumError)
 import GHC.Generics (Generic)
 import Test.QuickCheck.Arbitrary (Arbitrary (arbitrary), arbitraryBoundedEnum)
+import Test.QuickCheck.Gen (elements)
 import Prelude hiding (GT, LT)
 
 _flagCharOffset :: Int
@@ -1722,8 +1724,8 @@ pattern USWY :: SubFlag
 pattern USWY = USSubFlag 'w' 'y'
 
 instance Bounded SubFlag where
-  minBound = ENG
-  maxBound = WLS
+  minBound = head _subflags
+  maxBound = last _subflags
 
 -- | Convert the given two 'Char'acters of the ISO3166-1 Alpha-2 standard to an
 -- Emoji that renders the flag of the corresponding country or terroitory.
@@ -2045,7 +2047,7 @@ instance Arbitrary Flag where
   arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary SubFlag where
-  arbitrary = arbitraryBoundedEnum
+  arbitrary = elements _subflags
 
 instance Enum Flag where
   fromEnum AC = 0
@@ -2569,15 +2571,21 @@ instance Enum Flag where
   enumFrom = (`enumFromTo` maxBound)
   enumFromThen x y = enumFromThenTo x y maxBound
 
+_subflags :: [SubFlag]
+_subflags = [ENG, SCT, WLS, USAL, USAK, USAS, USAZ, USAR, USCA, USCO, USCT, USDE, USFL, USGA, USGU, USHI, USID, USIL, USIN, USIA, USKS, USKY, USLA, USME, USMD, USMA, USMI, USMN, USMS, USMO, USMT, USNE, USNV, USNH, USNJ, USNM, USNY, USNC, USND, USMP, USOH, USOK, USOR, USPA, USPR, USRI, USSC, USSD, USTN, USUM, USVI, USUT, USVT, USVA, USWA, USDC, USWV, USWI, USWY]
+
+(?!) :: Int -> [a] -> Maybe a
+(?!) n
+  | n < 0 = const Nothing
+  | otherwise = go n
+  where
+    go 0 (x : _) = Just x
+    go i (_ : xs) = go (i - 1) xs
+    go _ [] = Nothing
+
 instance Enum SubFlag where
-  fromEnum ENG = 0
-  fromEnum SCT = 1
-  fromEnum WLS = 2
-  fromEnum s = fromEnumError "SubFlag" s
-  toEnum 0 = ENG
-  toEnum 1 = SCT
-  toEnum 2 = WLS
-  toEnum i = toEnumError "SubFlag" i (minBound :: SubFlag, maxBound)
+  fromEnum s = fromMaybe (fromEnumError "SubFlag" s) (elemIndex s _subflags)
+  toEnum i = fromMaybe (toEnumError "SubFlag" i (minBound :: SubFlag, maxBound)) (i ?! _subflags)
   enumFrom = (`enumFromTo` maxBound)
   enumFromThen x y = enumFromThenTo x y maxBound
 
@@ -2591,24 +2599,12 @@ instance UnicodeText Flag where
       shft = mapToEnumSafe _flagCharOffset
 
 instance UnicodeText SubFlag where
-  toUnicodeText (SubFlag (Flag ca cb) cc cd ce) = pack ('\x1f3f4' : go' ca : go' cb : map go (l ce))
+  toUnicodeText (SubFlag (Flag ca cb) cc cd ce) = pack ('\x1f3f4' : go' ca : go' cb : map go (cc : cd : (maybe id (:) ce "\DEL")))
     where
       go = chr . (0xe0000 .|.) . ord
       go' = go . toLower
-      l (Just ce') = [cc, cd, ce', '\DEL']
-      l Nothing = [cc, cd, '\DEL']
-  fromUnicodeText t
-    | ['\x1f3f4', '\xe0067', '\xe0062', sa, sb, sc, '\xe007f'] <- unpack t = go sa sb sc
-    | otherwise = Nothing
-    where
-      go '\xe0065' '\xe006e' '\xe0067' = Just ENG
-      go '\xe0073' '\xe0063' '\xe0074' = Just SCT
-      go '\xe0077' '\xe006c' '\xe0073' = Just WLS
-      go _ _ _ = Nothing
-  isInTextRange "\x1f3f4\xe0067\xe0062\xe0065\xe006e\xe0067\xe007f" = True
-  isInTextRange "\x1f3f4\xe0067\xe0062\xe0073\xe0063\xe0074\xe007f" = True
-  isInTextRange "\x1f3f4\xe0067\xe0062\xe0077\xe006c\xe0073\xe007f" = True
-  isInTextRange _ = False
+  fromUnicodeText t = listToMaybe [sf | sf <- _subflags, t == toUnicodeText sf]
+  isInTextRange = (`elem` map toUnicodeText _subflags)
 
 -- | A data type to represent additional non-regional flags defined by the Unicode standard.
 data ExtraFlag

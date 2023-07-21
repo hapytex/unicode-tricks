@@ -2,6 +2,10 @@
 
 For a full list of changes, see the history on [GitHub](https://github.com/hapytex/unicode-tricks).
 
+## Version 0.14.0.0
+
+Add US state flags.
+
 ## Version 0.13.0.0
 
 Added tally marks
