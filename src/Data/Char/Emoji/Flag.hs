@@ -2599,7 +2599,7 @@ instance UnicodeText Flag where
       shft = mapToEnumSafe _flagCharOffset
 
 instance UnicodeText SubFlag where
-  toUnicodeText (SubFlag (Flag ca cb) cc cd ce) = pack ('\x1f3f4' : go' ca : go' cb : map go (cc : cd : (maybe id (:) ce "\DEL")))
+  toUnicodeText (SubFlag (Flag ca cb) cc cd ce) = pack ('\x1f3f4' : go' ca : go' cb : map go (cc : cd : maybe id (:) ce "\DEL"))
     where
       go = chr . (0xe0000 .|.) . ord
       go' = go . toLower
