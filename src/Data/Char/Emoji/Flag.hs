@@ -292,6 +292,62 @@ module Data.Char.Emoji.Flag
     pattern ENG,
     pattern SCT,
     pattern WLS,
+    pattern USAL,
+    pattern USAK,
+    pattern USAS,
+    pattern USAZ,
+    pattern USAR,
+    pattern USCA,
+    pattern USCO,
+    pattern USCT,
+    pattern USDE,
+    pattern USFL,
+    pattern USGA,
+    pattern USGU,
+    pattern USHI,
+    pattern USID,
+    pattern USIL,
+    pattern USIN,
+    pattern USIA,
+    pattern USKS,
+    pattern USKY,
+    pattern USLA,
+    pattern USME,
+    pattern USMD,
+    pattern USMA,
+    pattern USMI,
+    pattern USMN,
+    pattern USMS,
+    pattern USMO,
+    pattern USMT,
+    pattern USNE,
+    pattern USNV,
+    pattern USNH,
+    pattern USNJ,
+    pattern USNM,
+    pattern USNY,
+    pattern USNC,
+    pattern USND,
+    pattern USMP,
+    pattern USOH,
+    pattern USOK,
+    pattern USOR,
+    pattern USPA,
+    pattern USPR,
+    pattern USRI,
+    pattern USSC,
+    pattern USSD,
+    pattern USTN,
+    pattern USUM,
+    pattern USVI,
+    pattern USUT,
+    pattern USVT,
+    pattern USVA,
+    pattern USWA,
+    pattern USDC,
+    pattern USWV,
+    pattern USWI,
+    pattern USWY,
   )
 where
 
@@ -331,7 +387,7 @@ instance NFData Flag
 -- subregional flags are /England/ (eng), /Scotland/ (sct) and /Wales/ (wls),
 -- all beloning under the /United Kingdom/ flag (GB).
 -- The data constructor is made private to prevent making non-existing subflags.
-data SubFlag = SubFlag Flag Char Char Char deriving (Data, Eq, Generic, Ord, Read, Show)
+data SubFlag = SubFlag Flag Char Char (Maybe Char) deriving (Data, Eq, Generic, Ord, Read, Show)
 
 instance Bounded Flag where
   minBound = AC
@@ -1423,17 +1479,302 @@ pattern ZM = Flag 'Z' 'M'
 pattern ZW :: Flag
 pattern ZW = Flag 'Z' 'W'
 
--- | The 'SubFlag' pattern use for /England/ denoted with /GB-ENG/ or /ENG/.
+pattern GBSubFlag :: Char -> Char -> Char -> SubFlag
+pattern GBSubFlag a b c = SubFlag GB a b (Just c)
+
+pattern USSubFlag :: Char -> Char -> SubFlag
+pattern USSubFlag a b = SubFlag US a b Nothing
+
+-- | The 'SubFlag' pattern used for /England/ denoted with /GB-ENG/ or /ENG/.
 pattern ENG :: SubFlag
-pattern ENG = SubFlag GB 'e' 'n' 'g'
+pattern ENG = GBSubFlag 'e' 'n' 'g'
 
--- | The 'SubFlag' pattern use for /Scotland/ denoted with /GB-SCT/ or /SCT/.
+-- | The 'SubFlag' pattern used for /Scotland/ denoted with /GB-SCT/ or /SCT/.
 pattern SCT :: SubFlag
-pattern SCT = SubFlag GB 's' 'c' 't'
+pattern SCT = GBSubFlag 's' 'c' 't'
 
--- | The 'SubFlag' pattern use for /Wales/ denoted with /GB-WLS/ or /WLS/.
+-- | The 'SubFlag' pattern used for /Wales/ denoted with /GB-WLS/ or /WLS/.
 pattern WLS :: SubFlag
-pattern WLS = SubFlag GB 'w' 'l' 's'
+pattern WLS = GBSubFlag 'w' 'l' 's'
+
+-- | The 'SubFlag' pattern used for /Alabama/ denoted with /US-AL/ or /AL/
+pattern USAL :: SubFlag
+pattern USAL = USSubFlag 'a' 'l'
+
+
+-- | The 'SubFlag' pattern used for /Alaska/ denoted with /US-AK/ or /AK/
+pattern USAK :: SubFlag
+pattern USAK = USSubFlag 'a' 'k'
+
+
+-- | The 'SubFlag' pattern used for /American Samoa/ denoted with /US-AS/ or /AS/
+pattern USAS :: SubFlag
+pattern USAS = USSubFlag 'a' 's'
+
+
+-- | The 'SubFlag' pattern used for /Arizona/ denoted with /US-AZ/ or /AZ/
+pattern USAZ :: SubFlag
+pattern USAZ = USSubFlag 'a' 'z'
+
+
+-- | The 'SubFlag' pattern used for /Arkansas/ denoted with /US-AR/ or /AR/
+pattern USAR :: SubFlag
+pattern USAR = USSubFlag 'a' 'r'
+
+
+-- | The 'SubFlag' pattern used for /California/ denoted with /US-CA/ or /CA/
+pattern USCA :: SubFlag
+pattern USCA = USSubFlag 'c' 'a'
+
+
+-- | The 'SubFlag' pattern used for /Colorado/ denoted with /US-CO/ or /CO/
+pattern USCO :: SubFlag
+pattern USCO = USSubFlag 'c' 'o'
+
+
+-- | The 'SubFlag' pattern used for /Connecticut/ denoted with /US-CT/ or /CT/
+pattern USCT :: SubFlag
+pattern USCT = USSubFlag 'c' 't'
+
+
+-- | The 'SubFlag' pattern used for /Delaware/ denoted with /US-DE/ or /DE/
+pattern USDE :: SubFlag
+pattern USDE = USSubFlag 'd' 'e'
+
+
+-- | The 'SubFlag' pattern used for /Florida/ denoted with /US-FL/ or /FL/
+pattern USFL :: SubFlag
+pattern USFL = USSubFlag 'f' 'l'
+
+
+-- | The 'SubFlag' pattern used for /Georgia/ denoted with /US-GA/ or /GA/
+pattern USGA :: SubFlag
+pattern USGA = USSubFlag 'g' 'a'
+
+
+-- | The 'SubFlag' pattern used for /Guam/ denoted with /US-GU/ or /GU/
+pattern USGU :: SubFlag
+pattern USGU = USSubFlag 'g' 'u'
+
+
+-- | The 'SubFlag' pattern used for /Hawaii/ denoted with /US-HI/ or /HI/
+pattern USHI :: SubFlag
+pattern USHI = USSubFlag 'h' 'i'
+
+
+-- | The 'SubFlag' pattern used for /Idaho/ denoted with /US-ID/ or /ID/
+pattern USID :: SubFlag
+pattern USID = USSubFlag 'i' 'd'
+
+
+-- | The 'SubFlag' pattern used for /Illinois/ denoted with /US-IL/ or /IL/
+pattern USIL :: SubFlag
+pattern USIL = USSubFlag 'i' 'l'
+
+
+-- | The 'SubFlag' pattern used for /Indiana/ denoted with /US-IN/ or /IN/
+pattern USIN :: SubFlag
+pattern USIN = USSubFlag 'i' 'n'
+
+
+-- | The 'SubFlag' pattern used for /Iowa/ denoted with /US-IA/ or /IA/
+pattern USIA :: SubFlag
+pattern USIA = USSubFlag 'i' 'a'
+
+
+-- | The 'SubFlag' pattern used for /Kansas/ denoted with /US-KS/ or /KS/
+pattern USKS :: SubFlag
+pattern USKS = USSubFlag 'k' 's'
+
+
+-- | The 'SubFlag' pattern used for /Kentucky/ denoted with /US-KY/ or /KY/
+pattern USKY :: SubFlag
+pattern USKY = USSubFlag 'k' 'y'
+
+
+-- | The 'SubFlag' pattern used for /Louisiana/ denoted with /US-LA/ or /LA/
+pattern USLA :: SubFlag
+pattern USLA = USSubFlag 'l' 'a'
+
+
+-- | The 'SubFlag' pattern used for /Maine/ denoted with /US-ME/ or /ME/
+pattern USME :: SubFlag
+pattern USME = USSubFlag 'm' 'e'
+
+
+-- | The 'SubFlag' pattern used for /Maryland/ denoted with /US-MD/ or /MD/
+pattern USMD :: SubFlag
+pattern USMD = USSubFlag 'm' 'd'
+
+
+-- | The 'SubFlag' pattern used for /Massachusetts/ denoted with /US-MA/ or /MA/
+pattern USMA :: SubFlag
+pattern USMA = USSubFlag 'm' 'a'
+
+
+-- | The 'SubFlag' pattern used for /Michigan/ denoted with /US-MI/ or /MI/
+pattern USMI :: SubFlag
+pattern USMI = USSubFlag 'm' 'i'
+
+
+-- | The 'SubFlag' pattern used for /Minnesota/ denoted with /US-MN/ or /MN/
+pattern USMN :: SubFlag
+pattern USMN = USSubFlag 'm' 'n'
+
+
+-- | The 'SubFlag' pattern used for /Mississippi/ denoted with /US-MS/ or /MS/
+pattern USMS :: SubFlag
+pattern USMS = USSubFlag 'm' 's'
+
+
+-- | The 'SubFlag' pattern used for /Missouri/ denoted with /US-MO/ or /MO/
+pattern USMO :: SubFlag
+pattern USMO = USSubFlag 'm' 'o'
+
+
+-- | The 'SubFlag' pattern used for /Montana/ denoted with /US-MT/ or /MT/
+pattern USMT :: SubFlag
+pattern USMT = USSubFlag 'm' 't'
+
+
+-- | The 'SubFlag' pattern used for /Nebraska/ denoted with /US-NE/ or /NE/
+pattern USNE :: SubFlag
+pattern USNE = USSubFlag 'n' 'e'
+
+
+-- | The 'SubFlag' pattern used for /Nevada/ denoted with /US-NV/ or /NV/
+pattern USNV :: SubFlag
+pattern USNV = USSubFlag 'n' 'v'
+
+
+-- | The 'SubFlag' pattern used for /New Hampshire/ denoted with /US-NH/ or /NH/
+pattern USNH :: SubFlag
+pattern USNH = USSubFlag 'n' 'h'
+
+
+-- | The 'SubFlag' pattern used for /New Jersey/ denoted with /US-NJ/ or /NJ/
+pattern USNJ :: SubFlag
+pattern USNJ = USSubFlag 'n' 'j'
+
+
+-- | The 'SubFlag' pattern used for /New Mexico/ denoted with /US-NM/ or /NM/
+pattern USNM :: SubFlag
+pattern USNM = USSubFlag 'n' 'm'
+
+
+-- | The 'SubFlag' pattern used for /New York/ denoted with /US-NY/ or /NY/
+pattern USNY :: SubFlag
+pattern USNY = USSubFlag 'n' 'y'
+
+
+-- | The 'SubFlag' pattern used for /North Carolina/ denoted with /US-NC/ or /NC/
+pattern USNC :: SubFlag
+pattern USNC = USSubFlag 'n' 'c'
+
+
+-- | The 'SubFlag' pattern used for /North Dakota/ denoted with /US-ND/ or /ND/
+pattern USND :: SubFlag
+pattern USND = USSubFlag 'n' 'd'
+
+
+-- | The 'SubFlag' pattern used for /Northern Mariana Islands/ denoted with /US-MP/ or /MP/
+pattern USMP :: SubFlag
+pattern USMP = USSubFlag 'm' 'p'
+
+
+-- | The 'SubFlag' pattern used for /Ohio/ denoted with /US-OH/ or /OH/
+pattern USOH :: SubFlag
+pattern USOH = USSubFlag 'o' 'h'
+
+
+-- | The 'SubFlag' pattern used for /Oklahoma/ denoted with /US-OK/ or /OK/
+pattern USOK :: SubFlag
+pattern USOK = USSubFlag 'o' 'k'
+
+
+-- | The 'SubFlag' pattern used for /Oregon/ denoted with /US-OR/ or /OR/
+pattern USOR :: SubFlag
+pattern USOR = USSubFlag 'o' 'r'
+
+
+-- | The 'SubFlag' pattern used for /Pennsylvania/ denoted with /US-PA/ or /PA/
+pattern USPA :: SubFlag
+pattern USPA = USSubFlag 'p' 'a'
+
+
+-- | The 'SubFlag' pattern used for /Puerto Rico/ denoted with /US-PR/ or /PR/
+pattern USPR :: SubFlag
+pattern USPR = USSubFlag 'p' 'r'
+
+
+-- | The 'SubFlag' pattern used for /Rhode Island/ denoted with /US-RI/ or /RI/
+pattern USRI :: SubFlag
+pattern USRI = USSubFlag 'r' 'i'
+
+
+-- | The 'SubFlag' pattern used for /South Carolina/ denoted with /US-SC/ or /SC/
+pattern USSC :: SubFlag
+pattern USSC = USSubFlag 's' 'c'
+
+
+-- | The 'SubFlag' pattern used for /South Dakota/ denoted with /US-SD/ or /SD/
+pattern USSD :: SubFlag
+pattern USSD = USSubFlag 's' 'd'
+
+
+-- | The 'SubFlag' pattern used for /Tennessee/ denoted with /US-TN/ or /TN/
+pattern USTN :: SubFlag
+pattern USTN = USSubFlag 't' 'n'
+
+
+-- | The 'SubFlag' pattern used for /U.S. Outlying Islands/ denoted with /US-UM/ or /UM/
+pattern USUM :: SubFlag
+pattern USUM = USSubFlag 'u' 'm'
+
+
+-- | The 'SubFlag' pattern used for /U.S. Virgin Islands/ denoted with /US-VI/ or /VI/
+pattern USVI :: SubFlag
+pattern USVI = USSubFlag 'v' 'i'
+
+
+-- | The 'SubFlag' pattern used for /Utah/ denoted with /US-UT/ or /UT/
+pattern USUT :: SubFlag
+pattern USUT = USSubFlag 'u' 't'
+
+
+-- | The 'SubFlag' pattern used for /Vermont/ denoted with /US-VT/ or /VT/
+pattern USVT :: SubFlag
+pattern USVT = USSubFlag 'v' 't'
+
+
+-- | The 'SubFlag' pattern used for /Virginia/ denoted with /US-VA/ or /VA/
+pattern USVA :: SubFlag
+pattern USVA = USSubFlag 'v' 'a'
+
+
+-- | The 'SubFlag' pattern used for /Washington/ denoted with /US-WA/ or /WA/
+pattern USWA :: SubFlag
+pattern USWA = USSubFlag 'w' 'a'
+
+
+-- | The 'SubFlag' pattern used for /Washington DC/ denoted with /US-DC/ or /DC/
+pattern USDC :: SubFlag
+pattern USDC = USSubFlag 'd' 'c'
+
+
+-- | The 'SubFlag' pattern used for /West Virginia/ denoted with /US-WV/ or /WV/
+pattern USWV :: SubFlag
+pattern USWV = USSubFlag 'w' 'v'
+
+
+-- | The 'SubFlag' pattern used for /Wisconsin/ denoted with /US-WI/ or /WI/
+pattern USWI :: SubFlag
+pattern USWI = USSubFlag 'w' 'i'
+
+
+-- | The 'SubFlag' pattern used for /Wyoming/ denoted with /US-WY/ or /WY/
+pattern USWY :: SubFlag
+pattern USWY = USSubFlag 'w' 'y'
 
 instance Bounded SubFlag where
   minBound = ENG
@@ -2305,10 +2646,12 @@ instance UnicodeText Flag where
       shft = mapToEnumSafe _flagCharOffset
 
 instance UnicodeText SubFlag where
-  toUnicodeText (SubFlag (Flag ca cb) cc cd ce) = pack ('\x1f3f4' : go' ca : go' cb : map go [cc, cd, ce, '\DEL'])
+  toUnicodeText (SubFlag (Flag ca cb) cc cd ce) = pack ('\x1f3f4' : go' ca : go' cb : map go (l ce))
     where
       go = chr . (0xe0000 .|.) . ord
       go' = go . toLower
+      l (Just ce') = [cc, cd, ce', '\DEL']
+      l Nothing = [cc, cd, '\DEL']
   fromUnicodeText t
     | ['\x1f3f4', '\xe0067', '\xe0062', sa, sb, sc, '\xe007f'] <- unpack t = go sa sb sc
     | otherwise = Nothing
