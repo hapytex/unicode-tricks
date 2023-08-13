@@ -70,6 +70,15 @@ toSup '=' = Just '\x207c'
 toSup '(' = Just '\x207d'
 toSup ')' = Just '\x207e'
 toSup 'n' = Just '\x207f'
+toSup 'h' = Just '\x02b0'
+toSup 'ɦ' = Just '\x02b1'
+toSup 'j' = Just '\x02b2'
+toSup 'r' = Just '\x02b3'
+toSup 'ɹ' = Just '\x02b4'
+toSup 'ɻ' = Just '\x02b5'
+toSup 'ʁ' = Just '\x02b6'
+toSup 'w' = Just '\x02b7'
+toSup 'y' = Just '\x02b8'
 toSup c
   | isDigit c = Just (_digitToSub (ord c - ord '0'))
   | otherwise = Nothing
