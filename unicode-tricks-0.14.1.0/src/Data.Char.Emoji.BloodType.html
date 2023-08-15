@@ -1,0 +1,611 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="local-6989586621679275846"><span id="local-6989586621679275847"><span id="local-6989586621679275848"><span id="local-6989586621679275849"><span id="local-6989586621679275850"><span id="local-6989586621679275851"><span id="local-6989586621679275852"></span></span></span></span></span></span></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE PatternSynonyms #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Module      : Data.Char.Emoji.BloodType</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Description : A module that defines the emoji for /blood types/.</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-13"></span><span class="hs-comment">--</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- The Unicode standard defines four emoji for the 'O', 'B', 'A', and 'AB' blood type.</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Emoji.BloodType</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Blood type emoji</span></span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Data.Char.Emoji.BloodType.html#BloodType"><span class="hs-identifier">BloodType</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Emoji.BloodType.html#O"><span class="hs-identifier">O</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.BloodType.html#B"><span class="hs-identifier">B</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.BloodType.html#A"><span class="hs-identifier">A</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.BloodType.html#AB"><span class="hs-identifier">AB</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Drop of blood emoji</span></span><span>
+</span><span id="line-20"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.BloodType.html#DropOfBlood"><span class="hs-identifier">DropOfBlood</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Bits</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Bits</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">bit</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">bitSize</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">bitSizeMaybe</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">complement</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">isSigned</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">popCount</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">rotate</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">shift</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">testBit</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">xor</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(.&amp;.)</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(.|.)</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier">UnicodeText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier">fromUnicodeText</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier">isInTextRange</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier">toUnicodeText</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Core.html"><span class="hs-identifier">Data.Char.Emoji.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Core.html#EmojiSuffix"><span class="hs-identifier">EmojiSuffix</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Function</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">on</span></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">unpack</span></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitraryBoundedEnum</span></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span class="annot"><span class="hs-comment">-- | A emoji that depicts a drop of blood. This looks like &#129656;.</span></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.BloodType.html#DropOfBlood"><span class="hs-identifier hs-type">DropOfBlood</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">pattern</span><span> </span><span id="DropOfBlood"><span id="%24mDropOfBlood"><span id="%24bDropOfBlood"><span class="annot"><span class="annottext">$mDropOfBlood :: forall {r}. Char -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bDropOfBlood :: Char
+</span><a href="Data.Char.Emoji.BloodType.html#DropOfBlood"><span class="hs-identifier hs-var hs-var hs-var">DropOfBlood</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\x1fa78'</span></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- | A 'BloodType' object used to convert to its unicode equivalent. The</span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- 'BloodType' is also seen as a 2-bit value with the leftmost bit representing</span><span>
+</span><span id="line-41"></span><span class="hs-comment">-- the presence of /A antigens/ and the rightmost the presence of /B antigens/.</span><span>
+</span><span id="line-42"></span><span class="hs-keyword">data</span><span> </span><span id="BloodType"><span class="annot"><a href="Data.Char.Emoji.BloodType.html#BloodType"><span class="hs-identifier hs-var">BloodType</span></a></span></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-comment">-- | The /O blood type/, with no presence of A and B antigens, denoted by &#127358;&#65039;.</span></span><span>
+</span><span id="line-44"></span><span>    </span><span id="O"><span class="annot"><a href="Data.Char.Emoji.BloodType.html#O"><span class="hs-identifier hs-var">O</span></a></span></span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /B blood type/, with presence of the B antigen, denoted by &#127345;&#65039;.</span></span><span>
+</span><span id="line-46"></span><span>    </span><span id="B"><span class="annot"><a href="Data.Char.Emoji.BloodType.html#B"><span class="hs-identifier hs-var">B</span></a></span></span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /A blood type/, with presence of the A antigen, denoted by &#127344;&#65039;.</span></span><span>
+</span><span id="line-48"></span><span>    </span><span id="A"><span class="annot"><a href="Data.Char.Emoji.BloodType.html#A"><span class="hs-identifier hs-var">A</span></a></span></span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /AB blood type/, with presence of the A and B antigens, denoted by &#127374;.</span></span><span>
+</span><span id="line-50"></span><span>    </span><span id="AB"><span class="annot"><a href="Data.Char.Emoji.BloodType.html#AB"><span class="hs-identifier hs-var">AB</span></a></span></span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679275881"><span id="local-6989586621679275883"><span class="annot"><span class="annottext">BloodType
+BloodType -&gt; BloodType -&gt; Bounded BloodType
+forall a. a -&gt; a -&gt; Bounded a
+$cminBound :: BloodType
+minBound :: BloodType
+$cmaxBound :: BloodType
+maxBound :: BloodType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679275889"><span id="local-6989586621679275891"><span id="local-6989586621679275893"><span id="local-6989586621679275895"><span id="local-6989586621679275897"><span id="local-6989586621679275903"><span id="local-6989586621679275908"><span id="local-6989586621679275911"><span id="local-6989586621679275914"><span id="local-6989586621679275917"><span id="local-6989586621679275920"><span id="local-6989586621679275923"><span id="local-6989586621679275928"><span id="local-6989586621679275933"><span class="annot"><span class="annottext">Typeable BloodType
+Typeable BloodType
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; BloodType -&gt; c BloodType)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c BloodType)
+-&gt; (BloodType -&gt; Constr)
+-&gt; (BloodType -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c BloodType))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c BloodType))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; BloodType -&gt; BloodType)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BloodType -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BloodType -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; BloodType -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; BloodType -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; BloodType -&gt; m BloodType)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; BloodType -&gt; m BloodType)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; BloodType -&gt; m BloodType)
+-&gt; Data BloodType
+BloodType -&gt; Constr
+BloodType -&gt; DataType
+(forall b. Data b =&gt; b -&gt; b) -&gt; BloodType -&gt; BloodType
+forall a.
+Typeable a
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; BloodType -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; BloodType -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BloodType -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BloodType -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BloodType -&gt; m BloodType
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BloodType -&gt; m BloodType
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c BloodType
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; BloodType -&gt; c BloodType
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c BloodType)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c BloodType)
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; BloodType -&gt; c BloodType
+gfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; BloodType -&gt; c BloodType
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c BloodType
+gunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c BloodType
+$ctoConstr :: BloodType -&gt; Constr
+toConstr :: BloodType -&gt; Constr
+$cdataTypeOf :: BloodType -&gt; DataType
+dataTypeOf :: BloodType -&gt; DataType
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c BloodType)
+dataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c BloodType)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c BloodType)
+dataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c BloodType)
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; BloodType -&gt; BloodType
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; BloodType -&gt; BloodType
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BloodType -&gt; r
+gmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BloodType -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BloodType -&gt; r
+gmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BloodType -&gt; r
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; BloodType -&gt; [u]
+gmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; BloodType -&gt; [u]
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; BloodType -&gt; u
+gmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; BloodType -&gt; u
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BloodType -&gt; m BloodType
+gmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BloodType -&gt; m BloodType
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BloodType -&gt; m BloodType
+gmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BloodType -&gt; m BloodType
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BloodType -&gt; m BloodType
+gmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BloodType -&gt; m BloodType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679275939"><span id="local-6989586621679275947"><span id="local-6989586621679275953"><span id="local-6989586621679275967"><span id="local-6989586621679275969"><span id="local-6989586621679275973"><span id="local-6989586621679275977"><span id="local-6989586621679275981"><span class="annot"><span class="annottext">Int -&gt; BloodType
+BloodType -&gt; Int
+BloodType -&gt; [BloodType]
+BloodType -&gt; BloodType
+BloodType -&gt; BloodType -&gt; [BloodType]
+BloodType -&gt; BloodType -&gt; BloodType -&gt; [BloodType]
+(BloodType -&gt; BloodType)
+-&gt; (BloodType -&gt; BloodType)
+-&gt; (Int -&gt; BloodType)
+-&gt; (BloodType -&gt; Int)
+-&gt; (BloodType -&gt; [BloodType])
+-&gt; (BloodType -&gt; BloodType -&gt; [BloodType])
+-&gt; (BloodType -&gt; BloodType -&gt; [BloodType])
+-&gt; (BloodType -&gt; BloodType -&gt; BloodType -&gt; [BloodType])
+-&gt; Enum BloodType
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+$csucc :: BloodType -&gt; BloodType
+succ :: BloodType -&gt; BloodType
+$cpred :: BloodType -&gt; BloodType
+pred :: BloodType -&gt; BloodType
+$ctoEnum :: Int -&gt; BloodType
+toEnum :: Int -&gt; BloodType
+$cfromEnum :: BloodType -&gt; Int
+fromEnum :: BloodType -&gt; Int
+$cenumFrom :: BloodType -&gt; [BloodType]
+enumFrom :: BloodType -&gt; [BloodType]
+$cenumFromThen :: BloodType -&gt; BloodType -&gt; [BloodType]
+enumFromThen :: BloodType -&gt; BloodType -&gt; [BloodType]
+$cenumFromTo :: BloodType -&gt; BloodType -&gt; [BloodType]
+enumFromTo :: BloodType -&gt; BloodType -&gt; [BloodType]
+$cenumFromThenTo :: BloodType -&gt; BloodType -&gt; BloodType -&gt; [BloodType]
+enumFromThenTo :: BloodType -&gt; BloodType -&gt; BloodType -&gt; [BloodType]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679275985"><span id="local-6989586621679275987"><span class="annot"><span class="annottext">BloodType -&gt; BloodType -&gt; Bool
+(BloodType -&gt; BloodType -&gt; Bool)
+-&gt; (BloodType -&gt; BloodType -&gt; Bool) -&gt; Eq BloodType
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: BloodType -&gt; BloodType -&gt; Bool
+== :: BloodType -&gt; BloodType -&gt; Bool
+$c/= :: BloodType -&gt; BloodType -&gt; Bool
+/= :: BloodType -&gt; BloodType -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679275992"><span id="local-6989586621679275994"><span class="annot"><span class="annottext">(forall x. BloodType -&gt; Rep BloodType x)
+-&gt; (forall x. Rep BloodType x -&gt; BloodType) -&gt; Generic BloodType
+forall x. Rep BloodType x -&gt; BloodType
+forall x. BloodType -&gt; Rep BloodType x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cfrom :: forall x. BloodType -&gt; Rep BloodType x
+from :: forall x. BloodType -&gt; Rep BloodType x
+$cto :: forall x. Rep BloodType x -&gt; BloodType
+to :: forall x. Rep BloodType x -&gt; BloodType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276000"><span id="local-6989586621679276002"><span id="local-6989586621679276004"><span id="local-6989586621679276008"><span id="local-6989586621679276011"><span id="local-6989586621679276014"><span id="local-6989586621679276017"><span class="annot"><span class="annottext">Eq BloodType
+Eq BloodType
+-&gt; (BloodType -&gt; BloodType -&gt; Ordering)
+-&gt; (BloodType -&gt; BloodType -&gt; Bool)
+-&gt; (BloodType -&gt; BloodType -&gt; Bool)
+-&gt; (BloodType -&gt; BloodType -&gt; Bool)
+-&gt; (BloodType -&gt; BloodType -&gt; Bool)
+-&gt; (BloodType -&gt; BloodType -&gt; BloodType)
+-&gt; (BloodType -&gt; BloodType -&gt; BloodType)
+-&gt; Ord BloodType
+BloodType -&gt; BloodType -&gt; Bool
+BloodType -&gt; BloodType -&gt; Ordering
+BloodType -&gt; BloodType -&gt; BloodType
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: BloodType -&gt; BloodType -&gt; Ordering
+compare :: BloodType -&gt; BloodType -&gt; Ordering
+$c&lt; :: BloodType -&gt; BloodType -&gt; Bool
+&lt; :: BloodType -&gt; BloodType -&gt; Bool
+$c&lt;= :: BloodType -&gt; BloodType -&gt; Bool
+&lt;= :: BloodType -&gt; BloodType -&gt; Bool
+$c&gt; :: BloodType -&gt; BloodType -&gt; Bool
+&gt; :: BloodType -&gt; BloodType -&gt; Bool
+$c&gt;= :: BloodType -&gt; BloodType -&gt; Bool
+&gt;= :: BloodType -&gt; BloodType -&gt; Bool
+$cmax :: BloodType -&gt; BloodType -&gt; BloodType
+max :: BloodType -&gt; BloodType -&gt; BloodType
+$cmin :: BloodType -&gt; BloodType -&gt; BloodType
+min :: BloodType -&gt; BloodType -&gt; BloodType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276021"><span id="local-6989586621679276025"><span id="local-6989586621679276028"><span id="local-6989586621679276035"><span class="annot"><span class="annottext">ReadPrec [BloodType]
+ReadPrec BloodType
+Int -&gt; ReadS BloodType
+ReadS [BloodType]
+(Int -&gt; ReadS BloodType)
+-&gt; ReadS [BloodType]
+-&gt; ReadPrec BloodType
+-&gt; ReadPrec [BloodType]
+-&gt; Read BloodType
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+$creadsPrec :: Int -&gt; ReadS BloodType
+readsPrec :: Int -&gt; ReadS BloodType
+$creadList :: ReadS [BloodType]
+readList :: ReadS [BloodType]
+$creadPrec :: ReadPrec BloodType
+readPrec :: ReadPrec BloodType
+$creadListPrec :: ReadPrec [BloodType]
+readListPrec :: ReadPrec [BloodType]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276039"><span id="local-6989586621679276041"><span id="local-6989586621679276045"><span class="annot"><span class="annottext">Int -&gt; BloodType -&gt; ShowS
+[BloodType] -&gt; ShowS
+BloodType -&gt; [Char]
+(Int -&gt; BloodType -&gt; ShowS)
+-&gt; (BloodType -&gt; [Char])
+-&gt; ([BloodType] -&gt; ShowS)
+-&gt; Show BloodType
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; [Char]) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; BloodType -&gt; ShowS
+showsPrec :: Int -&gt; BloodType -&gt; ShowS
+$cshow :: BloodType -&gt; [Char]
+show :: BloodType -&gt; [Char]
+$cshowList :: [BloodType] -&gt; ShowS
+showList :: [BloodType] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276050"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.BloodType.html#BloodType"><span class="hs-identifier hs-type">BloodType</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-54"></span><span>  </span><span id="local-6989586621679276056"><span class="annot"><span class="annottext">arbitrary :: Gen BloodType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen BloodType
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span id="local-6989586621679275768"><span class="annot"><a href="Data.Char.Emoji.BloodType.html#_overEnumMask"><span class="hs-identifier hs-type">_overEnumMask</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Enum</span></span><span> </span><span class="annot"><a href="#local-6989586621679275768"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679275768"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679275768"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-57"></span><span id="_overEnumMask"><span class="annot"><span class="annottext">_overEnumMask :: forall a. Enum a =&gt; Int -&gt; (Int -&gt; Int) -&gt; a -&gt; a
+</span><a href="Data.Char.Emoji.BloodType.html#_overEnumMask"><span class="hs-identifier hs-var hs-var">_overEnumMask</span></a></span></span><span> </span><span id="local-6989586621679276063"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679276063"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span id="local-6989586621679276064"><span class="annot"><span class="annottext">Int -&gt; Int
+</span><a href="#local-6989586621679276064"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; a
+forall a. Enum a =&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; a) -&gt; (a -&gt; Int) -&gt; a -&gt; a
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679276063"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.&amp;.</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int) -&gt; (a -&gt; Int) -&gt; a -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int
+</span><a href="#local-6989586621679276064"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int) -&gt; (a -&gt; Int) -&gt; a -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span id="local-6989586621679275775"><span class="annot"><a href="Data.Char.Emoji.BloodType.html#_overEnum2"><span class="hs-identifier hs-type">_overEnum2</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Enum</span></span><span> </span><span class="annot"><a href="#local-6989586621679275775"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679275775"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679275775"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679275775"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-60"></span><span id="_overEnum2"><span class="annot"><span class="annottext">_overEnum2 :: forall a. Enum a =&gt; (Int -&gt; Int -&gt; Int) -&gt; a -&gt; a -&gt; a
+</span><a href="Data.Char.Emoji.BloodType.html#_overEnum2"><span class="hs-identifier hs-var hs-var">_overEnum2</span></a></span></span><span> </span><span id="local-6989586621679276072"><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+</span><a href="#local-6989586621679276072"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679276073"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679276073"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679276074"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679276074"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; a
+forall a. Enum a =&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int) -&gt; (a -&gt; Int) -&gt; a -&gt; a -&gt; Int
+forall b c a. (b -&gt; b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">on</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+</span><a href="#local-6989586621679276072"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679276073"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679276074"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span id="local-6989586621679275780"><span class="annot"><a href="Data.Char.Emoji.BloodType.html#_overEnumMask2"><span class="hs-identifier hs-type">_overEnumMask2</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Enum</span></span><span> </span><span class="annot"><a href="#local-6989586621679275780"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679275780"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679275780"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679275780"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-63"></span><span id="_overEnumMask2"><span class="annot"><span class="annottext">_overEnumMask2 :: forall a. Enum a =&gt; Int -&gt; (Int -&gt; Int -&gt; Int) -&gt; a -&gt; a -&gt; a
+</span><a href="Data.Char.Emoji.BloodType.html#_overEnumMask2"><span class="hs-identifier hs-var hs-var">_overEnumMask2</span></a></span></span><span> </span><span id="local-6989586621679276080"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679276080"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span id="local-6989586621679276081"><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+</span><a href="#local-6989586621679276081"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679276082"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679276082"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679276083"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679276083"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; a
+forall a. Enum a =&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679276080"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.&amp;.</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int) -&gt; (a -&gt; Int) -&gt; a -&gt; a -&gt; Int
+forall b c a. (b -&gt; b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">on</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+</span><a href="#local-6989586621679276081"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679276082"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679276083"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276093"><span id="local-6989586621679276098"><span id="local-6989586621679276101"><span id="local-6989586621679276104"><span id="local-6989586621679276111"><span id="local-6989586621679276114"><span id="local-6989586621679276117"><span id="local-6989586621679276120"><span id="local-6989586621679276123"><span id="local-6989586621679276126"><span class="annot"><span class="hs-identifier hs-type">Bits</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.BloodType.html#BloodType"><span class="hs-identifier hs-type">BloodType</span></a></span></span></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-66"></span><span>  </span><span id="local-6989586621679276132"><span class="annot"><span class="annottext">.&amp;. :: BloodType -&gt; BloodType -&gt; BloodType
+</span><span class="hs-operator hs-var hs-var hs-var hs-var">(.&amp;.)</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int) -&gt; BloodType -&gt; BloodType -&gt; BloodType
+forall a. Enum a =&gt; (Int -&gt; Int -&gt; Int) -&gt; a -&gt; a -&gt; a
+</span><a href="Data.Char.Emoji.BloodType.html#_overEnum2"><span class="hs-identifier hs-var">_overEnum2</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">(.&amp;.)</span></span><span>
+</span><span id="line-67"></span><span>  </span><span id="local-6989586621679276135"><span class="annot"><span class="annottext">.|. :: BloodType -&gt; BloodType -&gt; BloodType
+</span><span class="hs-operator hs-var hs-var hs-var hs-var">(.|.)</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int) -&gt; BloodType -&gt; BloodType -&gt; BloodType
+forall a. Enum a =&gt; (Int -&gt; Int -&gt; Int) -&gt; a -&gt; a -&gt; a
+</span><a href="Data.Char.Emoji.BloodType.html#_overEnum2"><span class="hs-identifier hs-var">_overEnum2</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">(.|.)</span></span><span>
+</span><span id="line-68"></span><span>  </span><span id="local-6989586621679276138"><span class="annot"><span class="annottext">xor :: BloodType -&gt; BloodType -&gt; BloodType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">xor</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; (Int -&gt; Int -&gt; Int) -&gt; BloodType -&gt; BloodType -&gt; BloodType
+forall a. Enum a =&gt; Int -&gt; (Int -&gt; Int -&gt; Int) -&gt; a -&gt; a -&gt; a
+</span><a href="Data.Char.Emoji.BloodType.html#_overEnumMask2"><span class="hs-identifier hs-var">_overEnumMask2</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x03</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">xor</span></span><span>
+</span><span id="line-69"></span><span>  </span><span id="local-6989586621679276139"><span class="annot"><span class="annottext">complement :: BloodType -&gt; BloodType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">complement</span></span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#O"><span class="hs-identifier hs-var">O</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#AB"><span class="hs-identifier hs-var">AB</span></a></span><span>
+</span><span id="line-70"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">complement</span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#A"><span class="hs-identifier hs-var">A</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#B"><span class="hs-identifier hs-var">B</span></a></span><span>
+</span><span id="line-71"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">complement</span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#B"><span class="hs-identifier hs-var">B</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#A"><span class="hs-identifier hs-var">A</span></a></span><span>
+</span><span id="line-72"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">complement</span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#AB"><span class="hs-identifier hs-var">AB</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#O"><span class="hs-identifier hs-var">O</span></a></span><span>
+</span><span id="line-73"></span><span>  </span><span id="local-6989586621679276142"><span class="annot"><span class="annottext">shift :: BloodType -&gt; Int -&gt; BloodType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">shift</span></span></span><span> </span><span id="local-6989586621679276143"><span class="annot"><span class="annottext">BloodType
+</span><a href="#local-6989586621679276143"><span class="hs-identifier hs-var">abo</span></a></span></span><span> </span><span id="local-6989586621679276144"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679276144"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; (Int -&gt; Int) -&gt; BloodType -&gt; BloodType
+forall a. Enum a =&gt; Int -&gt; (Int -&gt; Int) -&gt; a -&gt; a
+</span><a href="Data.Char.Emoji.BloodType.html#_overEnumMask"><span class="hs-identifier hs-var">_overEnumMask</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x03</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; Int -&gt; a
+</span><span class="hs-operator hs-var">`shift`</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679276144"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="#local-6989586621679276143"><span class="hs-identifier hs-var">abo</span></a></span><span>
+</span><span id="line-74"></span><span>  </span><span id="local-6989586621679276148"><span class="annot"><span class="annottext">rotate :: BloodType -&gt; Int -&gt; BloodType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">rotate</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; BloodType -&gt; BloodType) -&gt; BloodType -&gt; Int -&gt; BloodType
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; BloodType -&gt; BloodType
+forall {a}. (Eq a, Num a) =&gt; a -&gt; BloodType -&gt; BloodType
+</span><a href="#local-6989586621679276150"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; BloodType -&gt; BloodType)
+-&gt; (Int -&gt; Int) -&gt; Int -&gt; BloodType -&gt; BloodType
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x01</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.&amp;.</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-75"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-76"></span><span>      </span><span id="local-6989586621679276150"><span class="annot"><span class="annottext">go :: a -&gt; BloodType -&gt; BloodType
+</span><a href="#local-6989586621679276150"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#A"><span class="hs-identifier hs-var">A</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#B"><span class="hs-identifier hs-var">B</span></a></span><span>
+</span><span id="line-77"></span><span>      </span><span class="annot"><a href="#local-6989586621679276150"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#B"><span class="hs-identifier hs-var">B</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#B"><span class="hs-identifier hs-var">B</span></a></span><span>
+</span><span id="line-78"></span><span>      </span><span class="annot"><a href="#local-6989586621679276150"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679276157"><span class="annot"><span class="annottext">BloodType
+</span><a href="#local-6989586621679276157"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="#local-6989586621679276157"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-79"></span><span>  </span><span id="local-6989586621679276159"><span class="annot"><span class="annottext">bitSize :: BloodType -&gt; Int
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">bitSize</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; BloodType -&gt; Int
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span>
+</span><span id="line-80"></span><span>  </span><span id="local-6989586621679276162"><span class="annot"><span class="annottext">bitSizeMaybe :: BloodType -&gt; Maybe Int
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">bitSizeMaybe</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Int -&gt; BloodType -&gt; Maybe Int
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Maybe Int
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span>
+</span><span id="line-81"></span><span>  </span><span id="local-6989586621679276163"><span class="annot"><span class="annottext">isSigned :: BloodType -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">isSigned</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; BloodType -&gt; Bool
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-82"></span><span>  </span><span id="local-6989586621679276166"><span class="annot"><span class="annottext">testBit :: BloodType -&gt; Int -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">testBit</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Bits a =&gt; a -&gt; Int -&gt; Bool
+</span><span class="hs-identifier hs-var">testBit</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Bool)
+-&gt; (BloodType -&gt; Int) -&gt; BloodType -&gt; Int -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">BloodType -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span>
+</span><span id="line-83"></span><span>  </span><span id="local-6989586621679276171"><span class="annot"><span class="annottext">bit :: Int -&gt; BloodType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">bit</span></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#B"><span class="hs-identifier hs-var">B</span></a></span><span>
+</span><span id="line-84"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">bit</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#A"><span class="hs-identifier hs-var">A</span></a></span><span>
+</span><span id="line-85"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">bit</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#O"><span class="hs-identifier hs-var">O</span></a></span><span>
+</span><span id="line-86"></span><span>  </span><span id="local-6989586621679276172"><span class="annot"><span class="annottext">popCount :: BloodType -&gt; Int
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">popCount</span></span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#O"><span class="hs-identifier hs-var">O</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-87"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">popCount</span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#A"><span class="hs-identifier hs-var">A</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-88"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">popCount</span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#B"><span class="hs-identifier hs-var">B</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-89"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">popCount</span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#AB"><span class="hs-identifier hs-var">AB</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span>
+</span><span id="line-90"></span><span>
+</span><span id="line-91"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276176"><span id="local-6989586621679276183"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.BloodType.html#BloodType"><span class="hs-identifier hs-type">BloodType</span></a></span></span></span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276200"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.BloodType.html#BloodType"><span class="hs-identifier hs-type">BloodType</span></a></span></span><span>
+</span><span id="line-94"></span><span>
+</span><span id="line-95"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276221"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.BloodType.html#BloodType"><span class="hs-identifier hs-type">BloodType</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-96"></span><span>  </span><span id="local-6989586621679276231"><span class="annot"><span class="annottext">toUnicodeText :: BloodType -&gt; Text
+</span><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeText</span></a></span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#AB"><span class="hs-identifier hs-var">AB</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f18e&quot;</span></span><span>
+</span><span id="line-97"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var">toUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#A"><span class="hs-identifier hs-var">A</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f170\xfe0f&quot;</span></span><span>
+</span><span id="line-98"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var">toUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#B"><span class="hs-identifier hs-var">B</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f171\xfe0f&quot;</span></span><span>
+</span><span id="line-99"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var">toUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#O"><span class="hs-identifier hs-var">O</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f17e\xfe0f&quot;</span></span><span>
+</span><span id="line-100"></span><span>  </span><span id="local-6989586621679276235"><span class="annot"><span class="annottext">fromUnicodeText :: Text -&gt; Maybe BloodType
+</span><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeText</span></a></span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f18e&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BloodType -&gt; Maybe BloodType
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#AB"><span class="hs-identifier hs-var">AB</span></a></span><span>
+</span><span id="line-101"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var">fromUnicodeText</span></a></span><span> </span><span id="local-6989586621679276236"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679276236"><span class="hs-identifier hs-var">t</span></a></span></span><span>
+</span><span id="line-102"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">[</span><span id="local-6989586621679276237"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679276237"><span class="hs-identifier hs-var">c</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Emoji.Core.html#EmojiSuffix"><span class="hs-identifier hs-var">EmojiSuffix</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Char]
+</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679276236"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe BloodType
+</span><a href="#local-6989586621679276238"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679276237"><span class="hs-identifier hs-var">c</span></a></span><span>
+</span><span id="line-103"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe BloodType
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-104"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-105"></span><span>      </span><span id="local-6989586621679276238"><span class="annot"><span class="annottext">go :: Char -&gt; Maybe BloodType
+</span><a href="#local-6989586621679276238"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f170'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BloodType -&gt; Maybe BloodType
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#A"><span class="hs-identifier hs-var">A</span></a></span><span>
+</span><span id="line-106"></span><span>      </span><span class="annot"><a href="#local-6989586621679276238"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f171'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BloodType -&gt; Maybe BloodType
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#B"><span class="hs-identifier hs-var">B</span></a></span><span>
+</span><span id="line-107"></span><span>      </span><span class="annot"><a href="#local-6989586621679276238"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f17e'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BloodType -&gt; Maybe BloodType
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">BloodType
+</span><a href="Data.Char.Emoji.BloodType.html#O"><span class="hs-identifier hs-var">O</span></a></span><span>
+</span><span id="line-108"></span><span>      </span><span class="annot"><a href="#local-6989586621679276238"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe BloodType
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-109"></span><span>  </span><span id="local-6989586621679276247"><span class="annot"><span class="annottext">isInTextRange :: Text -&gt; Bool
+</span><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInTextRange</span></a></span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f170\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-110"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f171\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-111"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f17e\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-112"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f18e&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-113"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-114"></span></pre></body></html>

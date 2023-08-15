@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE CPP #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE PatternSynonyms #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Module      : Data.Char.Emoji.Core</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Description : A module that defines basic properties applicable to all /Emoji/.</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-11"></span><span class="hs-comment">--</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- A module that defines Emoji patterns.</span><span>
+</span><span id="line-13"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Emoji.Core</span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Append the emoji suffix</span></span><span>
+</span><span id="line-15"></span><span>    </span><span class="annot"><a href="Data.Char.Emoji.Core.html#withEmojiSuffix"><span class="hs-identifier">withEmojiSuffix</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Pattern synonyms</span></span><span>
+</span><span id="line-18"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Core.html#EmojiSuffix"><span class="hs-identifier">EmojiSuffix</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">where</span><span class="hs-cpp">
+
+#if __GLASGOW_HASKELL__ &lt; 803
+</span><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">Data.Semigroup</span><span class="hs-special">(</span><span class="hs-identifier">Semigroup</span><span class="hs-special">(</span><span class="hs-special">(</span><span class="hs-operator">&lt;&gt;</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-cpp">
+#endif
+</span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.String</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">IsString</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">fromString</span></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- | A 'Char'acter that is often used as a suffix to turn a character into an</span><span>
+</span><span id="line-28"></span><span class="hs-comment">-- emoji.</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Core.html#EmojiSuffix"><span class="hs-identifier hs-type">EmojiSuffix</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">pattern</span><span> </span><span id="EmojiSuffix"><span id="%24mEmojiSuffix"><span id="%24bEmojiSuffix"><span class="annot"><span class="annottext">$mEmojiSuffix :: forall {r}. Char -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bEmojiSuffix :: Char
+</span><a href="Data.Char.Emoji.Core.html#EmojiSuffix"><span class="hs-identifier hs-var hs-var hs-var">EmojiSuffix</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-char">'\xfe0f'</span></span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="annot"><span class="hs-comment">-- | Append the 'EmojiSuffix' to the string-like value.</span></span><span>
+</span><span id="line-33"></span><span id="local-6989586621679275685"><span class="annot"><a href="Data.Char.Emoji.Core.html#withEmojiSuffix"><span class="hs-identifier hs-type">withEmojiSuffix</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Semigroup</span></span><span> </span><span class="annot"><a href="#local-6989586621679275685"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IsString</span></span><span> </span><span class="annot"><a href="#local-6989586621679275685"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-35"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The string-like object to append the 'EmojiSuffix' to.</span></span><span>
+</span><span id="line-36"></span><span>  </span><span class="annot"><a href="#local-6989586621679275685"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-37"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The string-like object with an 'EmojiSuffix' as suffix.</span></span><span>
+</span><span id="line-38"></span><span>  </span><span class="annot"><a href="#local-6989586621679275685"><span class="hs-identifier hs-type">s</span></a></span></span><span>
+</span><span id="line-39"></span><span id="withEmojiSuffix"><span class="annot"><span class="annottext">withEmojiSuffix :: forall s. (Semigroup s, IsString s) =&gt; s -&gt; s
+</span><a href="Data.Char.Emoji.Core.html#withEmojiSuffix"><span class="hs-identifier hs-var hs-var">withEmojiSuffix</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">s -&gt; s -&gt; s
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; s
+forall a. IsString a =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">fromString</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Emoji.Core.html#EmojiSuffix"><span class="hs-identifier hs-var">EmojiSuffix</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span></pre></body></html>

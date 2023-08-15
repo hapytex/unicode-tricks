@@ -1,0 +1,722 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="local-6989586621679276420"><span id="local-6989586621679276421"><span id="local-6989586621679276422"><span id="local-6989586621679276423"><span id="local-6989586621679276424"><span id="local-6989586621679276425"><span id="local-6989586621679276426"><span id="local-6989586621679276427"></span></span></span></span></span></span></span></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications #-}</span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Module      : Data.Char.Emoji.Gender</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Description : A module that defines emoji that deal with gender.</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-13"></span><span class="hs-comment">--</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- Unicode has two emoji to express male and/or female. These</span><span>
+</span><span id="line-15"></span><span class="hs-comment">-- emoji are also used as modifiers for other emoji.</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Emoji.Gender</span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Gender sign emoji</span></span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#BinaryGender"><span class="hs-identifier">BinaryGender</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Emoji.Gender.html#Female"><span class="hs-identifier">Female</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#Male"><span class="hs-identifier">Male</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#Trigender"><span class="hs-identifier">Trigender</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Emoji.Gender.html#Binary"><span class="hs-identifier">Binary</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#Transgender"><span class="hs-identifier">Transgender</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier">UnicodeText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier">fromUnicodeText</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier">isInTextRange</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier">toUnicodeText</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitraryBoundedEnum</span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-comment">-- | A data type to specify the /gender/ of a person, animal, etc. used in an</span><span>
+</span><span id="line-31"></span><span class="hs-comment">-- emoji. The 'Data.Char.Emoji.BinaryGender' items are an instance of 'UnicodeText' that maps to the</span><span>
+</span><span id="line-32"></span><span class="hs-comment">-- /female/ and /male/ emoji. Often the corresponding codepoints are used</span><span>
+</span><span id="line-33"></span><span class="hs-comment">-- to annotate something as male/female.</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">data</span><span> </span><span id="BinaryGender"><span class="annot"><a href="Data.Char.Emoji.Gender.html#BinaryGender"><span class="hs-identifier hs-var">BinaryGender</span></a></span></span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Female"><span class="annot"><a href="Data.Char.Emoji.Gender.html#Female"><span class="hs-identifier hs-var">Female</span></a></span></span><span> </span><span class="hs-comment">-- The female sign, dented by &#9792;&#65039;.</span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Male"><span class="annot"><a href="Data.Char.Emoji.Gender.html#Male"><span class="hs-identifier hs-var">Male</span></a></span></span><span> </span><span class="hs-comment">-- The male sign, denoted by &#9794;&#65039;.</span><span>
+</span><span id="line-37"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679276438"><span id="local-6989586621679276440"><span class="annot"><span class="annottext">BinaryGender
+BinaryGender -&gt; BinaryGender -&gt; Bounded BinaryGender
+forall a. a -&gt; a -&gt; Bounded a
+$cminBound :: BinaryGender
+minBound :: BinaryGender
+$cmaxBound :: BinaryGender
+maxBound :: BinaryGender
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276446"><span id="local-6989586621679276448"><span id="local-6989586621679276450"><span id="local-6989586621679276452"><span id="local-6989586621679276454"><span id="local-6989586621679276460"><span id="local-6989586621679276465"><span id="local-6989586621679276468"><span id="local-6989586621679276471"><span id="local-6989586621679276474"><span id="local-6989586621679276477"><span id="local-6989586621679276480"><span id="local-6989586621679276485"><span id="local-6989586621679276490"><span class="annot"><span class="annottext">Typeable BinaryGender
+Typeable BinaryGender
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; BinaryGender -&gt; c BinaryGender)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c BinaryGender)
+-&gt; (BinaryGender -&gt; Constr)
+-&gt; (BinaryGender -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c BinaryGender))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c BinaryGender))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; BinaryGender -&gt; BinaryGender)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BinaryGender -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BinaryGender -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; BinaryGender -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; BinaryGender -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; BinaryGender -&gt; m BinaryGender)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; BinaryGender -&gt; m BinaryGender)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; BinaryGender -&gt; m BinaryGender)
+-&gt; Data BinaryGender
+BinaryGender -&gt; Constr
+BinaryGender -&gt; DataType
+(forall b. Data b =&gt; b -&gt; b) -&gt; BinaryGender -&gt; BinaryGender
+forall a.
+Typeable a
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; BinaryGender -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; BinaryGender -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BinaryGender -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BinaryGender -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BinaryGender -&gt; m BinaryGender
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BinaryGender -&gt; m BinaryGender
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c BinaryGender
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; BinaryGender -&gt; c BinaryGender
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c BinaryGender)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c BinaryGender)
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; BinaryGender -&gt; c BinaryGender
+gfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; BinaryGender -&gt; c BinaryGender
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c BinaryGender
+gunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c BinaryGender
+$ctoConstr :: BinaryGender -&gt; Constr
+toConstr :: BinaryGender -&gt; Constr
+$cdataTypeOf :: BinaryGender -&gt; DataType
+dataTypeOf :: BinaryGender -&gt; DataType
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c BinaryGender)
+dataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c BinaryGender)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c BinaryGender)
+dataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c BinaryGender)
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; BinaryGender -&gt; BinaryGender
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; BinaryGender -&gt; BinaryGender
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BinaryGender -&gt; r
+gmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BinaryGender -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BinaryGender -&gt; r
+gmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; BinaryGender -&gt; r
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; BinaryGender -&gt; [u]
+gmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; BinaryGender -&gt; [u]
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; BinaryGender -&gt; u
+gmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; BinaryGender -&gt; u
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BinaryGender -&gt; m BinaryGender
+gmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BinaryGender -&gt; m BinaryGender
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BinaryGender -&gt; m BinaryGender
+gmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BinaryGender -&gt; m BinaryGender
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BinaryGender -&gt; m BinaryGender
+gmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; BinaryGender -&gt; m BinaryGender
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276496"><span id="local-6989586621679276504"><span id="local-6989586621679276510"><span id="local-6989586621679276524"><span id="local-6989586621679276526"><span id="local-6989586621679276530"><span id="local-6989586621679276534"><span id="local-6989586621679276538"><span class="annot"><span class="annottext">Int -&gt; BinaryGender
+BinaryGender -&gt; Int
+BinaryGender -&gt; [BinaryGender]
+BinaryGender -&gt; BinaryGender
+BinaryGender -&gt; BinaryGender -&gt; [BinaryGender]
+BinaryGender -&gt; BinaryGender -&gt; BinaryGender -&gt; [BinaryGender]
+(BinaryGender -&gt; BinaryGender)
+-&gt; (BinaryGender -&gt; BinaryGender)
+-&gt; (Int -&gt; BinaryGender)
+-&gt; (BinaryGender -&gt; Int)
+-&gt; (BinaryGender -&gt; [BinaryGender])
+-&gt; (BinaryGender -&gt; BinaryGender -&gt; [BinaryGender])
+-&gt; (BinaryGender -&gt; BinaryGender -&gt; [BinaryGender])
+-&gt; (BinaryGender -&gt; BinaryGender -&gt; BinaryGender -&gt; [BinaryGender])
+-&gt; Enum BinaryGender
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+$csucc :: BinaryGender -&gt; BinaryGender
+succ :: BinaryGender -&gt; BinaryGender
+$cpred :: BinaryGender -&gt; BinaryGender
+pred :: BinaryGender -&gt; BinaryGender
+$ctoEnum :: Int -&gt; BinaryGender
+toEnum :: Int -&gt; BinaryGender
+$cfromEnum :: BinaryGender -&gt; Int
+fromEnum :: BinaryGender -&gt; Int
+$cenumFrom :: BinaryGender -&gt; [BinaryGender]
+enumFrom :: BinaryGender -&gt; [BinaryGender]
+$cenumFromThen :: BinaryGender -&gt; BinaryGender -&gt; [BinaryGender]
+enumFromThen :: BinaryGender -&gt; BinaryGender -&gt; [BinaryGender]
+$cenumFromTo :: BinaryGender -&gt; BinaryGender -&gt; [BinaryGender]
+enumFromTo :: BinaryGender -&gt; BinaryGender -&gt; [BinaryGender]
+$cenumFromThenTo :: BinaryGender -&gt; BinaryGender -&gt; BinaryGender -&gt; [BinaryGender]
+enumFromThenTo :: BinaryGender -&gt; BinaryGender -&gt; BinaryGender -&gt; [BinaryGender]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276542"><span id="local-6989586621679276544"><span class="annot"><span class="annottext">BinaryGender -&gt; BinaryGender -&gt; Bool
+(BinaryGender -&gt; BinaryGender -&gt; Bool)
+-&gt; (BinaryGender -&gt; BinaryGender -&gt; Bool) -&gt; Eq BinaryGender
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: BinaryGender -&gt; BinaryGender -&gt; Bool
+== :: BinaryGender -&gt; BinaryGender -&gt; Bool
+$c/= :: BinaryGender -&gt; BinaryGender -&gt; Bool
+/= :: BinaryGender -&gt; BinaryGender -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276549"><span id="local-6989586621679276551"><span class="annot"><span class="annottext">(forall x. BinaryGender -&gt; Rep BinaryGender x)
+-&gt; (forall x. Rep BinaryGender x -&gt; BinaryGender)
+-&gt; Generic BinaryGender
+forall x. Rep BinaryGender x -&gt; BinaryGender
+forall x. BinaryGender -&gt; Rep BinaryGender x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cfrom :: forall x. BinaryGender -&gt; Rep BinaryGender x
+from :: forall x. BinaryGender -&gt; Rep BinaryGender x
+$cto :: forall x. Rep BinaryGender x -&gt; BinaryGender
+to :: forall x. Rep BinaryGender x -&gt; BinaryGender
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276557"><span id="local-6989586621679276559"><span id="local-6989586621679276561"><span id="local-6989586621679276565"><span id="local-6989586621679276568"><span id="local-6989586621679276571"><span id="local-6989586621679276574"><span class="annot"><span class="annottext">Eq BinaryGender
+Eq BinaryGender
+-&gt; (BinaryGender -&gt; BinaryGender -&gt; Ordering)
+-&gt; (BinaryGender -&gt; BinaryGender -&gt; Bool)
+-&gt; (BinaryGender -&gt; BinaryGender -&gt; Bool)
+-&gt; (BinaryGender -&gt; BinaryGender -&gt; Bool)
+-&gt; (BinaryGender -&gt; BinaryGender -&gt; Bool)
+-&gt; (BinaryGender -&gt; BinaryGender -&gt; BinaryGender)
+-&gt; (BinaryGender -&gt; BinaryGender -&gt; BinaryGender)
+-&gt; Ord BinaryGender
+BinaryGender -&gt; BinaryGender -&gt; Bool
+BinaryGender -&gt; BinaryGender -&gt; Ordering
+BinaryGender -&gt; BinaryGender -&gt; BinaryGender
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: BinaryGender -&gt; BinaryGender -&gt; Ordering
+compare :: BinaryGender -&gt; BinaryGender -&gt; Ordering
+$c&lt; :: BinaryGender -&gt; BinaryGender -&gt; Bool
+&lt; :: BinaryGender -&gt; BinaryGender -&gt; Bool
+$c&lt;= :: BinaryGender -&gt; BinaryGender -&gt; Bool
+&lt;= :: BinaryGender -&gt; BinaryGender -&gt; Bool
+$c&gt; :: BinaryGender -&gt; BinaryGender -&gt; Bool
+&gt; :: BinaryGender -&gt; BinaryGender -&gt; Bool
+$c&gt;= :: BinaryGender -&gt; BinaryGender -&gt; Bool
+&gt;= :: BinaryGender -&gt; BinaryGender -&gt; Bool
+$cmax :: BinaryGender -&gt; BinaryGender -&gt; BinaryGender
+max :: BinaryGender -&gt; BinaryGender -&gt; BinaryGender
+$cmin :: BinaryGender -&gt; BinaryGender -&gt; BinaryGender
+min :: BinaryGender -&gt; BinaryGender -&gt; BinaryGender
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276578"><span id="local-6989586621679276582"><span id="local-6989586621679276585"><span id="local-6989586621679276590"><span class="annot"><span class="annottext">ReadPrec [BinaryGender]
+ReadPrec BinaryGender
+Int -&gt; ReadS BinaryGender
+ReadS [BinaryGender]
+(Int -&gt; ReadS BinaryGender)
+-&gt; ReadS [BinaryGender]
+-&gt; ReadPrec BinaryGender
+-&gt; ReadPrec [BinaryGender]
+-&gt; Read BinaryGender
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+$creadsPrec :: Int -&gt; ReadS BinaryGender
+readsPrec :: Int -&gt; ReadS BinaryGender
+$creadList :: ReadS [BinaryGender]
+readList :: ReadS [BinaryGender]
+$creadPrec :: ReadPrec BinaryGender
+readPrec :: ReadPrec BinaryGender
+$creadListPrec :: ReadPrec [BinaryGender]
+readListPrec :: ReadPrec [BinaryGender]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276594"><span id="local-6989586621679276596"><span id="local-6989586621679276600"><span class="annot"><span class="annottext">Int -&gt; BinaryGender -&gt; ShowS
+[BinaryGender] -&gt; ShowS
+BinaryGender -&gt; [Char]
+(Int -&gt; BinaryGender -&gt; ShowS)
+-&gt; (BinaryGender -&gt; [Char])
+-&gt; ([BinaryGender] -&gt; ShowS)
+-&gt; Show BinaryGender
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; [Char]) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; BinaryGender -&gt; ShowS
+showsPrec :: Int -&gt; BinaryGender -&gt; ShowS
+$cshow :: BinaryGender -&gt; [Char]
+show :: BinaryGender -&gt; [Char]
+$cshowList :: [BinaryGender] -&gt; ShowS
+showList :: [BinaryGender] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276605"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#BinaryGender"><span class="hs-identifier hs-type">BinaryGender</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-40"></span><span>  </span><span id="local-6989586621679276611"><span class="annot"><span class="annottext">arbitrary :: Gen BinaryGender
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen BinaryGender
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276615"><span id="local-6989586621679276622"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#BinaryGender"><span class="hs-identifier hs-type">BinaryGender</span></a></span></span></span><span>
+</span><span id="line-43"></span><span>
+</span><span id="line-44"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276634"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#BinaryGender"><span class="hs-identifier hs-type">BinaryGender</span></a></span></span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276651"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#BinaryGender"><span class="hs-identifier hs-type">BinaryGender</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-47"></span><span>  </span><span id="local-6989586621679276659"><span class="annot"><span class="annottext">toUnicodeText :: BinaryGender -&gt; Text
+</span><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeText</span></a></span></span><span> </span><span class="annot"><span class="annottext">BinaryGender
+</span><a href="Data.Char.Emoji.Gender.html#Male"><span class="hs-identifier hs-var">Male</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x2640\xfe0f&quot;</span></span><span>
+</span><span id="line-48"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var">toUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">BinaryGender
+</span><a href="Data.Char.Emoji.Gender.html#Female"><span class="hs-identifier hs-var">Female</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x2642\xfe0f&quot;</span></span><span>
+</span><span id="line-49"></span><span>  </span><span id="local-6989586621679276665"><span class="annot"><span class="annottext">fromUnicodeText :: Text -&gt; Maybe BinaryGender
+</span><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeText</span></a></span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x2640\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BinaryGender -&gt; Maybe BinaryGender
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">BinaryGender
+</span><a href="Data.Char.Emoji.Gender.html#Male"><span class="hs-identifier hs-var">Male</span></a></span><span>
+</span><span id="line-50"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var">fromUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x2642\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BinaryGender -&gt; Maybe BinaryGender
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">BinaryGender
+</span><a href="Data.Char.Emoji.Gender.html#Female"><span class="hs-identifier hs-var">Female</span></a></span><span>
+</span><span id="line-51"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var">fromUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe BinaryGender
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-52"></span><span>  </span><span id="local-6989586621679276670"><span class="annot"><span class="annottext">isInTextRange :: Text -&gt; Bool
+</span><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInTextRange</span></a></span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x2640\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-53"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x2642\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-54"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span class="annot"><span class="hs-comment">-- | A data type that, besides 'Male' and 'Female' can also represent a 'Transgender'.</span></span><span>
+</span><span id="line-57"></span><span class="hs-keyword">data</span><span> </span><span id="Trigender"><span class="annot"><a href="Data.Char.Emoji.Gender.html#Trigender"><span class="hs-identifier hs-var">Trigender</span></a></span></span><span>
+</span><span id="line-58"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-comment">-- | Specify a /binary/ gender which is /female/ or /male/.</span></span><span>
+</span><span id="line-59"></span><span>    </span><span id="Binary"><span class="annot"><a href="Data.Char.Emoji.Gender.html#Binary"><span class="hs-identifier hs-var">Binary</span></a></span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#BinaryGender"><span class="hs-identifier hs-type">BinaryGender</span></a></span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | A value that specifies a /transgender/, this is denoted with &#9895;&#65039;.</span></span><span>
+</span><span id="line-61"></span><span>    </span><span id="Transgender"><span class="annot"><a href="Data.Char.Emoji.Gender.html#Transgender"><span class="hs-identifier hs-var">Transgender</span></a></span></span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679276674"><span id="local-6989586621679276677"><span id="local-6989586621679276680"><span id="local-6989586621679276682"><span id="local-6989586621679276684"><span id="local-6989586621679276690"><span id="local-6989586621679276695"><span id="local-6989586621679276698"><span id="local-6989586621679276701"><span id="local-6989586621679276704"><span id="local-6989586621679276707"><span id="local-6989586621679276710"><span id="local-6989586621679276715"><span id="local-6989586621679276720"><span class="annot"><span class="annottext">Typeable Trigender
+Typeable Trigender
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; Trigender -&gt; c Trigender)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Trigender)
+-&gt; (Trigender -&gt; Constr)
+-&gt; (Trigender -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Trigender))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Trigender))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; Trigender -&gt; Trigender)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Trigender -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Trigender -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Trigender -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Trigender -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Trigender -&gt; m Trigender)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Trigender -&gt; m Trigender)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Trigender -&gt; m Trigender)
+-&gt; Data Trigender
+Trigender -&gt; Constr
+Trigender -&gt; DataType
+(forall b. Data b =&gt; b -&gt; b) -&gt; Trigender -&gt; Trigender
+forall a.
+Typeable a
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Trigender -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Trigender -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Trigender -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Trigender -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Trigender -&gt; m Trigender
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Trigender -&gt; m Trigender
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Trigender
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Trigender -&gt; c Trigender
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Trigender)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Trigender)
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Trigender -&gt; c Trigender
+gfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Trigender -&gt; c Trigender
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Trigender
+gunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Trigender
+$ctoConstr :: Trigender -&gt; Constr
+toConstr :: Trigender -&gt; Constr
+$cdataTypeOf :: Trigender -&gt; DataType
+dataTypeOf :: Trigender -&gt; DataType
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Trigender)
+dataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Trigender)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Trigender)
+dataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Trigender)
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; Trigender -&gt; Trigender
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; Trigender -&gt; Trigender
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Trigender -&gt; r
+gmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Trigender -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Trigender -&gt; r
+gmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Trigender -&gt; r
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Trigender -&gt; [u]
+gmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Trigender -&gt; [u]
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Trigender -&gt; u
+gmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Trigender -&gt; u
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Trigender -&gt; m Trigender
+gmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Trigender -&gt; m Trigender
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Trigender -&gt; m Trigender
+gmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Trigender -&gt; m Trigender
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Trigender -&gt; m Trigender
+gmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Trigender -&gt; m Trigender
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276725"><span id="local-6989586621679276728"><span class="annot"><span class="annottext">Trigender -&gt; Trigender -&gt; Bool
+(Trigender -&gt; Trigender -&gt; Bool)
+-&gt; (Trigender -&gt; Trigender -&gt; Bool) -&gt; Eq Trigender
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Trigender -&gt; Trigender -&gt; Bool
+== :: Trigender -&gt; Trigender -&gt; Bool
+$c/= :: Trigender -&gt; Trigender -&gt; Bool
+/= :: Trigender -&gt; Trigender -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276732"><span id="local-6989586621679276734"><span class="annot"><span class="annottext">(forall x. Trigender -&gt; Rep Trigender x)
+-&gt; (forall x. Rep Trigender x -&gt; Trigender) -&gt; Generic Trigender
+forall x. Rep Trigender x -&gt; Trigender
+forall x. Trigender -&gt; Rep Trigender x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cfrom :: forall x. Trigender -&gt; Rep Trigender x
+from :: forall x. Trigender -&gt; Rep Trigender x
+$cto :: forall x. Rep Trigender x -&gt; Trigender
+to :: forall x. Rep Trigender x -&gt; Trigender
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276739"><span id="local-6989586621679276742"><span id="local-6989586621679276745"><span id="local-6989586621679276749"><span id="local-6989586621679276752"><span id="local-6989586621679276755"><span id="local-6989586621679276758"><span class="annot"><span class="annottext">Eq Trigender
+Eq Trigender
+-&gt; (Trigender -&gt; Trigender -&gt; Ordering)
+-&gt; (Trigender -&gt; Trigender -&gt; Bool)
+-&gt; (Trigender -&gt; Trigender -&gt; Bool)
+-&gt; (Trigender -&gt; Trigender -&gt; Bool)
+-&gt; (Trigender -&gt; Trigender -&gt; Bool)
+-&gt; (Trigender -&gt; Trigender -&gt; Trigender)
+-&gt; (Trigender -&gt; Trigender -&gt; Trigender)
+-&gt; Ord Trigender
+Trigender -&gt; Trigender -&gt; Bool
+Trigender -&gt; Trigender -&gt; Ordering
+Trigender -&gt; Trigender -&gt; Trigender
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: Trigender -&gt; Trigender -&gt; Ordering
+compare :: Trigender -&gt; Trigender -&gt; Ordering
+$c&lt; :: Trigender -&gt; Trigender -&gt; Bool
+&lt; :: Trigender -&gt; Trigender -&gt; Bool
+$c&lt;= :: Trigender -&gt; Trigender -&gt; Bool
+&lt;= :: Trigender -&gt; Trigender -&gt; Bool
+$c&gt; :: Trigender -&gt; Trigender -&gt; Bool
+&gt; :: Trigender -&gt; Trigender -&gt; Bool
+$c&gt;= :: Trigender -&gt; Trigender -&gt; Bool
+&gt;= :: Trigender -&gt; Trigender -&gt; Bool
+$cmax :: Trigender -&gt; Trigender -&gt; Trigender
+max :: Trigender -&gt; Trigender -&gt; Trigender
+$cmin :: Trigender -&gt; Trigender -&gt; Trigender
+min :: Trigender -&gt; Trigender -&gt; Trigender
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276761"><span id="local-6989586621679276765"><span id="local-6989586621679276768"><span id="local-6989586621679276776"><span class="annot"><span class="annottext">ReadPrec [Trigender]
+ReadPrec Trigender
+Int -&gt; ReadS Trigender
+ReadS [Trigender]
+(Int -&gt; ReadS Trigender)
+-&gt; ReadS [Trigender]
+-&gt; ReadPrec Trigender
+-&gt; ReadPrec [Trigender]
+-&gt; Read Trigender
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+$creadsPrec :: Int -&gt; ReadS Trigender
+readsPrec :: Int -&gt; ReadS Trigender
+$creadList :: ReadS [Trigender]
+readList :: ReadS [Trigender]
+$creadPrec :: ReadPrec Trigender
+readPrec :: ReadPrec Trigender
+$creadListPrec :: ReadPrec [Trigender]
+readListPrec :: ReadPrec [Trigender]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276779"><span id="local-6989586621679276783"><span id="local-6989586621679276787"><span class="annot"><span class="annottext">Int -&gt; Trigender -&gt; ShowS
+[Trigender] -&gt; ShowS
+Trigender -&gt; [Char]
+(Int -&gt; Trigender -&gt; ShowS)
+-&gt; (Trigender -&gt; [Char])
+-&gt; ([Trigender] -&gt; ShowS)
+-&gt; Show Trigender
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; [Char]) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Trigender -&gt; ShowS
+showsPrec :: Int -&gt; Trigender -&gt; ShowS
+$cshow :: Trigender -&gt; [Char]
+show :: Trigender -&gt; [Char]
+$cshowList :: [Trigender] -&gt; ShowS
+showList :: [Trigender] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bounded</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#Trigender"><span class="hs-identifier hs-type">Trigender</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-65"></span><span>  </span><span id="local-6989586621679276793"><span class="annot"><span class="annottext">minBound :: Trigender
+</span><a href="#local-6989586621679276793"><span class="hs-identifier hs-var hs-var hs-var hs-var">minBound</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BinaryGender -&gt; Trigender
+</span><a href="Data.Char.Emoji.Gender.html#Binary"><span class="hs-identifier hs-var">Binary</span></a></span><span> </span><span class="annot"><span class="annottext">BinaryGender
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">minBound</span></span><span>
+</span><span id="line-66"></span><span>  </span><span id="local-6989586621679276795"><span class="annot"><span class="annottext">maxBound :: Trigender
+</span><a href="#local-6989586621679276795"><span class="hs-identifier hs-var hs-var hs-var hs-var">maxBound</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Trigender
+</span><a href="Data.Char.Emoji.Gender.html#Transgender"><span class="hs-identifier hs-var">Transgender</span></a></span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276798"><span id="local-6989586621679276802"><span id="local-6989586621679276807"><span id="local-6989586621679276810"><span id="local-6989586621679276813"><span id="local-6989586621679276816"><span class="annot"><span class="hs-identifier hs-type">Enum</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#Trigender"><span class="hs-identifier hs-type">Trigender</span></a></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-69"></span><span>  </span><span id="local-6989586621679276819"><span class="annot"><span class="annottext">fromEnum :: Trigender -&gt; Int
+</span><a href="#local-6989586621679276819"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromEnum</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Emoji.Gender.html#Binary"><span class="hs-identifier hs-type">Binary</span></a></span><span> </span><span id="local-6989586621679276821"><span class="annot"><span class="annottext">BinaryGender
+</span><a href="#local-6989586621679276821"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BinaryGender -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">BinaryGender
+</span><a href="#local-6989586621679276821"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-70"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">Trigender
+</span><a href="Data.Char.Emoji.Gender.html#Transgender"><span class="hs-identifier hs-var">Transgender</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span>
+</span><span id="line-71"></span><span>  </span><span id="local-6989586621679276825"><span class="annot"><span class="annottext">toEnum :: Int -&gt; Trigender
+</span><a href="#local-6989586621679276825"><span class="hs-identifier hs-var hs-var hs-var hs-var">toEnum</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Trigender
+</span><a href="Data.Char.Emoji.Gender.html#Transgender"><span class="hs-identifier hs-var">Transgender</span></a></span><span>
+</span><span id="line-72"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span id="local-6989586621679276827"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679276827"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BinaryGender -&gt; Trigender
+</span><a href="Data.Char.Emoji.Gender.html#Binary"><span class="hs-identifier hs-var">Binary</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; BinaryGender
+forall a. Enum a =&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679276827"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276830"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#Trigender"><span class="hs-identifier hs-type">Trigender</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-75"></span><span>  </span><span id="local-6989586621679276835"><span class="annot"><span class="annottext">arbitrary :: Gen Trigender
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen Trigender
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276839"><span id="local-6989586621679276846"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#Trigender"><span class="hs-identifier hs-type">Trigender</span></a></span></span></span><span>
+</span><span id="line-78"></span><span>
+</span><span id="line-79"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276857"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#Trigender"><span class="hs-identifier hs-type">Trigender</span></a></span></span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276874"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Gender.html#Trigender"><span class="hs-identifier hs-type">Trigender</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-82"></span><span>  </span><span id="local-6989586621679276880"><span class="annot"><span class="annottext">toUnicodeText :: Trigender -&gt; Text
+</span><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeText</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Emoji.Gender.html#Binary"><span class="hs-identifier hs-type">Binary</span></a></span><span> </span><span id="local-6989586621679276881"><span class="annot"><span class="annottext">BinaryGender
+</span><a href="#local-6989586621679276881"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BinaryGender -&gt; Text
+forall a. UnicodeText a =&gt; a -&gt; Text
+</span><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var">toUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">BinaryGender
+</span><a href="#local-6989586621679276881"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-83"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var">toUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">Trigender
+</span><a href="Data.Char.Emoji.Gender.html#Transgender"><span class="hs-identifier hs-var">Transgender</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x26a7\xfe0f&quot;</span></span><span>
+</span><span id="line-84"></span><span>  </span><span id="local-6989586621679276887"><span class="annot"><span class="annottext">fromUnicodeText :: Text -&gt; Maybe Trigender
+</span><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeText</span></a></span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x26a7\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Trigender -&gt; Maybe Trigender
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Trigender
+</span><a href="Data.Char.Emoji.Gender.html#Transgender"><span class="hs-identifier hs-var">Transgender</span></a></span><span>
+</span><span id="line-85"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var">fromUnicodeText</span></a></span><span> </span><span id="local-6989586621679276888"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679276888"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BinaryGender -&gt; Trigender
+</span><a href="Data.Char.Emoji.Gender.html#Binary"><span class="hs-identifier hs-var">Binary</span></a></span><span> </span><span class="annot"><span class="annottext">(BinaryGender -&gt; Trigender)
+-&gt; Maybe BinaryGender -&gt; Maybe Trigender
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe BinaryGender
+forall a. UnicodeText a =&gt; Text -&gt; Maybe a
+</span><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var">fromUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679276888"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-86"></span><span>  </span><span id="local-6989586621679276893"><span class="annot"><span class="annottext">isInTextRange :: Text -&gt; Bool
+</span><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInTextRange</span></a></span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x26a7\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-87"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span id="local-6989586621679276894"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679276894"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. UnicodeText a =&gt; Text -&gt; Bool
+</span><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Data.Char.Emoji.Gender.html#BinaryGender"><span class="hs-identifier hs-type">BinaryGender</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679276894"><span class="hs-identifier hs-var">c</span></a></span><span>
+</span><span id="line-88"></span></pre></body></html>

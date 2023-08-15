@@ -1,0 +1,1230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="local-6989586621679288062"><span id="local-6989586621679288063"><span id="local-6989586621679288064"><span id="local-6989586621679288065"><span id="local-6989586621679288066"><span id="local-6989586621679288067"><span id="local-6989586621679288068"><span id="local-6989586621679288069"><span id="local-6989586621679288070"><span id="local-6989586621679288071"><span id="local-6989586621679288072"><span id="local-6989586621679288073"><span id="local-6989586621679288074"><span id="local-6989586621679288075"><span id="local-6989586621679288076"><span id="local-6989586621679288077"><span id="local-6989586621679288078"><span id="local-6989586621679288079"><span id="local-6989586621679288080"><span id="local-6989586621679288081"><span id="local-6989586621679288082"><span id="local-6989586621679288083"><span id="local-6989586621679288084"><span id="local-6989586621679288085"></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications #-}</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Module      : Data.Char.Number.Roman</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Description : A module to print Roman numerals both in upper case and lower case.</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- This module aims to convert Roman numerals to a String of unicode characters that</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- represent the corresponding Roman number.</span><span>
+</span><span id="line-15"></span><span class="hs-comment">--</span><span>
+</span><span id="line-16"></span><span class="hs-comment">-- One can convert numbers to Roman numerals in upper case and lower case, and in 'Additive' and 'Subtractive' style.</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Number.Roman</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Data types to represent Roman numerals</span></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier">RomanLiteral</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier">I</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#II"><span class="hs-identifier">II</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#III"><span class="hs-identifier">III</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#IV"><span class="hs-identifier">IV</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#V"><span class="hs-identifier">V</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#VI"><span class="hs-identifier">VI</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#VII"><span class="hs-identifier">VII</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#VIII"><span class="hs-identifier">VIII</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#IX"><span class="hs-identifier">IX</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#X"><span class="hs-identifier">X</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#XI"><span class="hs-identifier">XI</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#XII"><span class="hs-identifier">XII</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#L"><span class="hs-identifier">L</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#C"><span class="hs-identifier">C</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#D"><span class="hs-identifier">D</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#M"><span class="hs-identifier">M</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanStyle"><span class="hs-identifier">RomanStyle</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Number.Roman.html#Additive"><span class="hs-identifier">Additive</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#Subtractive"><span class="hs-identifier">Subtractive</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Convert a number to Roman literals</span></span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Roman.html#toLiterals"><span class="hs-identifier">toLiterals</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Roman.html#romanLiteral"><span class="hs-identifier">romanLiteral</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Roman.html#romanLiteral%27"><span class="hs-identifier">romanLiteral'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Convert a number to text</span></span><span>
+</span><span id="line-28"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Roman.html#romanNumeral"><span class="hs-identifier">romanNumeral</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-29"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Roman.html#romanNumeral%27"><span class="hs-identifier">romanNumeral'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-30"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Roman.html#romanNumeralCase"><span class="hs-identifier">romanNumeralCase</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-31"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Roman.html#romanNumber"><span class="hs-identifier">romanNumber</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-32"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Roman.html#romanNumber%27"><span class="hs-identifier">romanNumber'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-33"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Roman.html#romanNumberCase"><span class="hs-identifier">romanNumberCase</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Bits</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-operator">(.|.)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Char</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">chr</span></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#LetterCase"><span class="hs-identifier">LetterCase</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#Ligate"><span class="hs-identifier">Ligate</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier">UnicodeCharacter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier">fromUnicodeChar</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar%27"><span class="hs-identifier">fromUnicodeChar'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier">isInCharRange</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier">toUnicodeChar</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier">UnicodeText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier">isInTextRange</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier">generateIsInTextRange'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#ligateF"><span class="hs-identifier">ligateF</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapFromEnum"><span class="hs-identifier">mapFromEnum</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapToEnum"><span class="hs-identifier">mapToEnum</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapToEnumSafe"><span class="hs-identifier">mapToEnumSafe</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#splitLetterCase"><span class="hs-identifier">splitLetterCase</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Default.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Default</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">def</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">cons</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">empty</span></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitraryBoundedEnum</span></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="hs-comment">-- | The style to convert a number to a Roman numeral. The 'UnicodeCharacter'</span><span>
+</span><span id="line-49"></span><span class="hs-comment">-- instance maps on the uppercase Roman literals.</span><span>
+</span><span id="line-50"></span><span class="hs-keyword">data</span><span> </span><span id="RomanStyle"><span class="annot"><a href="Data.Char.Number.Roman.html#RomanStyle"><span class="hs-identifier hs-var">RomanStyle</span></a></span></span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-comment">-- | The additive style converts four to &#8544;&#8544;&#8544;&#8544;.</span></span><span>
+</span><span id="line-52"></span><span>    </span><span id="Additive"><span class="annot"><a href="Data.Char.Number.Roman.html#Additive"><span class="hs-identifier hs-var">Additive</span></a></span></span><span>
+</span><span id="line-53"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The subtractive style converts four to &#8544;&#8548;.</span></span><span>
+</span><span id="line-54"></span><span>    </span><span id="Subtractive"><span class="annot"><a href="Data.Char.Number.Roman.html#Subtractive"><span class="hs-identifier hs-var">Subtractive</span></a></span></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679288138"><span id="local-6989586621679288140"><span class="annot"><span class="annottext">RomanStyle
+RomanStyle -&gt; RomanStyle -&gt; Bounded RomanStyle
+forall a. a -&gt; a -&gt; Bounded a
+$cminBound :: RomanStyle
+minBound :: RomanStyle
+$cmaxBound :: RomanStyle
+maxBound :: RomanStyle
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288146"><span id="local-6989586621679288148"><span id="local-6989586621679288150"><span id="local-6989586621679288152"><span id="local-6989586621679288154"><span id="local-6989586621679288160"><span id="local-6989586621679288165"><span id="local-6989586621679288168"><span id="local-6989586621679288171"><span id="local-6989586621679288174"><span id="local-6989586621679288177"><span id="local-6989586621679288180"><span id="local-6989586621679288185"><span id="local-6989586621679288190"><span class="annot"><span class="annottext">Typeable RomanStyle
+Typeable RomanStyle
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; RomanStyle -&gt; c RomanStyle)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c RomanStyle)
+-&gt; (RomanStyle -&gt; Constr)
+-&gt; (RomanStyle -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c RomanStyle))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c RomanStyle))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; RomanStyle -&gt; RomanStyle)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanStyle -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanStyle -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; RomanStyle -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; RomanStyle -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; RomanStyle -&gt; m RomanStyle)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; RomanStyle -&gt; m RomanStyle)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; RomanStyle -&gt; m RomanStyle)
+-&gt; Data RomanStyle
+RomanStyle -&gt; Constr
+RomanStyle -&gt; DataType
+(forall b. Data b =&gt; b -&gt; b) -&gt; RomanStyle -&gt; RomanStyle
+forall a.
+Typeable a
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; RomanStyle -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; RomanStyle -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanStyle -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanStyle -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanStyle -&gt; m RomanStyle
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanStyle -&gt; m RomanStyle
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c RomanStyle
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; RomanStyle -&gt; c RomanStyle
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c RomanStyle)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c RomanStyle)
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; RomanStyle -&gt; c RomanStyle
+gfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; RomanStyle -&gt; c RomanStyle
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c RomanStyle
+gunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c RomanStyle
+$ctoConstr :: RomanStyle -&gt; Constr
+toConstr :: RomanStyle -&gt; Constr
+$cdataTypeOf :: RomanStyle -&gt; DataType
+dataTypeOf :: RomanStyle -&gt; DataType
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c RomanStyle)
+dataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c RomanStyle)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c RomanStyle)
+dataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c RomanStyle)
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; RomanStyle -&gt; RomanStyle
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; RomanStyle -&gt; RomanStyle
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanStyle -&gt; r
+gmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanStyle -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanStyle -&gt; r
+gmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanStyle -&gt; r
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; RomanStyle -&gt; [u]
+gmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; RomanStyle -&gt; [u]
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; RomanStyle -&gt; u
+gmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; RomanStyle -&gt; u
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanStyle -&gt; m RomanStyle
+gmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanStyle -&gt; m RomanStyle
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanStyle -&gt; m RomanStyle
+gmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanStyle -&gt; m RomanStyle
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanStyle -&gt; m RomanStyle
+gmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanStyle -&gt; m RomanStyle
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288196"><span id="local-6989586621679288204"><span id="local-6989586621679288210"><span id="local-6989586621679288220"><span id="local-6989586621679288222"><span id="local-6989586621679288226"><span id="local-6989586621679288230"><span id="local-6989586621679288234"><span class="annot"><span class="annottext">Int -&gt; RomanStyle
+RomanStyle -&gt; Int
+RomanStyle -&gt; [RomanStyle]
+RomanStyle -&gt; RomanStyle
+RomanStyle -&gt; RomanStyle -&gt; [RomanStyle]
+RomanStyle -&gt; RomanStyle -&gt; RomanStyle -&gt; [RomanStyle]
+(RomanStyle -&gt; RomanStyle)
+-&gt; (RomanStyle -&gt; RomanStyle)
+-&gt; (Int -&gt; RomanStyle)
+-&gt; (RomanStyle -&gt; Int)
+-&gt; (RomanStyle -&gt; [RomanStyle])
+-&gt; (RomanStyle -&gt; RomanStyle -&gt; [RomanStyle])
+-&gt; (RomanStyle -&gt; RomanStyle -&gt; [RomanStyle])
+-&gt; (RomanStyle -&gt; RomanStyle -&gt; RomanStyle -&gt; [RomanStyle])
+-&gt; Enum RomanStyle
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+$csucc :: RomanStyle -&gt; RomanStyle
+succ :: RomanStyle -&gt; RomanStyle
+$cpred :: RomanStyle -&gt; RomanStyle
+pred :: RomanStyle -&gt; RomanStyle
+$ctoEnum :: Int -&gt; RomanStyle
+toEnum :: Int -&gt; RomanStyle
+$cfromEnum :: RomanStyle -&gt; Int
+fromEnum :: RomanStyle -&gt; Int
+$cenumFrom :: RomanStyle -&gt; [RomanStyle]
+enumFrom :: RomanStyle -&gt; [RomanStyle]
+$cenumFromThen :: RomanStyle -&gt; RomanStyle -&gt; [RomanStyle]
+enumFromThen :: RomanStyle -&gt; RomanStyle -&gt; [RomanStyle]
+$cenumFromTo :: RomanStyle -&gt; RomanStyle -&gt; [RomanStyle]
+enumFromTo :: RomanStyle -&gt; RomanStyle -&gt; [RomanStyle]
+$cenumFromThenTo :: RomanStyle -&gt; RomanStyle -&gt; RomanStyle -&gt; [RomanStyle]
+enumFromThenTo :: RomanStyle -&gt; RomanStyle -&gt; RomanStyle -&gt; [RomanStyle]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288238"><span id="local-6989586621679288240"><span class="annot"><span class="annottext">RomanStyle -&gt; RomanStyle -&gt; Bool
+(RomanStyle -&gt; RomanStyle -&gt; Bool)
+-&gt; (RomanStyle -&gt; RomanStyle -&gt; Bool) -&gt; Eq RomanStyle
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: RomanStyle -&gt; RomanStyle -&gt; Bool
+== :: RomanStyle -&gt; RomanStyle -&gt; Bool
+$c/= :: RomanStyle -&gt; RomanStyle -&gt; Bool
+/= :: RomanStyle -&gt; RomanStyle -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288245"><span id="local-6989586621679288247"><span class="annot"><span class="annottext">(forall x. RomanStyle -&gt; Rep RomanStyle x)
+-&gt; (forall x. Rep RomanStyle x -&gt; RomanStyle) -&gt; Generic RomanStyle
+forall x. Rep RomanStyle x -&gt; RomanStyle
+forall x. RomanStyle -&gt; Rep RomanStyle x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cfrom :: forall x. RomanStyle -&gt; Rep RomanStyle x
+from :: forall x. RomanStyle -&gt; Rep RomanStyle x
+$cto :: forall x. Rep RomanStyle x -&gt; RomanStyle
+to :: forall x. Rep RomanStyle x -&gt; RomanStyle
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288253"><span id="local-6989586621679288255"><span id="local-6989586621679288257"><span id="local-6989586621679288261"><span id="local-6989586621679288264"><span id="local-6989586621679288267"><span id="local-6989586621679288270"><span class="annot"><span class="annottext">Eq RomanStyle
+Eq RomanStyle
+-&gt; (RomanStyle -&gt; RomanStyle -&gt; Ordering)
+-&gt; (RomanStyle -&gt; RomanStyle -&gt; Bool)
+-&gt; (RomanStyle -&gt; RomanStyle -&gt; Bool)
+-&gt; (RomanStyle -&gt; RomanStyle -&gt; Bool)
+-&gt; (RomanStyle -&gt; RomanStyle -&gt; Bool)
+-&gt; (RomanStyle -&gt; RomanStyle -&gt; RomanStyle)
+-&gt; (RomanStyle -&gt; RomanStyle -&gt; RomanStyle)
+-&gt; Ord RomanStyle
+RomanStyle -&gt; RomanStyle -&gt; Bool
+RomanStyle -&gt; RomanStyle -&gt; Ordering
+RomanStyle -&gt; RomanStyle -&gt; RomanStyle
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: RomanStyle -&gt; RomanStyle -&gt; Ordering
+compare :: RomanStyle -&gt; RomanStyle -&gt; Ordering
+$c&lt; :: RomanStyle -&gt; RomanStyle -&gt; Bool
+&lt; :: RomanStyle -&gt; RomanStyle -&gt; Bool
+$c&lt;= :: RomanStyle -&gt; RomanStyle -&gt; Bool
+&lt;= :: RomanStyle -&gt; RomanStyle -&gt; Bool
+$c&gt; :: RomanStyle -&gt; RomanStyle -&gt; Bool
+&gt; :: RomanStyle -&gt; RomanStyle -&gt; Bool
+$c&gt;= :: RomanStyle -&gt; RomanStyle -&gt; Bool
+&gt;= :: RomanStyle -&gt; RomanStyle -&gt; Bool
+$cmax :: RomanStyle -&gt; RomanStyle -&gt; RomanStyle
+max :: RomanStyle -&gt; RomanStyle -&gt; RomanStyle
+$cmin :: RomanStyle -&gt; RomanStyle -&gt; RomanStyle
+min :: RomanStyle -&gt; RomanStyle -&gt; RomanStyle
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288274"><span id="local-6989586621679288278"><span id="local-6989586621679288281"><span id="local-6989586621679288286"><span class="annot"><span class="annottext">ReadPrec [RomanStyle]
+ReadPrec RomanStyle
+Int -&gt; ReadS RomanStyle
+ReadS [RomanStyle]
+(Int -&gt; ReadS RomanStyle)
+-&gt; ReadS [RomanStyle]
+-&gt; ReadPrec RomanStyle
+-&gt; ReadPrec [RomanStyle]
+-&gt; Read RomanStyle
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+$creadsPrec :: Int -&gt; ReadS RomanStyle
+readsPrec :: Int -&gt; ReadS RomanStyle
+$creadList :: ReadS [RomanStyle]
+readList :: ReadS [RomanStyle]
+$creadPrec :: ReadPrec RomanStyle
+readPrec :: ReadPrec RomanStyle
+$creadListPrec :: ReadPrec [RomanStyle]
+readListPrec :: ReadPrec [RomanStyle]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288290"><span id="local-6989586621679288292"><span id="local-6989586621679288296"><span class="annot"><span class="annottext">Int -&gt; RomanStyle -&gt; ShowS
+[RomanStyle] -&gt; ShowS
+RomanStyle -&gt; String
+(Int -&gt; RomanStyle -&gt; ShowS)
+-&gt; (RomanStyle -&gt; String)
+-&gt; ([RomanStyle] -&gt; ShowS)
+-&gt; Show RomanStyle
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; RomanStyle -&gt; ShowS
+showsPrec :: Int -&gt; RomanStyle -&gt; ShowS
+$cshow :: RomanStyle -&gt; String
+show :: RomanStyle -&gt; String
+$cshowList :: [RomanStyle] -&gt; ShowS
+showList :: [RomanStyle] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679288301"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanStyle"><span class="hs-identifier hs-type">RomanStyle</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-58"></span><span>  </span><span id="local-6989586621679288307"><span class="annot"><span class="annottext">arbitrary :: Gen RomanStyle
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen RomanStyle
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679288310"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-61"></span><span>  </span><span id="local-6989586621679288316"><span class="annot"><span class="annottext">arbitrary :: Gen RomanLiteral
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen RomanLiteral
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Default</span></span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanStyle"><span class="hs-identifier hs-type">RomanStyle</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-64"></span><span>  </span><span id="local-6989586621679288320"><span class="annot"><span class="annottext">def :: RomanStyle
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">def</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RomanStyle
+</span><a href="Data.Char.Number.Roman.html#Subtractive"><span class="hs-identifier hs-var">Subtractive</span></a></span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679288324"><span id="local-6989586621679288331"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanStyle"><span class="hs-identifier hs-type">RomanStyle</span></a></span></span></span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679288343"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanStyle"><span class="hs-identifier hs-type">RomanStyle</span></a></span></span><span>
+</span><span id="line-69"></span><span>
+</span><span id="line-70"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier hs-type">UnicodeCharacter</span></a></span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-71"></span><span>  </span><span id="local-6989586621679288364"><span class="annot"><span class="annottext">toUnicodeChar :: RomanLiteral -&gt; Char
+</span><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; RomanLiteral -&gt; Char
+forall a. Enum a =&gt; Int -&gt; a -&gt; Char
+</span><a href="Data.Char.Core.html#mapFromEnum"><span class="hs-identifier hs-var">mapFromEnum</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Number.Roman.html#_romanUppercaseOffset"><span class="hs-identifier hs-var">_romanUppercaseOffset</span></a></span><span>
+</span><span id="line-72"></span><span>  </span><span id="local-6989586621679288368"><span class="annot"><span class="annottext">fromUnicodeChar :: Char -&gt; Maybe RomanLiteral
+</span><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Maybe RomanLiteral
+forall a. (Bounded a, Enum a) =&gt; Int -&gt; Char -&gt; Maybe a
+</span><a href="Data.Char.Core.html#mapToEnumSafe"><span class="hs-identifier hs-var">mapToEnumSafe</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Number.Roman.html#_romanUppercaseOffset"><span class="hs-identifier hs-var">_romanUppercaseOffset</span></a></span><span>
+</span><span id="line-73"></span><span>  </span><span id="local-6989586621679288370"><span class="annot"><span class="annottext">fromUnicodeChar' :: Char -&gt; RomanLiteral
+</span><a href="Data.Char.Core.html#fromUnicodeChar%27"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; RomanLiteral
+forall a. Enum a =&gt; Int -&gt; Char -&gt; a
+</span><a href="Data.Char.Core.html#mapToEnum"><span class="hs-identifier hs-var">mapToEnum</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Number.Roman.html#_romanUppercaseOffset"><span class="hs-identifier hs-var">_romanUppercaseOffset</span></a></span><span>
+</span><span id="line-74"></span><span>  </span><span id="local-6989586621679288374"><span class="annot"><span class="annottext">isInCharRange :: Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInCharRange</span></a></span></span><span> </span><span id="local-6989586621679288375"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679288375"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2160'</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679288375"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679288375"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x216f'</span></span><span>
+</span><span id="line-75"></span><span>
+</span><span id="line-76"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679288379"><span id="local-6989586621679288384"><span id="local-6989586621679288388"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-77"></span><span>  </span><span id="local-6989586621679288393"><span class="annot"><span class="annottext">isInTextRange :: Text -&gt; Bool
+</span><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInTextRange</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. UnicodeCharacter a =&gt; Text -&gt; Bool
+</span><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier hs-var">generateIsInTextRange'</span></a></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span>
+</span><span id="line-78"></span><span>
+</span><span id="line-79"></span><span class="annot"><span class="hs-comment">-- | Roman numerals for which a unicode character exists.</span></span><span>
+</span><span id="line-80"></span><span class="hs-keyword">data</span><span> </span><span id="RomanLiteral"><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-var">RomanLiteral</span></a></span></span><span>
+</span><span id="line-81"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /one/: &#8544;.</span></span><span>
+</span><span id="line-82"></span><span>    </span><span id="I"><span class="annot"><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span></span><span>
+</span><span id="line-83"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /two/: &#8545;.</span></span><span>
+</span><span id="line-84"></span><span>    </span><span id="II"><span class="annot"><a href="Data.Char.Number.Roman.html#II"><span class="hs-identifier hs-var">II</span></a></span></span><span>
+</span><span id="line-85"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /three/: &#8546;.</span></span><span>
+</span><span id="line-86"></span><span>    </span><span id="III"><span class="annot"><a href="Data.Char.Number.Roman.html#III"><span class="hs-identifier hs-var">III</span></a></span></span><span>
+</span><span id="line-87"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /four/: &#8547;.</span></span><span>
+</span><span id="line-88"></span><span>    </span><span id="IV"><span class="annot"><a href="Data.Char.Number.Roman.html#IV"><span class="hs-identifier hs-var">IV</span></a></span></span><span>
+</span><span id="line-89"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /five/: &#8548;.</span></span><span>
+</span><span id="line-90"></span><span>    </span><span id="V"><span class="annot"><a href="Data.Char.Number.Roman.html#V"><span class="hs-identifier hs-var">V</span></a></span></span><span>
+</span><span id="line-91"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /six/: &#8549;.</span></span><span>
+</span><span id="line-92"></span><span>    </span><span id="VI"><span class="annot"><a href="Data.Char.Number.Roman.html#VI"><span class="hs-identifier hs-var">VI</span></a></span></span><span>
+</span><span id="line-93"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /seven/: &#8550;.</span></span><span>
+</span><span id="line-94"></span><span>    </span><span id="VII"><span class="annot"><a href="Data.Char.Number.Roman.html#VII"><span class="hs-identifier hs-var">VII</span></a></span></span><span>
+</span><span id="line-95"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /eight/: &#8551;.</span></span><span>
+</span><span id="line-96"></span><span>    </span><span id="VIII"><span class="annot"><a href="Data.Char.Number.Roman.html#VIII"><span class="hs-identifier hs-var">VIII</span></a></span></span><span>
+</span><span id="line-97"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /nine/: &#8552;.</span></span><span>
+</span><span id="line-98"></span><span>    </span><span id="IX"><span class="annot"><a href="Data.Char.Number.Roman.html#IX"><span class="hs-identifier hs-var">IX</span></a></span></span><span>
+</span><span id="line-99"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /ten/: &#8553;.</span></span><span>
+</span><span id="line-100"></span><span>    </span><span id="X"><span class="annot"><a href="Data.Char.Number.Roman.html#X"><span class="hs-identifier hs-var">X</span></a></span></span><span>
+</span><span id="line-101"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /eleven/: &#8554;.</span></span><span>
+</span><span id="line-102"></span><span>    </span><span id="XI"><span class="annot"><a href="Data.Char.Number.Roman.html#XI"><span class="hs-identifier hs-var">XI</span></a></span></span><span>
+</span><span id="line-103"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /twelve/: &#8555;.</span></span><span>
+</span><span id="line-104"></span><span>    </span><span id="XII"><span class="annot"><a href="Data.Char.Number.Roman.html#XII"><span class="hs-identifier hs-var">XII</span></a></span></span><span>
+</span><span id="line-105"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /fifty/: &#8556;.</span></span><span>
+</span><span id="line-106"></span><span>    </span><span id="L"><span class="annot"><a href="Data.Char.Number.Roman.html#L"><span class="hs-identifier hs-var">L</span></a></span></span><span>
+</span><span id="line-107"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /hundred/: &#8557;.</span></span><span>
+</span><span id="line-108"></span><span>    </span><span id="C"><span class="annot"><a href="Data.Char.Number.Roman.html#C"><span class="hs-identifier hs-var">C</span></a></span></span><span>
+</span><span id="line-109"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /five hundred/: &#8558;.</span></span><span>
+</span><span id="line-110"></span><span>    </span><span id="D"><span class="annot"><a href="Data.Char.Number.Roman.html#D"><span class="hs-identifier hs-var">D</span></a></span></span><span>
+</span><span id="line-111"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Roman numeral /thousand/: &#8559;.</span></span><span>
+</span><span id="line-112"></span><span>    </span><span id="M"><span class="annot"><a href="Data.Char.Number.Roman.html#M"><span class="hs-identifier hs-var">M</span></a></span></span><span>
+</span><span id="line-113"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679288395"><span id="local-6989586621679288397"><span class="annot"><span class="annottext">RomanLiteral
+RomanLiteral -&gt; RomanLiteral -&gt; Bounded RomanLiteral
+forall a. a -&gt; a -&gt; Bounded a
+$cminBound :: RomanLiteral
+minBound :: RomanLiteral
+$cmaxBound :: RomanLiteral
+maxBound :: RomanLiteral
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288401"><span id="local-6989586621679288403"><span id="local-6989586621679288405"><span id="local-6989586621679288407"><span id="local-6989586621679288409"><span id="local-6989586621679288415"><span id="local-6989586621679288420"><span id="local-6989586621679288423"><span id="local-6989586621679288426"><span id="local-6989586621679288429"><span id="local-6989586621679288432"><span id="local-6989586621679288435"><span id="local-6989586621679288440"><span id="local-6989586621679288445"><span class="annot"><span class="annottext">Typeable RomanLiteral
+Typeable RomanLiteral
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; RomanLiteral -&gt; c RomanLiteral)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c RomanLiteral)
+-&gt; (RomanLiteral -&gt; Constr)
+-&gt; (RomanLiteral -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c RomanLiteral))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c RomanLiteral))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; RomanLiteral -&gt; RomanLiteral)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanLiteral -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanLiteral -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; RomanLiteral -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; RomanLiteral -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; RomanLiteral -&gt; m RomanLiteral)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; RomanLiteral -&gt; m RomanLiteral)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; RomanLiteral -&gt; m RomanLiteral)
+-&gt; Data RomanLiteral
+RomanLiteral -&gt; Constr
+RomanLiteral -&gt; DataType
+(forall b. Data b =&gt; b -&gt; b) -&gt; RomanLiteral -&gt; RomanLiteral
+forall a.
+Typeable a
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; RomanLiteral -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; RomanLiteral -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanLiteral -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanLiteral -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanLiteral -&gt; m RomanLiteral
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanLiteral -&gt; m RomanLiteral
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c RomanLiteral
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; RomanLiteral -&gt; c RomanLiteral
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c RomanLiteral)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c RomanLiteral)
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; RomanLiteral -&gt; c RomanLiteral
+gfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; RomanLiteral -&gt; c RomanLiteral
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c RomanLiteral
+gunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c RomanLiteral
+$ctoConstr :: RomanLiteral -&gt; Constr
+toConstr :: RomanLiteral -&gt; Constr
+$cdataTypeOf :: RomanLiteral -&gt; DataType
+dataTypeOf :: RomanLiteral -&gt; DataType
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c RomanLiteral)
+dataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c RomanLiteral)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c RomanLiteral)
+dataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c RomanLiteral)
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; RomanLiteral -&gt; RomanLiteral
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; RomanLiteral -&gt; RomanLiteral
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanLiteral -&gt; r
+gmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanLiteral -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanLiteral -&gt; r
+gmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; RomanLiteral -&gt; r
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; RomanLiteral -&gt; [u]
+gmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; RomanLiteral -&gt; [u]
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; RomanLiteral -&gt; u
+gmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; RomanLiteral -&gt; u
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanLiteral -&gt; m RomanLiteral
+gmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanLiteral -&gt; m RomanLiteral
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanLiteral -&gt; m RomanLiteral
+gmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanLiteral -&gt; m RomanLiteral
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanLiteral -&gt; m RomanLiteral
+gmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; RomanLiteral -&gt; m RomanLiteral
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288450"><span id="local-6989586621679288456"><span id="local-6989586621679288462"><span id="local-6989586621679288470"><span id="local-6989586621679288472"><span id="local-6989586621679288475"><span id="local-6989586621679288479"><span id="local-6989586621679288482"><span class="annot"><span class="annottext">Int -&gt; RomanLiteral
+RomanLiteral -&gt; Int
+RomanLiteral -&gt; [RomanLiteral]
+RomanLiteral -&gt; RomanLiteral
+RomanLiteral -&gt; RomanLiteral -&gt; [RomanLiteral]
+RomanLiteral -&gt; RomanLiteral -&gt; RomanLiteral -&gt; [RomanLiteral]
+(RomanLiteral -&gt; RomanLiteral)
+-&gt; (RomanLiteral -&gt; RomanLiteral)
+-&gt; (Int -&gt; RomanLiteral)
+-&gt; (RomanLiteral -&gt; Int)
+-&gt; (RomanLiteral -&gt; [RomanLiteral])
+-&gt; (RomanLiteral -&gt; RomanLiteral -&gt; [RomanLiteral])
+-&gt; (RomanLiteral -&gt; RomanLiteral -&gt; [RomanLiteral])
+-&gt; (RomanLiteral -&gt; RomanLiteral -&gt; RomanLiteral -&gt; [RomanLiteral])
+-&gt; Enum RomanLiteral
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+$csucc :: RomanLiteral -&gt; RomanLiteral
+succ :: RomanLiteral -&gt; RomanLiteral
+$cpred :: RomanLiteral -&gt; RomanLiteral
+pred :: RomanLiteral -&gt; RomanLiteral
+$ctoEnum :: Int -&gt; RomanLiteral
+toEnum :: Int -&gt; RomanLiteral
+$cfromEnum :: RomanLiteral -&gt; Int
+fromEnum :: RomanLiteral -&gt; Int
+$cenumFrom :: RomanLiteral -&gt; [RomanLiteral]
+enumFrom :: RomanLiteral -&gt; [RomanLiteral]
+$cenumFromThen :: RomanLiteral -&gt; RomanLiteral -&gt; [RomanLiteral]
+enumFromThen :: RomanLiteral -&gt; RomanLiteral -&gt; [RomanLiteral]
+$cenumFromTo :: RomanLiteral -&gt; RomanLiteral -&gt; [RomanLiteral]
+enumFromTo :: RomanLiteral -&gt; RomanLiteral -&gt; [RomanLiteral]
+$cenumFromThenTo :: RomanLiteral -&gt; RomanLiteral -&gt; RomanLiteral -&gt; [RomanLiteral]
+enumFromThenTo :: RomanLiteral -&gt; RomanLiteral -&gt; RomanLiteral -&gt; [RomanLiteral]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288485"><span id="local-6989586621679288487"><span class="annot"><span class="annottext">RomanLiteral -&gt; RomanLiteral -&gt; Bool
+(RomanLiteral -&gt; RomanLiteral -&gt; Bool)
+-&gt; (RomanLiteral -&gt; RomanLiteral -&gt; Bool) -&gt; Eq RomanLiteral
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: RomanLiteral -&gt; RomanLiteral -&gt; Bool
+== :: RomanLiteral -&gt; RomanLiteral -&gt; Bool
+$c/= :: RomanLiteral -&gt; RomanLiteral -&gt; Bool
+/= :: RomanLiteral -&gt; RomanLiteral -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288491"><span id="local-6989586621679288493"><span class="annot"><span class="annottext">(forall x. RomanLiteral -&gt; Rep RomanLiteral x)
+-&gt; (forall x. Rep RomanLiteral x -&gt; RomanLiteral)
+-&gt; Generic RomanLiteral
+forall x. Rep RomanLiteral x -&gt; RomanLiteral
+forall x. RomanLiteral -&gt; Rep RomanLiteral x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cfrom :: forall x. RomanLiteral -&gt; Rep RomanLiteral x
+from :: forall x. RomanLiteral -&gt; Rep RomanLiteral x
+$cto :: forall x. Rep RomanLiteral x -&gt; RomanLiteral
+to :: forall x. Rep RomanLiteral x -&gt; RomanLiteral
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288496"><span id="local-6989586621679288498"><span id="local-6989586621679288502"><span class="annot"><span class="annottext">Int -&gt; RomanLiteral -&gt; ShowS
+[RomanLiteral] -&gt; ShowS
+RomanLiteral -&gt; String
+(Int -&gt; RomanLiteral -&gt; ShowS)
+-&gt; (RomanLiteral -&gt; String)
+-&gt; ([RomanLiteral] -&gt; ShowS)
+-&gt; Show RomanLiteral
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; RomanLiteral -&gt; ShowS
+showsPrec :: Int -&gt; RomanLiteral -&gt; ShowS
+$cshow :: RomanLiteral -&gt; String
+show :: RomanLiteral -&gt; String
+$cshowList :: [RomanLiteral] -&gt; ShowS
+showList :: [RomanLiteral] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288505"><span id="local-6989586621679288509"><span id="local-6989586621679288512"><span id="local-6989586621679288530"><span class="annot"><span class="annottext">ReadPrec [RomanLiteral]
+ReadPrec RomanLiteral
+Int -&gt; ReadS RomanLiteral
+ReadS [RomanLiteral]
+(Int -&gt; ReadS RomanLiteral)
+-&gt; ReadS [RomanLiteral]
+-&gt; ReadPrec RomanLiteral
+-&gt; ReadPrec [RomanLiteral]
+-&gt; Read RomanLiteral
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+$creadsPrec :: Int -&gt; ReadS RomanLiteral
+readsPrec :: Int -&gt; ReadS RomanLiteral
+$creadList :: ReadS [RomanLiteral]
+readList :: ReadS [RomanLiteral]
+$creadPrec :: ReadPrec RomanLiteral
+readPrec :: ReadPrec RomanLiteral
+$creadListPrec :: ReadPrec [RomanLiteral]
+readListPrec :: ReadPrec [RomanLiteral]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-114"></span><span>
+</span><span id="line-115"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679288535"><span id="local-6989586621679288542"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span></span></span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679288578"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span></span><span>
+</span><span id="line-118"></span><span>
+</span><span id="line-119"></span><span id="local-6989586621679287980"><span class="annot"><a href="Data.Char.Number.Roman.html#_literals"><span class="hs-identifier hs-type">_literals</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679287980"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanStyle"><span class="hs-identifier hs-type">RomanStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679287980"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span class="hs-special">]</span></span><span>
+</span><span id="line-120"></span><span id="_literals"><span class="annot"><span class="annottext">_literals :: forall i.
+Integral i =&gt;
+RomanStyle -&gt; [(i, [RomanLiteral] -&gt; [RomanLiteral])]
+</span><a href="Data.Char.Number.Roman.html#_literals"><span class="hs-identifier hs-var hs-var">_literals</span></a></span></span><span> </span><span class="annot"><span class="annottext">RomanStyle
+</span><a href="Data.Char.Number.Roman.html#Additive"><span class="hs-identifier hs-var">Additive</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-121"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1000</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#M"><span class="hs-identifier hs-var">M</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-122"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">500</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#D"><span class="hs-identifier hs-var">D</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-123"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">100</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#C"><span class="hs-identifier hs-var">C</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-124"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">50</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#L"><span class="hs-identifier hs-var">L</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-125"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">10</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#X"><span class="hs-identifier hs-var">X</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-126"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">5</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#V"><span class="hs-identifier hs-var">V</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-127"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-128"></span><span>  </span><span class="hs-special">]</span><span>
+</span><span id="line-129"></span><span class="annot"><a href="Data.Char.Number.Roman.html#_literals"><span class="hs-identifier hs-var">_literals</span></a></span><span> </span><span class="annot"><span class="annottext">RomanStyle
+</span><a href="Data.Char.Number.Roman.html#Subtractive"><span class="hs-identifier hs-var">Subtractive</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-130"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1000</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#M"><span class="hs-identifier hs-var">M</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-131"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">900</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#C"><span class="hs-identifier hs-var">C</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#M"><span class="hs-identifier hs-var">M</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[RomanLiteral] -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-132"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">500</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#D"><span class="hs-identifier hs-var">D</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-133"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">400</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#C"><span class="hs-identifier hs-var">C</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#D"><span class="hs-identifier hs-var">D</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[RomanLiteral] -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-134"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">100</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#C"><span class="hs-identifier hs-var">C</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-135"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">90</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#X"><span class="hs-identifier hs-var">X</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#C"><span class="hs-identifier hs-var">C</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[RomanLiteral] -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-136"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">50</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#L"><span class="hs-identifier hs-var">L</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-137"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">40</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#X"><span class="hs-identifier hs-var">X</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#L"><span class="hs-identifier hs-var">L</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[RomanLiteral] -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-138"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">10</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#X"><span class="hs-identifier hs-var">X</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-139"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">9</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#X"><span class="hs-identifier hs-var">X</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[RomanLiteral] -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-140"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">5</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#V"><span class="hs-identifier hs-var">V</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-141"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">4</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#V"><span class="hs-identifier hs-var">V</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[RomanLiteral] -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-142"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-143"></span><span>  </span><span class="hs-special">]</span><span>
+</span><span id="line-144"></span><span>
+</span><span id="line-145"></span><span class="annot"><a href="Data.Char.Number.Roman.html#_ligate"><span class="hs-identifier hs-type">_ligate</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-146"></span><span id="_ligate"><span class="annot"><span class="annottext">_ligate :: [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="Data.Char.Number.Roman.html#_ligate"><span class="hs-identifier hs-var hs-var">_ligate</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-147"></span><span class="annot"><a href="Data.Char.Number.Roman.html#_ligate"><span class="hs-identifier hs-var">_ligate</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679288643"><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="#local-6989586621679288643"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679288644"><span class="annot"><span class="annottext">[RomanLiteral]
+</span><a href="#local-6989586621679288644"><span class="hs-identifier hs-var">rs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288645"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="#local-6989586621679288643"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">[RomanLiteral]
+</span><a href="#local-6989586621679288644"><span class="hs-identifier hs-var">rs</span></a></span><span>
+</span><span id="line-148"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-149"></span><span>    </span><span id="local-6989586621679288645"><span class="annot"><span class="annottext">go :: RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288645"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621679288646"><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="#local-6989586621679288646"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="#local-6989586621679288646"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-150"></span><span>    </span><span class="annot"><a href="#local-6989586621679288645"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679288647"><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="#local-6989586621679288647"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679288648"><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="#local-6989586621679288648"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679288649"><span class="annot"><span class="annottext">[RomanLiteral]
+</span><a href="#local-6989586621679288649"><span class="hs-identifier hs-var">ys</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288650"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="#local-6989586621679288647"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="#local-6989586621679288648"><span class="hs-identifier hs-var">y</span></a></span><span> </span><span class="annot"><span class="annottext">[RomanLiteral]
+</span><a href="#local-6989586621679288649"><span class="hs-identifier hs-var">ys</span></a></span><span>
+</span><span id="line-151"></span><span>    </span><span id="local-6989586621679288650"><span class="annot"><span class="annottext">f :: RomanLiteral -&gt; RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288650"><span class="hs-identifier hs-var hs-var">f</span></a></span></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288645"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#II"><span class="hs-identifier hs-var">II</span></a></span><span>
+</span><span id="line-152"></span><span>    </span><span class="annot"><a href="#local-6989586621679288650"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#II"><span class="hs-identifier hs-var">II</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288651"><span class="hs-identifier hs-var">skip</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#III"><span class="hs-identifier hs-var">III</span></a></span><span>
+</span><span id="line-153"></span><span>    </span><span class="annot"><a href="#local-6989586621679288650"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#V"><span class="hs-identifier hs-var">V</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288651"><span class="hs-identifier hs-var">skip</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#IV"><span class="hs-identifier hs-var">IV</span></a></span><span>
+</span><span id="line-154"></span><span>    </span><span class="annot"><a href="#local-6989586621679288650"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#V"><span class="hs-identifier hs-var">V</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288645"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#VI"><span class="hs-identifier hs-var">VI</span></a></span><span>
+</span><span id="line-155"></span><span>    </span><span class="annot"><a href="#local-6989586621679288650"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#VI"><span class="hs-identifier hs-var">VI</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288645"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#VII"><span class="hs-identifier hs-var">VII</span></a></span><span>
+</span><span id="line-156"></span><span>    </span><span class="annot"><a href="#local-6989586621679288650"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#VII"><span class="hs-identifier hs-var">VII</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288651"><span class="hs-identifier hs-var">skip</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#VIII"><span class="hs-identifier hs-var">VIII</span></a></span><span>
+</span><span id="line-157"></span><span>    </span><span class="annot"><a href="#local-6989586621679288650"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#X"><span class="hs-identifier hs-var">X</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288645"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#XI"><span class="hs-identifier hs-var">XI</span></a></span><span>
+</span><span id="line-158"></span><span>    </span><span class="annot"><a href="#local-6989586621679288650"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#X"><span class="hs-identifier hs-var">X</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288651"><span class="hs-identifier hs-var">skip</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#IX"><span class="hs-identifier hs-var">IX</span></a></span><span>
+</span><span id="line-159"></span><span>    </span><span class="annot"><a href="#local-6989586621679288650"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#XI"><span class="hs-identifier hs-var">XI</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#I"><span class="hs-identifier hs-var">I</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288645"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="Data.Char.Number.Roman.html#XII"><span class="hs-identifier hs-var">XII</span></a></span><span>
+</span><span id="line-160"></span><span>    </span><span class="annot"><a href="#local-6989586621679288650"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span id="local-6989586621679288652"><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="#local-6989586621679288652"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679288653"><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="#local-6989586621679288653"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="#local-6989586621679288652"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([RomanLiteral] -&gt; [RomanLiteral])
+-&gt; ([RomanLiteral] -&gt; [RomanLiteral])
+-&gt; [RomanLiteral]
+-&gt; [RomanLiteral]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288645"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral
+</span><a href="#local-6989586621679288653"><span class="hs-identifier hs-var">y</span></a></span><span>
+</span><span id="line-161"></span><span>    </span><span id="local-6989586621679288651"><span class="annot"><span class="annottext">skip :: RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="#local-6989586621679288651"><span class="hs-identifier hs-var hs-var">skip</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">([RomanLiteral] -&gt; [RomanLiteral])
+-&gt; ([RomanLiteral] -&gt; [RomanLiteral])
+-&gt; [RomanLiteral]
+-&gt; [RomanLiteral]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="Data.Char.Number.Roman.html#_ligate"><span class="hs-identifier hs-var">_ligate</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(([RomanLiteral] -&gt; [RomanLiteral])
+ -&gt; [RomanLiteral] -&gt; [RomanLiteral])
+-&gt; (RomanLiteral -&gt; [RomanLiteral] -&gt; [RomanLiteral])
+-&gt; RomanLiteral
+-&gt; [RomanLiteral]
+-&gt; [RomanLiteral]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">:</span><span class="hs-special">)</span><span>
+</span><span id="line-162"></span><span>
+</span><span id="line-163"></span><span class="hs-comment">-- | Convert the given number with the given 'RomanStyle' and 'Ligate' style</span><span>
+</span><span id="line-164"></span><span class="hs-comment">-- to a sequence of 'RomanLiteral's, given the number can be represented</span><span>
+</span><span id="line-165"></span><span class="hs-comment">-- with Roman numerals (is strictly larger than zero).</span><span>
+</span><span id="line-166"></span><span id="local-6989586621679287989"><span class="annot"><a href="Data.Char.Number.Roman.html#toLiterals"><span class="hs-identifier hs-type">toLiterals</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-167"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679287989"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-168"></span><span>  </span><span class="annot"><span class="hs-comment">-- | Specifies if the Numeral is 'Additive' or 'Subtractive' style.</span></span><span>
+</span><span id="line-169"></span><span>  </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanStyle"><span class="hs-identifier hs-type">RomanStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-170"></span><span>  </span><span class="annot"><span class="hs-comment">-- | Specifies if characters like @&#8544;&#8548;@ are joined to @&#8547;@.</span></span><span>
+</span><span id="line-171"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Ligate"><span class="hs-identifier hs-type">Ligate</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-172"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-173"></span><span>  </span><span class="annot"><a href="#local-6989586621679287989"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-174"></span><span>  </span><span class="hs-comment">-- | A list of 'RomanLiteral's if the given number can be specified</span><span>
+</span><span id="line-175"></span><span>  </span><span class="hs-comment">-- with Roman numerals, 'Nothing' otherwise.</span><span>
+</span><span id="line-176"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span class="hs-special">]</span></span><span>
+</span><span id="line-177"></span><span id="toLiterals"><span class="annot"><span class="annottext">toLiterals :: forall i.
+Integral i =&gt;
+RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe [RomanLiteral]
+</span><a href="Data.Char.Number.Roman.html#toLiterals"><span class="hs-identifier hs-var hs-var">toLiterals</span></a></span></span><span> </span><span id="local-6989586621679288667"><span class="annot"><span class="annottext">RomanStyle
+</span><a href="#local-6989586621679288667"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span id="local-6989586621679288668"><span class="annot"><span class="annottext">Ligate
+</span><a href="#local-6989586621679288668"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679288669"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679288669"><span class="hs-identifier hs-var">k</span></a></span></span><span>
+</span><span id="line-178"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679288669"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([RomanLiteral] -&gt; [RomanLiteral])
+-&gt; Ligate -&gt; Maybe [RomanLiteral] -&gt; Maybe [RomanLiteral]
+forall (f :: * -&gt; *) a.
+Functor f =&gt;
+(a -&gt; a) -&gt; Ligate -&gt; f a -&gt; f a
+</span><a href="Data.Char.Core.html#ligateF"><span class="hs-identifier hs-var">ligateF</span></a></span><span> </span><span class="annot"><span class="annottext">[RomanLiteral] -&gt; [RomanLiteral]
+</span><a href="Data.Char.Number.Roman.html#_ligate"><span class="hs-identifier hs-var">_ligate</span></a></span><span> </span><span class="annot"><span class="annottext">Ligate
+</span><a href="#local-6989586621679288668"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+-&gt; [(i, [RomanLiteral] -&gt; [RomanLiteral])] -&gt; Maybe [RomanLiteral]
+forall {t} {a}.
+(Num t, Ord t) =&gt;
+t -&gt; [(t, [a] -&gt; [a])] -&gt; Maybe [a]
+</span><a href="#local-6989586621679288671"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679288669"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">RomanStyle -&gt; [(i, [RomanLiteral] -&gt; [RomanLiteral])]
+forall i.
+Integral i =&gt;
+RomanStyle -&gt; [(i, [RomanLiteral] -&gt; [RomanLiteral])]
+</span><a href="Data.Char.Number.Roman.html#_literals"><span class="hs-identifier hs-var">_literals</span></a></span><span> </span><span class="annot"><span class="annottext">RomanStyle
+</span><a href="#local-6989586621679288667"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-179"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe [RomanLiteral]
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-180"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-181"></span><span>    </span><span id="local-6989586621679288671"><span class="annot"><span class="annottext">go :: t -&gt; [(t, [a] -&gt; [a])] -&gt; Maybe [a]
+</span><a href="#local-6989586621679288671"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="annot"><span class="annottext">t
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">[(t, [a] -&gt; [a])]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[a] -&gt; Maybe [a]
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-182"></span><span>    </span><span class="annot"><a href="#local-6989586621679288671"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">t
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe [a]
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-183"></span><span>    </span><span class="annot"><a href="#local-6989586621679288671"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679288682"><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679288682"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679288683"><span class="annot"><span class="annottext">va :: [(t, [a] -&gt; [a])]
+</span><a href="#local-6989586621679288683"><span class="hs-identifier hs-var">va</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="hs-special">(</span><span id="local-6989586621679288684"><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679288684"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288685"><span class="annot"><span class="annottext">[a] -&gt; [a]
+</span><a href="#local-6989586621679288685"><span class="hs-identifier hs-var">l</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679288686"><span class="annot"><span class="annottext">[(t, [a] -&gt; [a])]
+</span><a href="#local-6989586621679288686"><span class="hs-identifier hs-var">vs</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-184"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679288682"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">t -&gt; t -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;=</span></span><span> </span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679288684"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[a] -&gt; [a]
+</span><a href="#local-6989586621679288685"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">([a] -&gt; [a]) -&gt; Maybe [a] -&gt; Maybe [a]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">t -&gt; [(t, [a] -&gt; [a])] -&gt; Maybe [a]
+</span><a href="#local-6989586621679288671"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679288682"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">t -&gt; t -&gt; t
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679288684"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[(t, [a] -&gt; [a])]
+</span><a href="#local-6989586621679288683"><span class="hs-identifier hs-var">va</span></a></span><span>
+</span><span id="line-185"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">t -&gt; [(t, [a] -&gt; [a])] -&gt; Maybe [a]
+</span><a href="#local-6989586621679288671"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679288682"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">[(t, [a] -&gt; [a])]
+</span><a href="#local-6989586621679288686"><span class="hs-identifier hs-var">vs</span></a></span><span>
+</span><span id="line-186"></span><span>
+</span><span id="line-187"></span><span class="annot"><a href="Data.Char.Number.Roman.html#_romanUppercaseOffset"><span class="hs-identifier hs-type">_romanUppercaseOffset</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-188"></span><span id="_romanUppercaseOffset"><span class="annot"><span class="annottext">_romanUppercaseOffset :: Int
+</span><a href="Data.Char.Number.Roman.html#_romanUppercaseOffset"><span class="hs-identifier hs-var hs-var">_romanUppercaseOffset</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x2160</span></span><span>
+</span><span id="line-189"></span><span>
+</span><span id="line-190"></span><span class="annot"><a href="Data.Char.Number.Roman.html#_romanLowercaseOffset"><span class="hs-identifier hs-type">_romanLowercaseOffset</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-191"></span><span id="_romanLowercaseOffset"><span class="annot"><span class="annottext">_romanLowercaseOffset :: Int
+</span><a href="Data.Char.Number.Roman.html#_romanLowercaseOffset"><span class="hs-identifier hs-var hs-var">_romanLowercaseOffset</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x2170</span></span><span>
+</span><span id="line-192"></span><span>
+</span><span id="line-193"></span><span class="annot"><a href="Data.Char.Number.Roman.html#_romanLiteral"><span class="hs-identifier hs-type">_romanLiteral</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-194"></span><span id="_romanLiteral"><span class="annot"><span class="annottext">_romanLiteral :: Int -&gt; RomanLiteral -&gt; Char
+</span><a href="Data.Char.Number.Roman.html#_romanLiteral"><span class="hs-identifier hs-var hs-var">_romanLiteral</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Char) -&gt; (RomanLiteral -&gt; Int) -&gt; RomanLiteral -&gt; Char
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((RomanLiteral -&gt; Int) -&gt; RomanLiteral -&gt; Char)
+-&gt; (Int -&gt; RomanLiteral -&gt; Int) -&gt; Int -&gt; RomanLiteral -&gt; Char
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int -&gt; Int) -&gt; (RomanLiteral -&gt; Int) -&gt; RomanLiteral -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Int) -&gt; RomanLiteral -&gt; Int)
+-&gt; (Int -&gt; Int -&gt; Int) -&gt; Int -&gt; RomanLiteral -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">(.|.)</span></span><span>
+</span><span id="line-195"></span><span>
+</span><span id="line-196"></span><span class="hs-comment">-- | Convert the given 'RomanLiteral' object to a unicode character in</span><span>
+</span><span id="line-197"></span><span class="hs-comment">-- /upper case/.</span><span>
+</span><span id="line-198"></span><span class="annot"><a href="Data.Char.Number.Roman.html#romanLiteral"><span class="hs-identifier hs-type">romanLiteral</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-199"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'RomanLiteral' to convert.</span></span><span>
+</span><span id="line-200"></span><span>  </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-201"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A unicode character that represents the given 'RomanLiteral'.</span></span><span>
+</span><span id="line-202"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-203"></span><span id="romanLiteral"><span class="annot"><span class="annottext">romanLiteral :: RomanLiteral -&gt; Char
+</span><a href="Data.Char.Number.Roman.html#romanLiteral"><span class="hs-identifier hs-var hs-var">romanLiteral</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; RomanLiteral -&gt; Char
+</span><a href="Data.Char.Number.Roman.html#_romanLiteral"><span class="hs-identifier hs-var">_romanLiteral</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Number.Roman.html#_romanUppercaseOffset"><span class="hs-identifier hs-var">_romanUppercaseOffset</span></a></span><span>
+</span><span id="line-204"></span><span>
+</span><span id="line-205"></span><span class="hs-comment">-- | Convert the given 'RomanLiteral' object to a unicode character in</span><span>
+</span><span id="line-206"></span><span class="hs-comment">-- /lower case/.</span><span>
+</span><span id="line-207"></span><span class="annot"><a href="Data.Char.Number.Roman.html#romanLiteral%27"><span class="hs-identifier hs-type">romanLiteral'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-208"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'RomanLiteral' to convert.</span></span><span>
+</span><span id="line-209"></span><span>  </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-210"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A unicode character that represents the given 'RomanLiteral'.</span></span><span>
+</span><span id="line-211"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-212"></span><span id="romanLiteral%27"><span class="annot"><span class="annottext">romanLiteral' :: RomanLiteral -&gt; Char
+</span><a href="Data.Char.Number.Roman.html#romanLiteral%27"><span class="hs-identifier hs-var hs-var">romanLiteral'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; RomanLiteral -&gt; Char
+</span><a href="Data.Char.Number.Roman.html#_romanLiteral"><span class="hs-identifier hs-var">_romanLiteral</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Number.Roman.html#_romanLowercaseOffset"><span class="hs-identifier hs-var">_romanLowercaseOffset</span></a></span><span>
+</span><span id="line-213"></span><span>
+</span><span id="line-214"></span><span class="annot"><a href="Data.Char.Number.Roman.html#_romanNumeral"><span class="hs-identifier hs-type">_romanNumeral</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-215"></span><span id="_romanNumeral"><span class="annot"><span class="annottext">_romanNumeral :: (RomanLiteral -&gt; Char) -&gt; [RomanLiteral] -&gt; Text
+</span><a href="Data.Char.Number.Roman.html#_romanNumeral"><span class="hs-identifier hs-var hs-var">_romanNumeral</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(RomanLiteral -&gt; Text -&gt; Text) -&gt; Text -&gt; [RomanLiteral] -&gt; Text
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; [a] -&gt; b
+forall (t :: * -&gt; *) a b.
+Foldable t =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-operator hs-var">`foldr`</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-identifier hs-var">empty</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((RomanLiteral -&gt; Text -&gt; Text) -&gt; [RomanLiteral] -&gt; Text)
+-&gt; ((RomanLiteral -&gt; Char) -&gt; RomanLiteral -&gt; Text -&gt; Text)
+-&gt; (RomanLiteral -&gt; Char)
+-&gt; [RomanLiteral]
+-&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char -&gt; Text -&gt; Text
+</span><span class="hs-identifier hs-var">cons</span></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Text -&gt; Text)
+-&gt; (RomanLiteral -&gt; Char) -&gt; RomanLiteral -&gt; Text -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="hs-special">)</span><span>
+</span><span id="line-216"></span><span>
+</span><span id="line-217"></span><span class="hs-comment">-- | Convert a sequence of 'RomanLiteral' objects to a 'Text' object that</span><span>
+</span><span id="line-218"></span><span class="hs-comment">-- contains a sequence of corresponding Unicode characters which are Roman</span><span>
+</span><span id="line-219"></span><span class="hs-comment">-- numberals in /upper case/.</span><span>
+</span><span id="line-220"></span><span class="annot"><a href="Data.Char.Number.Roman.html#romanNumeral"><span class="hs-identifier hs-type">romanNumeral</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-221"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.</span></span><span>
+</span><span id="line-222"></span><span>  </span><span class="hs-special">[</span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-223"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.</span></span><span>
+</span><span id="line-224"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-225"></span><span id="romanNumeral"><span class="annot"><span class="annottext">romanNumeral :: [RomanLiteral] -&gt; Text
+</span><a href="Data.Char.Number.Roman.html#romanNumeral"><span class="hs-identifier hs-var hs-var">romanNumeral</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(RomanLiteral -&gt; Char) -&gt; [RomanLiteral] -&gt; Text
+</span><a href="Data.Char.Number.Roman.html#_romanNumeral"><span class="hs-identifier hs-var">_romanNumeral</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; Char
+</span><a href="Data.Char.Number.Roman.html#romanLiteral"><span class="hs-identifier hs-var">romanLiteral</span></a></span><span>
+</span><span id="line-226"></span><span>
+</span><span id="line-227"></span><span class="hs-comment">-- | Convert a sequence of 'RomanLiteral' objects to a 'Text' object that</span><span>
+</span><span id="line-228"></span><span class="hs-comment">-- contains a sequence of corresponding Unicode characters which are Roman</span><span>
+</span><span id="line-229"></span><span class="hs-comment">-- numberals in /lower case/.</span><span>
+</span><span id="line-230"></span><span class="annot"><a href="Data.Char.Number.Roman.html#romanNumeral%27"><span class="hs-identifier hs-type">romanNumeral'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-231"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.</span></span><span>
+</span><span id="line-232"></span><span>  </span><span class="hs-special">[</span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-233"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.</span></span><span>
+</span><span id="line-234"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-235"></span><span id="romanNumeral%27"><span class="annot"><span class="annottext">romanNumeral' :: [RomanLiteral] -&gt; Text
+</span><a href="Data.Char.Number.Roman.html#romanNumeral%27"><span class="hs-identifier hs-var hs-var">romanNumeral'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(RomanLiteral -&gt; Char) -&gt; [RomanLiteral] -&gt; Text
+</span><a href="Data.Char.Number.Roman.html#_romanNumeral"><span class="hs-identifier hs-var">_romanNumeral</span></a></span><span> </span><span class="annot"><span class="annottext">RomanLiteral -&gt; Char
+</span><a href="Data.Char.Number.Roman.html#romanLiteral%27"><span class="hs-identifier hs-var">romanLiteral'</span></a></span><span>
+</span><span id="line-236"></span><span>
+</span><span id="line-237"></span><span class="hs-comment">-- | Convert a sequence of 'RomanLiteral' objects to a 'Text' object that</span><span>
+</span><span id="line-238"></span><span class="hs-comment">-- contains a sequence of corresponding Unicode characters which are Roman</span><span>
+</span><span id="line-239"></span><span class="hs-comment">-- numberals in /upper case/ or /lower case/ depending on the 'LetterCase' value.</span><span>
+</span><span id="line-240"></span><span class="annot"><a href="Data.Char.Number.Roman.html#romanNumeralCase"><span class="hs-identifier hs-type">romanNumeralCase</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-241"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'LetterCase' to apply.</span></span><span>
+</span><span id="line-242"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#LetterCase"><span class="hs-identifier hs-type">LetterCase</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-243"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given list of 'RomanLiteral' objects to convert to a Unicode equivalent.</span></span><span>
+</span><span id="line-244"></span><span>  </span><span class="hs-special">[</span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-245"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'Text' object that contains a sequence of unicode characters that represents the 'RomanLiteral's.</span></span><span>
+</span><span id="line-246"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-247"></span><span id="romanNumeralCase"><span class="annot"><span class="annottext">romanNumeralCase :: LetterCase -&gt; [RomanLiteral] -&gt; Text
+</span><a href="Data.Char.Number.Roman.html#romanNumeralCase"><span class="hs-identifier hs-var hs-var">romanNumeralCase</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([RomanLiteral] -&gt; Text)
+-&gt; ([RomanLiteral] -&gt; Text) -&gt; LetterCase -&gt; [RomanLiteral] -&gt; Text
+forall a. a -&gt; a -&gt; LetterCase -&gt; a
+</span><a href="Data.Char.Core.html#splitLetterCase"><span class="hs-identifier hs-var">splitLetterCase</span></a></span><span> </span><span class="annot"><span class="annottext">[RomanLiteral] -&gt; Text
+</span><a href="Data.Char.Number.Roman.html#romanNumeral"><span class="hs-identifier hs-var">romanNumeral</span></a></span><span> </span><span class="annot"><span class="annottext">[RomanLiteral] -&gt; Text
+</span><a href="Data.Char.Number.Roman.html#romanNumeral%27"><span class="hs-identifier hs-var">romanNumeral'</span></a></span><span>
+</span><span id="line-248"></span><span>
+</span><span id="line-249"></span><span id="local-6989586621679288006"><span id="local-6989586621679288007"><span class="annot"><a href="Data.Char.Number.Roman.html#_romanNumber"><span class="hs-identifier hs-type">_romanNumber</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679288006"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanLiteral"><span class="hs-identifier hs-type">RomanLiteral</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679288007"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanStyle"><span class="hs-identifier hs-type">RomanStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Char.Core.html#Ligate"><span class="hs-identifier hs-type">Ligate</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679288006"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679288007"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-250"></span><span id="_romanNumber"><span class="annot"><span class="annottext">_romanNumber :: forall i a.
+Integral i =&gt;
+([RomanLiteral] -&gt; a) -&gt; RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe a
+</span><a href="Data.Char.Number.Roman.html#_romanNumber"><span class="hs-identifier hs-var hs-var">_romanNumber</span></a></span></span><span> </span><span id="local-6989586621679288697"><span class="annot"><span class="annottext">[RomanLiteral] -&gt; a
+</span><a href="#local-6989586621679288697"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679288698"><span class="annot"><span class="annottext">RomanStyle
+</span><a href="#local-6989586621679288698"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span id="local-6989586621679288699"><span class="annot"><span class="annottext">Ligate
+</span><a href="#local-6989586621679288699"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([RomanLiteral] -&gt; a) -&gt; Maybe [RomanLiteral] -&gt; Maybe a
+forall a b. (a -&gt; b) -&gt; Maybe a -&gt; Maybe b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">[RomanLiteral] -&gt; a
+</span><a href="#local-6989586621679288697"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe [RomanLiteral] -&gt; Maybe a)
+-&gt; (i -&gt; Maybe [RomanLiteral]) -&gt; i -&gt; Maybe a
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe [RomanLiteral]
+forall i.
+Integral i =&gt;
+RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe [RomanLiteral]
+</span><a href="Data.Char.Number.Roman.html#toLiterals"><span class="hs-identifier hs-var">toLiterals</span></a></span><span> </span><span class="annot"><span class="annottext">RomanStyle
+</span><a href="#local-6989586621679288698"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">Ligate
+</span><a href="#local-6989586621679288699"><span class="hs-identifier hs-var">c</span></a></span><span>
+</span><span id="line-251"></span><span>
+</span><span id="line-252"></span><span class="hs-comment">-- | Convert a given number to a 'Text' wrapped in a 'Just' data constructor,</span><span>
+</span><span id="line-253"></span><span class="hs-comment">-- given the number, given it can be represented. 'Nothing' in case it can not</span><span>
+</span><span id="line-254"></span><span class="hs-comment">-- be represented. The number is written in Roman numerals in /upper case/.</span><span>
+</span><span id="line-255"></span><span id="local-6989586621679288013"><span class="annot"><a href="Data.Char.Number.Roman.html#romanNumber"><span class="hs-identifier hs-type">romanNumber</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-256"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679288013"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-257"></span><span>  </span><span class="annot"><span class="hs-comment">-- | Specifies if the Numeral is 'Additive' or 'Subtractive' style.</span></span><span>
+</span><span id="line-258"></span><span>  </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanStyle"><span class="hs-identifier hs-type">RomanStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-259"></span><span>  </span><span class="annot"><span class="hs-comment">-- | Specifies if characters like @&#8544;&#8548;@ are joined to @&#8547;@.</span></span><span>
+</span><span id="line-260"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Ligate"><span class="hs-identifier hs-type">Ligate</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-261"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-262"></span><span>  </span><span class="annot"><a href="#local-6989586621679288013"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-263"></span><span>  </span><span class="hs-comment">-- | A 'Text' if the given number can be specified with Roman</span><span>
+</span><span id="line-264"></span><span>  </span><span class="hs-comment">-- numerals wrapped in a 'Just', 'Nothing' otherwise.</span><span>
+</span><span id="line-265"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-266"></span><span id="romanNumber"><span class="annot"><span class="annottext">romanNumber :: forall i. Integral i =&gt; RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe Text
+</span><a href="Data.Char.Number.Roman.html#romanNumber"><span class="hs-identifier hs-var hs-var">romanNumber</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([RomanLiteral] -&gt; Text) -&gt; RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe Text
+forall i a.
+Integral i =&gt;
+([RomanLiteral] -&gt; a) -&gt; RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe a
+</span><a href="Data.Char.Number.Roman.html#_romanNumber"><span class="hs-identifier hs-var">_romanNumber</span></a></span><span> </span><span class="annot"><span class="annottext">[RomanLiteral] -&gt; Text
+</span><a href="Data.Char.Number.Roman.html#romanNumeral"><span class="hs-identifier hs-var">romanNumeral</span></a></span><span>
+</span><span id="line-267"></span><span>
+</span><span id="line-268"></span><span class="hs-comment">-- | Convert a given number to a 'Text' wrapped in a 'Just' data constructor,</span><span>
+</span><span id="line-269"></span><span class="hs-comment">-- given the number, given it can be represented. 'Nothing' in case it can not</span><span>
+</span><span id="line-270"></span><span class="hs-comment">-- be represented. The number is written in Roman numerals in /lower case/.</span><span>
+</span><span id="line-271"></span><span id="local-6989586621679288702"><span class="annot"><a href="Data.Char.Number.Roman.html#romanNumber%27"><span class="hs-identifier hs-type">romanNumber'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-272"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679288702"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-273"></span><span>  </span><span class="annot"><span class="hs-comment">-- | Specifies if the Numeral is 'Additive' or 'Subtractive' style.</span></span><span>
+</span><span id="line-274"></span><span>  </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanStyle"><span class="hs-identifier hs-type">RomanStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-275"></span><span>  </span><span class="annot"><span class="hs-comment">-- | Specifies if characters like @&#8544;&#8548;@ are joined to @&#8547;@.</span></span><span>
+</span><span id="line-276"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Ligate"><span class="hs-identifier hs-type">Ligate</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-277"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-278"></span><span>  </span><span class="annot"><a href="#local-6989586621679288702"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-279"></span><span>  </span><span class="hs-comment">-- | A 'Text' if the given number can be specified with Roman</span><span>
+</span><span id="line-280"></span><span>  </span><span class="hs-comment">-- numerals wrapped in a 'Just', 'Nothing' otherwise.</span><span>
+</span><span id="line-281"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-282"></span><span id="romanNumber%27"><span class="annot"><span class="annottext">romanNumber' :: forall i. Integral i =&gt; RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe Text
+</span><a href="Data.Char.Number.Roman.html#romanNumber%27"><span class="hs-identifier hs-var hs-var">romanNumber'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([RomanLiteral] -&gt; Text) -&gt; RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe Text
+forall i a.
+Integral i =&gt;
+([RomanLiteral] -&gt; a) -&gt; RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe a
+</span><a href="Data.Char.Number.Roman.html#_romanNumber"><span class="hs-identifier hs-var">_romanNumber</span></a></span><span> </span><span class="annot"><span class="annottext">[RomanLiteral] -&gt; Text
+</span><a href="Data.Char.Number.Roman.html#romanNumeral%27"><span class="hs-identifier hs-var">romanNumeral'</span></a></span><span>
+</span><span id="line-283"></span><span>
+</span><span id="line-284"></span><span class="hs-comment">-- | Convert a given number to a 'Text' wrapped in a 'Just' data constructor,</span><span>
+</span><span id="line-285"></span><span class="hs-comment">-- given the number, given it can be represented. 'Nothing' in case it can not</span><span>
+</span><span id="line-286"></span><span class="hs-comment">-- be represented. The number is written in Roman numerals in /upper case/ or</span><span>
+</span><span id="line-287"></span><span class="hs-comment">-- /lower case/ depending on the 'LetterCase' value.</span><span>
+</span><span id="line-288"></span><span id="local-6989586621679288016"><span class="annot"><a href="Data.Char.Number.Roman.html#romanNumberCase"><span class="hs-identifier hs-type">romanNumberCase</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-289"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679288016"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-290"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#LetterCase"><span class="hs-identifier hs-type">LetterCase</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-291"></span><span>  </span><span class="annot"><a href="Data.Char.Number.Roman.html#RomanStyle"><span class="hs-identifier hs-type">RomanStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-292"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Ligate"><span class="hs-identifier hs-type">Ligate</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-293"></span><span>  </span><span class="annot"><a href="#local-6989586621679288016"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-294"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-295"></span><span id="romanNumberCase"><span class="annot"><span class="annottext">romanNumberCase :: forall i.
+Integral i =&gt;
+LetterCase -&gt; RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe Text
+</span><a href="Data.Char.Number.Roman.html#romanNumberCase"><span class="hs-identifier hs-var hs-var">romanNumberCase</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe Text)
+-&gt; (RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe Text)
+-&gt; LetterCase
+-&gt; RomanStyle
+-&gt; Ligate
+-&gt; i
+-&gt; Maybe Text
+forall a. a -&gt; a -&gt; LetterCase -&gt; a
+</span><a href="Data.Char.Core.html#splitLetterCase"><span class="hs-identifier hs-var">splitLetterCase</span></a></span><span> </span><span class="annot"><span class="annottext">RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe Text
+forall i. Integral i =&gt; RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe Text
+</span><a href="Data.Char.Number.Roman.html#romanNumber"><span class="hs-identifier hs-var">romanNumber</span></a></span><span> </span><span class="annot"><span class="annottext">RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe Text
+forall i. Integral i =&gt; RomanStyle -&gt; Ligate -&gt; i -&gt; Maybe Text
+</span><a href="Data.Char.Number.Roman.html#romanNumber%27"><span class="hs-identifier hs-var">romanNumber'</span></a></span><span>
+</span><span id="line-296"></span></pre></body></html>

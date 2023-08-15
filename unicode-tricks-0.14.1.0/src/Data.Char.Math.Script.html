@@ -1,0 +1,254 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Module      : Data.Char.Math.Script</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- Description : Script/calligraphy mathematical alphanumeric symbols</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-9"></span><span class="hs-comment">--</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- See &quot;Data.Char.Math&quot; for further documentation.</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Math.Script</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Data.Char.Math.Script.html#script"><span class="hs-identifier">script</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-13"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#script%27"><span class="hs-identifier">script'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular"><span class="hs-identifier">scriptRegular</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier">scriptRegular'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#scriptBold"><span class="hs-identifier">scriptBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#scriptBold%27"><span class="hs-identifier">scriptBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphy"><span class="hs-identifier">calligraphy</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphy%27"><span class="hs-identifier">calligraphy'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphyRegular"><span class="hs-identifier">calligraphyRegular</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphyRegular%27"><span class="hs-identifier">calligraphyRegular'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphyBold"><span class="hs-identifier">calligraphyBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphyBold%27"><span class="hs-identifier">calligraphyBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier">Emphasis</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isAsciiAlpha"><span class="hs-identifier">isAsciiAlpha</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#splitEmphasis"><span class="hs-identifier">splitEmphasis</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Math.Internal.html"><span class="hs-identifier">Data.Char.Math.Internal</span></a></span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-comment">-- | Convert the given character to its /script/ or /calligraphic/ symbol. This</span><span>
+</span><span id="line-31"></span><span class="hs-comment">-- symbol is /not/ written in boldface.</span><span>
+</span><span id="line-32"></span><span class="hs-comment">-- If the symbol is not supported (see: &quot;Data.Char.Math#characters_ranges&quot;), the returned character is unspecified.</span><span>
+</span><span id="line-33"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-type">scriptRegular'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-34"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-35"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-36"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted in calligraphy, not in bold.</span></span><span>
+</span><span id="line-37"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-38"></span><span id="scriptRegular%27"><span class="annot"><span class="annottext">scriptRegular' :: Char -&gt; Char
+</span><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var hs-var">scriptRegular'</span></a></span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'B'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x212c'</span></span><span>
+</span><span id="line-39"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var">scriptRegular'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'E'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2130'</span></span><span>
+</span><span id="line-40"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var">scriptRegular'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'F'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2131'</span></span><span>
+</span><span id="line-41"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var">scriptRegular'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'H'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x210b'</span></span><span>
+</span><span id="line-42"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var">scriptRegular'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'I'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2110'</span></span><span>
+</span><span id="line-43"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var">scriptRegular'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'L'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2112'</span></span><span>
+</span><span id="line-44"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var">scriptRegular'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'M'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2133'</span></span><span>
+</span><span id="line-45"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var">scriptRegular'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'R'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x211b'</span></span><span>
+</span><span id="line-46"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var">scriptRegular'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'e'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x212f'</span></span><span>
+</span><span id="line-47"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var">scriptRegular'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'g'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x210a'</span></span><span>
+</span><span id="line-48"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var">scriptRegular'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'o'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2134'</span></span><span>
+</span><span id="line-49"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var">scriptRegular'</span></a></span><span> </span><span id="local-6989586621679286717"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679286717"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Internal.html#_baseUpperLower"><span class="hs-identifier hs-var">_baseUpperLower</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1d455</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679286717"><span class="hs-identifier hs-var">c</span></a></span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- | Convert the given character to its /script/ or /calligraphic/ symbol</span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- wrapped in a 'Just' data constructor. This symbol is /not/ written in</span><span>
+</span><span id="line-53"></span><span class="hs-comment">-- boldface.</span><span>
+</span><span id="line-54"></span><span class="hs-comment">-- If the character is not supported (see: &quot;Data.Char.Math#characters_ranges&quot;), 'Nothing' is returned.</span><span>
+</span><span id="line-55"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular"><span class="hs-identifier hs-type">scriptRegular</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-56"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-57"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-58"></span><span>  </span><span class="hs-comment">-- | The calligraphy symbol for the given character wrapped</span><span>
+</span><span id="line-59"></span><span>  </span><span class="hs-comment">-- in a 'Just' data constructor, 'Nothing' if there is no</span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-comment">-- equivalent /calligraphy/ character.</span><span>
+</span><span id="line-61"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-62"></span><span id="scriptRegular"><span class="annot"><span class="annottext">scriptRegular :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Script.html#scriptRegular"><span class="hs-identifier hs-var hs-var">scriptRegular</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; (Char -&gt; Char) -&gt; Char -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isAsciiAlpha"><span class="hs-identifier hs-var">isAsciiAlpha</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var">scriptRegular'</span></a></span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span class="hs-comment">-- | Convert the given character to its /script/ or /calligraphic/ symbol. This</span><span>
+</span><span id="line-65"></span><span class="hs-comment">-- symbol is written in boldface.</span><span>
+</span><span id="line-66"></span><span class="hs-comment">-- If the symbol is not supported (see: &quot;Data.Char.Math#characters_ranges&quot;), the returned character is unspecified.</span><span>
+</span><span id="line-67"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptBold%27"><span class="hs-identifier hs-type">scriptBold'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-68"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-69"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-70"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted in calligraphy, and in bold.</span></span><span>
+</span><span id="line-71"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-72"></span><span id="scriptBold%27"><span class="annot"><span class="annottext">scriptBold' :: Char -&gt; Char
+</span><a href="Data.Char.Math.Script.html#scriptBold%27"><span class="hs-identifier hs-var hs-var">scriptBold'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Internal.html#_baseUpperLower"><span class="hs-identifier hs-var">_baseUpperLower</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1d489</span></span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span class="hs-comment">-- | Convert the given character to its /script/ or /calligraphic/ symbol</span><span>
+</span><span id="line-75"></span><span class="hs-comment">-- wrapped in a 'Just' data constructor. This symbol is written in</span><span>
+</span><span id="line-76"></span><span class="hs-comment">-- boldface.</span><span>
+</span><span id="line-77"></span><span class="hs-comment">-- If the character is not supported (see: &quot;Data.Char.Math#characters_ranges&quot;), 'Nothing' is returned.</span><span>
+</span><span id="line-78"></span><span class="annot"><a href="Data.Char.Math.Script.html#scriptBold"><span class="hs-identifier hs-type">scriptBold</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-79"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-80"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-81"></span><span>  </span><span class="hs-comment">-- | The calligraphy symbol for the given character wrapped</span><span>
+</span><span id="line-82"></span><span>  </span><span class="hs-comment">-- in a 'Just' data constructor, 'Nothing' if there is no</span><span>
+</span><span id="line-83"></span><span>  </span><span class="hs-comment">-- equivalent /calligraphy/ character.</span><span>
+</span><span id="line-84"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-85"></span><span id="scriptBold"><span class="annot"><span class="annottext">scriptBold :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Script.html#scriptBold"><span class="hs-identifier hs-var hs-var">scriptBold</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; (Char -&gt; Char) -&gt; Char -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isAsciiAlpha"><span class="hs-identifier hs-var">isAsciiAlpha</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Script.html#scriptBold%27"><span class="hs-identifier hs-var">scriptBold'</span></a></span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span class="hs-comment">-- | Convert the given character to its /script/ or /calligraphic/ symbol. This</span><span>
+</span><span id="line-88"></span><span class="hs-comment">-- symbol is written in the given 'Emphasis' style.</span><span>
+</span><span id="line-89"></span><span class="hs-comment">-- If the symbol is not supported (see: &quot;Data.Char.Math#characters_ranges&quot;), the returned character is unspecified.</span><span>
+</span><span id="line-90"></span><span class="annot"><a href="Data.Char.Math.Script.html#script%27"><span class="hs-identifier hs-type">script'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-91"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' style to use.</span></span><span>
+</span><span id="line-92"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-93"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-94"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-95"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted in calligraphy, and depending on the 'Emphasis' in bold or not.</span></span><span>
+</span><span id="line-96"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-97"></span><span id="script%27"><span class="annot"><span class="annottext">script' :: Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Script.html#script%27"><span class="hs-identifier hs-var hs-var">script'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Char) -&gt; (Char -&gt; Char) -&gt; Emphasis -&gt; Char -&gt; Char
+forall a. a -&gt; a -&gt; Emphasis -&gt; a
+</span><a href="Data.Char.Core.html#splitEmphasis"><span class="hs-identifier hs-var">splitEmphasis</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var">scriptRegular'</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Script.html#scriptBold%27"><span class="hs-identifier hs-var">scriptBold'</span></a></span><span>
+</span><span id="line-98"></span><span>
+</span><span id="line-99"></span><span class="hs-comment">-- | Convert the given character to its /script/ or /calligraphic/ symbol</span><span>
+</span><span id="line-100"></span><span class="hs-comment">-- wrapped in a 'Just' data constructor. This symbol is /not/ written in</span><span>
+</span><span id="line-101"></span><span class="hs-comment">-- the given 'Emphasis' style.</span><span>
+</span><span id="line-102"></span><span class="hs-comment">-- If the character is not supported (see: &quot;Data.Char.Math#characters_ranges&quot;), 'Nothing' is returned.</span><span>
+</span><span id="line-103"></span><span class="annot"><a href="Data.Char.Math.Script.html#script"><span class="hs-identifier hs-type">script</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-104"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' style to use.</span></span><span>
+</span><span id="line-105"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-106"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-107"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-108"></span><span>  </span><span class="hs-comment">-- | The calligraphy symbol for the given character wrapped</span><span>
+</span><span id="line-109"></span><span>  </span><span class="hs-comment">-- in a 'Just' data constructor, 'Nothing' if there is no</span><span>
+</span><span id="line-110"></span><span>  </span><span class="hs-comment">-- equivalent /calligraphy/ character.</span><span>
+</span><span id="line-111"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-112"></span><span id="script"><span class="annot"><span class="annottext">script :: Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Script.html#script"><span class="hs-identifier hs-var hs-var">script</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Maybe Char)
+-&gt; (Char -&gt; Maybe Char) -&gt; Emphasis -&gt; Char -&gt; Maybe Char
+forall a. a -&gt; a -&gt; Emphasis -&gt; a
+</span><a href="Data.Char.Core.html#splitEmphasis"><span class="hs-identifier hs-var">splitEmphasis</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Script.html#scriptRegular"><span class="hs-identifier hs-var">scriptRegular</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Script.html#scriptBold"><span class="hs-identifier hs-var">scriptBold</span></a></span><span>
+</span><span id="line-113"></span><span>
+</span><span id="line-114"></span><span class="hs-comment">-- | Convert the given character to its /script/ or /calligraphic/ symbol. This</span><span>
+</span><span id="line-115"></span><span class="hs-comment">-- symbol is /not/ written in boldface.</span><span>
+</span><span id="line-116"></span><span class="hs-comment">-- If the symbol is not supported (see: &quot;Data.Char.Math#characters_ranges&quot;), the returned character is unspecified.</span><span>
+</span><span id="line-117"></span><span class="hs-comment">-- This is an alias of 'scriptRegular''.</span><span>
+</span><span id="line-118"></span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphyRegular%27"><span class="hs-identifier hs-type">calligraphyRegular'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-119"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-120"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-121"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted in calligraphy, not in bold.</span></span><span>
+</span><span id="line-122"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-123"></span><span id="calligraphyRegular%27"><span class="annot"><span class="annottext">calligraphyRegular' :: Char -&gt; Char
+</span><a href="Data.Char.Math.Script.html#calligraphyRegular%27"><span class="hs-identifier hs-var hs-var">calligraphyRegular'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier hs-var">scriptRegular'</span></a></span><span>
+</span><span id="line-124"></span><span>
+</span><span id="line-125"></span><span class="hs-comment">-- | Convert the given character to its /script/ or /calligraphic/ symbol</span><span>
+</span><span id="line-126"></span><span class="hs-comment">-- wrapped in a 'Just' data constructor. This symbol is /not/ written in</span><span>
+</span><span id="line-127"></span><span class="hs-comment">-- boldface.</span><span>
+</span><span id="line-128"></span><span class="hs-comment">-- If the character is not supported (see: &quot;Data.Char.Math#characters_ranges&quot;), 'Nothing' is returned.</span><span>
+</span><span id="line-129"></span><span class="hs-comment">-- This is an alias of 'scriptRegular'.</span><span>
+</span><span id="line-130"></span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphyRegular"><span class="hs-identifier hs-type">calligraphyRegular</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-131"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-132"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-133"></span><span>  </span><span class="hs-comment">-- | The calligraphy symbol for the given character wrapped</span><span>
+</span><span id="line-134"></span><span>  </span><span class="hs-comment">-- in a 'Just' data constructor, 'Nothing' if there is no</span><span>
+</span><span id="line-135"></span><span>  </span><span class="hs-comment">-- equivalent /calligraphy/ character.</span><span>
+</span><span id="line-136"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-137"></span><span id="calligraphyRegular"><span class="annot"><span class="annottext">calligraphyRegular :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Script.html#calligraphyRegular"><span class="hs-identifier hs-var hs-var">calligraphyRegular</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Script.html#scriptRegular"><span class="hs-identifier hs-var">scriptRegular</span></a></span><span>
+</span><span id="line-138"></span><span>
+</span><span id="line-139"></span><span class="hs-comment">-- | Convert the given character to its /script/ or /calligraphic/ symbol. This</span><span>
+</span><span id="line-140"></span><span class="hs-comment">-- symbol is written in boldface.</span><span>
+</span><span id="line-141"></span><span class="hs-comment">-- If the symbol is not supported (see: &quot;Data.Char.Math#characters_ranges&quot;), the returned character is unspecified.</span><span>
+</span><span id="line-142"></span><span class="hs-comment">-- This is an alias of 'scriptBold''.</span><span>
+</span><span id="line-143"></span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphyBold%27"><span class="hs-identifier hs-type">calligraphyBold'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-144"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-145"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-146"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted in calligraphy, and in bold.</span></span><span>
+</span><span id="line-147"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-148"></span><span id="calligraphyBold%27"><span class="annot"><span class="annottext">calligraphyBold' :: Char -&gt; Char
+</span><a href="Data.Char.Math.Script.html#calligraphyBold%27"><span class="hs-identifier hs-var hs-var">calligraphyBold'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Script.html#scriptBold%27"><span class="hs-identifier hs-var">scriptBold'</span></a></span><span>
+</span><span id="line-149"></span><span>
+</span><span id="line-150"></span><span class="hs-comment">-- | Convert the given character to its /script/ or /calligraphic/ symbol</span><span>
+</span><span id="line-151"></span><span class="hs-comment">-- wrapped in a 'Just' data constructor. This symbol is written in boldface.</span><span>
+</span><span id="line-152"></span><span class="hs-comment">-- If the character is not supported (see: &quot;Data.Char.Math#characters_ranges&quot;), 'Nothing' is returned.</span><span>
+</span><span id="line-153"></span><span class="hs-comment">-- This is an alias of 'scriptBold'.</span><span>
+</span><span id="line-154"></span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphyBold"><span class="hs-identifier hs-type">calligraphyBold</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-155"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-156"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-157"></span><span>  </span><span class="hs-comment">-- | The calligraphy symbol for the given character wrapped</span><span>
+</span><span id="line-158"></span><span>  </span><span class="hs-comment">-- in a 'Just' data constructor, 'Nothing' if there is no</span><span>
+</span><span id="line-159"></span><span>  </span><span class="hs-comment">-- equivalent /calligraphy/ character.</span><span>
+</span><span id="line-160"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-161"></span><span id="calligraphyBold"><span class="annot"><span class="annottext">calligraphyBold :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Script.html#calligraphyBold"><span class="hs-identifier hs-var hs-var">calligraphyBold</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Script.html#scriptBold"><span class="hs-identifier hs-var">scriptBold</span></a></span><span>
+</span><span id="line-162"></span><span>
+</span><span id="line-163"></span><span class="hs-comment">-- | Convert the given character to its /script/ or /calligraphic/ symbol. This</span><span>
+</span><span id="line-164"></span><span class="hs-comment">-- symbol is written in the given 'Emphasis' style.</span><span>
+</span><span id="line-165"></span><span class="hs-comment">-- If the symbol is not supported (see: &quot;Data.Char.Math#characters_ranges&quot;), the returned character is unspecified.</span><span>
+</span><span id="line-166"></span><span class="hs-comment">-- This is an alias of 'script''.</span><span>
+</span><span id="line-167"></span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphy%27"><span class="hs-identifier hs-type">calligraphy'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-168"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' style to use.</span></span><span>
+</span><span id="line-169"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-170"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-171"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-172"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted in calligraphy, and depending on the 'Emphasis' in bold or not.</span></span><span>
+</span><span id="line-173"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-174"></span><span id="calligraphy%27"><span class="annot"><span class="annottext">calligraphy' :: Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Script.html#calligraphy%27"><span class="hs-identifier hs-var hs-var">calligraphy'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Script.html#script%27"><span class="hs-identifier hs-var">script'</span></a></span><span>
+</span><span id="line-175"></span><span>
+</span><span id="line-176"></span><span class="hs-comment">-- | Convert the given character to its /script/ or /calligraphic/ symbol</span><span>
+</span><span id="line-177"></span><span class="hs-comment">-- wrapped in a 'Just' data constructor. This symbol is /not/ written in</span><span>
+</span><span id="line-178"></span><span class="hs-comment">-- the given 'Emphasis' style.</span><span>
+</span><span id="line-179"></span><span class="hs-comment">-- If the character is not supported (see: &quot;Data.Char.Math#characters_ranges&quot;), 'Nothing' is returned.</span><span>
+</span><span id="line-180"></span><span class="hs-comment">-- This is an alias of 'script'.</span><span>
+</span><span id="line-181"></span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphy"><span class="hs-identifier hs-type">calligraphy</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-182"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' style to use.</span></span><span>
+</span><span id="line-183"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-184"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-185"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-186"></span><span>  </span><span class="hs-comment">-- | The calligraphy symbol for the given character wrapped</span><span>
+</span><span id="line-187"></span><span>  </span><span class="hs-comment">-- in a 'Just' data constructor, 'Nothing' if there is no</span><span>
+</span><span id="line-188"></span><span>  </span><span class="hs-comment">-- equivalent /calligraphy/ character.</span><span>
+</span><span id="line-189"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-190"></span><span id="calligraphy"><span class="annot"><span class="annottext">calligraphy :: Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Script.html#calligraphy"><span class="hs-identifier hs-var hs-var">calligraphy</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Script.html#script"><span class="hs-identifier hs-var">script</span></a></span><span>
+</span><span id="line-191"></span></pre></body></html>

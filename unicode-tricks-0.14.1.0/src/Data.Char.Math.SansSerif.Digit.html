@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Module      : Data.Char.Math.SansSerif.Digit</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- Description : Sans serif mathematical alphanumeric symbols</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-9"></span><span class="hs-comment">--</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- See &quot;Data.Char.Math&quot; for further documentation.</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Math.SansSerif.Digit</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Character conversion</span></span><span>
+</span><span id="line-13"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerif"><span class="hs-identifier">digitSansSerif</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerif%27"><span class="hs-identifier">digitSansSerif'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifRegular"><span class="hs-identifier">digitSansSerifRegular</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifRegular%27"><span class="hs-identifier">digitSansSerifRegular'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifBold"><span class="hs-identifier">digitSansSerifBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifBold%27"><span class="hs-identifier">digitSansSerifBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Int to digit characters</span></span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerif"><span class="hs-identifier">intToDigitSansSerif</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerif%27"><span class="hs-identifier">intToDigitSansSerif'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifRegular"><span class="hs-identifier">intToDigitSansSerifRegular</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifRegular%27"><span class="hs-identifier">intToDigitSansSerifRegular'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifBold"><span class="hs-identifier">intToDigitSansSerifBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-26"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifBold%27"><span class="hs-identifier">intToDigitSansSerifBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Char</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">intToDigit</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">isDigit</span></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier">Emphasis</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#splitEmphasis"><span class="hs-identifier">splitEmphasis</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Math.Internal.html"><span class="hs-identifier">Data.Char.Math.Internal</span></a></span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-comment">-- | Convert the given digit character (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-35"></span><span class="hs-comment">-- in a non-bold sans-serif style. The result for characters outside this range is</span><span>
+</span><span id="line-36"></span><span class="hs-comment">-- unspecified.</span><span>
+</span><span id="line-37"></span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifRegular%27"><span class="hs-identifier hs-type">digitSansSerifRegular'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-38"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-39"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-40"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding symbol in sans-serifs not in bold, unspecified outside the the range.</span></span><span>
+</span><span id="line-41"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-42"></span><span id="digitSansSerifRegular%27"><span class="annot"><span class="annottext">digitSansSerifRegular' :: Char -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifRegular%27"><span class="hs-identifier hs-var hs-var">digitSansSerifRegular'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Internal.html#_shiftC"><span class="hs-identifier hs-var">_shiftC</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1d7b2</span></span><span>
+</span><span id="line-43"></span><span>
+</span><span id="line-44"></span><span class="hs-comment">-- | Convert the given digit character (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-45"></span><span class="hs-comment">-- in a non-bold sans-serif style wrapped in a 'Just' data constructor. For</span><span>
+</span><span id="line-46"></span><span class="hs-comment">-- characters outside this range, 'Nothing' is returned.</span><span>
+</span><span id="line-47"></span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifRegular"><span class="hs-identifier hs-type">digitSansSerifRegular</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-48"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-49"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-50"></span><span>  </span><span class="hs-comment">-- | The corresponding symbol in sans-serifs not in bold wrapped in a 'Just',</span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-comment">-- 'Nothing' if the character is outside the range.</span><span>
+</span><span id="line-52"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-53"></span><span id="digitSansSerifRegular"><span class="annot"><span class="annottext">digitSansSerifRegular :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifRegular"><span class="hs-identifier hs-var hs-var">digitSansSerifRegular</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; (Char -&gt; Char) -&gt; Char -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><span class="hs-identifier hs-var">isDigit</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifRegular%27"><span class="hs-identifier hs-var">digitSansSerifRegular'</span></a></span><span>
+</span><span id="line-54"></span><span>
+</span><span id="line-55"></span><span class="hs-comment">-- | Convert the given digit character (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-56"></span><span class="hs-comment">-- in a bold sans-serif style. The result for characters outside this range is</span><span>
+</span><span id="line-57"></span><span class="hs-comment">-- unspecified.</span><span>
+</span><span id="line-58"></span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifBold%27"><span class="hs-identifier hs-type">digitSansSerifBold'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-59"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-60"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-61"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding symbol in sans-serifs in bold, unspecified outside the the range.</span></span><span>
+</span><span id="line-62"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-63"></span><span id="digitSansSerifBold%27"><span class="annot"><span class="annottext">digitSansSerifBold' :: Char -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifBold%27"><span class="hs-identifier hs-var hs-var">digitSansSerifBold'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Internal.html#_shiftC"><span class="hs-identifier hs-var">_shiftC</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1d7bc</span></span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span class="hs-comment">-- | Convert the given digit character (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-66"></span><span class="hs-comment">-- in a bold sans-serif style wrapped in a 'Just' data constructor. For</span><span>
+</span><span id="line-67"></span><span class="hs-comment">-- characters outside this range, 'Nothing' is returned.</span><span>
+</span><span id="line-68"></span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifBold"><span class="hs-identifier hs-type">digitSansSerifBold</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-69"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-70"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-71"></span><span>  </span><span class="hs-comment">-- | The corresponding symbol in sans-serifs in bold wrapped in a 'Just',</span><span>
+</span><span id="line-72"></span><span>  </span><span class="hs-comment">-- 'Nothing' if the character is outside the range.</span><span>
+</span><span id="line-73"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-74"></span><span id="digitSansSerifBold"><span class="annot"><span class="annottext">digitSansSerifBold :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifBold"><span class="hs-identifier hs-var hs-var">digitSansSerifBold</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; (Char -&gt; Char) -&gt; Char -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><span class="hs-identifier hs-var">isDigit</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifBold%27"><span class="hs-identifier hs-var">digitSansSerifBold'</span></a></span><span>
+</span><span id="line-75"></span><span>
+</span><span id="line-76"></span><span class="hs-comment">-- | Convert the given digit character (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-77"></span><span class="hs-comment">-- with a given 'Emphasis' in sans-serif style. The result for characters outside this</span><span>
+</span><span id="line-78"></span><span class="hs-comment">-- range is unspecified.</span><span>
+</span><span id="line-79"></span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerif%27"><span class="hs-identifier hs-type">digitSansSerif'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-80"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given /emphasis/ style.</span></span><span>
+</span><span id="line-81"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-82"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-83"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-84"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding symbol in sans-serifs for the given /emphasis/ style, unspecified outside the the range.</span></span><span>
+</span><span id="line-85"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-86"></span><span id="digitSansSerif%27"><span class="annot"><span class="annottext">digitSansSerif' :: Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerif%27"><span class="hs-identifier hs-var hs-var">digitSansSerif'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Char) -&gt; (Char -&gt; Char) -&gt; Emphasis -&gt; Char -&gt; Char
+forall a. a -&gt; a -&gt; Emphasis -&gt; a
+</span><a href="Data.Char.Core.html#splitEmphasis"><span class="hs-identifier hs-var">splitEmphasis</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifRegular%27"><span class="hs-identifier hs-var">digitSansSerifRegular'</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifBold%27"><span class="hs-identifier hs-var">digitSansSerifBold'</span></a></span><span>
+</span><span id="line-87"></span><span>
+</span><span id="line-88"></span><span class="hs-comment">-- | Convert the given digit character (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-89"></span><span class="hs-comment">-- with the given 'Emphasis' in sans-serif style wrapped in a 'Just' data constructor.</span><span>
+</span><span id="line-90"></span><span class="hs-comment">-- For characters outside this range, 'Nothing' is returned.</span><span>
+</span><span id="line-91"></span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerif"><span class="hs-identifier hs-type">digitSansSerif</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-92"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given /emphasis/ style.</span></span><span>
+</span><span id="line-93"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-94"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-95"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-96"></span><span>  </span><span class="hs-comment">-- | The corresponding symbol in sans-serifs for the given /emphasis/ style wrapped in a 'Just',</span><span>
+</span><span id="line-97"></span><span>  </span><span class="hs-comment">-- 'Nothing' if the character is outside the range.</span><span>
+</span><span id="line-98"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-99"></span><span id="digitSansSerif"><span class="annot"><span class="annottext">digitSansSerif :: Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerif"><span class="hs-identifier hs-var hs-var">digitSansSerif</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Maybe Char)
+-&gt; (Char -&gt; Maybe Char) -&gt; Emphasis -&gt; Char -&gt; Maybe Char
+forall a. a -&gt; a -&gt; Emphasis -&gt; a
+</span><a href="Data.Char.Core.html#splitEmphasis"><span class="hs-identifier hs-var">splitEmphasis</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifRegular"><span class="hs-identifier hs-var">digitSansSerifRegular</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifBold"><span class="hs-identifier hs-var">digitSansSerifBold</span></a></span><span>
+</span><span id="line-100"></span><span>
+</span><span id="line-101"></span><span class="hs-comment">-- | Convert the given number (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-102"></span><span class="hs-comment">-- in a non-bold sans-serif style. The result for numbers outside this range is</span><span>
+</span><span id="line-103"></span><span class="hs-comment">-- unspecified.</span><span>
+</span><span id="line-104"></span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifRegular%27"><span class="hs-identifier hs-type">intToDigitSansSerifRegular'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-105"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-106"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-107"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding symbol in sans-serifs not in bold, unspecified outside the the range.</span></span><span>
+</span><span id="line-108"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-109"></span><span id="intToDigitSansSerifRegular%27"><span class="annot"><span class="annottext">intToDigitSansSerifRegular' :: Int -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifRegular%27"><span class="hs-identifier hs-var hs-var">intToDigitSansSerifRegular'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifRegular%27"><span class="hs-identifier hs-var">digitSansSerifRegular'</span></a></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Char) -&gt; (Int -&gt; Char) -&gt; Int -&gt; Char
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">intToDigit</span></span><span>
+</span><span id="line-110"></span><span>
+</span><span id="line-111"></span><span class="hs-comment">-- | Convert the given number (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-112"></span><span class="hs-comment">-- in a non-bold sans-serif style wrapped in a 'Just' data constructor. For</span><span>
+</span><span id="line-113"></span><span class="hs-comment">-- numbers outside this range, 'Nothing' is returned.</span><span>
+</span><span id="line-114"></span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifRegular"><span class="hs-identifier hs-type">intToDigitSansSerifRegular</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-115"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-116"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-117"></span><span>  </span><span class="hs-comment">-- | The corresponding symbol in sans-serifs not in bold wrapped in a 'Just',</span><span>
+</span><span id="line-118"></span><span>  </span><span class="hs-comment">-- 'Nothing' if the character is outside the range.</span><span>
+</span><span id="line-119"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-120"></span><span id="intToDigitSansSerifRegular"><span class="annot"><span class="annottext">intToDigitSansSerifRegular :: Int -&gt; Maybe Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifRegular"><span class="hs-identifier hs-var hs-var">intToDigitSansSerifRegular</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; (Int -&gt; Char) -&gt; Int -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bool
+</span><a href="Data.Char.Math.Internal.html#_isValidInt"><span class="hs-identifier hs-var">_isValidInt</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifRegular%27"><span class="hs-identifier hs-var">intToDigitSansSerifRegular'</span></a></span><span>
+</span><span id="line-121"></span><span>
+</span><span id="line-122"></span><span class="hs-comment">-- | Convert the given number (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-123"></span><span class="hs-comment">-- in a bold sans-serif style. The result for numbers outside this range is</span><span>
+</span><span id="line-124"></span><span class="hs-comment">-- unspecified.</span><span>
+</span><span id="line-125"></span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifBold%27"><span class="hs-identifier hs-type">intToDigitSansSerifBold'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-126"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-127"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-128"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding symbol in sans-serifs in bold, unspecified outside the the range.</span></span><span>
+</span><span id="line-129"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-130"></span><span id="intToDigitSansSerifBold%27"><span class="annot"><span class="annottext">intToDigitSansSerifBold' :: Int -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifBold%27"><span class="hs-identifier hs-var hs-var">intToDigitSansSerifBold'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifBold%27"><span class="hs-identifier hs-var">digitSansSerifBold'</span></a></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Char) -&gt; (Int -&gt; Char) -&gt; Int -&gt; Char
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">intToDigit</span></span><span>
+</span><span id="line-131"></span><span>
+</span><span id="line-132"></span><span class="hs-comment">-- | Convert the given number (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-133"></span><span class="hs-comment">-- in a bold sans-serif style wrapped in a 'Just' data constructor. For</span><span>
+</span><span id="line-134"></span><span class="hs-comment">-- numbers outside this range, 'Nothing' is returned.</span><span>
+</span><span id="line-135"></span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifBold"><span class="hs-identifier hs-type">intToDigitSansSerifBold</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-136"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-137"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-138"></span><span>  </span><span class="hs-comment">-- | The corresponding symbol in sans-serifs in bold wrapped in a 'Just',</span><span>
+</span><span id="line-139"></span><span>  </span><span class="hs-comment">-- 'Nothing' if the character is outside the range.</span><span>
+</span><span id="line-140"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-141"></span><span id="intToDigitSansSerifBold"><span class="annot"><span class="annottext">intToDigitSansSerifBold :: Int -&gt; Maybe Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifBold"><span class="hs-identifier hs-var hs-var">intToDigitSansSerifBold</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; (Int -&gt; Char) -&gt; Int -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bool
+</span><a href="Data.Char.Math.Internal.html#_isValidInt"><span class="hs-identifier hs-var">_isValidInt</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifBold%27"><span class="hs-identifier hs-var">intToDigitSansSerifBold'</span></a></span><span>
+</span><span id="line-142"></span><span>
+</span><span id="line-143"></span><span class="hs-comment">-- | Convert the given number (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-144"></span><span class="hs-comment">-- with a given 'Emphasis' in sans-serif style. The result for numbers outside this</span><span>
+</span><span id="line-145"></span><span class="hs-comment">-- range is unspecified.</span><span>
+</span><span id="line-146"></span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerif%27"><span class="hs-identifier hs-type">intToDigitSansSerif'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-147"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given /emphasis/ style.</span></span><span>
+</span><span id="line-148"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-149"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-150"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-151"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding symbol in sans-serifs in the given /emphasis/ style, unspecified outside the the range.</span></span><span>
+</span><span id="line-152"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-153"></span><span id="intToDigitSansSerif%27"><span class="annot"><span class="annottext">intToDigitSansSerif' :: Emphasis -&gt; Int -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerif%27"><span class="hs-identifier hs-var hs-var">intToDigitSansSerif'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Char) -&gt; (Int -&gt; Char) -&gt; Emphasis -&gt; Int -&gt; Char
+forall a. a -&gt; a -&gt; Emphasis -&gt; a
+</span><a href="Data.Char.Core.html#splitEmphasis"><span class="hs-identifier hs-var">splitEmphasis</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifRegular%27"><span class="hs-identifier hs-var">intToDigitSansSerifRegular'</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifBold%27"><span class="hs-identifier hs-var">intToDigitSansSerifBold'</span></a></span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span class="hs-comment">-- | Convert the given number (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-156"></span><span class="hs-comment">-- with the given 'Emphasis' in sans-serif style wrapped in a 'Just' data constructor.</span><span>
+</span><span id="line-157"></span><span class="hs-comment">-- For numbers outside this range, 'Nothing' is returned.</span><span>
+</span><span id="line-158"></span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerif"><span class="hs-identifier hs-type">intToDigitSansSerif</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-159"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given /emphasis/ style.</span></span><span>
+</span><span id="line-160"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-161"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert</span></span><span>
+</span><span id="line-162"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-163"></span><span>  </span><span class="hs-comment">-- | The corresponding symbol in sans-serifs in the given /emphasis/ style wrapped in a 'Just',</span><span>
+</span><span id="line-164"></span><span>  </span><span class="hs-comment">-- 'Nothing' if the character is outside the range.</span><span>
+</span><span id="line-165"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-166"></span><span id="intToDigitSansSerif"><span class="annot"><span class="annottext">intToDigitSansSerif :: Emphasis -&gt; Int -&gt; Maybe Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerif"><span class="hs-identifier hs-var hs-var">intToDigitSansSerif</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Maybe Char)
+-&gt; (Int -&gt; Maybe Char) -&gt; Emphasis -&gt; Int -&gt; Maybe Char
+forall a. a -&gt; a -&gt; Emphasis -&gt; a
+</span><a href="Data.Char.Core.html#splitEmphasis"><span class="hs-identifier hs-var">splitEmphasis</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Maybe Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifRegular"><span class="hs-identifier hs-var">intToDigitSansSerifRegular</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Maybe Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerifBold"><span class="hs-identifier hs-var">intToDigitSansSerifBold</span></a></span><span>
+</span><span id="line-167"></span></pre></body></html>

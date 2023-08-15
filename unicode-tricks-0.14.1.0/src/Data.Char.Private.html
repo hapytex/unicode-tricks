@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Module      : Data.Char.Private</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- Description : Determine if characters belong to the /private use area/.</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-9"></span><span class="hs-comment">--</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Unicode has a &lt;https://www.unicode.org/charts/PDF/UE000.pdf block&gt; named /Private Use Area/ that can be used for all sorts of characters, and each font can decide to allocate</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- certain characters for this block. In the submodules, popular usages are supoorted.</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Private</span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Character bounds</span></span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><a href="Data.Char.Private.html#privateStart"><span class="hs-identifier">privateStart</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>    </span><span class="annot"><a href="Data.Char.Private.html#privateStop"><span class="hs-identifier">privateStop</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><a href="Data.Char.Private.html#isPrivateChar"><span class="hs-identifier">isPrivateChar</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Generating private characters</span></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Data.Char.Private.html#privateCharGen"><span class="hs-identifier">privateCharGen</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Gen</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">choose</span></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="annot"><span class="hs-comment">-- | The first character in the /private use area/.</span></span><span>
+</span><span id="line-26"></span><span class="annot"><a href="Data.Char.Private.html#privateStart"><span class="hs-identifier hs-type">privateStart</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-27"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The first 'Char' in the /private use area/.</span></span><span>
+</span><span id="line-28"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-29"></span><span id="privateStart"><span class="annot"><span class="annottext">privateStart :: Char
+</span><a href="Data.Char.Private.html#privateStart"><span class="hs-identifier hs-var hs-var">privateStart</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\xe000'</span></span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="annot"><span class="hs-comment">-- | The last character in the /private use area/.</span></span><span>
+</span><span id="line-32"></span><span class="annot"><a href="Data.Char.Private.html#privateStop"><span class="hs-identifier hs-type">privateStop</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-33"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The last 'Char' in the /private use area/.</span></span><span>
+</span><span id="line-34"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-35"></span><span id="privateStop"><span class="annot"><span class="annottext">privateStop :: Char
+</span><a href="Data.Char.Private.html#privateStop"><span class="hs-identifier hs-var hs-var">privateStop</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\xf8ff'</span></span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="annot"><span class="hs-comment">-- | Checks if the given 'Char' is in the /private use area/.</span></span><span>
+</span><span id="line-38"></span><span class="annot"><a href="Data.Char.Private.html#isPrivateChar"><span class="hs-identifier hs-type">isPrivateChar</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-39"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Char' to check.</span></span><span>
+</span><span id="line-40"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-41"></span><span>  </span><span class="annot"><span class="hs-comment">-- | 'True' if the 'Char' is in the /private use area/; 'False' otherwise.</span></span><span>
+</span><span id="line-42"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-43"></span><span id="isPrivateChar"><span class="annot"><span class="annottext">isPrivateChar :: Char -&gt; Bool
+</span><a href="Data.Char.Private.html#isPrivateChar"><span class="hs-identifier hs-var hs-var">isPrivateChar</span></a></span></span><span> </span><span id="local-6989586621679289206"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679289206"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Private.html#privateStart"><span class="hs-identifier hs-var">privateStart</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679289206"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679289206"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Private.html#privateStop"><span class="hs-identifier hs-var">privateStop</span></a></span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="annot"><span class="hs-comment">-- | A generator of 'Char'acters in the /private use area/.</span></span><span>
+</span><span id="line-46"></span><span class="annot"><a href="Data.Char.Private.html#privateCharGen"><span class="hs-identifier hs-type">privateCharGen</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-47"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'Gen' that generates 'Char' objects in the /private use area/.</span></span><span>
+</span><span id="line-48"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-49"></span><span id="privateCharGen"><span class="annot"><span class="annottext">privateCharGen :: Gen Char
+</span><a href="Data.Char.Private.html#privateCharGen"><span class="hs-identifier hs-var hs-var">privateCharGen</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char, Char) -&gt; Gen Char
+forall a. Random a =&gt; (a, a) -&gt; Gen a
+</span><span class="hs-identifier hs-var">choose</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Private.html#privateStart"><span class="hs-identifier hs-var">privateStart</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Private.html#privateStop"><span class="hs-identifier hs-var">privateStop</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span></pre></body></html>

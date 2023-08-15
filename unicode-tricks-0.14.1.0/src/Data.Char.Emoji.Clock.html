@@ -1,0 +1,552 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="local-6989586621679275321"><span id="local-6989586621679275322"></span></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications #-}</span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Module      : Data.Char.Emoji.Clock</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Description : A module that defines emoji that display a clock.</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-13"></span><span class="hs-comment">--</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- The emoji have 24 clock emoji, each time with 30 minutes difference.</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Emoji.Clock</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Clock emoji</span></span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier">Clock</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#hours"><span class="hs-identifier">hours</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#minutes30"><span class="hs-identifier">minutes30</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#clock"><span class="hs-identifier">clock</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#closestClock"><span class="hs-identifier">closestClock</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Bits</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">shiftL</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">shiftR</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(.|.)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Bool</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">bool</span></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Char</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">chr</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ord</span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier">UnicodeCharacter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier">fromUnicodeChar</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier">isInCharRange</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier">toUnicodeChar</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier">UnicodeText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier">isInTextRange</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier">generateIsInTextRange'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Enum</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">toEnumError</span></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitraryBoundedEnum</span></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-comment">-- | A 'Clock' object that can be converted to a unicode character that displays</span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- a clock with the given time. The 'Clock' has an 'hours' field that contains</span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- the given hours between 0 and 12, and a 'minutes30' field that if 'True',</span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- means that the clock is half past that hour.</span><span>
+</span><span id="line-40"></span><span class="hs-keyword">data</span><span> </span><span id="Clock"><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-var">Clock</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Clock"><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-var">Clock</span></a></span></span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="hs-comment">-- | The number of hours on the given clock. Is between 0 and 12. For 0, the 'minutes30' is 'True'; and for 12, the 'minutes30' is 'False'.</span></span><span>
+</span><span id="line-42"></span><span>    </span><span id="hours"><span class="annot"><span class="annottext">Clock -&gt; Int
+</span><a href="Data.Char.Emoji.Clock.html#hours"><span class="hs-identifier hs-var hs-var">hours</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span>
+</span><span id="line-43"></span><span>    </span><span class="annot"><span class="hs-comment">-- | Is 'True' if it is half past the given hour on the 'Clock'.</span></span><span>
+</span><span id="line-44"></span><span>    </span><span id="minutes30"><span class="annot"><span class="annottext">Clock -&gt; Bool
+</span><a href="Data.Char.Emoji.Clock.html#minutes30"><span class="hs-identifier hs-var hs-var">minutes30</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679275356"><span id="local-6989586621679275362"><span id="local-6989586621679275366"><span id="local-6989586621679275368"><span id="local-6989586621679275370"><span id="local-6989586621679275376"><span id="local-6989586621679275381"><span id="local-6989586621679275384"><span id="local-6989586621679275387"><span id="local-6989586621679275390"><span id="local-6989586621679275393"><span id="local-6989586621679275396"><span id="local-6989586621679275401"><span id="local-6989586621679275406"><span class="annot"><span class="annottext">Typeable Clock
+Typeable Clock
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; Clock -&gt; c Clock)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Clock)
+-&gt; (Clock -&gt; Constr)
+-&gt; (Clock -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Clock))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Clock))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; Clock -&gt; Clock)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Clock -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Clock -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Clock -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Clock -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Clock -&gt; m Clock)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Clock -&gt; m Clock)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Clock -&gt; m Clock)
+-&gt; Data Clock
+Clock -&gt; Constr
+Clock -&gt; DataType
+(forall b. Data b =&gt; b -&gt; b) -&gt; Clock -&gt; Clock
+forall a.
+Typeable a
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Clock -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Clock -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Clock -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Clock -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Clock -&gt; m Clock
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Clock -&gt; m Clock
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Clock
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Clock -&gt; c Clock
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Clock)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Clock)
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Clock -&gt; c Clock
+gfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Clock -&gt; c Clock
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Clock
+gunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Clock
+$ctoConstr :: Clock -&gt; Constr
+toConstr :: Clock -&gt; Constr
+$cdataTypeOf :: Clock -&gt; DataType
+dataTypeOf :: Clock -&gt; DataType
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Clock)
+dataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Clock)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Clock)
+dataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Clock)
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; Clock -&gt; Clock
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; Clock -&gt; Clock
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Clock -&gt; r
+gmapQl :: forall r r'.
+(r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Clock -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Clock -&gt; r
+gmapQr :: forall r r'.
+(r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Clock -&gt; r
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Clock -&gt; [u]
+gmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Clock -&gt; [u]
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Clock -&gt; u
+gmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Clock -&gt; u
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Clock -&gt; m Clock
+gmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Clock -&gt; m Clock
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Clock -&gt; m Clock
+gmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Clock -&gt; m Clock
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Clock -&gt; m Clock
+gmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Clock -&gt; m Clock
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679275412"><span id="local-6989586621679275417"><span class="annot"><span class="annottext">Clock -&gt; Clock -&gt; Bool
+(Clock -&gt; Clock -&gt; Bool) -&gt; (Clock -&gt; Clock -&gt; Bool) -&gt; Eq Clock
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Clock -&gt; Clock -&gt; Bool
+== :: Clock -&gt; Clock -&gt; Bool
+$c/= :: Clock -&gt; Clock -&gt; Bool
+/= :: Clock -&gt; Clock -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679275422"><span id="local-6989586621679275424"><span class="annot"><span class="annottext">(forall x. Clock -&gt; Rep Clock x)
+-&gt; (forall x. Rep Clock x -&gt; Clock) -&gt; Generic Clock
+forall x. Rep Clock x -&gt; Clock
+forall x. Clock -&gt; Rep Clock x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cfrom :: forall x. Clock -&gt; Rep Clock x
+from :: forall x. Clock -&gt; Rep Clock x
+$cto :: forall x. Rep Clock x -&gt; Clock
+to :: forall x. Rep Clock x -&gt; Clock
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679275430"><span id="local-6989586621679275435"><span id="local-6989586621679275439"><span id="local-6989586621679275443"><span id="local-6989586621679275446"><span id="local-6989586621679275449"><span id="local-6989586621679275452"><span class="annot"><span class="annottext">Eq Clock
+Eq Clock
+-&gt; (Clock -&gt; Clock -&gt; Ordering)
+-&gt; (Clock -&gt; Clock -&gt; Bool)
+-&gt; (Clock -&gt; Clock -&gt; Bool)
+-&gt; (Clock -&gt; Clock -&gt; Bool)
+-&gt; (Clock -&gt; Clock -&gt; Bool)
+-&gt; (Clock -&gt; Clock -&gt; Clock)
+-&gt; (Clock -&gt; Clock -&gt; Clock)
+-&gt; Ord Clock
+Clock -&gt; Clock -&gt; Bool
+Clock -&gt; Clock -&gt; Ordering
+Clock -&gt; Clock -&gt; Clock
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: Clock -&gt; Clock -&gt; Ordering
+compare :: Clock -&gt; Clock -&gt; Ordering
+$c&lt; :: Clock -&gt; Clock -&gt; Bool
+&lt; :: Clock -&gt; Clock -&gt; Bool
+$c&lt;= :: Clock -&gt; Clock -&gt; Bool
+&lt;= :: Clock -&gt; Clock -&gt; Bool
+$c&gt; :: Clock -&gt; Clock -&gt; Bool
+&gt; :: Clock -&gt; Clock -&gt; Bool
+$c&gt;= :: Clock -&gt; Clock -&gt; Bool
+&gt;= :: Clock -&gt; Clock -&gt; Bool
+$cmax :: Clock -&gt; Clock -&gt; Clock
+max :: Clock -&gt; Clock -&gt; Clock
+$cmin :: Clock -&gt; Clock -&gt; Clock
+min :: Clock -&gt; Clock -&gt; Clock
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679275456"><span id="local-6989586621679275460"><span id="local-6989586621679275463"><span id="local-6989586621679275477"><span class="annot"><span class="annottext">ReadPrec [Clock]
+ReadPrec Clock
+Int -&gt; ReadS Clock
+ReadS [Clock]
+(Int -&gt; ReadS Clock)
+-&gt; ReadS [Clock]
+-&gt; ReadPrec Clock
+-&gt; ReadPrec [Clock]
+-&gt; Read Clock
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+$creadsPrec :: Int -&gt; ReadS Clock
+readsPrec :: Int -&gt; ReadS Clock
+$creadList :: ReadS [Clock]
+readList :: ReadS [Clock]
+$creadPrec :: ReadPrec Clock
+readPrec :: ReadPrec Clock
+$creadListPrec :: ReadPrec [Clock]
+readListPrec :: ReadPrec [Clock]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679275481"><span id="local-6989586621679275488"><span id="local-6989586621679275492"><span class="annot"><span class="annottext">Int -&gt; Clock -&gt; ShowS
+[Clock] -&gt; ShowS
+Clock -&gt; String
+(Int -&gt; Clock -&gt; ShowS)
+-&gt; (Clock -&gt; String) -&gt; ([Clock] -&gt; ShowS) -&gt; Show Clock
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Clock -&gt; ShowS
+showsPrec :: Int -&gt; Clock -&gt; ShowS
+$cshow :: Clock -&gt; String
+show :: Clock -&gt; String
+$cshowList :: [Clock] -&gt; ShowS
+showList :: [Clock] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679275498"><span id="local-6989586621679275505"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-type">Clock</span></a></span></span></span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679275522"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-type">Clock</span></a></span></span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bounded</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-type">Clock</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-53"></span><span>  </span><span id="local-6989586621679275546"><span class="annot"><span class="annottext">minBound :: Clock
+</span><a href="#local-6989586621679275546"><span class="hs-identifier hs-var hs-var hs-var hs-var">minBound</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bool -&gt; Clock
+</span><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-var">Clock</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-54"></span><span>  </span><span id="local-6989586621679275548"><span class="annot"><span class="annottext">maxBound :: Clock
+</span><a href="#local-6989586621679275548"><span class="hs-identifier hs-var hs-var hs-var hs-var">maxBound</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bool -&gt; Clock
+</span><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-var">Clock</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">12</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679275551"><span id="local-6989586621679275555"><span id="local-6989586621679275562"><span id="local-6989586621679275565"><span class="annot"><span class="hs-identifier hs-type">Enum</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-type">Clock</span></a></span></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-57"></span><span>  </span><span id="local-6989586621679275575"><span class="annot"><span class="annottext">fromEnum :: Clock -&gt; Int
+</span><a href="#local-6989586621679275575"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromEnum</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-type">Clock</span></a></span><span> </span><span id="local-6989586621679275577"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275577"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span id="local-6989586621679275578"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679275578"><span class="hs-identifier hs-var">m30</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int
+forall a. Enum a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">pred</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">shiftL</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275577"><span class="hs-identifier hs-var">h</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.|.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool -&gt; Int
+forall a. a -&gt; a -&gt; Bool -&gt; a
+</span><span class="hs-identifier hs-var">bool</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679275578"><span class="hs-identifier hs-var">m30</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span>  </span><span id="local-6989586621679275590"><span class="annot"><span class="annottext">toEnum :: Int -&gt; Clock
+</span><a href="#local-6989586621679275590"><span class="hs-identifier hs-var hs-var hs-var hs-var">toEnum</span></a></span></span><span> </span><span id="local-6989586621679275592"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275592"><span class="hs-identifier hs-var">hm30</span></a></span></span><span>
+</span><span id="line-59"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275592"><span class="hs-identifier hs-var">hm30</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275592"><span class="hs-identifier hs-var">hm30</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">23</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Int -&gt; (Clock, Clock) -&gt; Clock
+forall a b. Show a =&gt; String -&gt; Int -&gt; (a, a) -&gt; b
+</span><span class="hs-identifier hs-var">toEnumError</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Clock&quot;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275592"><span class="hs-identifier hs-var">hm30</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Clock
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">minBound</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-type">Clock</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Clock
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">maxBound</span></span><span class="hs-special">)</span><span>
+</span><span id="line-60"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bool -&gt; Clock
+</span><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-var">Clock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">shiftR</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275596"><span class="hs-identifier hs-var">hm30'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Bool
+forall a. Integral a =&gt; a -&gt; Bool
+</span><span class="hs-identifier hs-var">odd</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275596"><span class="hs-identifier hs-var">hm30'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-61"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-62"></span><span>      </span><span id="local-6989586621679275596"><span class="annot"><span class="annottext">hm30' :: Int
+</span><a href="#local-6989586621679275596"><span class="hs-identifier hs-var hs-var">hm30'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int
+forall a. Enum a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">succ</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275592"><span class="hs-identifier hs-var">hm30</span></a></span><span>
+</span><span id="line-63"></span><span>  </span><span id="local-6989586621679275602"><span class="annot"><span class="annottext">enumFrom :: Clock -&gt; [Clock]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">enumFrom</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Clock -&gt; Clock -&gt; [Clock]
+forall a. Enum a =&gt; a -&gt; a -&gt; [a]
+</span><span class="hs-operator hs-var">`enumFromTo`</span></span><span> </span><span class="annot"><span class="annottext">Clock
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">maxBound</span></span><span class="hs-special">)</span><span>
+</span><span id="line-64"></span><span>  </span><span id="local-6989586621679275605"><span class="annot"><span class="annottext">enumFromThen :: Clock -&gt; Clock -&gt; [Clock]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">enumFromThen</span></span></span><span> </span><span id="local-6989586621679275606"><span class="annot"><span class="annottext">Clock
+</span><a href="#local-6989586621679275606"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679275607"><span class="annot"><span class="annottext">Clock
+</span><a href="#local-6989586621679275607"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Clock -&gt; Clock -&gt; Clock -&gt; [Clock]
+forall a. Enum a =&gt; a -&gt; a -&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">enumFromThenTo</span></span><span> </span><span class="annot"><span class="annottext">Clock
+</span><a href="#local-6989586621679275606"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Clock
+</span><a href="#local-6989586621679275607"><span class="hs-identifier hs-var">y</span></a></span><span> </span><span class="annot"><span class="annottext">Clock
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">maxBound</span></span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span class="hs-comment">-- | Generate the 'Clock' object that is the closest to the given hours and</span><span>
+</span><span id="line-67"></span><span class="hs-comment">-- minutes.</span><span>
+</span><span id="line-68"></span><span class="annot"><a href="Data.Char.Emoji.Clock.html#closestClock"><span class="hs-identifier hs-type">closestClock</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-69"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The number of hours.</span></span><span>
+</span><span id="line-70"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-71"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The number of minutes, must be between 0 and 60.</span></span><span>
+</span><span id="line-72"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-73"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The clock object that is the closest to the given hours and minutes.</span></span><span>
+</span><span id="line-74"></span><span>  </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-type">Clock</span></a></span><span>
+</span><span id="line-75"></span><span id="closestClock"><span class="annot"><span class="annottext">closestClock :: Int -&gt; Int -&gt; Clock
+</span><a href="Data.Char.Emoji.Clock.html#closestClock"><span class="hs-identifier hs-var hs-var">closestClock</span></a></span></span><span> </span><span id="local-6989586621679275608"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275608"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span id="local-6989586621679275609"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275609"><span class="hs-identifier hs-var">m</span></a></span></span><span>
+</span><span id="line-76"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275609"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">15</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bool -&gt; Clock
+</span><a href="Data.Char.Emoji.Clock.html#clock"><span class="hs-identifier hs-var">clock</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275608"><span class="hs-identifier hs-var">h</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-77"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275609"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">45</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bool -&gt; Clock
+</span><a href="Data.Char.Emoji.Clock.html#clock"><span class="hs-identifier hs-var">clock</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275608"><span class="hs-identifier hs-var">h</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-78"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bool -&gt; Clock
+</span><a href="Data.Char.Emoji.Clock.html#clock"><span class="hs-identifier hs-var">clock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275608"><span class="hs-identifier hs-var">h</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-79"></span><span>
+</span><span id="line-80"></span><span class="hs-comment">-- | Construct a 'Clock' object with the given number of hours, and a 'Bool'ean</span><span>
+</span><span id="line-81"></span><span class="hs-comment">-- that indicates if it is half past that hour.</span><span>
+</span><span id="line-82"></span><span class="hs-comment">-- The function will ensure that the hours are between 0 and 12 (both inclusive).</span><span>
+</span><span id="line-83"></span><span class="hs-comment">-- For half past 12, we use half past 0, for 12 hours, we use simply 12.</span><span>
+</span><span id="line-84"></span><span class="annot"><a href="Data.Char.Emoji.Clock.html#clock"><span class="hs-identifier hs-type">clock</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-85"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given hour of the clock, can be any value, but will be set between 1 and 12.</span></span><span>
+</span><span id="line-86"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-87"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'Bool'ean that indicates if it is half past that hour, so 'True' means we add 30 minutes.</span></span><span>
+</span><span id="line-88"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-89"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A clock object that represents the time that is passed through an hour and .</span></span><span>
+</span><span id="line-90"></span><span>  </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-type">Clock</span></a></span><span>
+</span><span id="line-91"></span><span id="clock"><span class="annot"><span class="annottext">clock :: Int -&gt; Bool -&gt; Clock
+</span><a href="Data.Char.Emoji.Clock.html#clock"><span class="hs-identifier hs-var hs-var">clock</span></a></span></span><span> </span><span id="local-6989586621679275611"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275611"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span id="local-6989586621679275612"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679275612"><span class="hs-identifier hs-var">b</span></a></span></span><span>
+</span><span id="line-92"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679275612"><span class="hs-identifier hs-var">b</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275614"><span class="hs-identifier hs-var">h'</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">12</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bool -&gt; Clock
+</span><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-var">Clock</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-93"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bool -&gt; Clock
+</span><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-var">Clock</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275614"><span class="hs-identifier hs-var">h'</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679275612"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-94"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-95"></span><span>    </span><span id="local-6989586621679275614"><span class="annot"><span class="annottext">h' :: Int
+</span><a href="#local-6989586621679275614"><span class="hs-identifier hs-var hs-var">h'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">mod</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275611"><span class="hs-identifier hs-var">h</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">12</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-96"></span><span>
+</span><span id="line-97"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679275624"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-type">Clock</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-98"></span><span>  </span><span id="local-6989586621679275630"><span class="annot"><span class="annottext">arbitrary :: Gen Clock
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen Clock
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-99"></span><span>
+</span><span id="line-100"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679275634"><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier hs-type">UnicodeCharacter</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-type">Clock</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-101"></span><span>  </span><span id="local-6989586621679275647"><span class="annot"><span class="annottext">toUnicodeChar :: Clock -&gt; Char
+</span><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeChar</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-type">Clock</span></a></span><span> </span><span id="local-6989586621679275648"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275648"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f54f</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275648"><span class="hs-identifier hs-var">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-102"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-type">Clock</span></a></span><span> </span><span id="local-6989586621679275649"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275649"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f55c</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">mod</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679275649"><span class="hs-identifier hs-var">h</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">12</span></span><span class="hs-special">)</span><span>
+</span><span id="line-103"></span><span>  </span><span id="local-6989586621679275660"><span class="annot"><span class="annottext">fromUnicodeChar :: Char -&gt; Maybe Clock
+</span><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar</span></a></span></span><span> </span><span id="local-6989586621679275661"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679275661"><span class="hs-identifier hs-var">c</span></a></span></span><span>
+</span><span id="line-104"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679275661"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f550'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Clock
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-105"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679275661"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f55c'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Clock -&gt; Maybe Clock
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Bool -&gt; Clock
+</span><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-var">Clock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char -&gt; Int
+</span><span class="hs-identifier hs-var">ord</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679275661"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f54f</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span>
+</span><span id="line-106"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679275661"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f568'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Clock -&gt; Maybe Clock
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Bool -&gt; Clock
+</span><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-var">Clock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">mod</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char -&gt; Int
+</span><span class="hs-identifier hs-var">ord</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679275661"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f55b</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">12</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span class="hs-special">)</span><span>
+</span><span id="line-107"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Clock
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-108"></span><span>  </span><span id="local-6989586621679275664"><span class="annot"><span class="annottext">isInCharRange :: Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInCharRange</span></a></span></span><span> </span><span id="local-6989586621679275665"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679275665"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f550'</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679275665"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679275665"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f567'</span></span><span>
+</span><span id="line-109"></span><span>
+</span><span id="line-110"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679275668"><span id="local-6989586621679275673"><span id="local-6989586621679275677"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-type">Clock</span></a></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-111"></span><span>  </span><span id="local-6989586621679275682"><span class="annot"><span class="annottext">isInTextRange :: Text -&gt; Bool
+</span><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInTextRange</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. UnicodeCharacter a =&gt; Text -&gt; Bool
+</span><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier hs-var">generateIsInTextRange'</span></a></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Data.Char.Emoji.Clock.html#Clock"><span class="hs-identifier hs-type">Clock</span></a></span><span>
+</span><span id="line-112"></span></pre></body></html>

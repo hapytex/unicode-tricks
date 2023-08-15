@@ -1,0 +1,493 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE TupleSections #-}</span><span>
+</span><span id="line-3"></span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- Module      : Data.Char.Number.VulgarFraction</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Description : A module used to render vulgar fractions with Unicode.</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-10"></span><span class="hs-comment">--</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- Uncode has two blocks where vulgar fractions are defined: &lt;https://www.unicode.org/charts/PDF/U0080.pdf C1 controls and latin supplement 1&gt; and</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- &lt;https://www.unicode.org/charts/PDF/U2150.pdf Number forms&gt;. These are fractions that are commenly used.</span><span>
+</span><span id="line-13"></span><span class="hs-comment">--</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- The module exports function 'toVulgar' and 'ratioToVulgar' to convert the ratio to a 'Char' with that fraction if that exists. The</span><span>
+</span><span id="line-15"></span><span class="hs-comment">-- functon 'ratioToVulgarFallback' and 'ratioToVulgarFallback' are used to try to find a vulgar fraction character, and if that fails,</span><span>
+</span><span id="line-16"></span><span class="hs-comment">-- it prints the fraction with the help of the 'Data.Char.Small' module.</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Number.VulgarFraction</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Render to a vulgar fraction</span></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#ratioToVulgar"><span class="hs-identifier">ratioToVulgar</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier">toVulgar</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Try to parse a vulgar fraction</span></span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier">fromVulgar</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgarToRatio"><span class="hs-identifier">fromVulgarToRatio</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Render to a vulgar fraction, with a fallback to using small characters</span></span><span>
+</span><span id="line-27"></span><span>    </span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#ratioToVulgarFallback"><span class="hs-identifier">ratioToVulgarFallback</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-28"></span><span>    </span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgarFallback"><span class="hs-identifier">toVulgarFallback</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Convert 'Text' to a vulgar fraction or fallback on a 'Text' that contains a numerator and denominator as a sequence of characters</span></span><span>
+</span><span id="line-31"></span><span>    </span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgarFallback"><span class="hs-identifier">fromVulgarFallback</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-32"></span><span>    </span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgarFallbackToRatio"><span class="hs-identifier">fromVulgarFallbackToRatio</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Applicative</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-operator">(&lt;|&gt;)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Small.html"><span class="hs-identifier">Data.Char.Small</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Small.html#asSub%27"><span class="hs-identifier">asSub'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Small.html#fromSubSup"><span class="hs-identifier">fromSubSup</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Small.html#ratioPartsToUnicode%27"><span class="hs-identifier">ratioPartsToUnicode'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Small.html#unicodeToRatioParts"><span class="hs-identifier">unicodeToRatioParts</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Ratio</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Ratio</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">denominator</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">numerator</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(%)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">cons</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">singleton</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">unpack</span></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Text.Read</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">readMaybe</span></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="annot"><span class="hs-comment">-- | Convert the given 'Ratio' item to a vulgar fraction character, if such character exists; 'Nothing' otherwise.</span></span><span>
+</span><span id="line-43"></span><span id="local-6989586621679290222"><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#ratioToVulgar"><span class="hs-identifier hs-type">ratioToVulgar</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-44"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679290222"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-45"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The 'Ratio' for which we try to find the corresponding 'Char'acter.</span></span><span>
+</span><span id="line-46"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Ratio</span></span><span> </span><span class="annot"><a href="#local-6989586621679290222"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-47"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter wrapped in a 'Just' if such character exists; 'Nothing' otherwise.</span></span><span>
+</span><span id="line-48"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span></span><span>
+</span><span id="line-49"></span><span id="ratioToVulgar"><span class="annot"><span class="annottext">ratioToVulgar :: forall i. Integral i =&gt; Ratio i -&gt; Maybe Char
+</span><a href="Data.Char.Number.VulgarFraction.html#ratioToVulgar"><span class="hs-identifier hs-var hs-var">ratioToVulgar</span></a></span></span><span> </span><span id="local-6989586621679290305"><span class="annot"><span class="annottext">Ratio i
+</span><a href="#local-6989586621679290305"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Maybe Char
+forall i j. (Integral i, Integral j) =&gt; i -&gt; j -&gt; Maybe Char
+</span><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Ratio i -&gt; i
+forall a. Ratio a -&gt; a
+</span><span class="hs-identifier hs-var">numerator</span></span><span> </span><span class="annot"><span class="annottext">Ratio i
+</span><a href="#local-6989586621679290305"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Ratio i -&gt; i
+forall a. Ratio a -&gt; a
+</span><span class="hs-identifier hs-var">denominator</span></span><span> </span><span class="annot"><span class="annottext">Ratio i
+</span><a href="#local-6989586621679290305"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- | Convert the given 'Ratio' to a singleton 'Text' with the vulgar fraction character,</span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- if such character exists; it will make ue of the 'ratioPartsToUnicode'' to generate a 'Text'</span><span>
+</span><span id="line-53"></span><span class="hs-comment">-- object (with multiple 'Char'acters) that looks like a fraction.</span><span>
+</span><span id="line-54"></span><span id="local-6989586621679290227"><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#ratioToVulgarFallback"><span class="hs-identifier hs-type">ratioToVulgarFallback</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-55"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679290227"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-56"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Ratio' to convert.</span></span><span>
+</span><span id="line-57"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Ratio</span></span><span> </span><span class="annot"><a href="#local-6989586621679290227"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-58"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'Text' object with a single 'Char'acter if a vulgar fraction character exists; otherwise a 'Text' object created by 'ratioPartsToUnicode''.</span></span><span>
+</span><span id="line-59"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-60"></span><span id="ratioToVulgarFallback"><span class="annot"><span class="annottext">ratioToVulgarFallback :: forall i. Integral i =&gt; Ratio i -&gt; Text
+</span><a href="Data.Char.Number.VulgarFraction.html#ratioToVulgarFallback"><span class="hs-identifier hs-var hs-var">ratioToVulgarFallback</span></a></span></span><span> </span><span id="local-6989586621679290309"><span class="annot"><span class="annottext">Ratio i
+</span><a href="#local-6989586621679290309"><span class="hs-identifier hs-var">nd</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Text
+forall i j. (Integral i, Integral j) =&gt; i -&gt; j -&gt; Text
+</span><a href="Data.Char.Number.VulgarFraction.html#toVulgarFallback"><span class="hs-identifier hs-var">toVulgarFallback</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Ratio i -&gt; i
+forall a. Ratio a -&gt; a
+</span><span class="hs-identifier hs-var">numerator</span></span><span> </span><span class="annot"><span class="annottext">Ratio i
+</span><a href="#local-6989586621679290309"><span class="hs-identifier hs-var">nd</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Ratio i -&gt; i
+forall a. Ratio a -&gt; a
+</span><span class="hs-identifier hs-var">denominator</span></span><span> </span><span class="annot"><span class="annottext">Ratio i
+</span><a href="#local-6989586621679290309"><span class="hs-identifier hs-var">nd</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span class="annot"><span class="hs-comment">-- | Convert the given /numerator/ den /denominator/ to a vulgar fraction character, if such character exists; 'Nothing' otherwise.</span></span><span>
+</span><span id="line-63"></span><span id="local-6989586621679290224"><span id="local-6989586621679290225"><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-type">toVulgar</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679290224"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679290225"><span class="hs-identifier hs-type">j</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-65"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given numerator.</span></span><span>
+</span><span id="line-66"></span><span>  </span><span class="annot"><a href="#local-6989586621679290224"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-67"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given denominator.</span></span><span>
+</span><span id="line-68"></span><span>  </span><span class="annot"><a href="#local-6989586621679290225"><span class="hs-identifier hs-type">j</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-69"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter wrapped in a 'Just' if such character exists; 'Nothing' otherwise.</span></span><span>
+</span><span id="line-70"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span></span></span><span>
+</span><span id="line-71"></span><span id="toVulgar"><span class="annot"><span class="annottext">toVulgar :: forall i j. (Integral i, Integral j) =&gt; i -&gt; j -&gt; Maybe Char
+</span><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var hs-var">toVulgar</span></a></span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">4</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x00bc'</span></span><span>
+</span><span id="line-72"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">2</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x00bd'</span></span><span>
+</span><span id="line-73"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">3</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">4</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x00be'</span></span><span>
+</span><span id="line-74"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">7</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2150'</span></span><span>
+</span><span id="line-75"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">9</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2151'</span></span><span>
+</span><span id="line-76"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">10</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2152'</span></span><span>
+</span><span id="line-77"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">3</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2153'</span></span><span>
+</span><span id="line-78"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">2</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">3</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2154'</span></span><span>
+</span><span id="line-79"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">5</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2155'</span></span><span>
+</span><span id="line-80"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">2</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">5</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2156'</span></span><span>
+</span><span id="line-81"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">3</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">5</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2157'</span></span><span>
+</span><span id="line-82"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">4</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">5</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2158'</span></span><span>
+</span><span id="line-83"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">6</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2159'</span></span><span>
+</span><span id="line-84"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">5</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">6</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x215a'</span></span><span>
+</span><span id="line-85"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">8</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x215b'</span></span><span>
+</span><span id="line-86"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">3</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">8</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x215c'</span></span><span>
+</span><span id="line-87"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">5</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">8</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x215d'</span></span><span>
+</span><span id="line-88"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">7</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">8</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x215e'</span></span><span>
+</span><span id="line-89"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">3</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2189'</span></span><span> </span><span class="hs-comment">-- used in baseball</span><span>
+</span><span id="line-90"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Char
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-91"></span><span>
+</span><span id="line-92"></span><span class="hs-comment">-- | Convert the given numerator and denominator to a singleton 'Text' with the vulgar fraction character,</span><span>
+</span><span id="line-93"></span><span class="hs-comment">-- if such character exists; it will make ue of the 'ratioPartsToUnicode'' to generate a 'Text'</span><span>
+</span><span id="line-94"></span><span class="hs-comment">-- object (with multiple 'Char'acters) that looks like a fraction.</span><span>
+</span><span id="line-95"></span><span id="local-6989586621679290230"><span id="local-6989586621679290231"><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#toVulgarFallback"><span class="hs-identifier hs-type">toVulgarFallback</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-96"></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679290230"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679290231"><span class="hs-identifier hs-type">j</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-97"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given /numerator/.</span></span><span>
+</span><span id="line-98"></span><span>  </span><span class="annot"><a href="#local-6989586621679290230"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-99"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given /denominator/.</span></span><span>
+</span><span id="line-100"></span><span>  </span><span class="annot"><a href="#local-6989586621679290231"><span class="hs-identifier hs-type">j</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-101"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'Text' object with a single 'Char'acter if a vulgar fraction character exists; otherwise a 'Text' object created by 'ratioPartsToUnicode''.</span></span><span>
+</span><span id="line-102"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span></span><span>
+</span><span id="line-103"></span><span id="toVulgarFallback"><span class="annot"><span class="annottext">toVulgarFallback :: forall i j. (Integral i, Integral j) =&gt; i -&gt; j -&gt; Text
+</span><a href="Data.Char.Number.VulgarFraction.html#toVulgarFallback"><span class="hs-identifier hs-var hs-var">toVulgarFallback</span></a></span></span><span> </span><span id="local-6989586621679290406"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679290406"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span id="local-6989586621679290407"><span class="annot"><span class="annottext">j
+</span><a href="#local-6989586621679290407"><span class="hs-identifier hs-var">j</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; (Char -&gt; Text) -&gt; Maybe Char -&gt; Text
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; j -&gt; Text
+forall {i} {j}. (Integral j, Integral i) =&gt; i -&gt; j -&gt; Text
+</span><a href="#local-6989586621679290409"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679290406"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">j
+</span><a href="#local-6989586621679290407"><span class="hs-identifier hs-var">j</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Text
+</span><span class="hs-identifier hs-var">singleton</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; j -&gt; Maybe Char
+forall i j. (Integral i, Integral j) =&gt; i -&gt; j -&gt; Maybe Char
+</span><a href="Data.Char.Number.VulgarFraction.html#toVulgar"><span class="hs-identifier hs-var">toVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679290406"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">j
+</span><a href="#local-6989586621679290407"><span class="hs-identifier hs-var">j</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-104"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-105"></span><span>    </span><span id="local-6989586621679290409"><span class="annot"><span class="annottext">go :: i -&gt; j -&gt; Text
+</span><a href="#local-6989586621679290409"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span> </span><span id="local-6989586621679290441"><span class="annot"><span class="annottext">j
+</span><a href="#local-6989586621679290441"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">j
+</span><a href="#local-6989586621679290441"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">j -&gt; j -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Text -&gt; Text
+</span><span class="hs-identifier hs-var">cons</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x215f'</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">j -&gt; Text
+forall i. Integral i =&gt; i -&gt; Text
+</span><a href="Data.Char.Small.html#asSub%27"><span class="hs-identifier hs-var">asSub'</span></a></span><span> </span><span class="annot"><span class="annottext">j
+</span><a href="#local-6989586621679290441"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-106"></span><span>    </span><span class="annot"><a href="#local-6989586621679290409"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679290443"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679290443"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679290444"><span class="annot"><span class="annottext">j
+</span><a href="#local-6989586621679290444"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; j -&gt; Text
+forall i j. (Integral i, Integral j) =&gt; i -&gt; j -&gt; Text
+</span><a href="Data.Char.Small.html#ratioPartsToUnicode%27"><span class="hs-identifier hs-var">ratioPartsToUnicode'</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679290443"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">j
+</span><a href="#local-6989586621679290444"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-107"></span><span>
+</span><span id="line-108"></span><span class="hs-comment">-- | Try to convert a given 'Char', if it is a /vulgar fraction/, to a 2-tuple with the numerator and denominator. Returns 'Nothing' if the 'Char'</span><span>
+</span><span id="line-109"></span><span class="hs-comment">-- is not a vulgar fraction character.</span><span>
+</span><span id="line-110"></span><span id="local-6989586621679290245"><span id="local-6989586621679290246"><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-type">fromVulgar</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-111"></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679290245"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679290246"><span class="hs-identifier hs-type">j</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-112"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The character to decode.</span></span><span>
+</span><span id="line-113"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-114"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The numerator and denominator wrapped in a 'Just' if the character is a vulgar fraction, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-115"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679290245"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679290246"><span class="hs-identifier hs-type">j</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-116"></span><span id="fromVulgar"><span class="annot"><span class="annottext">fromVulgar :: forall i j. (Integral i, Integral j) =&gt; Char -&gt; Maybe (i, j)
+</span><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var hs-var">fromVulgar</span></a></span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x00bc'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">4</span></span><span class="hs-special">)</span><span>
+</span><span id="line-117"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x00bd'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span>
+</span><span id="line-118"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x00be'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">3</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">4</span></span><span class="hs-special">)</span><span>
+</span><span id="line-119"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2150'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">7</span></span><span class="hs-special">)</span><span>
+</span><span id="line-120"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2151'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">9</span></span><span class="hs-special">)</span><span>
+</span><span id="line-121"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2152'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">10</span></span><span class="hs-special">)</span><span>
+</span><span id="line-122"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2153'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">3</span></span><span class="hs-special">)</span><span>
+</span><span id="line-123"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2154'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">2</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">3</span></span><span class="hs-special">)</span><span>
+</span><span id="line-124"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2155'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">5</span></span><span class="hs-special">)</span><span>
+</span><span id="line-125"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2156'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">2</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">5</span></span><span class="hs-special">)</span><span>
+</span><span id="line-126"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2157'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">3</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">5</span></span><span class="hs-special">)</span><span>
+</span><span id="line-127"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2158'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">4</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">5</span></span><span class="hs-special">)</span><span>
+</span><span id="line-128"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2159'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">6</span></span><span class="hs-special">)</span><span>
+</span><span id="line-129"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x215a'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">5</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">6</span></span><span class="hs-special">)</span><span>
+</span><span id="line-130"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x215b'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">8</span></span><span class="hs-special">)</span><span>
+</span><span id="line-131"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x215c'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">3</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">8</span></span><span class="hs-special">)</span><span>
+</span><span id="line-132"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x215d'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">5</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">8</span></span><span class="hs-special">)</span><span>
+</span><span id="line-133"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x215e'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">7</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">8</span></span><span class="hs-special">)</span><span>
+</span><span id="line-134"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2189'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(i, j) -&gt; Maybe (i, j)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">j
+</span><span class="hs-number">3</span></span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- used in baseball</span><span>
+</span><span id="line-135"></span><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (i, j)
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-136"></span><span>
+</span><span id="line-137"></span><span class="annot"><span class="hs-comment">-- | Try to convert the given 'Char', if it is a /vulgar fraction/, to a 'Ratio' object. Returns 'Nothing' if the 'Char' is not a vulgar fraction character.</span></span><span>
+</span><span id="line-138"></span><span id="local-6989586621679290249"><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgarToRatio"><span class="hs-identifier hs-type">fromVulgarToRatio</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-139"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679290249"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-140"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The character to decode.</span></span><span>
+</span><span id="line-141"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-142"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Ratio' wrapped in a 'Just' if the ratio is a vulgar fraction, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-143"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ratio</span></span><span> </span><span class="annot"><a href="#local-6989586621679290249"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-144"></span><span id="fromVulgarToRatio"><span class="annot"><span class="annottext">fromVulgarToRatio :: forall i. Integral i =&gt; Char -&gt; Maybe (Ratio i)
+</span><a href="Data.Char.Number.VulgarFraction.html#fromVulgarToRatio"><span class="hs-identifier hs-var hs-var">fromVulgarToRatio</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">((i, i) -&gt; Ratio i) -&gt; Maybe (i, i) -&gt; Maybe (Ratio i)
+forall a b. (a -&gt; b) -&gt; Maybe a -&gt; Maybe b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(i -&gt; i -&gt; Ratio i) -&gt; (i, i) -&gt; Ratio i
+forall a b c. (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c
+</span><span class="hs-identifier hs-var">uncurry</span></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Ratio i
+forall a. Integral a =&gt; a -&gt; a -&gt; Ratio a
+</span><span class="hs-operator hs-var">(%)</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Maybe (i, i) -&gt; Maybe (Ratio i))
+-&gt; (Char -&gt; Maybe (i, i)) -&gt; Char -&gt; Maybe (Ratio i)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe (i, i)
+forall i j. (Integral i, Integral j) =&gt; Char -&gt; Maybe (i, j)
+</span><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span>
+</span><span id="line-145"></span><span>
+</span><span id="line-146"></span><span class="annot"><span class="hs-comment">-- | Try to parse the text as a /vulgar fraction/ and fallback on the 'unicodeToRatioParts' function to parse it as a fraction.</span></span><span>
+</span><span id="line-147"></span><span id="local-6989586621679290261"><span id="local-6989586621679290262"><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgarFallback"><span class="hs-identifier hs-type">fromVulgarFallback</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-148"></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Read</span></span><span> </span><span class="annot"><a href="#local-6989586621679290261"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679290261"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Read</span></span><span> </span><span class="annot"><a href="#local-6989586621679290262"><span class="hs-identifier hs-type">j</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679290262"><span class="hs-identifier hs-type">j</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-149"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The 'Text' we try to decode as a (vulgar) fraction.</span></span><span>
+</span><span id="line-150"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-151"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 2-tuple with the numerator and denominator wrapped in a 'Just' if the 'Text' can be parsed, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-152"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679290261"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679290262"><span class="hs-identifier hs-type">j</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-153"></span><span id="fromVulgarFallback"><span class="annot"><span class="annottext">fromVulgarFallback :: forall i j.
+(Read i, Integral i, Read j, Integral j) =&gt;
+Text -&gt; Maybe (i, j)
+</span><a href="Data.Char.Number.VulgarFraction.html#fromVulgarFallback"><span class="hs-identifier hs-var hs-var">fromVulgarFallback</span></a></span></span><span> </span><span id="local-6989586621679290512"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679290512"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Maybe (i, j)
+forall {i} {j}. (Integral i, Integral j) =&gt; [Char] -&gt; Maybe (i, j)
+</span><a href="#local-6989586621679290513"><span class="hs-identifier hs-var">_attm0</span></a></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><a href="#local-6989586621679290514"><span class="hs-identifier hs-var">d'</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe (i, j) -&gt; Maybe (i, j) -&gt; Maybe (i, j)
+forall a. Maybe a -&gt; Maybe a -&gt; Maybe a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">&lt;|&gt;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Maybe (i, j)
+forall {t} {a}. (Num t, Read a) =&gt; [Char] -&gt; Maybe (t, a)
+</span><a href="#local-6989586621679290515"><span class="hs-identifier hs-var">_attm1</span></a></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><a href="#local-6989586621679290514"><span class="hs-identifier hs-var">d'</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe (i, j) -&gt; Maybe (i, j) -&gt; Maybe (i, j)
+forall a. Maybe a -&gt; Maybe a -&gt; Maybe a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">&lt;|&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe (i, j)
+forall i j. (Read i, Read j) =&gt; Text -&gt; Maybe (i, j)
+</span><a href="Data.Char.Small.html#unicodeToRatioParts"><span class="hs-identifier hs-var">unicodeToRatioParts</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679290512"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-154"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-155"></span><span>    </span><span id="local-6989586621679290514"><span class="annot"><span class="annottext">d' :: [Char]
+</span><a href="#local-6989586621679290514"><span class="hs-identifier hs-var hs-var">d'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Char]
+</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679290512"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-156"></span><span>    </span><span id="local-6989586621679290513"><span class="annot"><span class="annottext">_attm0 :: [Char] -&gt; Maybe (i, j)
+</span><a href="#local-6989586621679290513"><span class="hs-identifier hs-var hs-var">_attm0</span></a></span></span><span> </span><span class="hs-special">[</span><span id="local-6989586621679290540"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679290540"><span class="hs-identifier hs-var">d0</span></a></span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe (i, j)
+forall i j. (Integral i, Integral j) =&gt; Char -&gt; Maybe (i, j)
+</span><a href="Data.Char.Number.VulgarFraction.html#fromVulgar"><span class="hs-identifier hs-var">fromVulgar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679290540"><span class="hs-identifier hs-var">d0</span></a></span><span>
+</span><span id="line-157"></span><span>    </span><span class="annot"><a href="#local-6989586621679290513"><span class="hs-identifier hs-var">_attm0</span></a></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (i, j)
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-158"></span><span>    </span><span id="local-6989586621679290515"><span class="annot"><span class="annottext">_attm1 :: [Char] -&gt; Maybe (t, a)
+</span><a href="#local-6989586621679290515"><span class="hs-identifier hs-var hs-var">_attm1</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x215f'</span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679290546"><span class="annot"><span class="annottext">[Char]
+</span><a href="#local-6989586621679290546"><span class="hs-identifier hs-var">ds</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">t
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(a -&gt; (t, a)) -&gt; Maybe a -&gt; Maybe (t, a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Maybe a
+forall a. Read a =&gt; [Char] -&gt; Maybe a
+</span><span class="hs-identifier hs-var">readMaybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Char -&gt; Char) -&gt; [Char] -&gt; [Char]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Small.html#fromSubSup"><span class="hs-identifier hs-var">fromSubSup</span></a></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><a href="#local-6989586621679290546"><span class="hs-identifier hs-var">ds</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-159"></span><span>    </span><span class="annot"><a href="#local-6989586621679290515"><span class="hs-identifier hs-var">_attm1</span></a></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (t, a)
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-160"></span><span>
+</span><span id="line-161"></span><span class="annot"><span class="hs-comment">-- | Try to parse the text as a /vulgar fraction/ and fallback on the 'unicodeToRatioParts' function to parse it as a fraction.</span></span><span>
+</span><span id="line-162"></span><span id="local-6989586621679290280"><span class="annot"><a href="Data.Char.Number.VulgarFraction.html#fromVulgarFallbackToRatio"><span class="hs-identifier hs-type">fromVulgarFallbackToRatio</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-163"></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Read</span></span><span> </span><span class="annot"><a href="#local-6989586621679290280"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679290280"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-164"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The 'Text' we try to decode as a (vulgar) fraction.</span></span><span>
+</span><span id="line-165"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-166"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The parsed 'Ratio' wrapped in a 'Just' if the 'Text' can be parsed, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-167"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ratio</span></span><span> </span><span class="annot"><a href="#local-6989586621679290280"><span class="hs-identifier hs-type">i</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-168"></span><span id="fromVulgarFallbackToRatio"><span class="annot"><span class="annottext">fromVulgarFallbackToRatio :: forall i. (Read i, Integral i) =&gt; Text -&gt; Maybe (Ratio i)
+</span><a href="Data.Char.Number.VulgarFraction.html#fromVulgarFallbackToRatio"><span class="hs-identifier hs-var hs-var">fromVulgarFallbackToRatio</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">((i, i) -&gt; Ratio i) -&gt; Maybe (i, i) -&gt; Maybe (Ratio i)
+forall a b. (a -&gt; b) -&gt; Maybe a -&gt; Maybe b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(i -&gt; i -&gt; Ratio i) -&gt; (i, i) -&gt; Ratio i
+forall a b c. (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c
+</span><span class="hs-identifier hs-var">uncurry</span></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Ratio i
+forall a. Integral a =&gt; a -&gt; a -&gt; Ratio a
+</span><span class="hs-operator hs-var">(%)</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Maybe (i, i) -&gt; Maybe (Ratio i))
+-&gt; (Text -&gt; Maybe (i, i)) -&gt; Text -&gt; Maybe (Ratio i)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe (i, i)
+forall i j.
+(Read i, Integral i, Read j, Integral j) =&gt;
+Text -&gt; Maybe (i, j)
+</span><a href="Data.Char.Number.VulgarFraction.html#fromVulgarFallback"><span class="hs-identifier hs-var">fromVulgarFallback</span></a></span><span>
+</span><span id="line-169"></span></pre></body></html>

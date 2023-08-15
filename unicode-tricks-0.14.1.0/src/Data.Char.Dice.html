@@ -1,0 +1,454 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="local-6989586621679269658"><span id="local-6989586621679269659"><span id="local-6989586621679269660"><span id="local-6989586621679269661"><span id="local-6989586621679269662"><span id="local-6989586621679269663"><span id="local-6989586621679269664"><span id="local-6989586621679269665"><span id="local-6989586621679269666"></span></span></span></span></span></span></span></span></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications #-}</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Module      : Data.Char.Dice</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Description : Support for dice characters in unicode.</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- Unicode has a &lt;https://www.unicode.org/charts/PDF/U2600.pdf block&gt; named /Miscellaneous Symbols/ that includes unicode characters for dice, this module aims to make it more convenient to render</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- die characters.</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Dice</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Represent die values</span></span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Data.Char.Dice.html#DieValue"><span class="hs-identifier">DieValue</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Dice.html#I"><span class="hs-identifier">I</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Dice.html#II"><span class="hs-identifier">II</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Dice.html#III"><span class="hs-identifier">III</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Dice.html#IV"><span class="hs-identifier">IV</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Dice.html#V"><span class="hs-identifier">V</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Dice.html#VI"><span class="hs-identifier">VI</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Convert to a die value</span></span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Data.Char.Dice.html#toDieValue"><span class="hs-identifier">toDieValue</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Render a die</span></span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><a href="Data.Char.Dice.html#die"><span class="hs-identifier">die</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Bits</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-operator">(.|.)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Char</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">chr</span></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier">UnicodeCharacter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier">fromUnicodeChar</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar%27"><span class="hs-identifier">fromUnicodeChar'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier">isInCharRange</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier">toUnicodeChar</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier">UnicodeText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier">isInTextRange</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier">generateIsInTextRange'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapFromEnum"><span class="hs-identifier">mapFromEnum</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapToEnum"><span class="hs-identifier">mapToEnum</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapToEnumSafe"><span class="hs-identifier">mapToEnumSafe</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitraryBoundedEnum</span></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="annot"><a href="Data.Char.Dice.html#_dieOffset"><span class="hs-identifier hs-type">_dieOffset</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-37"></span><span id="_dieOffset"><span class="annot"><span class="annottext">_dieOffset :: Int
+</span><a href="Data.Char.Dice.html#_dieOffset"><span class="hs-identifier hs-var hs-var">_dieOffset</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x2680</span></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="annot"><span class="hs-comment">-- | A data type to store the values of a die.</span></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">data</span><span> </span><span id="DieValue"><span class="annot"><a href="Data.Char.Dice.html#DieValue"><span class="hs-identifier hs-var">DieValue</span></a></span></span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-comment">-- | A die with value /one/, represented with &#9856;.</span></span><span>
+</span><span id="line-42"></span><span>    </span><span id="I"><span class="annot"><a href="Data.Char.Dice.html#I"><span class="hs-identifier hs-var">I</span></a></span></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | A die with value /two/, represented with &#9857;.</span></span><span>
+</span><span id="line-44"></span><span>    </span><span id="II"><span class="annot"><a href="Data.Char.Dice.html#II"><span class="hs-identifier hs-var">II</span></a></span></span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | A die with value /three/, represented with &#9858;.</span></span><span>
+</span><span id="line-46"></span><span>    </span><span id="III"><span class="annot"><a href="Data.Char.Dice.html#III"><span class="hs-identifier hs-var">III</span></a></span></span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | A die with value /four/, represented with &#9859;.</span></span><span>
+</span><span id="line-48"></span><span>    </span><span id="IV"><span class="annot"><a href="Data.Char.Dice.html#IV"><span class="hs-identifier hs-var">IV</span></a></span></span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | A die with value /five/, represented with &#9860;.</span></span><span>
+</span><span id="line-50"></span><span>    </span><span id="V"><span class="annot"><a href="Data.Char.Dice.html#V"><span class="hs-identifier hs-var">V</span></a></span></span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | A die with value /six/, represented with &#9861;.</span></span><span>
+</span><span id="line-52"></span><span>    </span><span id="VI"><span class="annot"><a href="Data.Char.Dice.html#VI"><span class="hs-identifier hs-var">VI</span></a></span></span><span>
+</span><span id="line-53"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679269694"><span id="local-6989586621679269696"><span class="annot"><span class="annottext">DieValue
+DieValue -&gt; DieValue -&gt; Bounded DieValue
+forall a. a -&gt; a -&gt; Bounded a
+$cminBound :: DieValue
+minBound :: DieValue
+$cmaxBound :: DieValue
+maxBound :: DieValue
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679269702"><span id="local-6989586621679269704"><span id="local-6989586621679269706"><span id="local-6989586621679269708"><span id="local-6989586621679269710"><span id="local-6989586621679269716"><span id="local-6989586621679269721"><span id="local-6989586621679269724"><span id="local-6989586621679269727"><span id="local-6989586621679269730"><span id="local-6989586621679269733"><span id="local-6989586621679269736"><span id="local-6989586621679269741"><span id="local-6989586621679269746"><span class="annot"><span class="annottext">Typeable DieValue
+Typeable DieValue
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; DieValue -&gt; c DieValue)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c DieValue)
+-&gt; (DieValue -&gt; Constr)
+-&gt; (DieValue -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c DieValue))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c DieValue))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; DieValue -&gt; DieValue)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; DieValue -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; DieValue -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; DieValue -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; DieValue -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; DieValue -&gt; m DieValue)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; DieValue -&gt; m DieValue)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; DieValue -&gt; m DieValue)
+-&gt; Data DieValue
+DieValue -&gt; Constr
+DieValue -&gt; DataType
+(forall b. Data b =&gt; b -&gt; b) -&gt; DieValue -&gt; DieValue
+forall a.
+Typeable a
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; DieValue -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; DieValue -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; DieValue -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; DieValue -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; DieValue -&gt; m DieValue
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; DieValue -&gt; m DieValue
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c DieValue
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; DieValue -&gt; c DieValue
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c DieValue)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c DieValue)
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; DieValue -&gt; c DieValue
+gfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; DieValue -&gt; c DieValue
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c DieValue
+gunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c DieValue
+$ctoConstr :: DieValue -&gt; Constr
+toConstr :: DieValue -&gt; Constr
+$cdataTypeOf :: DieValue -&gt; DataType
+dataTypeOf :: DieValue -&gt; DataType
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c DieValue)
+dataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c DieValue)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c DieValue)
+dataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c DieValue)
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; DieValue -&gt; DieValue
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; DieValue -&gt; DieValue
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; DieValue -&gt; r
+gmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; DieValue -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; DieValue -&gt; r
+gmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; DieValue -&gt; r
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; DieValue -&gt; [u]
+gmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; DieValue -&gt; [u]
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; DieValue -&gt; u
+gmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; DieValue -&gt; u
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; DieValue -&gt; m DieValue
+gmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; DieValue -&gt; m DieValue
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; DieValue -&gt; m DieValue
+gmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; DieValue -&gt; m DieValue
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; DieValue -&gt; m DieValue
+gmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; DieValue -&gt; m DieValue
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679269752"><span id="local-6989586621679269760"><span id="local-6989586621679269766"><span id="local-6989586621679269776"><span id="local-6989586621679269778"><span id="local-6989586621679269782"><span id="local-6989586621679269786"><span id="local-6989586621679269789"><span class="annot"><span class="annottext">Int -&gt; DieValue
+DieValue -&gt; Int
+DieValue -&gt; [DieValue]
+DieValue -&gt; DieValue
+DieValue -&gt; DieValue -&gt; [DieValue]
+DieValue -&gt; DieValue -&gt; DieValue -&gt; [DieValue]
+(DieValue -&gt; DieValue)
+-&gt; (DieValue -&gt; DieValue)
+-&gt; (Int -&gt; DieValue)
+-&gt; (DieValue -&gt; Int)
+-&gt; (DieValue -&gt; [DieValue])
+-&gt; (DieValue -&gt; DieValue -&gt; [DieValue])
+-&gt; (DieValue -&gt; DieValue -&gt; [DieValue])
+-&gt; (DieValue -&gt; DieValue -&gt; DieValue -&gt; [DieValue])
+-&gt; Enum DieValue
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+$csucc :: DieValue -&gt; DieValue
+succ :: DieValue -&gt; DieValue
+$cpred :: DieValue -&gt; DieValue
+pred :: DieValue -&gt; DieValue
+$ctoEnum :: Int -&gt; DieValue
+toEnum :: Int -&gt; DieValue
+$cfromEnum :: DieValue -&gt; Int
+fromEnum :: DieValue -&gt; Int
+$cenumFrom :: DieValue -&gt; [DieValue]
+enumFrom :: DieValue -&gt; [DieValue]
+$cenumFromThen :: DieValue -&gt; DieValue -&gt; [DieValue]
+enumFromThen :: DieValue -&gt; DieValue -&gt; [DieValue]
+$cenumFromTo :: DieValue -&gt; DieValue -&gt; [DieValue]
+enumFromTo :: DieValue -&gt; DieValue -&gt; [DieValue]
+$cenumFromThenTo :: DieValue -&gt; DieValue -&gt; DieValue -&gt; [DieValue]
+enumFromThenTo :: DieValue -&gt; DieValue -&gt; DieValue -&gt; [DieValue]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679269793"><span id="local-6989586621679269795"><span class="annot"><span class="annottext">DieValue -&gt; DieValue -&gt; Bool
+(DieValue -&gt; DieValue -&gt; Bool)
+-&gt; (DieValue -&gt; DieValue -&gt; Bool) -&gt; Eq DieValue
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: DieValue -&gt; DieValue -&gt; Bool
+== :: DieValue -&gt; DieValue -&gt; Bool
+$c/= :: DieValue -&gt; DieValue -&gt; Bool
+/= :: DieValue -&gt; DieValue -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679269800"><span id="local-6989586621679269802"><span class="annot"><span class="annottext">(forall x. DieValue -&gt; Rep DieValue x)
+-&gt; (forall x. Rep DieValue x -&gt; DieValue) -&gt; Generic DieValue
+forall x. Rep DieValue x -&gt; DieValue
+forall x. DieValue -&gt; Rep DieValue x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cfrom :: forall x. DieValue -&gt; Rep DieValue x
+from :: forall x. DieValue -&gt; Rep DieValue x
+$cto :: forall x. Rep DieValue x -&gt; DieValue
+to :: forall x. Rep DieValue x -&gt; DieValue
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679269808"><span id="local-6989586621679269810"><span id="local-6989586621679269812"><span id="local-6989586621679269816"><span id="local-6989586621679269819"><span id="local-6989586621679269822"><span id="local-6989586621679269825"><span class="annot"><span class="annottext">Eq DieValue
+Eq DieValue
+-&gt; (DieValue -&gt; DieValue -&gt; Ordering)
+-&gt; (DieValue -&gt; DieValue -&gt; Bool)
+-&gt; (DieValue -&gt; DieValue -&gt; Bool)
+-&gt; (DieValue -&gt; DieValue -&gt; Bool)
+-&gt; (DieValue -&gt; DieValue -&gt; Bool)
+-&gt; (DieValue -&gt; DieValue -&gt; DieValue)
+-&gt; (DieValue -&gt; DieValue -&gt; DieValue)
+-&gt; Ord DieValue
+DieValue -&gt; DieValue -&gt; Bool
+DieValue -&gt; DieValue -&gt; Ordering
+DieValue -&gt; DieValue -&gt; DieValue
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: DieValue -&gt; DieValue -&gt; Ordering
+compare :: DieValue -&gt; DieValue -&gt; Ordering
+$c&lt; :: DieValue -&gt; DieValue -&gt; Bool
+&lt; :: DieValue -&gt; DieValue -&gt; Bool
+$c&lt;= :: DieValue -&gt; DieValue -&gt; Bool
+&lt;= :: DieValue -&gt; DieValue -&gt; Bool
+$c&gt; :: DieValue -&gt; DieValue -&gt; Bool
+&gt; :: DieValue -&gt; DieValue -&gt; Bool
+$c&gt;= :: DieValue -&gt; DieValue -&gt; Bool
+&gt;= :: DieValue -&gt; DieValue -&gt; Bool
+$cmax :: DieValue -&gt; DieValue -&gt; DieValue
+max :: DieValue -&gt; DieValue -&gt; DieValue
+$cmin :: DieValue -&gt; DieValue -&gt; DieValue
+min :: DieValue -&gt; DieValue -&gt; DieValue
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679269829"><span id="local-6989586621679269833"><span id="local-6989586621679269836"><span id="local-6989586621679269845"><span class="annot"><span class="annottext">ReadPrec [DieValue]
+ReadPrec DieValue
+Int -&gt; ReadS DieValue
+ReadS [DieValue]
+(Int -&gt; ReadS DieValue)
+-&gt; ReadS [DieValue]
+-&gt; ReadPrec DieValue
+-&gt; ReadPrec [DieValue]
+-&gt; Read DieValue
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+$creadsPrec :: Int -&gt; ReadS DieValue
+readsPrec :: Int -&gt; ReadS DieValue
+$creadList :: ReadS [DieValue]
+readList :: ReadS [DieValue]
+$creadPrec :: ReadPrec DieValue
+readPrec :: ReadPrec DieValue
+$creadListPrec :: ReadPrec [DieValue]
+readListPrec :: ReadPrec [DieValue]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679269849"><span id="local-6989586621679269851"><span id="local-6989586621679269855"><span class="annot"><span class="annottext">Int -&gt; DieValue -&gt; ShowS
+[DieValue] -&gt; ShowS
+DieValue -&gt; String
+(Int -&gt; DieValue -&gt; ShowS)
+-&gt; (DieValue -&gt; String) -&gt; ([DieValue] -&gt; ShowS) -&gt; Show DieValue
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; DieValue -&gt; ShowS
+showsPrec :: Int -&gt; DieValue -&gt; ShowS
+$cshow :: DieValue -&gt; String
+show :: DieValue -&gt; String
+$cshowList :: [DieValue] -&gt; ShowS
+showList :: [DieValue] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span>
+</span><span id="line-55"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679269861"><span id="local-6989586621679269868"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Dice.html#DieValue"><span class="hs-identifier hs-type">DieValue</span></a></span></span></span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679269889"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Dice.html#DieValue"><span class="hs-identifier hs-type">DieValue</span></a></span></span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="hs-comment">-- | Convert the given integral value to a 'DieValue' that represents the given</span><span>
+</span><span id="line-60"></span><span class="hs-comment">-- number. If the number is less than one, or greater than six, 'Nothing' is</span><span>
+</span><span id="line-61"></span><span class="hs-comment">-- returned.</span><span>
+</span><span id="line-62"></span><span id="local-6989586621679269611"><span class="annot"><a href="Data.Char.Dice.html#toDieValue"><span class="hs-identifier hs-type">toDieValue</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-63"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679269611"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-64"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given integral value to convert to a 'DieValue'.</span></span><span>
+</span><span id="line-65"></span><span>  </span><span class="annot"><a href="#local-6989586621679269611"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-66"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'DieValue' wrapped in a 'Just' if the given integral value is greater than zero, and less than seven, otherwise 'Nothing'.</span></span><span>
+</span><span id="line-67"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Data.Char.Dice.html#DieValue"><span class="hs-identifier hs-type">DieValue</span></a></span></span><span>
+</span><span id="line-68"></span><span id="toDieValue"><span class="annot"><span class="annottext">toDieValue :: forall i. Integral i =&gt; i -&gt; Maybe DieValue
+</span><a href="Data.Char.Dice.html#toDieValue"><span class="hs-identifier hs-var hs-var">toDieValue</span></a></span></span><span> </span><span id="local-6989586621679269927"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679269927"><span class="hs-identifier hs-var">i</span></a></span></span><span>
+</span><span id="line-69"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679269927"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679269927"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">6</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DieValue -&gt; Maybe DieValue
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; DieValue
+forall a. Enum a =&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; Int
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679269927"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe DieValue
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-71"></span><span>
+</span><span id="line-72"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679269934"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Dice.html#DieValue"><span class="hs-identifier hs-type">DieValue</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-73"></span><span>  </span><span id="local-6989586621679269940"><span class="annot"><span class="annottext">arbitrary :: Gen DieValue
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen DieValue
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span class="hs-comment">-- | Convert the given 'DieValue' to a unicode character that represents a /die/</span><span>
+</span><span id="line-76"></span><span class="hs-comment">-- with that value.</span><span>
+</span><span id="line-77"></span><span class="annot"><a href="Data.Char.Dice.html#die"><span class="hs-identifier hs-type">die</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-78"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The die value to convert.</span></span><span>
+</span><span id="line-79"></span><span>  </span><span class="annot"><a href="Data.Char.Dice.html#DieValue"><span class="hs-identifier hs-type">DieValue</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-80"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A unicode character that represents a die with the given 'DieValue'.</span></span><span>
+</span><span id="line-81"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-82"></span><span id="die"><span class="annot"><span class="annottext">die :: DieValue -&gt; Char
+</span><a href="Data.Char.Dice.html#die"><span class="hs-identifier hs-var hs-var">die</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Char) -&gt; (DieValue -&gt; Int) -&gt; DieValue -&gt; Char
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Dice.html#_dieOffset"><span class="hs-identifier hs-var">_dieOffset</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.|.</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int) -&gt; (DieValue -&gt; Int) -&gt; DieValue -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">DieValue -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier hs-type">UnicodeCharacter</span></a></span><span> </span><span class="annot"><a href="Data.Char.Dice.html#DieValue"><span class="hs-identifier hs-type">DieValue</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-85"></span><span>  </span><span id="local-6989586621679269950"><span class="annot"><span class="annottext">toUnicodeChar :: DieValue -&gt; Char
+</span><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; DieValue -&gt; Char
+forall a. Enum a =&gt; Int -&gt; a -&gt; Char
+</span><a href="Data.Char.Core.html#mapFromEnum"><span class="hs-identifier hs-var">mapFromEnum</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Dice.html#_dieOffset"><span class="hs-identifier hs-var">_dieOffset</span></a></span><span>
+</span><span id="line-86"></span><span>  </span><span id="local-6989586621679269953"><span class="annot"><span class="annottext">fromUnicodeChar :: Char -&gt; Maybe DieValue
+</span><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Maybe DieValue
+forall a. (Bounded a, Enum a) =&gt; Int -&gt; Char -&gt; Maybe a
+</span><a href="Data.Char.Core.html#mapToEnumSafe"><span class="hs-identifier hs-var">mapToEnumSafe</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Dice.html#_dieOffset"><span class="hs-identifier hs-var">_dieOffset</span></a></span><span>
+</span><span id="line-87"></span><span>  </span><span id="local-6989586621679269955"><span class="annot"><span class="annottext">fromUnicodeChar' :: Char -&gt; DieValue
+</span><a href="Data.Char.Core.html#fromUnicodeChar%27"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; DieValue
+forall a. Enum a =&gt; Int -&gt; Char -&gt; a
+</span><a href="Data.Char.Core.html#mapToEnum"><span class="hs-identifier hs-var">mapToEnum</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Dice.html#_dieOffset"><span class="hs-identifier hs-var">_dieOffset</span></a></span><span>
+</span><span id="line-88"></span><span>  </span><span id="local-6989586621679269959"><span class="annot"><span class="annottext">isInCharRange :: Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInCharRange</span></a></span></span><span> </span><span id="local-6989586621679269960"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679269960"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2680'</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679269960"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679269960"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2685'</span></span><span>
+</span><span id="line-89"></span><span>
+</span><span id="line-90"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679269962"><span id="local-6989586621679269967"><span id="local-6989586621679269971"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Dice.html#DieValue"><span class="hs-identifier hs-type">DieValue</span></a></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-91"></span><span>  </span><span id="local-6989586621679269976"><span class="annot"><span class="annottext">isInTextRange :: Text -&gt; Bool
+</span><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInTextRange</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. UnicodeCharacter a =&gt; Text -&gt; Bool
+</span><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier hs-var">generateIsInTextRange'</span></a></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Data.Char.Dice.html#DieValue"><span class="hs-identifier hs-type">DieValue</span></a></span><span>
+</span><span id="line-92"></span></pre></body></html>

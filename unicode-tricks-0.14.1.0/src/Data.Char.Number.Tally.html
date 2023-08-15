@@ -1,0 +1,459 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="local-6989586621679288902"><span id="local-6989586621679288903"><span id="local-6989586621679288904"><span id="local-6989586621679288905"><span id="local-6989586621679288906"></span></span></span></span></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications #-}</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Module      : Data.Char.Number.Tally</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Description : A module to print Tally numerals.</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- This module aims to convert numbers to (Western) tally marks and vice versa.</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Number.Tally</span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Data types to represent tally marks</span></span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Tally.html#TallyLiteral"><span class="hs-identifier">TallyLiteral</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Number.Tally.html#I"><span class="hs-identifier">I</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Tally.html#V"><span class="hs-identifier">V</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Convert a number to 'TallyLiteral's</span></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Tally.html#toLiterals"><span class="hs-identifier">toLiterals</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Tally.html#toLiterals%27"><span class="hs-identifier">toLiterals'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Tally.html#tallyNumber"><span class="hs-identifier">tallyNumber</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Tally.html#tallyNumber%27"><span class="hs-identifier">tallyNumber'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier">UnicodeCharacter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier">fromUnicodeChar</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar%27"><span class="hs-identifier">fromUnicodeChar'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier">isInCharRange</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier">toUnicodeChar</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier">UnicodeText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier">isInTextRange</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier">generateIsInTextRange'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapFromEnum"><span class="hs-identifier">mapFromEnum</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapToEnum"><span class="hs-identifier">mapToEnum</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapToEnumSafe"><span class="hs-identifier">mapToEnumSafe</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">genericReplicate</span></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">pack</span></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitraryBoundedEnum</span></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span class="annot"><a href="Data.Char.Number.Tally.html#_tallyOffset"><span class="hs-identifier hs-type">_tallyOffset</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-36"></span><span id="_tallyOffset"><span class="annot"><span class="annottext">_tallyOffset :: Int
+</span><a href="Data.Char.Number.Tally.html#_tallyOffset"><span class="hs-identifier hs-var hs-var">_tallyOffset</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1d377</span></span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="annot"><span class="hs-comment">-- | A tally literal that is either a one (&#119671;), or five grouped together (&#119672;).</span></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">data</span><span> </span><span id="TallyLiteral"><span class="annot"><a href="Data.Char.Number.Tally.html#TallyLiteral"><span class="hs-identifier hs-var">TallyLiteral</span></a></span></span><span>
+</span><span id="line-40"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the tally numeral /one/: &#119671;.</span></span><span>
+</span><span id="line-41"></span><span>    </span><span id="I"><span class="annot"><a href="Data.Char.Number.Tally.html#I"><span class="hs-identifier hs-var">I</span></a></span></span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the tally numeral /five/: &#119672;.</span></span><span>
+</span><span id="line-43"></span><span>    </span><span id="V"><span class="annot"><a href="Data.Char.Number.Tally.html#V"><span class="hs-identifier hs-var">V</span></a></span></span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679288928"><span id="local-6989586621679288930"><span class="annot"><span class="annottext">TallyLiteral
+TallyLiteral -&gt; TallyLiteral -&gt; Bounded TallyLiteral
+forall a. a -&gt; a -&gt; Bounded a
+$cminBound :: TallyLiteral
+minBound :: TallyLiteral
+$cmaxBound :: TallyLiteral
+maxBound :: TallyLiteral
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288936"><span id="local-6989586621679288938"><span id="local-6989586621679288940"><span id="local-6989586621679288942"><span id="local-6989586621679288944"><span id="local-6989586621679288950"><span id="local-6989586621679288955"><span id="local-6989586621679288958"><span id="local-6989586621679288961"><span id="local-6989586621679288964"><span id="local-6989586621679288967"><span id="local-6989586621679288970"><span id="local-6989586621679288975"><span id="local-6989586621679288980"><span class="annot"><span class="annottext">Typeable TallyLiteral
+Typeable TallyLiteral
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; TallyLiteral -&gt; c TallyLiteral)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c TallyLiteral)
+-&gt; (TallyLiteral -&gt; Constr)
+-&gt; (TallyLiteral -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c TallyLiteral))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c TallyLiteral))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; TallyLiteral -&gt; TallyLiteral)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; TallyLiteral -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; TallyLiteral -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; TallyLiteral -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; TallyLiteral -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; TallyLiteral -&gt; m TallyLiteral)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; TallyLiteral -&gt; m TallyLiteral)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; TallyLiteral -&gt; m TallyLiteral)
+-&gt; Data TallyLiteral
+TallyLiteral -&gt; Constr
+TallyLiteral -&gt; DataType
+(forall b. Data b =&gt; b -&gt; b) -&gt; TallyLiteral -&gt; TallyLiteral
+forall a.
+Typeable a
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; TallyLiteral -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; TallyLiteral -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; TallyLiteral -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; TallyLiteral -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; TallyLiteral -&gt; m TallyLiteral
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; TallyLiteral -&gt; m TallyLiteral
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c TallyLiteral
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; TallyLiteral -&gt; c TallyLiteral
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c TallyLiteral)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c TallyLiteral)
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; TallyLiteral -&gt; c TallyLiteral
+gfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; TallyLiteral -&gt; c TallyLiteral
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c TallyLiteral
+gunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c TallyLiteral
+$ctoConstr :: TallyLiteral -&gt; Constr
+toConstr :: TallyLiteral -&gt; Constr
+$cdataTypeOf :: TallyLiteral -&gt; DataType
+dataTypeOf :: TallyLiteral -&gt; DataType
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c TallyLiteral)
+dataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c TallyLiteral)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c TallyLiteral)
+dataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c TallyLiteral)
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; TallyLiteral -&gt; TallyLiteral
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; TallyLiteral -&gt; TallyLiteral
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; TallyLiteral -&gt; r
+gmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; TallyLiteral -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; TallyLiteral -&gt; r
+gmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; TallyLiteral -&gt; r
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; TallyLiteral -&gt; [u]
+gmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; TallyLiteral -&gt; [u]
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; TallyLiteral -&gt; u
+gmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; TallyLiteral -&gt; u
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; TallyLiteral -&gt; m TallyLiteral
+gmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; TallyLiteral -&gt; m TallyLiteral
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; TallyLiteral -&gt; m TallyLiteral
+gmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; TallyLiteral -&gt; m TallyLiteral
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; TallyLiteral -&gt; m TallyLiteral
+gmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; TallyLiteral -&gt; m TallyLiteral
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679288986"><span id="local-6989586621679288994"><span id="local-6989586621679289000"><span id="local-6989586621679289010"><span id="local-6989586621679289012"><span id="local-6989586621679289016"><span id="local-6989586621679289020"><span id="local-6989586621679289024"><span class="annot"><span class="annottext">Int -&gt; TallyLiteral
+TallyLiteral -&gt; Int
+TallyLiteral -&gt; [TallyLiteral]
+TallyLiteral -&gt; TallyLiteral
+TallyLiteral -&gt; TallyLiteral -&gt; [TallyLiteral]
+TallyLiteral -&gt; TallyLiteral -&gt; TallyLiteral -&gt; [TallyLiteral]
+(TallyLiteral -&gt; TallyLiteral)
+-&gt; (TallyLiteral -&gt; TallyLiteral)
+-&gt; (Int -&gt; TallyLiteral)
+-&gt; (TallyLiteral -&gt; Int)
+-&gt; (TallyLiteral -&gt; [TallyLiteral])
+-&gt; (TallyLiteral -&gt; TallyLiteral -&gt; [TallyLiteral])
+-&gt; (TallyLiteral -&gt; TallyLiteral -&gt; [TallyLiteral])
+-&gt; (TallyLiteral -&gt; TallyLiteral -&gt; TallyLiteral -&gt; [TallyLiteral])
+-&gt; Enum TallyLiteral
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+$csucc :: TallyLiteral -&gt; TallyLiteral
+succ :: TallyLiteral -&gt; TallyLiteral
+$cpred :: TallyLiteral -&gt; TallyLiteral
+pred :: TallyLiteral -&gt; TallyLiteral
+$ctoEnum :: Int -&gt; TallyLiteral
+toEnum :: Int -&gt; TallyLiteral
+$cfromEnum :: TallyLiteral -&gt; Int
+fromEnum :: TallyLiteral -&gt; Int
+$cenumFrom :: TallyLiteral -&gt; [TallyLiteral]
+enumFrom :: TallyLiteral -&gt; [TallyLiteral]
+$cenumFromThen :: TallyLiteral -&gt; TallyLiteral -&gt; [TallyLiteral]
+enumFromThen :: TallyLiteral -&gt; TallyLiteral -&gt; [TallyLiteral]
+$cenumFromTo :: TallyLiteral -&gt; TallyLiteral -&gt; [TallyLiteral]
+enumFromTo :: TallyLiteral -&gt; TallyLiteral -&gt; [TallyLiteral]
+$cenumFromThenTo :: TallyLiteral -&gt; TallyLiteral -&gt; TallyLiteral -&gt; [TallyLiteral]
+enumFromThenTo :: TallyLiteral -&gt; TallyLiteral -&gt; TallyLiteral -&gt; [TallyLiteral]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679289028"><span id="local-6989586621679289030"><span class="annot"><span class="annottext">TallyLiteral -&gt; TallyLiteral -&gt; Bool
+(TallyLiteral -&gt; TallyLiteral -&gt; Bool)
+-&gt; (TallyLiteral -&gt; TallyLiteral -&gt; Bool) -&gt; Eq TallyLiteral
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: TallyLiteral -&gt; TallyLiteral -&gt; Bool
+== :: TallyLiteral -&gt; TallyLiteral -&gt; Bool
+$c/= :: TallyLiteral -&gt; TallyLiteral -&gt; Bool
+/= :: TallyLiteral -&gt; TallyLiteral -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679289035"><span id="local-6989586621679289037"><span class="annot"><span class="annottext">(forall x. TallyLiteral -&gt; Rep TallyLiteral x)
+-&gt; (forall x. Rep TallyLiteral x -&gt; TallyLiteral)
+-&gt; Generic TallyLiteral
+forall x. Rep TallyLiteral x -&gt; TallyLiteral
+forall x. TallyLiteral -&gt; Rep TallyLiteral x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cfrom :: forall x. TallyLiteral -&gt; Rep TallyLiteral x
+from :: forall x. TallyLiteral -&gt; Rep TallyLiteral x
+$cto :: forall x. Rep TallyLiteral x -&gt; TallyLiteral
+to :: forall x. Rep TallyLiteral x -&gt; TallyLiteral
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679289041"><span id="local-6989586621679289043"><span id="local-6989586621679289047"><span class="annot"><span class="annottext">Int -&gt; TallyLiteral -&gt; ShowS
+[TallyLiteral] -&gt; ShowS
+TallyLiteral -&gt; String
+(Int -&gt; TallyLiteral -&gt; ShowS)
+-&gt; (TallyLiteral -&gt; String)
+-&gt; ([TallyLiteral] -&gt; ShowS)
+-&gt; Show TallyLiteral
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; TallyLiteral -&gt; ShowS
+showsPrec :: Int -&gt; TallyLiteral -&gt; ShowS
+$cshow :: TallyLiteral -&gt; String
+show :: TallyLiteral -&gt; String
+$cshowList :: [TallyLiteral] -&gt; ShowS
+showList :: [TallyLiteral] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679289051"><span id="local-6989586621679289055"><span id="local-6989586621679289058"><span id="local-6989586621679289063"><span class="annot"><span class="annottext">ReadPrec [TallyLiteral]
+ReadPrec TallyLiteral
+Int -&gt; ReadS TallyLiteral
+ReadS [TallyLiteral]
+(Int -&gt; ReadS TallyLiteral)
+-&gt; ReadS [TallyLiteral]
+-&gt; ReadPrec TallyLiteral
+-&gt; ReadPrec [TallyLiteral]
+-&gt; Read TallyLiteral
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+$creadsPrec :: Int -&gt; ReadS TallyLiteral
+readsPrec :: Int -&gt; ReadS TallyLiteral
+$creadList :: ReadS [TallyLiteral]
+readList :: ReadS [TallyLiteral]
+$creadPrec :: ReadPrec TallyLiteral
+readPrec :: ReadPrec TallyLiteral
+$creadListPrec :: ReadPrec [TallyLiteral]
+readListPrec :: ReadPrec [TallyLiteral]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679289068"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Number.Tally.html#TallyLiteral"><span class="hs-identifier hs-type">TallyLiteral</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-47"></span><span>  </span><span id="local-6989586621679289074"><span class="annot"><span class="annottext">arbitrary :: Gen TallyLiteral
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen TallyLiteral
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier hs-type">UnicodeCharacter</span></a></span><span> </span><span class="annot"><a href="Data.Char.Number.Tally.html#TallyLiteral"><span class="hs-identifier hs-type">TallyLiteral</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-50"></span><span>  </span><span id="local-6989586621679289082"><span class="annot"><span class="annottext">toUnicodeChar :: TallyLiteral -&gt; Char
+</span><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; TallyLiteral -&gt; Char
+forall a. Enum a =&gt; Int -&gt; a -&gt; Char
+</span><a href="Data.Char.Core.html#mapFromEnum"><span class="hs-identifier hs-var">mapFromEnum</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Number.Tally.html#_tallyOffset"><span class="hs-identifier hs-var">_tallyOffset</span></a></span><span>
+</span><span id="line-51"></span><span>  </span><span id="local-6989586621679289085"><span class="annot"><span class="annottext">fromUnicodeChar :: Char -&gt; Maybe TallyLiteral
+</span><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Maybe TallyLiteral
+forall a. (Bounded a, Enum a) =&gt; Int -&gt; Char -&gt; Maybe a
+</span><a href="Data.Char.Core.html#mapToEnumSafe"><span class="hs-identifier hs-var">mapToEnumSafe</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Number.Tally.html#_tallyOffset"><span class="hs-identifier hs-var">_tallyOffset</span></a></span><span>
+</span><span id="line-52"></span><span>  </span><span id="local-6989586621679289087"><span class="annot"><span class="annottext">fromUnicodeChar' :: Char -&gt; TallyLiteral
+</span><a href="Data.Char.Core.html#fromUnicodeChar%27"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; TallyLiteral
+forall a. Enum a =&gt; Int -&gt; Char -&gt; a
+</span><a href="Data.Char.Core.html#mapToEnum"><span class="hs-identifier hs-var">mapToEnum</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Number.Tally.html#_tallyOffset"><span class="hs-identifier hs-var">_tallyOffset</span></a></span><span>
+</span><span id="line-53"></span><span>  </span><span id="local-6989586621679289091"><span class="annot"><span class="annottext">isInCharRange :: Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInCharRange</span></a></span></span><span> </span><span id="local-6989586621679289092"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679289092"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1d377'</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679289092"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679289092"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1d378'</span></span><span>
+</span><span id="line-54"></span><span>
+</span><span id="line-55"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679289096"><span id="local-6989586621679289101"><span id="local-6989586621679289105"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Number.Tally.html#TallyLiteral"><span class="hs-identifier hs-type">TallyLiteral</span></a></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-56"></span><span>  </span><span id="local-6989586621679289110"><span class="annot"><span class="annottext">isInTextRange :: Text -&gt; Bool
+</span><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInTextRange</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. UnicodeCharacter a =&gt; Text -&gt; Bool
+</span><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier hs-var">generateIsInTextRange'</span></a></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Data.Char.Number.Tally.html#TallyLiteral"><span class="hs-identifier hs-type">TallyLiteral</span></a></span><span>
+</span><span id="line-57"></span><span>
+</span><span id="line-58"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679289114"><span id="local-6989586621679289121"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Number.Tally.html#TallyLiteral"><span class="hs-identifier hs-type">TallyLiteral</span></a></span></span></span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679289133"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Number.Tally.html#TallyLiteral"><span class="hs-identifier hs-type">TallyLiteral</span></a></span></span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span class="annot"><span class="hs-comment">-- | Convert a given /positive/ natural number to a sequence of 'TallyLiteral's.</span></span><span>
+</span><span id="line-63"></span><span id="local-6989586621679288861"><span class="annot"><a href="Data.Char.Number.Tally.html#toLiterals"><span class="hs-identifier hs-type">toLiterals</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-64"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679288861"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-65"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-66"></span><span>  </span><span class="annot"><a href="#local-6989586621679288861"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-67"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A list of 'TallyLiteral's if the given number can be specified with tally marks, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-68"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Data.Char.Number.Tally.html#TallyLiteral"><span class="hs-identifier hs-type">TallyLiteral</span></a></span><span class="hs-special">]</span></span><span>
+</span><span id="line-69"></span><span id="toLiterals"><span class="annot"><span class="annottext">toLiterals :: forall i. Integral i =&gt; i -&gt; Maybe [TallyLiteral]
+</span><a href="Data.Char.Number.Tally.html#toLiterals"><span class="hs-identifier hs-var hs-var">toLiterals</span></a></span></span><span> </span><span id="local-6989586621679289157"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679289157"><span class="hs-identifier hs-var">k</span></a></span></span><span>
+</span><span id="line-70"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679289157"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[TallyLiteral] -&gt; Maybe [TallyLiteral]
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; [TallyLiteral]
+forall i. Integral i =&gt; i -&gt; [TallyLiteral]
+</span><a href="Data.Char.Number.Tally.html#toLiterals%27"><span class="hs-identifier hs-var">toLiterals'</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679289157"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-71"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe [TallyLiteral]
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-72"></span><span>
+</span><span id="line-73"></span><span class="annot"><span class="hs-comment">-- | Convert a given number to a sequence of 'TallyLiteral's, for negative numbers or zero, the behavior is unspecified.</span></span><span>
+</span><span id="line-74"></span><span id="local-6989586621679288866"><span class="annot"><a href="Data.Char.Number.Tally.html#toLiterals%27"><span class="hs-identifier hs-type">toLiterals'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-75"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679288866"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-76"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-77"></span><span>  </span><span class="annot"><a href="#local-6989586621679288866"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-78"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A list of 'TallyLiteral's that denotes the given number.</span></span><span>
+</span><span id="line-79"></span><span>  </span><span class="hs-special">[</span><span class="annot"><a href="Data.Char.Number.Tally.html#TallyLiteral"><span class="hs-identifier hs-type">TallyLiteral</span></a></span><span class="hs-special">]</span></span><span>
+</span><span id="line-80"></span><span id="toLiterals%27"><span class="annot"><span class="annottext">toLiterals' :: forall i. Integral i =&gt; i -&gt; [TallyLiteral]
+</span><a href="Data.Char.Number.Tally.html#toLiterals%27"><span class="hs-identifier hs-var hs-var">toLiterals'</span></a></span></span><span> </span><span id="local-6989586621679289169"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679289169"><span class="hs-identifier hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; TallyLiteral -&gt; [TallyLiteral]
+forall i a. Integral i =&gt; i -&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">genericReplicate</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679289170"><span class="hs-identifier hs-var">k0</span></a></span><span> </span><span class="annot"><span class="annottext">TallyLiteral
+</span><a href="Data.Char.Number.Tally.html#V"><span class="hs-identifier hs-var">V</span></a></span><span> </span><span class="annot"><span class="annottext">[TallyLiteral] -&gt; [TallyLiteral] -&gt; [TallyLiteral]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">i -&gt; TallyLiteral -&gt; [TallyLiteral]
+forall i a. Integral i =&gt; i -&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">genericReplicate</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679289171"><span class="hs-identifier hs-var">k1</span></a></span><span> </span><span class="annot"><span class="annottext">TallyLiteral
+</span><a href="Data.Char.Number.Tally.html#I"><span class="hs-identifier hs-var">I</span></a></span><span>
+</span><span id="line-81"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-82"></span><span>    </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span id="local-6989586621679289170"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679289170"><span class="hs-identifier hs-var">k0</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679289171"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679289171"><span class="hs-identifier hs-var">k1</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679289169"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; (i, i)
+forall a. Integral a =&gt; a -&gt; a -&gt; (a, a)
+</span><span class="hs-operator hs-var">`divMod`</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">5</span></span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="annot"><span class="hs-comment">-- | Convert a given /positive/ natural number to a 'Text' object with the tally marks for that number.</span></span><span>
+</span><span id="line-85"></span><span id="local-6989586621679288871"><span class="annot"><a href="Data.Char.Number.Tally.html#tallyNumber"><span class="hs-identifier hs-type">tallyNumber</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-86"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679288871"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-87"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-88"></span><span>  </span><span class="annot"><a href="#local-6989586621679288871"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-89"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'Text' with the tally marks wrapped in a 'Just' if the number can be represented with tally marks; 'Nothing' otherwise.</span></span><span>
+</span><span id="line-90"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-91"></span><span id="tallyNumber"><span class="annot"><span class="annottext">tallyNumber :: forall i. Integral i =&gt; i -&gt; Maybe Text
+</span><a href="Data.Char.Number.Tally.html#tallyNumber"><span class="hs-identifier hs-var hs-var">tallyNumber</span></a></span></span><span> </span><span id="local-6989586621679289187"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679289187"><span class="hs-identifier hs-var">k</span></a></span></span><span>
+</span><span id="line-92"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679289187"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe Text
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; Text
+forall i. Integral i =&gt; i -&gt; Text
+</span><a href="Data.Char.Number.Tally.html#tallyNumber%27"><span class="hs-identifier hs-var">tallyNumber'</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679289187"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-93"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Text
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-94"></span><span>
+</span><span id="line-95"></span><span class="annot"><span class="hs-comment">-- | Convert a given number to a 'Text' object with the tally marks for that number, for negative numbers or zero, the behavior is unspecified.</span></span><span>
+</span><span id="line-96"></span><span id="local-6989586621679288873"><span class="annot"><a href="Data.Char.Number.Tally.html#tallyNumber%27"><span class="hs-identifier hs-type">tallyNumber'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-97"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679288873"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-98"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-99"></span><span>  </span><span class="annot"><a href="#local-6989586621679288873"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-100"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Text' that contains the number as /tally marks/.</span></span><span>
+</span><span id="line-101"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-102"></span><span id="tallyNumber%27"><span class="annot"><span class="annottext">tallyNumber' :: forall i. Integral i =&gt; i -&gt; Text
+</span><a href="Data.Char.Number.Tally.html#tallyNumber%27"><span class="hs-identifier hs-var hs-var">tallyNumber'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
+</span><span class="hs-identifier hs-var">pack</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Text) -&gt; (i -&gt; String) -&gt; i -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(TallyLiteral -&gt; Char) -&gt; [TallyLiteral] -&gt; String
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">TallyLiteral -&gt; Char
+forall a. UnicodeCharacter a =&gt; a -&gt; Char
+</span><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">([TallyLiteral] -&gt; String) -&gt; (i -&gt; [TallyLiteral]) -&gt; i -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">i -&gt; [TallyLiteral]
+forall i. Integral i =&gt; i -&gt; [TallyLiteral]
+</span><a href="Data.Char.Number.Tally.html#toLiterals%27"><span class="hs-identifier hs-var">toLiterals'</span></a></span><span>
+</span><span id="line-103"></span></pre></body></html>

@@ -1,0 +1,1093 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="local-6989586621679279743"><span id="local-6989586621679279744"><span id="local-6989586621679279745"><span id="local-6989586621679279746"><span id="local-6989586621679279747"><span id="local-6989586621679279748"><span id="local-6989586621679279749"><span id="local-6989586621679279750"><span id="local-6989586621679279751"><span id="local-6989586621679279752"><span id="local-6989586621679279753"><span id="local-6989586621679279754"><span id="local-6989586621679279755"><span id="local-6989586621679279756"><span id="local-6989586621679279757"><span id="local-6989586621679279758"><span id="local-6989586621679279759"><span id="local-6989586621679279760"><span id="local-6989586621679279761"><span id="local-6989586621679279762"><span id="local-6989586621679279763"><span id="local-6989586621679279764"><span id="local-6989586621679279765"><span id="local-6989586621679279766"></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE PatternSynonyms #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications #-}</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Module      : Data.Char.Emoji.Hand</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Description : A module that provides Emojis about hands and fingers.</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-14"></span><span class="hs-comment">--</span><span>
+</span><span id="line-15"></span><span class="hs-comment">-- Unicode has emoji's for hands. In this module we make it more convenient</span><span>
+</span><span id="line-16"></span><span class="hs-comment">-- to render hand gestures with a specific skin color.</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Emoji.Hand</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SingleCharHandGesture"><span class="hs-identifier">SingleCharHandGesture</span></a></span><span>
+</span><span id="line-19"></span><span>      </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#WavingHand"><span class="hs-identifier">WavingHand</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>        </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#RaisedBackOfHand"><span class="hs-identifier">RaisedBackOfHand</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>        </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#RaisedHand"><span class="hs-identifier">RaisedHand</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>        </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#VulcanSalute"><span class="hs-identifier">VulcanSalute</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-23"></span><span>        </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#OkHandSign"><span class="hs-identifier">OkHandSign</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>        </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#PinchedFingers"><span class="hs-identifier">PinchedFingers</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>        </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#PinchingHand"><span class="hs-identifier">PinchingHand</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-26"></span><span>        </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#CrossedFingers"><span class="hs-identifier">CrossedFingers</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-27"></span><span>        </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#LoveYouGesture"><span class="hs-identifier">LoveYouGesture</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-28"></span><span>        </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SignOfTheHorns"><span class="hs-identifier">SignOfTheHorns</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-29"></span><span>        </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#CallMeHand"><span class="hs-identifier">CallMeHand</span></a></span><span>
+</span><span id="line-30"></span><span>      </span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-31"></span><span>    </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#MultiCharHandGesture"><span class="hs-identifier">MultiCharHandGesture</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-32"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#FingersCrossed"><span class="hs-identifier">FingersCrossed</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-33"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SpockHand"><span class="hs-identifier">SpockHand</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-34"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#HornsSign"><span class="hs-identifier">HornsSign</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier">UnicodeCharacter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier">fromUnicodeChar</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier">isInCharRange</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier">toUnicodeChar</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier">UnicodeText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier">fromUnicodeText</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier">isInTextRange</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier">toUnicodeText</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier">generateIsInTextRange'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Emoji.SkinColor.html"><span class="hs-identifier">Data.Char.Emoji.SkinColor</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Emoji.SkinColor.html#WithSkinColorModifierUnicodeText"><span class="hs-identifier">WithSkinColorModifierUnicodeText</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitraryBoundedEnum</span></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span class="annot"><span class="hs-comment">-- | A datatype that constructs /hand gestures/ that correspond with a /single/ 'Char'acter.</span></span><span>
+</span><span id="line-47"></span><span class="hs-keyword">data</span><span> </span><span id="SingleCharHandGesture"><span class="annot"><a href="Data.Char.Emoji.Hand.html#SingleCharHandGesture"><span class="hs-identifier hs-var">SingleCharHandGesture</span></a></span></span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-comment">-- | A waving hand, this is denoted with &#128075;.</span></span><span>
+</span><span id="line-49"></span><span>    </span><span id="WavingHand"><span class="annot"><a href="Data.Char.Emoji.Hand.html#WavingHand"><span class="hs-identifier hs-var">WavingHand</span></a></span></span><span>
+</span><span id="line-50"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The raised back of a hand, this is denoted with &#129306;.</span></span><span>
+</span><span id="line-51"></span><span>    </span><span id="RaisedBackOfHand"><span class="annot"><a href="Data.Char.Emoji.Hand.html#RaisedBackOfHand"><span class="hs-identifier hs-var">RaisedBackOfHand</span></a></span></span><span>
+</span><span id="line-52"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | A raised hand, this is denoted with &#9995;.</span></span><span>
+</span><span id="line-53"></span><span>    </span><span id="RaisedHand"><span class="annot"><a href="Data.Char.Emoji.Hand.html#RaisedHand"><span class="hs-identifier hs-var">RaisedHand</span></a></span></span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /Vulcan/ salute, this is denoted with &#128406;.</span></span><span>
+</span><span id="line-55"></span><span>    </span><span id="VulcanSalute"><span class="annot"><a href="Data.Char.Emoji.Hand.html#VulcanSalute"><span class="hs-identifier hs-var">VulcanSalute</span></a></span></span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The okay hand sign, this is denoted with &#128076;.</span></span><span>
+</span><span id="line-57"></span><span>    </span><span id="OkHandSign"><span class="annot"><a href="Data.Char.Emoji.Hand.html#OkHandSign"><span class="hs-identifier hs-var">OkHandSign</span></a></span></span><span>
+</span><span id="line-58"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- |  The /pinched fingers/ gesture, this is denoted with &#129292;.</span></span><span>
+</span><span id="line-59"></span><span>    </span><span id="PinchedFingers"><span class="annot"><a href="Data.Char.Emoji.Hand.html#PinchedFingers"><span class="hs-identifier hs-var">PinchedFingers</span></a></span></span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /pinching hand/ gesture, this is denoted with &#129295;.</span></span><span>
+</span><span id="line-61"></span><span>    </span><span id="PinchingHand"><span class="annot"><a href="Data.Char.Emoji.Hand.html#PinchingHand"><span class="hs-identifier hs-var">PinchingHand</span></a></span></span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /crossed fingers/ gesture, this is denoted with &#129310;.</span></span><span>
+</span><span id="line-63"></span><span>    </span><span id="CrossedFingers"><span class="annot"><a href="Data.Char.Emoji.Hand.html#CrossedFingers"><span class="hs-identifier hs-var">CrossedFingers</span></a></span></span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /love you/ gesture, this is denoted with &#129311;.</span></span><span>
+</span><span id="line-65"></span><span>    </span><span id="LoveYouGesture"><span class="annot"><a href="Data.Char.Emoji.Hand.html#LoveYouGesture"><span class="hs-identifier hs-var">LoveYouGesture</span></a></span></span><span>
+</span><span id="line-66"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The sign of the horns, this is denoted with &#129304;.</span></span><span>
+</span><span id="line-67"></span><span>    </span><span id="SignOfTheHorns"><span class="annot"><a href="Data.Char.Emoji.Hand.html#SignOfTheHorns"><span class="hs-identifier hs-var">SignOfTheHorns</span></a></span></span><span>
+</span><span id="line-68"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /call me/ hand sign, this is denoted with &#129305;.</span></span><span>
+</span><span id="line-69"></span><span>    </span><span id="CallMeHand"><span class="annot"><a href="Data.Char.Emoji.Hand.html#CallMeHand"><span class="hs-identifier hs-var">CallMeHand</span></a></span></span><span>
+</span><span id="line-70"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | A middle finger pointing up, this is denoted with &#128405;.</span></span><span>
+</span><span id="line-71"></span><span>    </span><span id="MiddleFinger"><span class="annot"><a href="Data.Char.Emoji.Hand.html#MiddleFinger"><span class="hs-identifier hs-var">MiddleFinger</span></a></span></span><span>
+</span><span id="line-72"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | An emoji where the thumb is pointing upwards, this is denoted with &#128077;.</span></span><span>
+</span><span id="line-73"></span><span>    </span><span id="ThumbsUp"><span class="annot"><a href="Data.Char.Emoji.Hand.html#ThumbsUp"><span class="hs-identifier hs-var">ThumbsUp</span></a></span></span><span>
+</span><span id="line-74"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | An emoji where the thumb is pointing downwards, this is denoted with &#128078;.</span></span><span>
+</span><span id="line-75"></span><span>    </span><span id="ThumbsDown"><span class="annot"><a href="Data.Char.Emoji.Hand.html#ThumbsDown"><span class="hs-identifier hs-var">ThumbsDown</span></a></span></span><span>
+</span><span id="line-76"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | An emoji where the fist is rased, this is denoted with &#9994;.</span></span><span>
+</span><span id="line-77"></span><span>    </span><span id="RaisedFist"><span class="annot"><a href="Data.Char.Emoji.Hand.html#RaisedFist"><span class="hs-identifier hs-var">RaisedFist</span></a></span></span><span>
+</span><span id="line-78"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | An emoji of a fisted hand, this is denoted with &#128074;.</span></span><span>
+</span><span id="line-79"></span><span>    </span><span id="FistedHand"><span class="annot"><a href="Data.Char.Emoji.Hand.html#FistedHand"><span class="hs-identifier hs-var">FistedHand</span></a></span></span><span>
+</span><span id="line-80"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679279796"><span id="local-6989586621679279798"><span class="annot"><span class="annottext">SingleCharHandGesture
+SingleCharHandGesture
+-&gt; SingleCharHandGesture -&gt; Bounded SingleCharHandGesture
+forall a. a -&gt; a -&gt; Bounded a
+$cminBound :: SingleCharHandGesture
+minBound :: SingleCharHandGesture
+$cmaxBound :: SingleCharHandGesture
+maxBound :: SingleCharHandGesture
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679279804"><span id="local-6989586621679279806"><span id="local-6989586621679279808"><span id="local-6989586621679279810"><span id="local-6989586621679279812"><span id="local-6989586621679279818"><span id="local-6989586621679279823"><span id="local-6989586621679279826"><span id="local-6989586621679279829"><span id="local-6989586621679279832"><span id="local-6989586621679279835"><span id="local-6989586621679279838"><span id="local-6989586621679279843"><span id="local-6989586621679279848"><span class="annot"><span class="annottext">Typeable SingleCharHandGesture
+Typeable SingleCharHandGesture
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g)
+    -&gt; SingleCharHandGesture
+    -&gt; c SingleCharHandGesture)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c SingleCharHandGesture)
+-&gt; (SingleCharHandGesture -&gt; Constr)
+-&gt; (SingleCharHandGesture -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c SingleCharHandGesture))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c SingleCharHandGesture))
+-&gt; ((forall b. Data b =&gt; b -&gt; b)
+    -&gt; SingleCharHandGesture -&gt; SingleCharHandGesture)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r
+    -&gt; (forall d. Data d =&gt; d -&gt; r')
+    -&gt; SingleCharHandGesture
+    -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r
+    -&gt; (forall d. Data d =&gt; d -&gt; r')
+    -&gt; SingleCharHandGesture
+    -&gt; r)
+-&gt; (forall u.
+    (forall d. Data d =&gt; d -&gt; u) -&gt; SingleCharHandGesture -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; SingleCharHandGesture -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; SingleCharHandGesture -&gt; m SingleCharHandGesture)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; SingleCharHandGesture -&gt; m SingleCharHandGesture)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; SingleCharHandGesture -&gt; m SingleCharHandGesture)
+-&gt; Data SingleCharHandGesture
+SingleCharHandGesture -&gt; Constr
+SingleCharHandGesture -&gt; DataType
+(forall b. Data b =&gt; b -&gt; b)
+-&gt; SingleCharHandGesture -&gt; SingleCharHandGesture
+forall a.
+Typeable a
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u.
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; SingleCharHandGesture -&gt; u
+forall u.
+(forall d. Data d =&gt; d -&gt; u) -&gt; SingleCharHandGesture -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; SingleCharHandGesture -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; SingleCharHandGesture -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; SingleCharHandGesture -&gt; m SingleCharHandGesture
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; SingleCharHandGesture -&gt; m SingleCharHandGesture
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c SingleCharHandGesture
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g)
+-&gt; SingleCharHandGesture
+-&gt; c SingleCharHandGesture
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c SingleCharHandGesture)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c SingleCharHandGesture)
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g)
+-&gt; SingleCharHandGesture
+-&gt; c SingleCharHandGesture
+gfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g)
+-&gt; SingleCharHandGesture
+-&gt; c SingleCharHandGesture
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c SingleCharHandGesture
+gunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c SingleCharHandGesture
+$ctoConstr :: SingleCharHandGesture -&gt; Constr
+toConstr :: SingleCharHandGesture -&gt; Constr
+$cdataTypeOf :: SingleCharHandGesture -&gt; DataType
+dataTypeOf :: SingleCharHandGesture -&gt; DataType
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c SingleCharHandGesture)
+dataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c SingleCharHandGesture)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c SingleCharHandGesture)
+dataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c SingleCharHandGesture)
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b)
+-&gt; SingleCharHandGesture -&gt; SingleCharHandGesture
+gmapT :: (forall b. Data b =&gt; b -&gt; b)
+-&gt; SingleCharHandGesture -&gt; SingleCharHandGesture
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; SingleCharHandGesture -&gt; r
+gmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; SingleCharHandGesture -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; SingleCharHandGesture -&gt; r
+gmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; SingleCharHandGesture -&gt; r
+$cgmapQ :: forall u.
+(forall d. Data d =&gt; d -&gt; u) -&gt; SingleCharHandGesture -&gt; [u]
+gmapQ :: forall u.
+(forall d. Data d =&gt; d -&gt; u) -&gt; SingleCharHandGesture -&gt; [u]
+$cgmapQi :: forall u.
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; SingleCharHandGesture -&gt; u
+gmapQi :: forall u.
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; SingleCharHandGesture -&gt; u
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; SingleCharHandGesture -&gt; m SingleCharHandGesture
+gmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; SingleCharHandGesture -&gt; m SingleCharHandGesture
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; SingleCharHandGesture -&gt; m SingleCharHandGesture
+gmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; SingleCharHandGesture -&gt; m SingleCharHandGesture
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; SingleCharHandGesture -&gt; m SingleCharHandGesture
+gmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; SingleCharHandGesture -&gt; m SingleCharHandGesture
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679279854"><span id="local-6989586621679279862"><span id="local-6989586621679279868"><span id="local-6989586621679279882"><span id="local-6989586621679279884"><span id="local-6989586621679279888"><span id="local-6989586621679279892"><span id="local-6989586621679279896"><span class="annot"><span class="annottext">Int -&gt; SingleCharHandGesture
+SingleCharHandGesture -&gt; Int
+SingleCharHandGesture -&gt; [SingleCharHandGesture]
+SingleCharHandGesture -&gt; SingleCharHandGesture
+SingleCharHandGesture
+-&gt; SingleCharHandGesture -&gt; [SingleCharHandGesture]
+SingleCharHandGesture
+-&gt; SingleCharHandGesture
+-&gt; SingleCharHandGesture
+-&gt; [SingleCharHandGesture]
+(SingleCharHandGesture -&gt; SingleCharHandGesture)
+-&gt; (SingleCharHandGesture -&gt; SingleCharHandGesture)
+-&gt; (Int -&gt; SingleCharHandGesture)
+-&gt; (SingleCharHandGesture -&gt; Int)
+-&gt; (SingleCharHandGesture -&gt; [SingleCharHandGesture])
+-&gt; (SingleCharHandGesture
+    -&gt; SingleCharHandGesture -&gt; [SingleCharHandGesture])
+-&gt; (SingleCharHandGesture
+    -&gt; SingleCharHandGesture -&gt; [SingleCharHandGesture])
+-&gt; (SingleCharHandGesture
+    -&gt; SingleCharHandGesture
+    -&gt; SingleCharHandGesture
+    -&gt; [SingleCharHandGesture])
+-&gt; Enum SingleCharHandGesture
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+$csucc :: SingleCharHandGesture -&gt; SingleCharHandGesture
+succ :: SingleCharHandGesture -&gt; SingleCharHandGesture
+$cpred :: SingleCharHandGesture -&gt; SingleCharHandGesture
+pred :: SingleCharHandGesture -&gt; SingleCharHandGesture
+$ctoEnum :: Int -&gt; SingleCharHandGesture
+toEnum :: Int -&gt; SingleCharHandGesture
+$cfromEnum :: SingleCharHandGesture -&gt; Int
+fromEnum :: SingleCharHandGesture -&gt; Int
+$cenumFrom :: SingleCharHandGesture -&gt; [SingleCharHandGesture]
+enumFrom :: SingleCharHandGesture -&gt; [SingleCharHandGesture]
+$cenumFromThen :: SingleCharHandGesture
+-&gt; SingleCharHandGesture -&gt; [SingleCharHandGesture]
+enumFromThen :: SingleCharHandGesture
+-&gt; SingleCharHandGesture -&gt; [SingleCharHandGesture]
+$cenumFromTo :: SingleCharHandGesture
+-&gt; SingleCharHandGesture -&gt; [SingleCharHandGesture]
+enumFromTo :: SingleCharHandGesture
+-&gt; SingleCharHandGesture -&gt; [SingleCharHandGesture]
+$cenumFromThenTo :: SingleCharHandGesture
+-&gt; SingleCharHandGesture
+-&gt; SingleCharHandGesture
+-&gt; [SingleCharHandGesture]
+enumFromThenTo :: SingleCharHandGesture
+-&gt; SingleCharHandGesture
+-&gt; SingleCharHandGesture
+-&gt; [SingleCharHandGesture]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679279900"><span id="local-6989586621679279902"><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool
+(SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool)
+-&gt; (SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool)
+-&gt; Eq SingleCharHandGesture
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool
+== :: SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool
+$c/= :: SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool
+/= :: SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679279907"><span id="local-6989586621679279909"><span class="annot"><span class="annottext">(forall x. SingleCharHandGesture -&gt; Rep SingleCharHandGesture x)
+-&gt; (forall x. Rep SingleCharHandGesture x -&gt; SingleCharHandGesture)
+-&gt; Generic SingleCharHandGesture
+forall x. Rep SingleCharHandGesture x -&gt; SingleCharHandGesture
+forall x. SingleCharHandGesture -&gt; Rep SingleCharHandGesture x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cfrom :: forall x. SingleCharHandGesture -&gt; Rep SingleCharHandGesture x
+from :: forall x. SingleCharHandGesture -&gt; Rep SingleCharHandGesture x
+$cto :: forall x. Rep SingleCharHandGesture x -&gt; SingleCharHandGesture
+to :: forall x. Rep SingleCharHandGesture x -&gt; SingleCharHandGesture
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679279915"><span id="local-6989586621679279917"><span id="local-6989586621679279919"><span id="local-6989586621679279923"><span id="local-6989586621679279926"><span id="local-6989586621679279929"><span id="local-6989586621679279932"><span class="annot"><span class="annottext">Eq SingleCharHandGesture
+Eq SingleCharHandGesture
+-&gt; (SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Ordering)
+-&gt; (SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool)
+-&gt; (SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool)
+-&gt; (SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool)
+-&gt; (SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool)
+-&gt; (SingleCharHandGesture
+    -&gt; SingleCharHandGesture -&gt; SingleCharHandGesture)
+-&gt; (SingleCharHandGesture
+    -&gt; SingleCharHandGesture -&gt; SingleCharHandGesture)
+-&gt; Ord SingleCharHandGesture
+SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool
+SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Ordering
+SingleCharHandGesture
+-&gt; SingleCharHandGesture -&gt; SingleCharHandGesture
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Ordering
+compare :: SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Ordering
+$c&lt; :: SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool
+&lt; :: SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool
+$c&lt;= :: SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool
+&lt;= :: SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool
+$c&gt; :: SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool
+&gt; :: SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool
+$c&gt;= :: SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool
+&gt;= :: SingleCharHandGesture -&gt; SingleCharHandGesture -&gt; Bool
+$cmax :: SingleCharHandGesture
+-&gt; SingleCharHandGesture -&gt; SingleCharHandGesture
+max :: SingleCharHandGesture
+-&gt; SingleCharHandGesture -&gt; SingleCharHandGesture
+$cmin :: SingleCharHandGesture
+-&gt; SingleCharHandGesture -&gt; SingleCharHandGesture
+min :: SingleCharHandGesture
+-&gt; SingleCharHandGesture -&gt; SingleCharHandGesture
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679279936"><span id="local-6989586621679279940"><span id="local-6989586621679279943"><span id="local-6989586621679279962"><span class="annot"><span class="annottext">ReadPrec [SingleCharHandGesture]
+ReadPrec SingleCharHandGesture
+Int -&gt; ReadS SingleCharHandGesture
+ReadS [SingleCharHandGesture]
+(Int -&gt; ReadS SingleCharHandGesture)
+-&gt; ReadS [SingleCharHandGesture]
+-&gt; ReadPrec SingleCharHandGesture
+-&gt; ReadPrec [SingleCharHandGesture]
+-&gt; Read SingleCharHandGesture
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+$creadsPrec :: Int -&gt; ReadS SingleCharHandGesture
+readsPrec :: Int -&gt; ReadS SingleCharHandGesture
+$creadList :: ReadS [SingleCharHandGesture]
+readList :: ReadS [SingleCharHandGesture]
+$creadPrec :: ReadPrec SingleCharHandGesture
+readPrec :: ReadPrec SingleCharHandGesture
+$creadListPrec :: ReadPrec [SingleCharHandGesture]
+readListPrec :: ReadPrec [SingleCharHandGesture]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679279966"><span id="local-6989586621679279968"><span id="local-6989586621679279972"><span class="annot"><span class="annottext">Int -&gt; SingleCharHandGesture -&gt; ShowS
+[SingleCharHandGesture] -&gt; ShowS
+SingleCharHandGesture -&gt; [Char]
+(Int -&gt; SingleCharHandGesture -&gt; ShowS)
+-&gt; (SingleCharHandGesture -&gt; [Char])
+-&gt; ([SingleCharHandGesture] -&gt; ShowS)
+-&gt; Show SingleCharHandGesture
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; [Char]) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; SingleCharHandGesture -&gt; ShowS
+showsPrec :: Int -&gt; SingleCharHandGesture -&gt; ShowS
+$cshow :: SingleCharHandGesture -&gt; [Char]
+show :: SingleCharHandGesture -&gt; [Char]
+$cshowList :: [SingleCharHandGesture] -&gt; ShowS
+showList :: [SingleCharHandGesture] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679279977"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SingleCharHandGesture"><span class="hs-identifier hs-type">SingleCharHandGesture</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-83"></span><span>  </span><span id="local-6989586621679279983"><span class="annot"><span class="annottext">arbitrary :: Gen SingleCharHandGesture
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen SingleCharHandGesture
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679279987"><span id="local-6989586621679279994"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SingleCharHandGesture"><span class="hs-identifier hs-type">SingleCharHandGesture</span></a></span></span></span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679280035"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SingleCharHandGesture"><span class="hs-identifier hs-type">SingleCharHandGesture</span></a></span></span><span>
+</span><span id="line-88"></span><span>
+</span><span id="line-89"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679280080"><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier hs-type">UnicodeCharacter</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SingleCharHandGesture"><span class="hs-identifier hs-type">SingleCharHandGesture</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-90"></span><span>  </span><span id="local-6989586621679280085"><span class="annot"><span class="annottext">toUnicodeChar :: SingleCharHandGesture -&gt; Char
+</span><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeChar</span></a></span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#WavingHand"><span class="hs-identifier hs-var">WavingHand</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44b'</span></span><span>
+</span><span id="line-91"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#RaisedBackOfHand"><span class="hs-identifier hs-var">RaisedBackOfHand</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f91a'</span></span><span>
+</span><span id="line-92"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#RaisedHand"><span class="hs-identifier hs-var">RaisedHand</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x270b'</span></span><span>
+</span><span id="line-93"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#VulcanSalute"><span class="hs-identifier hs-var">VulcanSalute</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f596'</span></span><span>
+</span><span id="line-94"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#OkHandSign"><span class="hs-identifier hs-var">OkHandSign</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44c'</span></span><span>
+</span><span id="line-95"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#PinchedFingers"><span class="hs-identifier hs-var">PinchedFingers</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f90c'</span></span><span>
+</span><span id="line-96"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#PinchingHand"><span class="hs-identifier hs-var">PinchingHand</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f90f'</span></span><span>
+</span><span id="line-97"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#CrossedFingers"><span class="hs-identifier hs-var">CrossedFingers</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f91e'</span></span><span>
+</span><span id="line-98"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#LoveYouGesture"><span class="hs-identifier hs-var">LoveYouGesture</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f91f'</span></span><span>
+</span><span id="line-99"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#SignOfTheHorns"><span class="hs-identifier hs-var">SignOfTheHorns</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f918'</span></span><span>
+</span><span id="line-100"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#CallMeHand"><span class="hs-identifier hs-var">CallMeHand</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f919'</span></span><span>
+</span><span id="line-101"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#MiddleFinger"><span class="hs-identifier hs-var">MiddleFinger</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f595'</span></span><span>
+</span><span id="line-102"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#ThumbsUp"><span class="hs-identifier hs-var">ThumbsUp</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44d'</span></span><span>
+</span><span id="line-103"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#ThumbsDown"><span class="hs-identifier hs-var">ThumbsDown</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44e'</span></span><span>
+</span><span id="line-104"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#RaisedFist"><span class="hs-identifier hs-var">RaisedFist</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x270a'</span></span><span>
+</span><span id="line-105"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#FistedHand"><span class="hs-identifier hs-var">FistedHand</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44a'</span></span><span>
+</span><span id="line-106"></span><span>  </span><span id="local-6989586621679280086"><span class="annot"><span class="annottext">fromUnicodeChar :: Char -&gt; Maybe SingleCharHandGesture
+</span><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar</span></a></span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44b'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#WavingHand"><span class="hs-identifier hs-var">WavingHand</span></a></span><span>
+</span><span id="line-107"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f91a'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#RaisedBackOfHand"><span class="hs-identifier hs-var">RaisedBackOfHand</span></a></span><span>
+</span><span id="line-108"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x270b'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#RaisedHand"><span class="hs-identifier hs-var">RaisedHand</span></a></span><span>
+</span><span id="line-109"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f596'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#VulcanSalute"><span class="hs-identifier hs-var">VulcanSalute</span></a></span><span>
+</span><span id="line-110"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44c'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#OkHandSign"><span class="hs-identifier hs-var">OkHandSign</span></a></span><span>
+</span><span id="line-111"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f90c'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#PinchedFingers"><span class="hs-identifier hs-var">PinchedFingers</span></a></span><span>
+</span><span id="line-112"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f90f'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#PinchingHand"><span class="hs-identifier hs-var">PinchingHand</span></a></span><span>
+</span><span id="line-113"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f91e'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#CrossedFingers"><span class="hs-identifier hs-var">CrossedFingers</span></a></span><span>
+</span><span id="line-114"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f91f'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#LoveYouGesture"><span class="hs-identifier hs-var">LoveYouGesture</span></a></span><span>
+</span><span id="line-115"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f918'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#SignOfTheHorns"><span class="hs-identifier hs-var">SignOfTheHorns</span></a></span><span>
+</span><span id="line-116"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f919'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#CallMeHand"><span class="hs-identifier hs-var">CallMeHand</span></a></span><span>
+</span><span id="line-117"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f595'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#MiddleFinger"><span class="hs-identifier hs-var">MiddleFinger</span></a></span><span>
+</span><span id="line-118"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44d'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#ThumbsUp"><span class="hs-identifier hs-var">ThumbsUp</span></a></span><span>
+</span><span id="line-119"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44e'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#ThumbsDown"><span class="hs-identifier hs-var">ThumbsDown</span></a></span><span>
+</span><span id="line-120"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x270a'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#RaisedFist"><span class="hs-identifier hs-var">RaisedFist</span></a></span><span>
+</span><span id="line-121"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44a'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture -&gt; Maybe SingleCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#FistedHand"><span class="hs-identifier hs-var">FistedHand</span></a></span><span>
+</span><span id="line-122"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var">fromUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe SingleCharHandGesture
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-123"></span><span>  </span><span id="local-6989586621679280087"><span class="annot"><span class="annottext">isInCharRange :: Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInCharRange</span></a></span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44b'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-124"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f91a'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-125"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x270b'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-126"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f596'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-127"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44c'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-128"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f90c'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-129"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f90f'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-130"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f91e'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-131"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f91f'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-132"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f918'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-133"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f919'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-134"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f595'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-135"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44d'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-136"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44e'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-137"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x270a'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-138"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f44a'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-139"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var">isInCharRange</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-140"></span><span>
+</span><span id="line-141"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679280089"><span id="local-6989586621679280094"><span id="local-6989586621679280098"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SingleCharHandGesture"><span class="hs-identifier hs-type">SingleCharHandGesture</span></a></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-142"></span><span>  </span><span id="local-6989586621679280103"><span class="annot"><span class="annottext">isInTextRange :: Text -&gt; Bool
+</span><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInTextRange</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. UnicodeCharacter a =&gt; Text -&gt; Bool
+</span><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier hs-var">generateIsInTextRange'</span></a></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SingleCharHandGesture"><span class="hs-identifier hs-type">SingleCharHandGesture</span></a></span><span>
+</span><span id="line-143"></span><span>
+</span><span id="line-144"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679280107"><span id="local-6989586621679280111"><span id="local-6989586621679280114"><span class="annot"><a href="Data.Char.Emoji.SkinColor.html#WithSkinColorModifierUnicodeText"><span class="hs-identifier hs-type">WithSkinColorModifierUnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SingleCharHandGesture"><span class="hs-identifier hs-type">SingleCharHandGesture</span></a></span></span></span></span><span>
+</span><span id="line-145"></span><span>
+</span><span id="line-146"></span><span class="annot"><span class="hs-comment">-- | Emoji with hands that map on a /sequence/ of characters instead of one character.</span></span><span>
+</span><span id="line-147"></span><span class="hs-keyword">data</span><span> </span><span id="MultiCharHandGesture"><span class="annot"><a href="Data.Char.Emoji.Hand.html#MultiCharHandGesture"><span class="hs-identifier hs-var">MultiCharHandGesture</span></a></span></span><span>
+</span><span id="line-148"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-comment">-- | The raised hand with fingers splayed emoji, this is denoted as &#128400;&#65039;.</span></span><span>
+</span><span id="line-149"></span><span>    </span><span id="RaisedHandWithFingersSplayed"><span class="annot"><a href="Data.Char.Emoji.Hand.html#RaisedHandWithFingersSplayed"><span class="hs-identifier hs-var">RaisedHandWithFingersSplayed</span></a></span></span><span>
+</span><span id="line-150"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /victory hand/ emoji, this is denoted as &#9996;&#65039;.</span></span><span>
+</span><span id="line-151"></span><span>    </span><span id="VictoryHand"><span class="annot"><a href="Data.Char.Emoji.Hand.html#VictoryHand"><span class="hs-identifier hs-var">VictoryHand</span></a></span></span><span>
+</span><span id="line-152"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679280120"><span id="local-6989586621679280122"><span class="annot"><span class="annottext">MultiCharHandGesture
+MultiCharHandGesture
+-&gt; MultiCharHandGesture -&gt; Bounded MultiCharHandGesture
+forall a. a -&gt; a -&gt; Bounded a
+$cminBound :: MultiCharHandGesture
+minBound :: MultiCharHandGesture
+$cmaxBound :: MultiCharHandGesture
+maxBound :: MultiCharHandGesture
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280127"><span id="local-6989586621679280129"><span id="local-6989586621679280131"><span id="local-6989586621679280133"><span id="local-6989586621679280135"><span id="local-6989586621679280141"><span id="local-6989586621679280146"><span id="local-6989586621679280149"><span id="local-6989586621679280152"><span id="local-6989586621679280155"><span id="local-6989586621679280158"><span id="local-6989586621679280161"><span id="local-6989586621679280166"><span id="local-6989586621679280171"><span class="annot"><span class="annottext">Typeable MultiCharHandGesture
+Typeable MultiCharHandGesture
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g)
+    -&gt; MultiCharHandGesture
+    -&gt; c MultiCharHandGesture)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MultiCharHandGesture)
+-&gt; (MultiCharHandGesture -&gt; Constr)
+-&gt; (MultiCharHandGesture -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MultiCharHandGesture))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c MultiCharHandGesture))
+-&gt; ((forall b. Data b =&gt; b -&gt; b)
+    -&gt; MultiCharHandGesture -&gt; MultiCharHandGesture)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MultiCharHandGesture -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MultiCharHandGesture -&gt; r)
+-&gt; (forall u.
+    (forall d. Data d =&gt; d -&gt; u) -&gt; MultiCharHandGesture -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MultiCharHandGesture -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; MultiCharHandGesture -&gt; m MultiCharHandGesture)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; MultiCharHandGesture -&gt; m MultiCharHandGesture)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d)
+    -&gt; MultiCharHandGesture -&gt; m MultiCharHandGesture)
+-&gt; Data MultiCharHandGesture
+MultiCharHandGesture -&gt; Constr
+MultiCharHandGesture -&gt; DataType
+(forall b. Data b =&gt; b -&gt; b)
+-&gt; MultiCharHandGesture -&gt; MultiCharHandGesture
+forall a.
+Typeable a
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u.
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MultiCharHandGesture -&gt; u
+forall u.
+(forall d. Data d =&gt; d -&gt; u) -&gt; MultiCharHandGesture -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MultiCharHandGesture -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MultiCharHandGesture -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; MultiCharHandGesture -&gt; m MultiCharHandGesture
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; MultiCharHandGesture -&gt; m MultiCharHandGesture
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MultiCharHandGesture
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g)
+-&gt; MultiCharHandGesture
+-&gt; c MultiCharHandGesture
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MultiCharHandGesture)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c MultiCharHandGesture)
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g)
+-&gt; MultiCharHandGesture
+-&gt; c MultiCharHandGesture
+gfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g)
+-&gt; MultiCharHandGesture
+-&gt; c MultiCharHandGesture
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MultiCharHandGesture
+gunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MultiCharHandGesture
+$ctoConstr :: MultiCharHandGesture -&gt; Constr
+toConstr :: MultiCharHandGesture -&gt; Constr
+$cdataTypeOf :: MultiCharHandGesture -&gt; DataType
+dataTypeOf :: MultiCharHandGesture -&gt; DataType
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MultiCharHandGesture)
+dataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MultiCharHandGesture)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c MultiCharHandGesture)
+dataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c MultiCharHandGesture)
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b)
+-&gt; MultiCharHandGesture -&gt; MultiCharHandGesture
+gmapT :: (forall b. Data b =&gt; b -&gt; b)
+-&gt; MultiCharHandGesture -&gt; MultiCharHandGesture
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MultiCharHandGesture -&gt; r
+gmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MultiCharHandGesture -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MultiCharHandGesture -&gt; r
+gmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MultiCharHandGesture -&gt; r
+$cgmapQ :: forall u.
+(forall d. Data d =&gt; d -&gt; u) -&gt; MultiCharHandGesture -&gt; [u]
+gmapQ :: forall u.
+(forall d. Data d =&gt; d -&gt; u) -&gt; MultiCharHandGesture -&gt; [u]
+$cgmapQi :: forall u.
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MultiCharHandGesture -&gt; u
+gmapQi :: forall u.
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MultiCharHandGesture -&gt; u
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; MultiCharHandGesture -&gt; m MultiCharHandGesture
+gmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; MultiCharHandGesture -&gt; m MultiCharHandGesture
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; MultiCharHandGesture -&gt; m MultiCharHandGesture
+gmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; MultiCharHandGesture -&gt; m MultiCharHandGesture
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; MultiCharHandGesture -&gt; m MultiCharHandGesture
+gmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d)
+-&gt; MultiCharHandGesture -&gt; m MultiCharHandGesture
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280176"><span id="local-6989586621679280182"><span id="local-6989586621679280188"><span id="local-6989586621679280199"><span id="local-6989586621679280201"><span id="local-6989586621679280204"><span id="local-6989586621679280208"><span id="local-6989586621679280212"><span class="annot"><span class="annottext">Int -&gt; MultiCharHandGesture
+MultiCharHandGesture -&gt; Int
+MultiCharHandGesture -&gt; [MultiCharHandGesture]
+MultiCharHandGesture -&gt; MultiCharHandGesture
+MultiCharHandGesture
+-&gt; MultiCharHandGesture -&gt; [MultiCharHandGesture]
+MultiCharHandGesture
+-&gt; MultiCharHandGesture
+-&gt; MultiCharHandGesture
+-&gt; [MultiCharHandGesture]
+(MultiCharHandGesture -&gt; MultiCharHandGesture)
+-&gt; (MultiCharHandGesture -&gt; MultiCharHandGesture)
+-&gt; (Int -&gt; MultiCharHandGesture)
+-&gt; (MultiCharHandGesture -&gt; Int)
+-&gt; (MultiCharHandGesture -&gt; [MultiCharHandGesture])
+-&gt; (MultiCharHandGesture
+    -&gt; MultiCharHandGesture -&gt; [MultiCharHandGesture])
+-&gt; (MultiCharHandGesture
+    -&gt; MultiCharHandGesture -&gt; [MultiCharHandGesture])
+-&gt; (MultiCharHandGesture
+    -&gt; MultiCharHandGesture
+    -&gt; MultiCharHandGesture
+    -&gt; [MultiCharHandGesture])
+-&gt; Enum MultiCharHandGesture
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+$csucc :: MultiCharHandGesture -&gt; MultiCharHandGesture
+succ :: MultiCharHandGesture -&gt; MultiCharHandGesture
+$cpred :: MultiCharHandGesture -&gt; MultiCharHandGesture
+pred :: MultiCharHandGesture -&gt; MultiCharHandGesture
+$ctoEnum :: Int -&gt; MultiCharHandGesture
+toEnum :: Int -&gt; MultiCharHandGesture
+$cfromEnum :: MultiCharHandGesture -&gt; Int
+fromEnum :: MultiCharHandGesture -&gt; Int
+$cenumFrom :: MultiCharHandGesture -&gt; [MultiCharHandGesture]
+enumFrom :: MultiCharHandGesture -&gt; [MultiCharHandGesture]
+$cenumFromThen :: MultiCharHandGesture
+-&gt; MultiCharHandGesture -&gt; [MultiCharHandGesture]
+enumFromThen :: MultiCharHandGesture
+-&gt; MultiCharHandGesture -&gt; [MultiCharHandGesture]
+$cenumFromTo :: MultiCharHandGesture
+-&gt; MultiCharHandGesture -&gt; [MultiCharHandGesture]
+enumFromTo :: MultiCharHandGesture
+-&gt; MultiCharHandGesture -&gt; [MultiCharHandGesture]
+$cenumFromThenTo :: MultiCharHandGesture
+-&gt; MultiCharHandGesture
+-&gt; MultiCharHandGesture
+-&gt; [MultiCharHandGesture]
+enumFromThenTo :: MultiCharHandGesture
+-&gt; MultiCharHandGesture
+-&gt; MultiCharHandGesture
+-&gt; [MultiCharHandGesture]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280215"><span id="local-6989586621679280217"><span class="annot"><span class="annottext">MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool
+(MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool)
+-&gt; (MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool)
+-&gt; Eq MultiCharHandGesture
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool
+== :: MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool
+$c/= :: MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool
+/= :: MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280221"><span id="local-6989586621679280223"><span class="annot"><span class="annottext">(forall x. MultiCharHandGesture -&gt; Rep MultiCharHandGesture x)
+-&gt; (forall x. Rep MultiCharHandGesture x -&gt; MultiCharHandGesture)
+-&gt; Generic MultiCharHandGesture
+forall x. Rep MultiCharHandGesture x -&gt; MultiCharHandGesture
+forall x. MultiCharHandGesture -&gt; Rep MultiCharHandGesture x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cfrom :: forall x. MultiCharHandGesture -&gt; Rep MultiCharHandGesture x
+from :: forall x. MultiCharHandGesture -&gt; Rep MultiCharHandGesture x
+$cto :: forall x. Rep MultiCharHandGesture x -&gt; MultiCharHandGesture
+to :: forall x. Rep MultiCharHandGesture x -&gt; MultiCharHandGesture
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280228"><span id="local-6989586621679280230"><span id="local-6989586621679280232"><span id="local-6989586621679280236"><span id="local-6989586621679280239"><span id="local-6989586621679280242"><span id="local-6989586621679280245"><span class="annot"><span class="annottext">Eq MultiCharHandGesture
+Eq MultiCharHandGesture
+-&gt; (MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Ordering)
+-&gt; (MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool)
+-&gt; (MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool)
+-&gt; (MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool)
+-&gt; (MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool)
+-&gt; (MultiCharHandGesture
+    -&gt; MultiCharHandGesture -&gt; MultiCharHandGesture)
+-&gt; (MultiCharHandGesture
+    -&gt; MultiCharHandGesture -&gt; MultiCharHandGesture)
+-&gt; Ord MultiCharHandGesture
+MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool
+MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Ordering
+MultiCharHandGesture
+-&gt; MultiCharHandGesture -&gt; MultiCharHandGesture
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Ordering
+compare :: MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Ordering
+$c&lt; :: MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool
+&lt; :: MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool
+$c&lt;= :: MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool
+&lt;= :: MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool
+$c&gt; :: MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool
+&gt; :: MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool
+$c&gt;= :: MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool
+&gt;= :: MultiCharHandGesture -&gt; MultiCharHandGesture -&gt; Bool
+$cmax :: MultiCharHandGesture
+-&gt; MultiCharHandGesture -&gt; MultiCharHandGesture
+max :: MultiCharHandGesture
+-&gt; MultiCharHandGesture -&gt; MultiCharHandGesture
+$cmin :: MultiCharHandGesture
+-&gt; MultiCharHandGesture -&gt; MultiCharHandGesture
+min :: MultiCharHandGesture
+-&gt; MultiCharHandGesture -&gt; MultiCharHandGesture
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280248"><span id="local-6989586621679280252"><span id="local-6989586621679280255"><span id="local-6989586621679280259"><span class="annot"><span class="annottext">ReadPrec [MultiCharHandGesture]
+ReadPrec MultiCharHandGesture
+Int -&gt; ReadS MultiCharHandGesture
+ReadS [MultiCharHandGesture]
+(Int -&gt; ReadS MultiCharHandGesture)
+-&gt; ReadS [MultiCharHandGesture]
+-&gt; ReadPrec MultiCharHandGesture
+-&gt; ReadPrec [MultiCharHandGesture]
+-&gt; Read MultiCharHandGesture
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+$creadsPrec :: Int -&gt; ReadS MultiCharHandGesture
+readsPrec :: Int -&gt; ReadS MultiCharHandGesture
+$creadList :: ReadS [MultiCharHandGesture]
+readList :: ReadS [MultiCharHandGesture]
+$creadPrec :: ReadPrec MultiCharHandGesture
+readPrec :: ReadPrec MultiCharHandGesture
+$creadListPrec :: ReadPrec [MultiCharHandGesture]
+readListPrec :: ReadPrec [MultiCharHandGesture]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280262"><span id="local-6989586621679280264"><span id="local-6989586621679280268"><span class="annot"><span class="annottext">Int -&gt; MultiCharHandGesture -&gt; ShowS
+[MultiCharHandGesture] -&gt; ShowS
+MultiCharHandGesture -&gt; [Char]
+(Int -&gt; MultiCharHandGesture -&gt; ShowS)
+-&gt; (MultiCharHandGesture -&gt; [Char])
+-&gt; ([MultiCharHandGesture] -&gt; ShowS)
+-&gt; Show MultiCharHandGesture
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; [Char]) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; MultiCharHandGesture -&gt; ShowS
+showsPrec :: Int -&gt; MultiCharHandGesture -&gt; ShowS
+$cshow :: MultiCharHandGesture -&gt; [Char]
+show :: MultiCharHandGesture -&gt; [Char]
+$cshowList :: [MultiCharHandGesture] -&gt; ShowS
+showList :: [MultiCharHandGesture] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-153"></span><span>
+</span><span id="line-154"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679280272"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#MultiCharHandGesture"><span class="hs-identifier hs-type">MultiCharHandGesture</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-155"></span><span>  </span><span id="local-6989586621679280277"><span class="annot"><span class="annottext">arbitrary :: Gen MultiCharHandGesture
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen MultiCharHandGesture
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-156"></span><span>
+</span><span id="line-157"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679280281"><span id="local-6989586621679280288"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#MultiCharHandGesture"><span class="hs-identifier hs-type">MultiCharHandGesture</span></a></span></span></span><span>
+</span><span id="line-158"></span><span>
+</span><span id="line-159"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679280295"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#MultiCharHandGesture"><span class="hs-identifier hs-type">MultiCharHandGesture</span></a></span></span><span>
+</span><span id="line-160"></span><span>
+</span><span id="line-161"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679280308"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#MultiCharHandGesture"><span class="hs-identifier hs-type">MultiCharHandGesture</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-162"></span><span>  </span><span id="local-6989586621679280315"><span class="annot"><span class="annottext">toUnicodeText :: MultiCharHandGesture -&gt; Text
+</span><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeText</span></a></span></span><span> </span><span class="annot"><span class="annottext">MultiCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#RaisedHandWithFingersSplayed"><span class="hs-identifier hs-var">RaisedHandWithFingersSplayed</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f590\xfe0f&quot;</span></span><span>
+</span><span id="line-163"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var">toUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">MultiCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#VictoryHand"><span class="hs-identifier hs-var">VictoryHand</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x270c\xfe0f&quot;</span></span><span>
+</span><span id="line-164"></span><span>  </span><span id="local-6989586621679280321"><span class="annot"><span class="annottext">fromUnicodeText :: Text -&gt; Maybe MultiCharHandGesture
+</span><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeText</span></a></span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f590\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MultiCharHandGesture -&gt; Maybe MultiCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">MultiCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#RaisedHandWithFingersSplayed"><span class="hs-identifier hs-var">RaisedHandWithFingersSplayed</span></a></span><span>
+</span><span id="line-165"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var">fromUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x270c\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MultiCharHandGesture -&gt; Maybe MultiCharHandGesture
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">MultiCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#VictoryHand"><span class="hs-identifier hs-var">VictoryHand</span></a></span><span>
+</span><span id="line-166"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var">fromUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe MultiCharHandGesture
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-167"></span><span>  </span><span id="local-6989586621679280326"><span class="annot"><span class="annottext">isInTextRange :: Text -&gt; Bool
+</span><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInTextRange</span></a></span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f590\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-168"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x270c\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-169"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-170"></span><span>
+</span><span id="line-171"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679280330"><span id="local-6989586621679280334"><span id="local-6989586621679280337"><span class="annot"><a href="Data.Char.Emoji.SkinColor.html#WithSkinColorModifierUnicodeText"><span class="hs-identifier hs-type">WithSkinColorModifierUnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#MultiCharHandGesture"><span class="hs-identifier hs-type">MultiCharHandGesture</span></a></span></span></span></span><span>
+</span><span id="line-172"></span><span>
+</span><span id="line-173"></span><span class="annot"><span class="hs-comment">-- | A pattern synonym for 'CrossedFingers'.</span></span><span>
+</span><span id="line-174"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#FingersCrossed"><span class="hs-identifier hs-type">FingersCrossed</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SingleCharHandGesture"><span class="hs-identifier hs-type">SingleCharHandGesture</span></a></span><span>
+</span><span id="line-175"></span><span class="hs-keyword">pattern</span><span> </span><span id="FingersCrossed"><span id="%24mFingersCrossed"><span id="%24bFingersCrossed"><span class="annot"><span class="annottext">$mFingersCrossed :: forall {r}.
+SingleCharHandGesture -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bFingersCrossed :: SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#FingersCrossed"><span class="hs-identifier hs-var hs-var hs-var">FingersCrossed</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#CrossedFingers"><span class="hs-identifier hs-type">CrossedFingers</span></a></span><span>
+</span><span id="line-176"></span><span>
+</span><span id="line-177"></span><span class="annot"><span class="hs-comment">-- | A pattern synonym for the 'VulcanSalute'.</span></span><span>
+</span><span id="line-178"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SpockHand"><span class="hs-identifier hs-type">SpockHand</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SingleCharHandGesture"><span class="hs-identifier hs-type">SingleCharHandGesture</span></a></span><span>
+</span><span id="line-179"></span><span class="hs-keyword">pattern</span><span> </span><span id="SpockHand"><span id="%24mSpockHand"><span id="%24bSpockHand"><span class="annot"><span class="annottext">$mSpockHand :: forall {r}.
+SingleCharHandGesture -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bSpockHand :: SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#SpockHand"><span class="hs-identifier hs-var hs-var hs-var">SpockHand</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#VulcanSalute"><span class="hs-identifier hs-type">VulcanSalute</span></a></span><span>
+</span><span id="line-180"></span><span>
+</span><span id="line-181"></span><span class="annot"><span class="hs-comment">-- | A pattern synonym for 'SignOfTheHorns'.</span></span><span>
+</span><span id="line-182"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#HornsSign"><span class="hs-identifier hs-type">HornsSign</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SingleCharHandGesture"><span class="hs-identifier hs-type">SingleCharHandGesture</span></a></span><span>
+</span><span id="line-183"></span><span class="hs-keyword">pattern</span><span> </span><span id="HornsSign"><span id="%24mHornsSign"><span id="%24bHornsSign"><span class="annot"><span class="annottext">$mHornsSign :: forall {r}.
+SingleCharHandGesture -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bHornsSign :: SingleCharHandGesture
+</span><a href="Data.Char.Emoji.Hand.html#HornsSign"><span class="hs-identifier hs-var hs-var hs-var">HornsSign</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Hand.html#SignOfTheHorns"><span class="hs-identifier hs-type">SignOfTheHorns</span></a></span><span>
+</span><span id="line-184"></span></pre></body></html>

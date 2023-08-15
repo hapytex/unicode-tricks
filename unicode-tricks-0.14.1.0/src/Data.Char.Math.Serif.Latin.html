@@ -1,0 +1,340 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Module      : Data.Char.Math.Serif.Latin</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- Description : Serif mathematical alphanumeric symbols</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-9"></span><span class="hs-comment">--</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- See &quot;Data.Char.Math&quot; for further documentation.</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Math.Serif.Latin</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerif"><span class="hs-identifier">latinSerif</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-13"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerif%27"><span class="hs-identifier">latinSerif'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBold"><span class="hs-identifier">latinSerifNoBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBold%27"><span class="hs-identifier">latinSerifNoBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifBold"><span class="hs-identifier">latinSerifBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifBold%27"><span class="hs-identifier">latinSerifBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoItalic"><span class="hs-identifier">latinSerifNoItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoItalic%27"><span class="hs-identifier">latinSerifNoItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifItalic"><span class="hs-identifier">latinSerifItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifItalic%27"><span class="hs-identifier">latinSerifItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldNoItalic"><span class="hs-identifier">latinSerifNoBoldNoItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldNoItalic%27"><span class="hs-identifier">latinSerifNoBoldNoItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldNoItalic"><span class="hs-identifier">latinSerifBoldNoItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldNoItalic%27"><span class="hs-identifier">latinSerifBoldNoItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-26"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldItalic"><span class="hs-identifier">latinSerifNoBoldItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-27"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldItalic%27"><span class="hs-identifier">latinSerifNoBoldItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-28"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldItalic"><span class="hs-identifier">latinSerifBoldItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-29"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldItalic%27"><span class="hs-identifier">latinSerifBoldItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier">Emphasis</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#ItalicType"><span class="hs-identifier">ItalicType</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isAsciiAlpha"><span class="hs-identifier">isAsciiAlpha</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#splitEmphasis"><span class="hs-identifier">splitEmphasis</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#splitItalicType"><span class="hs-identifier">splitItalicType</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Math.Internal.html"><span class="hs-identifier">Data.Char.Math.Internal</span></a></span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, in the</span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- given /emphasis/ and in the given /italics/ type wrapped in a 'Just'. If</span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- the character is outside the @A@&#8211;@Z@ and @a@&#8211;@z@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-39"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerif"><span class="hs-identifier hs-type">latinSerif</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-40"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'ItalicType' to use.</span></span><span>
+</span><span id="line-41"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#ItalicType"><span class="hs-identifier hs-type">ItalicType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-42"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' to use.</span></span><span>
+</span><span id="line-43"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-44"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-45"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-46"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-47"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-48"></span><span id="latinSerif"><span class="annot"><span class="annottext">latinSerif :: ItalicType -&gt; Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerif"><span class="hs-identifier hs-var hs-var">latinSerif</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Emphasis -&gt; Char -&gt; Maybe Char)
+-&gt; (Emphasis -&gt; Char -&gt; Maybe Char)
+-&gt; ItalicType
+-&gt; Emphasis
+-&gt; Char
+-&gt; Maybe Char
+forall a. a -&gt; a -&gt; ItalicType -&gt; a
+</span><a href="Data.Char.Core.html#splitItalicType"><span class="hs-identifier hs-var">splitItalicType</span></a></span><span> </span><span class="annot"><span class="annottext">Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoItalic"><span class="hs-identifier hs-var">latinSerifNoItalic</span></a></span><span> </span><span class="annot"><span class="annottext">Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifItalic"><span class="hs-identifier hs-var">latinSerifItalic</span></a></span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, with a</span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- given /emphasis/ and a given /italics/ style. This maps characters an equivalent serif symbol for the @A@&#8211;@Z@ and</span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- @a@&#8211;@z@ range. For characters outside the range, the behavior is unspecified.</span><span>
+</span><span id="line-53"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerif%27"><span class="hs-identifier hs-type">latinSerif'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-54"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'ItalicType' to use.</span></span><span>
+</span><span id="line-55"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#ItalicType"><span class="hs-identifier hs-type">ItalicType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-56"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' to use.</span></span><span>
+</span><span id="line-57"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-58"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-59"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-60"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted with serifs, depending on the given 'Emphasis' in bold or not, and depending on the given 'ItalicType' in italics or not.</span></span><span>
+</span><span id="line-61"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-62"></span><span id="latinSerif%27"><span class="annot"><span class="annottext">latinSerif' :: ItalicType -&gt; Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerif%27"><span class="hs-identifier hs-var hs-var">latinSerif'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Emphasis -&gt; Char -&gt; Char)
+-&gt; (Emphasis -&gt; Char -&gt; Char)
+-&gt; ItalicType
+-&gt; Emphasis
+-&gt; Char
+-&gt; Char
+forall a. a -&gt; a -&gt; ItalicType -&gt; a
+</span><a href="Data.Char.Core.html#splitItalicType"><span class="hs-identifier hs-var">splitItalicType</span></a></span><span> </span><span class="annot"><span class="annottext">Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoItalic%27"><span class="hs-identifier hs-var">latinSerifNoItalic'</span></a></span><span> </span><span class="annot"><span class="annottext">Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifItalic%27"><span class="hs-identifier hs-var">latinSerifItalic'</span></a></span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, with no</span><span>
+</span><span id="line-65"></span><span class="hs-comment">-- /bold/ and no /italics/. This maps characters to itself for the @A@&#8211;@Z@ and</span><span>
+</span><span id="line-66"></span><span class="hs-comment">-- @a@&#8211;@z@ range. For characters outside the range, the behavior is unspecified.</span><span>
+</span><span id="line-67"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldNoItalic%27"><span class="hs-identifier hs-type">latinSerifNoBoldNoItalic'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-68"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-69"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-70"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted with serifs, not in bold and not in italics.</span></span><span>
+</span><span id="line-71"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-72"></span><span id="latinSerifNoBoldNoItalic%27"><span class="annot"><span class="annottext">latinSerifNoBoldNoItalic' :: Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldNoItalic%27"><span class="hs-identifier hs-var hs-var">latinSerifNoBoldNoItalic'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, with no</span><span>
+</span><span id="line-75"></span><span class="hs-comment">-- /bold/, and no /italics/ wrapped in a 'Just'. If the character is outside the</span><span>
+</span><span id="line-76"></span><span class="hs-comment">-- @A@&#8211;@Z@ and @a@&#8211;@z@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-77"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldNoItalic"><span class="hs-identifier hs-type">latinSerifNoBoldNoItalic</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-78"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-79"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-80"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-81"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-82"></span><span id="latinSerifNoBoldNoItalic"><span class="annot"><span class="annottext">latinSerifNoBoldNoItalic :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldNoItalic"><span class="hs-identifier hs-var hs-var">latinSerifNoBoldNoItalic</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; (Char -&gt; Char) -&gt; Char -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isAsciiAlpha"><span class="hs-identifier hs-var">isAsciiAlpha</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldNoItalic%27"><span class="hs-identifier hs-var">latinSerifNoBoldNoItalic'</span></a></span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, with no</span><span>
+</span><span id="line-85"></span><span class="hs-comment">-- /bold/ and in /italics/. This maps characters an equivalent serif symbol for the @A@&#8211;@Z@ and</span><span>
+</span><span id="line-86"></span><span class="hs-comment">-- @a@&#8211;@z@ range. For characters outside the range, the behavior is unspecified.</span><span>
+</span><span id="line-87"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldItalic%27"><span class="hs-identifier hs-type">latinSerifNoBoldItalic'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-88"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-89"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-90"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted with serifs, not in bold and in italics.</span></span><span>
+</span><span id="line-91"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-92"></span><span id="latinSerifNoBoldItalic%27"><span class="annot"><span class="annottext">latinSerifNoBoldItalic' :: Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldItalic%27"><span class="hs-identifier hs-var hs-var">latinSerifNoBoldItalic'</span></a></span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'h'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x210e'</span></span><span>
+</span><span id="line-93"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldItalic%27"><span class="hs-identifier hs-var">latinSerifNoBoldItalic'</span></a></span><span> </span><span id="local-6989586621679286828"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679286828"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Internal.html#_baseUpperLower"><span class="hs-identifier hs-var">_baseUpperLower</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1d3ed</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679286828"><span class="hs-identifier hs-var">c</span></a></span><span>
+</span><span id="line-94"></span><span>
+</span><span id="line-95"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, with no</span><span>
+</span><span id="line-96"></span><span class="hs-comment">-- /bold/, and in /italics/ wrapped in a 'Just'. If the character is outside the</span><span>
+</span><span id="line-97"></span><span class="hs-comment">-- @A@&#8211;@Z@ and @a@&#8211;@z@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-98"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldItalic"><span class="hs-identifier hs-type">latinSerifNoBoldItalic</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-99"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-100"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-101"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-102"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-103"></span><span id="latinSerifNoBoldItalic"><span class="annot"><span class="annottext">latinSerifNoBoldItalic :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldItalic"><span class="hs-identifier hs-var hs-var">latinSerifNoBoldItalic</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; (Char -&gt; Char) -&gt; Char -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isAsciiAlpha"><span class="hs-identifier hs-var">isAsciiAlpha</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldItalic%27"><span class="hs-identifier hs-var">latinSerifNoBoldItalic'</span></a></span><span>
+</span><span id="line-104"></span><span>
+</span><span id="line-105"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, in /bold/</span><span>
+</span><span id="line-106"></span><span class="hs-comment">-- not in /italics/. This maps characters an equivalent serif symbol for the @A@&#8211;@Z@ and</span><span>
+</span><span id="line-107"></span><span class="hs-comment">-- @a@&#8211;@z@ range. For characters outside the range, the behavior is unspecified.</span><span>
+</span><span id="line-108"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldNoItalic%27"><span class="hs-identifier hs-type">latinSerifBoldNoItalic'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-109"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-110"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-111"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted with serifs, in bold and not in italics.</span></span><span>
+</span><span id="line-112"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-113"></span><span id="latinSerifBoldNoItalic%27"><span class="annot"><span class="annottext">latinSerifBoldNoItalic' :: Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldNoItalic%27"><span class="hs-identifier hs-var hs-var">latinSerifBoldNoItalic'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Internal.html#_baseUpperLower"><span class="hs-identifier hs-var">_baseUpperLower</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1d3b9</span></span><span>
+</span><span id="line-114"></span><span>
+</span><span id="line-115"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, in</span><span>
+</span><span id="line-116"></span><span class="hs-comment">-- /bold/, and no /italics/ wrapped in a 'Just'. If the character is outside the</span><span>
+</span><span id="line-117"></span><span class="hs-comment">-- @A@&#8211;@Z@ and @a@&#8211;@z@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-118"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldNoItalic"><span class="hs-identifier hs-type">latinSerifBoldNoItalic</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-119"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-120"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-121"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-122"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-123"></span><span id="latinSerifBoldNoItalic"><span class="annot"><span class="annottext">latinSerifBoldNoItalic :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldNoItalic"><span class="hs-identifier hs-var hs-var">latinSerifBoldNoItalic</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; (Char -&gt; Char) -&gt; Char -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isAsciiAlpha"><span class="hs-identifier hs-var">isAsciiAlpha</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldNoItalic%27"><span class="hs-identifier hs-var">latinSerifBoldNoItalic'</span></a></span><span>
+</span><span id="line-124"></span><span>
+</span><span id="line-125"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, with in</span><span>
+</span><span id="line-126"></span><span class="hs-comment">-- /bold/ and in /italics/. This maps characters an equivalent serif symbol for the @A@&#8211;@Z@ and</span><span>
+</span><span id="line-127"></span><span class="hs-comment">-- @a@&#8211;@z@ range. For characters outside the range, the behavior is unspecified.</span><span>
+</span><span id="line-128"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldItalic%27"><span class="hs-identifier hs-type">latinSerifBoldItalic'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-129"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-130"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-131"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted with serifs, in bold and in italics.</span></span><span>
+</span><span id="line-132"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-133"></span><span id="latinSerifBoldItalic%27"><span class="annot"><span class="annottext">latinSerifBoldItalic' :: Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldItalic%27"><span class="hs-identifier hs-var hs-var">latinSerifBoldItalic'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Internal.html#_baseUpperLower"><span class="hs-identifier hs-var">_baseUpperLower</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1d421</span></span><span>
+</span><span id="line-134"></span><span>
+</span><span id="line-135"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, in</span><span>
+</span><span id="line-136"></span><span class="hs-comment">-- /bold/, and in /italics/ wrapped in a 'Just'. If the character is outside the</span><span>
+</span><span id="line-137"></span><span class="hs-comment">-- @A@&#8211;@Z@ and @a@&#8211;@z@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-138"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldItalic"><span class="hs-identifier hs-type">latinSerifBoldItalic</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-139"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-140"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-141"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-142"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-143"></span><span id="latinSerifBoldItalic"><span class="annot"><span class="annottext">latinSerifBoldItalic :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldItalic"><span class="hs-identifier hs-var hs-var">latinSerifBoldItalic</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; (Char -&gt; Char) -&gt; Char -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isAsciiAlpha"><span class="hs-identifier hs-var">isAsciiAlpha</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldItalic%27"><span class="hs-identifier hs-var">latinSerifBoldItalic'</span></a></span><span>
+</span><span id="line-144"></span><span>
+</span><span id="line-145"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, in /bold/</span><span>
+</span><span id="line-146"></span><span class="hs-comment">-- and in a /italics/ type. This maps characters an equivalent serif symbol for the @A@&#8211;@Z@ and</span><span>
+</span><span id="line-147"></span><span class="hs-comment">-- @a@&#8211;@z@ range. For characters outside the range, the behavior is unspecified.</span><span>
+</span><span id="line-148"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifBold%27"><span class="hs-identifier hs-type">latinSerifBold'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-149"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'ItalicType' to use.</span></span><span>
+</span><span id="line-150"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#ItalicType"><span class="hs-identifier hs-type">ItalicType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-151"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-152"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-153"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted with serifs, in bold and depending on the given 'ItalicType' in italics or not.</span></span><span>
+</span><span id="line-154"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-155"></span><span id="latinSerifBold%27"><span class="annot"><span class="annottext">latinSerifBold' :: ItalicType -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBold%27"><span class="hs-identifier hs-var hs-var">latinSerifBold'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Char) -&gt; (Char -&gt; Char) -&gt; ItalicType -&gt; Char -&gt; Char
+forall a. a -&gt; a -&gt; ItalicType -&gt; a
+</span><a href="Data.Char.Core.html#splitItalicType"><span class="hs-identifier hs-var">splitItalicType</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldNoItalic%27"><span class="hs-identifier hs-var">latinSerifBoldNoItalic'</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldItalic%27"><span class="hs-identifier hs-var">latinSerifBoldItalic'</span></a></span><span>
+</span><span id="line-156"></span><span>
+</span><span id="line-157"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, in /bold/</span><span>
+</span><span id="line-158"></span><span class="hs-comment">-- with the given /italics/ type wrapped in a 'Just'. If the character is outside the</span><span>
+</span><span id="line-159"></span><span class="hs-comment">-- @A@&#8211;@Z@ and @a@&#8211;@z@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-160"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifBold"><span class="hs-identifier hs-type">latinSerifBold</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-161"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'ItalicType' to use.</span></span><span>
+</span><span id="line-162"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#ItalicType"><span class="hs-identifier hs-type">ItalicType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-163"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-164"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-165"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-166"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-167"></span><span id="latinSerifBold"><span class="annot"><span class="annottext">latinSerifBold :: ItalicType -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBold"><span class="hs-identifier hs-var hs-var">latinSerifBold</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Maybe Char)
+-&gt; (Char -&gt; Maybe Char) -&gt; ItalicType -&gt; Char -&gt; Maybe Char
+forall a. a -&gt; a -&gt; ItalicType -&gt; a
+</span><a href="Data.Char.Core.html#splitItalicType"><span class="hs-identifier hs-var">splitItalicType</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldNoItalic"><span class="hs-identifier hs-var">latinSerifBoldNoItalic</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldItalic"><span class="hs-identifier hs-var">latinSerifBoldItalic</span></a></span><span>
+</span><span id="line-168"></span><span>
+</span><span id="line-169"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, not in /bold/</span><span>
+</span><span id="line-170"></span><span class="hs-comment">-- and in a /italics/ type. This maps characters an equivalent serif symbol for the @A@&#8211;@Z@ and</span><span>
+</span><span id="line-171"></span><span class="hs-comment">-- @a@&#8211;@z@ range. For characters outside the range, the behavior is unspecified.</span><span>
+</span><span id="line-172"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBold%27"><span class="hs-identifier hs-type">latinSerifNoBold'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-173"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'ItalicType' to use.</span></span><span>
+</span><span id="line-174"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#ItalicType"><span class="hs-identifier hs-type">ItalicType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-175"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-176"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-177"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted with serifs, not in bold and depending on the given 'ItalicType' in italics or not.</span></span><span>
+</span><span id="line-178"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-179"></span><span id="latinSerifNoBold%27"><span class="annot"><span class="annottext">latinSerifNoBold' :: ItalicType -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBold%27"><span class="hs-identifier hs-var hs-var">latinSerifNoBold'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Char) -&gt; (Char -&gt; Char) -&gt; ItalicType -&gt; Char -&gt; Char
+forall a. a -&gt; a -&gt; ItalicType -&gt; a
+</span><a href="Data.Char.Core.html#splitItalicType"><span class="hs-identifier hs-var">splitItalicType</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldNoItalic%27"><span class="hs-identifier hs-var">latinSerifNoBoldNoItalic'</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldItalic%27"><span class="hs-identifier hs-var">latinSerifNoBoldItalic'</span></a></span><span>
+</span><span id="line-180"></span><span>
+</span><span id="line-181"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, with no /bold/</span><span>
+</span><span id="line-182"></span><span class="hs-comment">-- and in the given /italics/ type wrapped in a 'Just'. If the character is outside the</span><span>
+</span><span id="line-183"></span><span class="hs-comment">-- @A@&#8211;@Z@ and @a@&#8211;@z@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-184"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBold"><span class="hs-identifier hs-type">latinSerifNoBold</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-185"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'ItalicType' to use.</span></span><span>
+</span><span id="line-186"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#ItalicType"><span class="hs-identifier hs-type">ItalicType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-187"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-188"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-189"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-190"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-191"></span><span id="latinSerifNoBold"><span class="annot"><span class="annottext">latinSerifNoBold :: ItalicType -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBold"><span class="hs-identifier hs-var hs-var">latinSerifNoBold</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Maybe Char)
+-&gt; (Char -&gt; Maybe Char) -&gt; ItalicType -&gt; Char -&gt; Maybe Char
+forall a. a -&gt; a -&gt; ItalicType -&gt; a
+</span><a href="Data.Char.Core.html#splitItalicType"><span class="hs-identifier hs-var">splitItalicType</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldNoItalic"><span class="hs-identifier hs-var">latinSerifNoBoldNoItalic</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldItalic"><span class="hs-identifier hs-var">latinSerifNoBoldItalic</span></a></span><span>
+</span><span id="line-192"></span><span>
+</span><span id="line-193"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, with a</span><span>
+</span><span id="line-194"></span><span class="hs-comment">-- given /emphasis/ and in italics. This maps characters an equivalent serif symbol for the @A@&#8211;@Z@ and</span><span>
+</span><span id="line-195"></span><span class="hs-comment">-- @a@&#8211;@z@ range. For characters outside the range, the behavior is unspecified.</span><span>
+</span><span id="line-196"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifItalic%27"><span class="hs-identifier hs-type">latinSerifItalic'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-197"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' to use.</span></span><span>
+</span><span id="line-198"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-199"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-200"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-201"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted with serifs, depending on the given 'Emphasis' in bold or not, and in italics.</span></span><span>
+</span><span id="line-202"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-203"></span><span id="latinSerifItalic%27"><span class="annot"><span class="annottext">latinSerifItalic' :: Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifItalic%27"><span class="hs-identifier hs-var hs-var">latinSerifItalic'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Char) -&gt; (Char -&gt; Char) -&gt; Emphasis -&gt; Char -&gt; Char
+forall a. a -&gt; a -&gt; Emphasis -&gt; a
+</span><a href="Data.Char.Core.html#splitEmphasis"><span class="hs-identifier hs-var">splitEmphasis</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldItalic%27"><span class="hs-identifier hs-var">latinSerifNoBoldItalic'</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldItalic%27"><span class="hs-identifier hs-var">latinSerifBoldItalic'</span></a></span><span>
+</span><span id="line-204"></span><span>
+</span><span id="line-205"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, in the</span><span>
+</span><span id="line-206"></span><span class="hs-comment">-- given /emphasis/ and in /italics/ wrapped in a 'Just'. If the character</span><span>
+</span><span id="line-207"></span><span class="hs-comment">-- is outside the @A@&#8211;@Z@ and @a@&#8211;@z@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-208"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifItalic"><span class="hs-identifier hs-type">latinSerifItalic</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-209"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' to use.</span></span><span>
+</span><span id="line-210"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-211"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-212"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-213"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-214"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-215"></span><span id="latinSerifItalic"><span class="annot"><span class="annottext">latinSerifItalic :: Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifItalic"><span class="hs-identifier hs-var hs-var">latinSerifItalic</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Maybe Char)
+-&gt; (Char -&gt; Maybe Char) -&gt; Emphasis -&gt; Char -&gt; Maybe Char
+forall a. a -&gt; a -&gt; Emphasis -&gt; a
+</span><a href="Data.Char.Core.html#splitEmphasis"><span class="hs-identifier hs-var">splitEmphasis</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldItalic"><span class="hs-identifier hs-var">latinSerifNoBoldItalic</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldItalic"><span class="hs-identifier hs-var">latinSerifBoldItalic</span></a></span><span>
+</span><span id="line-216"></span><span>
+</span><span id="line-217"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, with a</span><span>
+</span><span id="line-218"></span><span class="hs-comment">-- given /emphasis/ and not in italics. This maps characters an equivalent serif symbol for the @A@&#8211;@Z@ and</span><span>
+</span><span id="line-219"></span><span class="hs-comment">-- @a@&#8211;@z@ range. For characters outside the range, the behavior is unspecified.</span><span>
+</span><span id="line-220"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoItalic%27"><span class="hs-identifier hs-type">latinSerifNoItalic'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-221"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' to use.</span></span><span>
+</span><span id="line-222"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-223"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-224"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-225"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted with serifs, depending on the given 'Emphasis' in bold or not, and not in italics.</span></span><span>
+</span><span id="line-226"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-227"></span><span id="latinSerifNoItalic%27"><span class="annot"><span class="annottext">latinSerifNoItalic' :: Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoItalic%27"><span class="hs-identifier hs-var hs-var">latinSerifNoItalic'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Char) -&gt; (Char -&gt; Char) -&gt; Emphasis -&gt; Char -&gt; Char
+forall a. a -&gt; a -&gt; Emphasis -&gt; a
+</span><a href="Data.Char.Core.html#splitEmphasis"><span class="hs-identifier hs-var">splitEmphasis</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldNoItalic%27"><span class="hs-identifier hs-var">latinSerifNoBoldNoItalic'</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldNoItalic%27"><span class="hs-identifier hs-var">latinSerifBoldNoItalic'</span></a></span><span>
+</span><span id="line-228"></span><span>
+</span><span id="line-229"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with serifs, in the</span><span>
+</span><span id="line-230"></span><span class="hs-comment">-- given /emphasis/ and not in /italics/ wrapped in a 'Just'. If the character</span><span>
+</span><span id="line-231"></span><span class="hs-comment">-- is outside the @A@&#8211;@Z@ and @a@&#8211;@z@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-232"></span><span class="annot"><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoItalic"><span class="hs-identifier hs-type">latinSerifNoItalic</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-233"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' to use.</span></span><span>
+</span><span id="line-234"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-235"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-236"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-237"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-238"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-239"></span><span id="latinSerifNoItalic"><span class="annot"><span class="annottext">latinSerifNoItalic :: Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoItalic"><span class="hs-identifier hs-var hs-var">latinSerifNoItalic</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Maybe Char)
+-&gt; (Char -&gt; Maybe Char) -&gt; Emphasis -&gt; Char -&gt; Maybe Char
+forall a. a -&gt; a -&gt; Emphasis -&gt; a
+</span><a href="Data.Char.Core.html#splitEmphasis"><span class="hs-identifier hs-var">splitEmphasis</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifNoBoldNoItalic"><span class="hs-identifier hs-var">latinSerifNoBoldNoItalic</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Latin.html#latinSerifBoldNoItalic"><span class="hs-identifier hs-var">latinSerifBoldNoItalic</span></a></span><span>
+</span><span id="line-240"></span></pre></body></html>

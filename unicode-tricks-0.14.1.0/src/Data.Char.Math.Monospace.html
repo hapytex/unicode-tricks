@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Module      : Data.Char.Math.Monospace</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- Description : Monospaced mathematical alphanumeric symbols</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-9"></span><span class="hs-comment">--</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- See &quot;Data.Char.Math&quot; for further documentation.</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Math.Monospace</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Letters</span></span><span>
+</span><span id="line-13"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Monospace.html#monospace"><span class="hs-identifier">monospace</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Monospace.html#monospace%27"><span class="hs-identifier">monospace'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Digits</span></span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Monospace.html#digitMonospace"><span class="hs-identifier">digitMonospace</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Monospace.html#digitMonospace%27"><span class="hs-identifier">digitMonospace'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Monospace.html#intToDigitMonospace"><span class="hs-identifier">intToDigitMonospace</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Monospace.html#intToDigitMonospace%27"><span class="hs-identifier">intToDigitMonospace'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Char</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">intToDigit</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">isDigit</span></span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#isAsciiAlphaNum"><span class="hs-identifier">isAsciiAlphaNum</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Math.Internal.html"><span class="hs-identifier">Data.Char.Math.Internal</span></a></span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="hs-comment">-- | Convert the given character to its /monospace/ equivalent for the alphabet</span><span>
+</span><span id="line-29"></span><span class="hs-comment">-- and numerical range (@A@&#8211;@Z@, @a@&#8211;@z@, and @0@&#8211;@9@). For characters outside</span><span>
+</span><span id="line-30"></span><span class="hs-comment">-- the range, the result is unspecified.</span><span>
+</span><span id="line-31"></span><span class="annot"><a href="Data.Char.Math.Monospace.html#monospace%27"><span class="hs-identifier hs-type">monospace'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-32"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert to a /monospace/ symbol.</span></span><span>
+</span><span id="line-33"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-34"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent monospace symbol for the given character.</span></span><span>
+</span><span id="line-35"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-36"></span><span id="monospace%27"><span class="annot"><span class="annottext">monospace' :: Char -&gt; Char
+</span><a href="Data.Char.Math.Monospace.html#monospace%27"><span class="hs-identifier hs-var hs-var">monospace'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Internal.html#_baseUpperLowerNum"><span class="hs-identifier hs-var">_baseUpperLowerNum</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1d7c6</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1d629</span></span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- | Convert the given character to its /monospace/ equivalent for the alphabet</span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- and numerical range (@A@&#8211;@Z@, @a@&#8211;@z@, and @0@&#8211;@9@) wrapped in a 'Just' data</span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- constructor. For characters outside the range, 'Nothing' is returned.</span><span>
+</span><span id="line-41"></span><span class="annot"><a href="Data.Char.Math.Monospace.html#monospace"><span class="hs-identifier hs-type">monospace</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-42"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert to a /monspace/ symbol.</span></span><span>
+</span><span id="line-43"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-44"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent monospace character wrapped in a 'Just' data constructor, 'Nothing' if outside the alphanumerical range.</span></span><span>
+</span><span id="line-45"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-46"></span><span id="monospace"><span class="annot"><span class="annottext">monospace :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Monospace.html#monospace"><span class="hs-identifier hs-var hs-var">monospace</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; (Char -&gt; Char) -&gt; Char -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isAsciiAlphaNum"><span class="hs-identifier hs-var">isAsciiAlphaNum</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Monospace.html#monospace%27"><span class="hs-identifier hs-var">monospace'</span></a></span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="hs-comment">-- | Convert the given number (@0@&#8211;@9@) to its corresponding character in</span><span>
+</span><span id="line-49"></span><span class="hs-comment">-- /monospace/ style. Unspecified result for numbers outside this range.</span><span>
+</span><span id="line-50"></span><span class="annot"><a href="Data.Char.Math.Monospace.html#intToDigitMonospace%27"><span class="hs-identifier hs-type">intToDigitMonospace'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-51"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-52"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-53"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding character in monspace style. Unspecified outside the digit range.</span></span><span>
+</span><span id="line-54"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-55"></span><span id="intToDigitMonospace%27"><span class="annot"><span class="annottext">intToDigitMonospace' :: Int -&gt; Char
+</span><a href="Data.Char.Math.Monospace.html#intToDigitMonospace%27"><span class="hs-identifier hs-var hs-var">intToDigitMonospace'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Monospace.html#digitMonospace%27"><span class="hs-identifier hs-var">digitMonospace'</span></a></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Char) -&gt; (Int -&gt; Char) -&gt; Int -&gt; Char
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">intToDigit</span></span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span class="hs-comment">-- | Convert the given number (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-58"></span><span class="hs-comment">-- in /monospace/ style wrapped in a 'Just' data constructor. For</span><span>
+</span><span id="line-59"></span><span class="hs-comment">-- numbers outside this range, 'Nothing' is returned.</span><span>
+</span><span id="line-60"></span><span class="annot"><a href="Data.Char.Math.Monospace.html#intToDigitMonospace"><span class="hs-identifier hs-type">intToDigitMonospace</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-61"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-62"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-comment">-- | The corresponding symbol in /monospace/ style wrapped in a 'Just',</span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-comment">-- 'Nothing' if the character is outside the range.</span><span>
+</span><span id="line-65"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-66"></span><span id="intToDigitMonospace"><span class="annot"><span class="annottext">intToDigitMonospace :: Int -&gt; Maybe Char
+</span><a href="Data.Char.Math.Monospace.html#intToDigitMonospace"><span class="hs-identifier hs-var hs-var">intToDigitMonospace</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; (Int -&gt; Char) -&gt; Int -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bool
+</span><a href="Data.Char.Math.Internal.html#_isValidInt"><span class="hs-identifier hs-var">_isValidInt</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="Data.Char.Math.Monospace.html#intToDigitMonospace%27"><span class="hs-identifier hs-var">intToDigitMonospace'</span></a></span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span class="hs-comment">-- | Converts the given digit (@0@&#8211;@9@) charcters to its equivalent in</span><span>
+</span><span id="line-69"></span><span class="hs-comment">-- /monospace/ style. Unspecified result for characters outside the range.</span><span>
+</span><span id="line-70"></span><span class="annot"><a href="Data.Char.Math.Monospace.html#digitMonospace%27"><span class="hs-identifier hs-type">digitMonospace'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-71"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given digit character to convert.</span></span><span>
+</span><span id="line-72"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-73"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding character in monspace style. Unspecified outside the digit range.</span></span><span>
+</span><span id="line-74"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-75"></span><span id="digitMonospace%27"><span class="annot"><span class="annottext">digitMonospace' :: Char -&gt; Char
+</span><a href="Data.Char.Math.Monospace.html#digitMonospace%27"><span class="hs-identifier hs-var hs-var">digitMonospace'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Monospace.html#monospace%27"><span class="hs-identifier hs-var">monospace'</span></a></span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span class="hs-comment">-- | Converts the given digit (@0@&#8211;@9@) charcters to its equivalent in</span><span>
+</span><span id="line-78"></span><span class="hs-comment">-- /monospace/ style wrapped in a 'Just' data constructor. 'Nothing'</span><span>
+</span><span id="line-79"></span><span class="hs-comment">-- for characters outside the range.</span><span>
+</span><span id="line-80"></span><span class="annot"><a href="Data.Char.Math.Monospace.html#digitMonospace"><span class="hs-identifier hs-type">digitMonospace</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-81"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given digit character to convert.</span></span><span>
+</span><span id="line-82"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-83"></span><span>  </span><span class="hs-comment">-- | The corresponding symbol in monospace style wrapped in a 'Just',</span><span>
+</span><span id="line-84"></span><span>  </span><span class="hs-comment">-- 'Nothing' if the character is outside the range.</span><span>
+</span><span id="line-85"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-86"></span><span id="digitMonospace"><span class="annot"><span class="annottext">digitMonospace :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Monospace.html#digitMonospace"><span class="hs-identifier hs-var hs-var">digitMonospace</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; (Char -&gt; Char) -&gt; Char -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><span class="hs-identifier hs-var">isDigit</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.Monospace.html#digitMonospace%27"><span class="hs-identifier hs-var">digitMonospace'</span></a></span><span>
+</span><span id="line-87"></span></pre></body></html>

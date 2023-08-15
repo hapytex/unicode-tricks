@@ -1,0 +1,420 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Module      : Data.Char.Math</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- Description : A module to write math unicode alphanumerical characters.</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-9"></span><span class="hs-comment">--</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- = Introduction</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- This module aims to make it more convenient to transform mathematical characters</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- to their /double struck/, /fraktur/, /calligraphic/, etc. equivalent.</span><span>
+</span><span id="line-13"></span><span class="hs-comment">--</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- Most of the characters are defined in the @&lt;https://www.unicode.org/charts/PDF/U1D400.pdf 1D400&#8211;1D7FF&gt;@</span><span>
+</span><span id="line-15"></span><span class="hs-comment">-- Unicode block /Mathematical Alphanumeric Symbols/.</span><span>
+</span><span id="line-16"></span><span class="hs-comment">-- See also the &lt;https://en.wikipedia.org/wiki/Mathematical_Alphanumeric_Symbols Wikipedia page&gt;.</span><span>
+</span><span id="line-17"></span><span class="hs-comment">--</span><span>
+</span><span id="line-18"></span><span class="hs-comment">-- == Examples</span><span>
+</span><span id="line-19"></span><span class="hs-comment">-- &gt;&gt;&gt; math Serif Italic Bold 'x'</span><span>
+</span><span id="line-20"></span><span class="hs-comment">-- Just '\119961'</span><span>
+</span><span id="line-21"></span><span class="hs-comment">-- &gt;&gt;&gt; math Serif Italic Bold '3'</span><span>
+</span><span id="line-22"></span><span class="hs-comment">-- Just '\120785'</span><span>
+</span><span id="line-23"></span><span class="hs-comment">-- &gt;&gt;&gt; latinMath Serif Italic Bold 'x'</span><span>
+</span><span id="line-24"></span><span class="hs-comment">-- Just '\119961'</span><span>
+</span><span id="line-25"></span><span class="hs-comment">-- &gt;&gt;&gt; latinMath Serif Italic Bold '3'</span><span>
+</span><span id="line-26"></span><span class="hs-comment">-- Nothing</span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- &gt;&gt;&gt; script NoBold 'S'</span><span>
+</span><span id="line-28"></span><span class="hs-comment">-- Just '\119982'</span><span>
+</span><span id="line-29"></span><span class="hs-comment">-- &gt;&gt;&gt; intToDigitChar SansSerif Bold 3</span><span>
+</span><span id="line-30"></span><span class="hs-comment">-- Just '\120815'</span><span>
+</span><span id="line-31"></span><span class="hs-comment">-- &gt;&gt;&gt; intToDigitChar SansSerif Bold 33</span><span>
+</span><span id="line-32"></span><span class="hs-comment">-- Nothing</span><span>
+</span><span id="line-33"></span><span class="hs-comment">--</span><span>
+</span><span id="line-34"></span><span class="hs-comment">-- == Supported ranges of characters #characters_ranges#</span><span>
+</span><span id="line-35"></span><span class="hs-comment">-- The transformations of this module only supports the following small subset of Unicode points:</span><span>
+</span><span id="line-36"></span><span class="hs-comment">--</span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- [ASCII latin letters] @A@&#8211;@Z@ and @a@&#8211;@z@ ranges</span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- [Greek-like symbols]</span><span>
+</span><span id="line-39"></span><span class="hs-comment">--</span><span>
+</span><span id="line-40"></span><span class="hs-comment">--     * The following characters from the Unicode block [/Greek and Coptic/](http://unicode.org/charts/PDF/U0370.pdf):</span><span>
+</span><span id="line-41"></span><span class="hs-comment">--       @&#913;&#914;&#915;&#916;&#917;&#918;&#919;&#920;&#921;&#922;&#923;&#924;&#925;&#926;&#927;&#928;&#929;&#931;&#932;&#933;&#934;&#935;&#936;&#937;&#1012;&#945;&#946;&#947;&#948;&#949;&#950;&#951;&#952;&#953;&#954;&#955;&#956;&#957;&#958;&#959;&#960;&#961;&#962;&#963;&#964;&#965;&#966;&#967;&#968;&#969;&#1013;&#977;&#1008;&#981;&#1009;&#982;@.</span><span>
+</span><span id="line-42"></span><span class="hs-comment">--     * The following characters from the Unicode block [/Mathematical Operators/](https://www.unicode.org/charts/PDF/U2200.pdf):</span><span>
+</span><span id="line-43"></span><span class="hs-comment">--       @&#8711;&#8706;@.</span><span>
+</span><span id="line-44"></span><span class="hs-comment">--</span><span>
+</span><span id="line-45"></span><span class="hs-comment">-- [Digits] @0@&#8211;@9@ range</span><span>
+</span><span id="line-46"></span><span class="hs-comment">--</span><span>
+</span><span id="line-47"></span><span class="hs-comment">-- == Naming Conventions</span><span>
+</span><span id="line-48"></span><span class="hs-comment">-- The functions with a name finishing with a quote @'@ (such as 'math'') do not check their input:</span><span>
+</span><span id="line-49"></span><span class="hs-comment">-- they transform the characters in the supported range and have an /unspecified behaviour/ outside this range.</span><span>
+</span><span id="line-50"></span><span class="hs-comment">--</span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- The functions without a quote in their name (such as 'math') check their input and output and wrap the</span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- resulting transformation with 'Maybe'.</span><span>
+</span><span id="line-53"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Math</span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Serif/sans-serif mathematical symbols</span></span><span>
+</span><span id="line-55"></span><span>    </span><span class="annot"><a href="Data.Char.Math.html#math"><span class="hs-identifier">math</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-56"></span><span>    </span><span class="annot"><a href="Data.Char.Math.html#math%27"><span class="hs-identifier">math'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-57"></span><span>
+</span><span id="line-58"></span><span>    </span><span class="annot"><span class="hs-comment">-- ** Latin-only characters</span></span><span>
+</span><span id="line-59"></span><span>    </span><span class="annot"><a href="Data.Char.Math.html#latinMath"><span class="hs-identifier">latinMath</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-60"></span><span>    </span><span class="annot"><a href="Data.Char.Math.html#mathAlpha"><span class="hs-identifier">mathAlpha</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-61"></span><span>    </span><span class="annot"><a href="Data.Char.Math.html#mathAlpha%27"><span class="hs-identifier">mathAlpha'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span>    </span><span class="annot"><span class="hs-comment">-- ** Serif mathematical symbols</span></span><span>
+</span><span id="line-64"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serif"><span class="hs-identifier">serif</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-65"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serif%27"><span class="hs-identifier">serif'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-66"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifNoBold"><span class="hs-identifier">serifNoBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-67"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifNoBold%27"><span class="hs-identifier">serifNoBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-68"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifBold"><span class="hs-identifier">serifBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-69"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifBold%27"><span class="hs-identifier">serifBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-70"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifNoItalic"><span class="hs-identifier">serifNoItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-71"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifNoItalic%27"><span class="hs-identifier">serifNoItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-72"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifItalic"><span class="hs-identifier">serifItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-73"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifItalic%27"><span class="hs-identifier">serifItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-74"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifNoBoldNoItalic"><span class="hs-identifier">serifNoBoldNoItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-75"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifNoBoldNoItalic%27"><span class="hs-identifier">serifNoBoldNoItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-76"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifBoldNoItalic"><span class="hs-identifier">serifBoldNoItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-77"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifBoldNoItalic%27"><span class="hs-identifier">serifBoldNoItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-78"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifNoBoldItalic"><span class="hs-identifier">serifNoBoldItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-79"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifNoBoldItalic%27"><span class="hs-identifier">serifNoBoldItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-80"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifBoldItalic"><span class="hs-identifier">serifBoldItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-81"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.html#serifBoldItalic%27"><span class="hs-identifier">serifBoldItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span>    </span><span class="annot"><span class="hs-comment">-- ** Sans-serif mathematical symbols</span></span><span>
+</span><span id="line-84"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerif"><span class="hs-identifier">sansSerif</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-85"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerif%27"><span class="hs-identifier">sansSerif'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-86"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifNoBold"><span class="hs-identifier">sansSerifNoBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-87"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifNoBold%27"><span class="hs-identifier">sansSerifNoBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-88"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifBold"><span class="hs-identifier">sansSerifBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-89"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifBold%27"><span class="hs-identifier">sansSerifBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-90"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifNoItalic"><span class="hs-identifier">sansSerifNoItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-91"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifNoItalic%27"><span class="hs-identifier">sansSerifNoItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-92"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifItalic"><span class="hs-identifier">sansSerifItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-93"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifItalic%27"><span class="hs-identifier">sansSerifItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-94"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifNoBoldNoItalic"><span class="hs-identifier">sansSerifNoBoldNoItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-95"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifNoBoldNoItalic%27"><span class="hs-identifier">sansSerifNoBoldNoItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-96"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifBoldNoItalic"><span class="hs-identifier">sansSerifBoldNoItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-97"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifBoldNoItalic%27"><span class="hs-identifier">sansSerifBoldNoItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-98"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifNoBoldItalic"><span class="hs-identifier">sansSerifNoBoldItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-99"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifNoBoldItalic%27"><span class="hs-identifier">sansSerifNoBoldItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-100"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifBoldItalic"><span class="hs-identifier">sansSerifBoldItalic</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-101"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.html#sansSerifBoldItalic%27"><span class="hs-identifier">sansSerifBoldItalic'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Digit characters</span></span><span>
+</span><span id="line-104"></span><span>
+</span><span id="line-105"></span><span>    </span><span class="annot"><span class="hs-comment">-- ** Char-based conversion</span></span><span>
+</span><span id="line-106"></span><span>    </span><span class="annot"><a href="Data.Char.Math.html#digit"><span class="hs-identifier">digit</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-107"></span><span>    </span><span class="annot"><a href="Data.Char.Math.html#digit%27"><span class="hs-identifier">digit'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-108"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerif"><span class="hs-identifier">digitSansSerif</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-109"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerif%27"><span class="hs-identifier">digitSansSerif'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-110"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Digit.html#digitSerif"><span class="hs-identifier">digitSerif</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-111"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Digit.html#digitSerif%27"><span class="hs-identifier">digitSerif'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-112"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Digit.html#digitSerifRegular"><span class="hs-identifier">digitSerifRegular</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-113"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Digit.html#digitSerifRegular%27"><span class="hs-identifier">digitSerifRegular'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-114"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Digit.html#digitSerifBold"><span class="hs-identifier">digitSerifBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-115"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Digit.html#digitSerifBold%27"><span class="hs-identifier">digitSerifBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-116"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifRegular"><span class="hs-identifier">digitSansSerifRegular</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-117"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifRegular%27"><span class="hs-identifier">digitSansSerifRegular'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-118"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifBold"><span class="hs-identifier">digitSansSerifBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-119"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerifBold%27"><span class="hs-identifier">digitSansSerifBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-120"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Monospace.html#digitMonospace"><span class="hs-identifier">digitMonospace</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-121"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Monospace.html#digitMonospace%27"><span class="hs-identifier">digitMonospace'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-122"></span><span>    </span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#digitDoubleStruck"><span class="hs-identifier">digitDoubleStruck</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-123"></span><span>    </span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#digitDoubleStruck%27"><span class="hs-identifier">digitDoubleStruck'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-124"></span><span>
+</span><span id="line-125"></span><span>    </span><span class="annot"><span class="hs-comment">-- ** Int to digit characters</span></span><span>
+</span><span id="line-126"></span><span>    </span><span class="annot"><a href="Data.Char.Math.html#intToDigitChar"><span class="hs-identifier">intToDigitChar</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-127"></span><span>    </span><span class="annot"><a href="Data.Char.Math.html#intToDigitChar%27"><span class="hs-identifier">intToDigitChar'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-128"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Digit.html#intToDigitSerif"><span class="hs-identifier">intToDigitSerif</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-129"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Digit.html#intToDigitSerif%27"><span class="hs-identifier">intToDigitSerif'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-130"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerif"><span class="hs-identifier">intToDigitSansSerif</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-131"></span><span>    </span><span class="annot"><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerif%27"><span class="hs-identifier">intToDigitSansSerif'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-132"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Digit.html#intToDigitSerifRegular"><span class="hs-identifier">intToDigitSerifRegular</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-133"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Digit.html#intToDigitSerifRegular%27"><span class="hs-identifier">intToDigitSerifRegular'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-134"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Digit.html#intToDigitSerifBold"><span class="hs-identifier">intToDigitSerifBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-135"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Serif.Digit.html#intToDigitSerifBold%27"><span class="hs-identifier">intToDigitSerifBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-136"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Monospace.html#intToDigitMonospace"><span class="hs-identifier">intToDigitMonospace</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-137"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Monospace.html#intToDigitMonospace%27"><span class="hs-identifier">intToDigitMonospace'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-138"></span><span>    </span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#intToDigitDoubleStruck"><span class="hs-identifier">intToDigitDoubleStruck</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-139"></span><span>    </span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#intToDigitDoubleStruck%27"><span class="hs-identifier">intToDigitDoubleStruck'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-140"></span><span>
+</span><span id="line-141"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Monospace symbols</span></span><span>
+</span><span id="line-142"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Monospace.html#monospace"><span class="hs-identifier">monospace</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-143"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Monospace.html#monospace%27"><span class="hs-identifier">monospace'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-144"></span><span>
+</span><span id="line-145"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Double struck symbols</span></span><span>
+</span><span id="line-146"></span><span>    </span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#doubleStruck"><span class="hs-identifier">doubleStruck</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-147"></span><span>    </span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#doubleStruck%27"><span class="hs-identifier">doubleStruck'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-148"></span><span>
+</span><span id="line-149"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Script (or calligraphic symbols)</span></span><span>
+</span><span id="line-150"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#script"><span class="hs-identifier">script</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-151"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#script%27"><span class="hs-identifier">script'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-152"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular"><span class="hs-identifier">scriptRegular</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-153"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#scriptRegular%27"><span class="hs-identifier">scriptRegular'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-154"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#scriptBold"><span class="hs-identifier">scriptBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-155"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#scriptBold%27"><span class="hs-identifier">scriptBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-156"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphy"><span class="hs-identifier">calligraphy</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-157"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphy%27"><span class="hs-identifier">calligraphy'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-158"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphyRegular"><span class="hs-identifier">calligraphyRegular</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-159"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphyRegular%27"><span class="hs-identifier">calligraphyRegular'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-160"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphyBold"><span class="hs-identifier">calligraphyBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-161"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Script.html#calligraphyBold%27"><span class="hs-identifier">calligraphyBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-162"></span><span>
+</span><span id="line-163"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Fraktur symbols</span></span><span>
+</span><span id="line-164"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Fraktur.html#fraktur"><span class="hs-identifier">fraktur</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-165"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Fraktur.html#fraktur%27"><span class="hs-identifier">fraktur'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-166"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Fraktur.html#frakturRegular"><span class="hs-identifier">frakturRegular</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-167"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Fraktur.html#frakturRegular%27"><span class="hs-identifier">frakturRegular'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-168"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Fraktur.html#frakturBold"><span class="hs-identifier">frakturBold</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-169"></span><span>    </span><span class="annot"><a href="Data.Char.Math.Fraktur.html#frakturBold%27"><span class="hs-identifier">frakturBold'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-170"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-171"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-172"></span><span>
+</span><span id="line-173"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier">Emphasis</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#FontStyle"><span class="hs-identifier">FontStyle</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#ItalicType"><span class="hs-identifier">ItalicType</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isAsciiAlpha"><span class="hs-identifier">isAsciiAlpha</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#splitFontStyle"><span class="hs-identifier">splitFontStyle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-174"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html"><span class="hs-identifier">Data.Char.Math.DoubleStruck</span></a></span><span>
+</span><span id="line-175"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Math.Fraktur.html"><span class="hs-identifier">Data.Char.Math.Fraktur</span></a></span><span>
+</span><span id="line-176"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Math.Monospace.html"><span class="hs-identifier">Data.Char.Math.Monospace</span></a></span><span>
+</span><span id="line-177"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Math.SansSerif.html"><span class="hs-identifier">Data.Char.Math.SansSerif</span></a></span><span>
+</span><span id="line-178"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Math.Script.html"><span class="hs-identifier">Data.Char.Math.Script</span></a></span><span>
+</span><span id="line-179"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Math.Serif.html"><span class="hs-identifier">Data.Char.Math.Serif</span></a></span><span>
+</span><span id="line-180"></span><span>
+</span><span id="line-181"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with the given /font/ style, with a</span><span>
+</span><span id="line-182"></span><span class="hs-comment">-- given /emphasis/ and a given /italics/ style. This maps characters an equivalent sans-serif symbol for</span><span>
+</span><span id="line-183"></span><span class="hs-comment">-- characters in the [supported ranges](#characters_ranges).</span><span>
+</span><span id="line-184"></span><span class="hs-comment">-- For characters outside the range, the behavior is unspecified.</span><span>
+</span><span id="line-185"></span><span class="annot"><a href="Data.Char.Math.html#math%27"><span class="hs-identifier hs-type">math'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-186"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'FontStyle' to use.</span></span><span>
+</span><span id="line-187"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#FontStyle"><span class="hs-identifier hs-type">FontStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-188"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'ItalicType' to use.</span></span><span>
+</span><span id="line-189"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#ItalicType"><span class="hs-identifier hs-type">ItalicType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-190"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' to use.</span></span><span>
+</span><span id="line-191"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-192"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-193"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-194"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted in the given 'FontStyle', depending on the given 'Emphasis' in bold or not, and depending on the given 'ItalicType' in italics or not.</span></span><span>
+</span><span id="line-195"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-196"></span><span id="math%27"><span class="annot"><span class="annottext">math' :: FontStyle -&gt; ItalicType -&gt; Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.html#math%27"><span class="hs-identifier hs-var hs-var">math'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(ItalicType -&gt; Emphasis -&gt; Char -&gt; Char)
+-&gt; (ItalicType -&gt; Emphasis -&gt; Char -&gt; Char)
+-&gt; FontStyle
+-&gt; ItalicType
+-&gt; Emphasis
+-&gt; Char
+-&gt; Char
+forall a. a -&gt; a -&gt; FontStyle -&gt; a
+</span><a href="Data.Char.Core.html#splitFontStyle"><span class="hs-identifier hs-var">splitFontStyle</span></a></span><span> </span><span class="annot"><span class="annottext">ItalicType -&gt; Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.html#sansSerif%27"><span class="hs-identifier hs-var">sansSerif'</span></a></span><span> </span><span class="annot"><span class="annottext">ItalicType -&gt; Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.html#serif%27"><span class="hs-identifier hs-var">serif'</span></a></span><span>
+</span><span id="line-197"></span><span>
+</span><span id="line-198"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with the given /font/</span><span>
+</span><span id="line-199"></span><span class="hs-comment">-- style, in the given /emphasis/ and in the given /italics/ type wrapped in a 'Just'</span><span>
+</span><span id="line-200"></span><span class="hs-comment">-- if the character is supported (see: [supported ranges](#characters_ranges))</span><span>
+</span><span id="line-201"></span><span class="hs-comment">-- If the character is outside theses ranges, 'Nothing' is returned.</span><span>
+</span><span id="line-202"></span><span class="annot"><a href="Data.Char.Math.html#math"><span class="hs-identifier hs-type">math</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-203"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'FontStyle' to use.</span></span><span>
+</span><span id="line-204"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#FontStyle"><span class="hs-identifier hs-type">FontStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-205"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'ItalicType' to use.</span></span><span>
+</span><span id="line-206"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#ItalicType"><span class="hs-identifier hs-type">ItalicType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-207"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' to use.</span></span><span>
+</span><span id="line-208"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-209"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-210"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-211"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-212"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-213"></span><span id="math"><span class="annot"><span class="annottext">math :: FontStyle -&gt; ItalicType -&gt; Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.html#math"><span class="hs-identifier hs-var hs-var">math</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(ItalicType -&gt; Emphasis -&gt; Char -&gt; Maybe Char)
+-&gt; (ItalicType -&gt; Emphasis -&gt; Char -&gt; Maybe Char)
+-&gt; FontStyle
+-&gt; ItalicType
+-&gt; Emphasis
+-&gt; Char
+-&gt; Maybe Char
+forall a. a -&gt; a -&gt; FontStyle -&gt; a
+</span><a href="Data.Char.Core.html#splitFontStyle"><span class="hs-identifier hs-var">splitFontStyle</span></a></span><span> </span><span class="annot"><span class="annottext">ItalicType -&gt; Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.SansSerif.html#sansSerif"><span class="hs-identifier hs-var">sansSerif</span></a></span><span> </span><span class="annot"><span class="annottext">ItalicType -&gt; Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.html#serif"><span class="hs-identifier hs-var">serif</span></a></span><span>
+</span><span id="line-214"></span><span>
+</span><span id="line-215"></span><span class="hs-pragma">{-# DEPRECATED</span><span> </span><span class="hs-pragma">mathAlpha'</span><span> </span><span class="hs-pragma">&quot;Use `math'`&quot;</span><span> </span><span class="hs-pragma">#-}</span><span>
+</span><span id="line-216"></span><span>
+</span><span id="line-217"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with the given /font/ style, with a</span><span>
+</span><span id="line-218"></span><span class="hs-comment">-- given /emphasis/ and a given /italics/ style. This maps characters an equivalent sansSerif symbol for the @A@&#8211;@Z@ and</span><span>
+</span><span id="line-219"></span><span class="hs-comment">-- @a@&#8211;@z@ range. For characters outside the range, the behavior is unspecified.</span><span>
+</span><span id="line-220"></span><span class="annot"><a href="Data.Char.Math.html#mathAlpha%27"><span class="hs-identifier hs-type">mathAlpha'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-221"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'FontStyle' to use.</span></span><span>
+</span><span id="line-222"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#FontStyle"><span class="hs-identifier hs-type">FontStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-223"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'ItalicType' to use.</span></span><span>
+</span><span id="line-224"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#ItalicType"><span class="hs-identifier hs-type">ItalicType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-225"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' to use.</span></span><span>
+</span><span id="line-226"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-227"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-228"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-229"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character that is formatted in the given 'FontStyle', depending on the given 'Emphasis' in bold or not, and depending on the given 'ItalicType' in italics or not.</span></span><span>
+</span><span id="line-230"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-231"></span><span id="mathAlpha%27"><span class="annot"><span class="annottext">mathAlpha' :: FontStyle -&gt; ItalicType -&gt; Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.html#mathAlpha%27"><span class="hs-identifier hs-var hs-var">mathAlpha'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FontStyle -&gt; ItalicType -&gt; Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.html#math%27"><span class="hs-identifier hs-var">math'</span></a></span><span>
+</span><span id="line-232"></span><span>
+</span><span id="line-233"></span><span class="hs-pragma">{-# DEPRECATED</span><span> </span><span class="hs-pragma">mathAlpha</span><span> </span><span class="hs-pragma">&quot;Use `latinMath`&quot;</span><span> </span><span class="hs-pragma">#-}</span><span>
+</span><span id="line-234"></span><span>
+</span><span id="line-235"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with the given /font/</span><span>
+</span><span id="line-236"></span><span class="hs-comment">-- style, in the given /emphasis/ and in the given /italics/ type wrapped in a 'Just'. If</span><span>
+</span><span id="line-237"></span><span class="hs-comment">-- the character is outside the @A@&#8211;@Z@ and @a@&#8211;@z@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-238"></span><span class="annot"><a href="Data.Char.Math.html#mathAlpha"><span class="hs-identifier hs-type">mathAlpha</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-239"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'FontStyle' to use.</span></span><span>
+</span><span id="line-240"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#FontStyle"><span class="hs-identifier hs-type">FontStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-241"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'ItalicType' to use.</span></span><span>
+</span><span id="line-242"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#ItalicType"><span class="hs-identifier hs-type">ItalicType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-243"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' to use.</span></span><span>
+</span><span id="line-244"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-245"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-246"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-247"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-248"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-249"></span><span id="mathAlpha"><span class="annot"><span class="annottext">mathAlpha :: FontStyle -&gt; ItalicType -&gt; Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.html#mathAlpha"><span class="hs-identifier hs-var hs-var">mathAlpha</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FontStyle -&gt; ItalicType -&gt; Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.html#latinMath"><span class="hs-identifier hs-var">latinMath</span></a></span><span>
+</span><span id="line-250"></span><span>
+</span><span id="line-251"></span><span class="hs-comment">-- | Convert the given character to a mathematical symbol with the given /font/</span><span>
+</span><span id="line-252"></span><span class="hs-comment">-- style, in the given /emphasis/ and in the given /italics/ type wrapped in a 'Just'. If</span><span>
+</span><span id="line-253"></span><span class="hs-comment">-- the character is outside the @A@&#8211;@Z@ and @a@&#8211;@z@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-254"></span><span class="annot"><a href="Data.Char.Math.html#latinMath"><span class="hs-identifier hs-type">latinMath</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-255"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'FontStyle' to use.</span></span><span>
+</span><span id="line-256"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#FontStyle"><span class="hs-identifier hs-type">FontStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-257"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'ItalicType' to use.</span></span><span>
+</span><span id="line-258"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#ItalicType"><span class="hs-identifier hs-type">ItalicType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-259"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Emphasis' to use.</span></span><span>
+</span><span id="line-260"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-261"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-262"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-263"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The equivalent character wrapped in a 'Just' if in the valid range, 'Nothing' otherwise.</span></span><span>
+</span><span id="line-264"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-265"></span><span id="latinMath"><span class="annot"><span class="annottext">latinMath :: FontStyle -&gt; ItalicType -&gt; Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.html#latinMath"><span class="hs-identifier hs-var hs-var">latinMath</span></a></span></span><span> </span><span id="local-6989586621679286983"><span class="annot"><span class="annottext">FontStyle
+</span><a href="#local-6989586621679286983"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679286984"><span class="annot"><span class="annottext">ItalicType
+</span><a href="#local-6989586621679286984"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span id="local-6989586621679286985"><span class="annot"><span class="annottext">Emphasis
+</span><a href="#local-6989586621679286985"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span id="local-6989586621679286986"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679286986"><span class="hs-identifier hs-var">c</span></a></span></span><span>
+</span><span id="line-266"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isAsciiAlpha"><span class="hs-identifier hs-var">isAsciiAlpha</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679286986"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Maybe Char) -&gt; Char -&gt; Maybe Char
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(ItalicType -&gt; Emphasis -&gt; Char -&gt; Char)
+-&gt; (ItalicType -&gt; Emphasis -&gt; Char -&gt; Char)
+-&gt; FontStyle
+-&gt; ItalicType
+-&gt; Emphasis
+-&gt; Char
+-&gt; Char
+forall a. a -&gt; a -&gt; FontStyle -&gt; a
+</span><a href="Data.Char.Core.html#splitFontStyle"><span class="hs-identifier hs-var">splitFontStyle</span></a></span><span> </span><span class="annot"><span class="annottext">ItalicType -&gt; Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.html#sansSerif%27"><span class="hs-identifier hs-var">sansSerif'</span></a></span><span> </span><span class="annot"><span class="annottext">ItalicType -&gt; Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.html#serif%27"><span class="hs-identifier hs-var">serif'</span></a></span><span> </span><span class="annot"><span class="annottext">FontStyle
+</span><a href="#local-6989586621679286983"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">ItalicType
+</span><a href="#local-6989586621679286984"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Emphasis
+</span><a href="#local-6989586621679286985"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679286986"><span class="hs-identifier hs-var">c</span></a></span><span>
+</span><span id="line-267"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Char
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-268"></span><span>
+</span><span id="line-269"></span><span class="hs-comment">-- | Convert the given digit character (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-270"></span><span class="hs-comment">-- with a given 'Emphasis' in the given /font/ style. The result for characters outside this</span><span>
+</span><span id="line-271"></span><span class="hs-comment">-- range is unspecified.</span><span>
+</span><span id="line-272"></span><span class="annot"><a href="Data.Char.Math.html#digit%27"><span class="hs-identifier hs-type">digit'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-273"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given /font/ style.</span></span><span>
+</span><span id="line-274"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#FontStyle"><span class="hs-identifier hs-type">FontStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-275"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given /emphasis/ style.</span></span><span>
+</span><span id="line-276"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-277"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-278"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-279"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding symbol in the given /font/ style for the given /emphasis/ style, unspecified outside the the range.</span></span><span>
+</span><span id="line-280"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-281"></span><span id="digit%27"><span class="annot"><span class="annottext">digit' :: FontStyle -&gt; Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.html#digit%27"><span class="hs-identifier hs-var hs-var">digit'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Emphasis -&gt; Char -&gt; Char)
+-&gt; (Emphasis -&gt; Char -&gt; Char)
+-&gt; FontStyle
+-&gt; Emphasis
+-&gt; Char
+-&gt; Char
+forall a. a -&gt; a -&gt; FontStyle -&gt; a
+</span><a href="Data.Char.Core.html#splitFontStyle"><span class="hs-identifier hs-var">splitFontStyle</span></a></span><span> </span><span class="annot"><span class="annottext">Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerif%27"><span class="hs-identifier hs-var">digitSansSerif'</span></a></span><span> </span><span class="annot"><span class="annottext">Emphasis -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Serif.Digit.html#digitSerif%27"><span class="hs-identifier hs-var">digitSerif'</span></a></span><span>
+</span><span id="line-282"></span><span>
+</span><span id="line-283"></span><span class="hs-comment">-- | Convert the given digit character (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-284"></span><span class="hs-comment">-- with the given 'Emphasis' in the given /font/ style wrapped in a 'Just' data constructor.</span><span>
+</span><span id="line-285"></span><span class="hs-comment">-- For characters outside this range, 'Nothing' is returned.</span><span>
+</span><span id="line-286"></span><span class="annot"><a href="Data.Char.Math.html#digit"><span class="hs-identifier hs-type">digit</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-287"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given /font/ style.</span></span><span>
+</span><span id="line-288"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#FontStyle"><span class="hs-identifier hs-type">FontStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-289"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given /emphasis/ style.</span></span><span>
+</span><span id="line-290"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-291"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given character to convert.</span></span><span>
+</span><span id="line-292"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-293"></span><span>  </span><span class="hs-comment">-- | The corresponding symbol in serifs for the given /emphasis/ style wrapped in a 'Just',</span><span>
+</span><span id="line-294"></span><span>  </span><span class="hs-comment">-- 'Nothing' if the character is outside the range.</span><span>
+</span><span id="line-295"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-296"></span><span id="digit"><span class="annot"><span class="annottext">digit :: FontStyle -&gt; Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.html#digit"><span class="hs-identifier hs-var hs-var">digit</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Emphasis -&gt; Char -&gt; Maybe Char)
+-&gt; (Emphasis -&gt; Char -&gt; Maybe Char)
+-&gt; FontStyle
+-&gt; Emphasis
+-&gt; Char
+-&gt; Maybe Char
+forall a. a -&gt; a -&gt; FontStyle -&gt; a
+</span><a href="Data.Char.Core.html#splitFontStyle"><span class="hs-identifier hs-var">splitFontStyle</span></a></span><span> </span><span class="annot"><span class="annottext">Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#digitSansSerif"><span class="hs-identifier hs-var">digitSansSerif</span></a></span><span> </span><span class="annot"><span class="annottext">Emphasis -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Digit.html#digitSerif"><span class="hs-identifier hs-var">digitSerif</span></a></span><span>
+</span><span id="line-297"></span><span>
+</span><span id="line-298"></span><span class="hs-comment">-- | Convert the given number (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-299"></span><span class="hs-comment">-- with a given 'Emphasis' in the given 'FontStyle'. The result for numbers outside this</span><span>
+</span><span id="line-300"></span><span class="hs-comment">-- range is unspecified.</span><span>
+</span><span id="line-301"></span><span class="annot"><a href="Data.Char.Math.html#intToDigitChar%27"><span class="hs-identifier hs-type">intToDigitChar'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-302"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given /font/ style.</span></span><span>
+</span><span id="line-303"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#FontStyle"><span class="hs-identifier hs-type">FontStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-304"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given /emphasis/ style.</span></span><span>
+</span><span id="line-305"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-306"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-307"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-308"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding symbol in sans-serifs in the given /font/ style the given /emphasis/ style, unspecified outside the the range.</span></span><span>
+</span><span id="line-309"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-310"></span><span id="intToDigitChar%27"><span class="annot"><span class="annottext">intToDigitChar' :: FontStyle -&gt; Emphasis -&gt; Int -&gt; Char
+</span><a href="Data.Char.Math.html#intToDigitChar%27"><span class="hs-identifier hs-var hs-var">intToDigitChar'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Emphasis -&gt; Int -&gt; Char)
+-&gt; (Emphasis -&gt; Int -&gt; Char)
+-&gt; FontStyle
+-&gt; Emphasis
+-&gt; Int
+-&gt; Char
+forall a. a -&gt; a -&gt; FontStyle -&gt; a
+</span><a href="Data.Char.Core.html#splitFontStyle"><span class="hs-identifier hs-var">splitFontStyle</span></a></span><span> </span><span class="annot"><span class="annottext">Emphasis -&gt; Int -&gt; Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerif%27"><span class="hs-identifier hs-var">intToDigitSansSerif'</span></a></span><span> </span><span class="annot"><span class="annottext">Emphasis -&gt; Int -&gt; Char
+</span><a href="Data.Char.Math.Serif.Digit.html#intToDigitSerif%27"><span class="hs-identifier hs-var">intToDigitSerif'</span></a></span><span>
+</span><span id="line-311"></span><span>
+</span><span id="line-312"></span><span class="hs-comment">-- | Convert the given number (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-313"></span><span class="hs-comment">-- with the given 'Emphasis' in the given 'FontStyle' wrapped in a 'Just' data constructor.</span><span>
+</span><span id="line-314"></span><span class="hs-comment">-- For numbers outside this range, 'Nothing' is returned.</span><span>
+</span><span id="line-315"></span><span class="annot"><a href="Data.Char.Math.html#intToDigitChar"><span class="hs-identifier hs-type">intToDigitChar</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-316"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given /font/ style.</span></span><span>
+</span><span id="line-317"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#FontStyle"><span class="hs-identifier hs-type">FontStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-318"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given /emphasis/ style.</span></span><span>
+</span><span id="line-319"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#Emphasis"><span class="hs-identifier hs-type">Emphasis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-320"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-321"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-322"></span><span>  </span><span class="hs-comment">-- | The corresponding symbol in the given /font/ style in the given /emphasis/ style wrapped in a 'Just',</span><span>
+</span><span id="line-323"></span><span>  </span><span class="hs-comment">-- 'Nothing' if the character is outside the range.</span><span>
+</span><span id="line-324"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-325"></span><span id="intToDigitChar"><span class="annot"><span class="annottext">intToDigitChar :: FontStyle -&gt; Emphasis -&gt; Int -&gt; Maybe Char
+</span><a href="Data.Char.Math.html#intToDigitChar"><span class="hs-identifier hs-var hs-var">intToDigitChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Emphasis -&gt; Int -&gt; Maybe Char)
+-&gt; (Emphasis -&gt; Int -&gt; Maybe Char)
+-&gt; FontStyle
+-&gt; Emphasis
+-&gt; Int
+-&gt; Maybe Char
+forall a. a -&gt; a -&gt; FontStyle -&gt; a
+</span><a href="Data.Char.Core.html#splitFontStyle"><span class="hs-identifier hs-var">splitFontStyle</span></a></span><span> </span><span class="annot"><span class="annottext">Emphasis -&gt; Int -&gt; Maybe Char
+</span><a href="Data.Char.Math.SansSerif.Digit.html#intToDigitSansSerif"><span class="hs-identifier hs-var">intToDigitSansSerif</span></a></span><span> </span><span class="annot"><span class="annottext">Emphasis -&gt; Int -&gt; Maybe Char
+</span><a href="Data.Char.Math.Serif.Digit.html#intToDigitSerif"><span class="hs-identifier hs-var">intToDigitSerif</span></a></span><span>
+</span><span id="line-326"></span></pre></body></html>

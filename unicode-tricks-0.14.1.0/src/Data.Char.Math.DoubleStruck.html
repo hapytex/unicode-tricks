@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Module      : Data.Char.Math.DoubleStruck</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- Description : Double struck mathematical alphanumeric symbols</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-9"></span><span class="hs-comment">--</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- See &quot;Data.Char.Math&quot; for further documentation.</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Math.DoubleStruck</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Letters</span></span><span>
+</span><span id="line-13"></span><span>    </span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#doubleStruck"><span class="hs-identifier">doubleStruck</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#doubleStruck%27"><span class="hs-identifier">doubleStruck'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Digits</span></span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#digitDoubleStruck"><span class="hs-identifier">digitDoubleStruck</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#digitDoubleStruck%27"><span class="hs-identifier">digitDoubleStruck'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#intToDigitDoubleStruck"><span class="hs-identifier">intToDigitDoubleStruck</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#intToDigitDoubleStruck%27"><span class="hs-identifier">intToDigitDoubleStruck'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Char</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">intToDigit</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">isDigit</span></span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#isAsciiAlphaNum"><span class="hs-identifier">isAsciiAlphaNum</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Math.Internal.html"><span class="hs-identifier">Data.Char.Math.Internal</span></a></span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="hs-comment">-- | Obtain the double struck symbol for the given character. The supported</span><span>
+</span><span id="line-29"></span><span class="hs-comment">-- range of characters are the alphabet character (@A@&#8211;@Z@, and @a@&#8211;@z@), and</span><span>
+</span><span id="line-30"></span><span class="hs-comment">-- the numerical characters (@0@&#8211;@9@). For characters other than these, the</span><span>
+</span><span id="line-31"></span><span class="hs-comment">-- behaviour is unspecified.</span><span>
+</span><span id="line-32"></span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#doubleStruck%27"><span class="hs-identifier hs-type">doubleStruck'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-33"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The character to convert to a /double struck/ symbol.</span></span><span>
+</span><span id="line-34"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-comment">-- | The double struck symbol for the given character. If the character</span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-comment">-- is not an ASCII alphanumerical character, the result is</span><span>
+</span><span id="line-37"></span><span>  </span><span class="hs-comment">-- unspecified.</span><span>
+</span><span id="line-38"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-39"></span><span id="doubleStruck%27"><span class="annot"><span class="annottext">doubleStruck' :: Char -&gt; Char
+</span><a href="Data.Char.Math.DoubleStruck.html#doubleStruck%27"><span class="hs-identifier hs-var hs-var">doubleStruck'</span></a></span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'C'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2102'</span></span><span>
+</span><span id="line-40"></span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#doubleStruck%27"><span class="hs-identifier hs-var">doubleStruck'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'H'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x210d'</span></span><span>
+</span><span id="line-41"></span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#doubleStruck%27"><span class="hs-identifier hs-var">doubleStruck'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'N'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2115'</span></span><span>
+</span><span id="line-42"></span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#doubleStruck%27"><span class="hs-identifier hs-var">doubleStruck'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'P'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2119'</span></span><span>
+</span><span id="line-43"></span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#doubleStruck%27"><span class="hs-identifier hs-var">doubleStruck'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'Q'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x211a'</span></span><span>
+</span><span id="line-44"></span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#doubleStruck%27"><span class="hs-identifier hs-var">doubleStruck'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'R'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x211d'</span></span><span>
+</span><span id="line-45"></span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#doubleStruck%27"><span class="hs-identifier hs-var">doubleStruck'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'Z'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2124'</span></span><span>
+</span><span id="line-46"></span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#doubleStruck%27"><span class="hs-identifier hs-var">doubleStruck'</span></a></span><span> </span><span id="local-6989586621679286521"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679286521"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Math.Internal.html#_baseUpperLowerNum"><span class="hs-identifier hs-var">_baseUpperLowerNum</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1d7a8</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1d4f1</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679286521"><span class="hs-identifier hs-var">c</span></a></span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="hs-comment">-- | Obtain the double struck symbol for the given character. The supported</span><span>
+</span><span id="line-49"></span><span class="hs-comment">-- range of characters are the alphabet characters (@A@&#8211;@Z@, and @a@&#8211;@z@), and</span><span>
+</span><span id="line-50"></span><span class="hs-comment">-- the numerical characters (@0@&#8211;@9@). The symbols are wrapped in the 'Just'</span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- data constructor. For characters outside the range, 'Nothing' is returned.</span><span>
+</span><span id="line-52"></span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#doubleStruck"><span class="hs-identifier hs-type">doubleStruck</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-53"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The character to convert to a /double struck/ symbol.</span></span><span>
+</span><span id="line-54"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-comment">-- | The double struck symbol for the given character wrapped</span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-comment">-- in a 'Just' data constructor, 'Nothing' if there is no</span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-comment">-- equivalent /double stuck/ character.</span><span>
+</span><span id="line-58"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-59"></span><span id="doubleStruck"><span class="annot"><span class="annottext">doubleStruck :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.DoubleStruck.html#doubleStruck"><span class="hs-identifier hs-var hs-var">doubleStruck</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; (Char -&gt; Char) -&gt; Char -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isAsciiAlphaNum"><span class="hs-identifier hs-var">isAsciiAlphaNum</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.DoubleStruck.html#doubleStruck%27"><span class="hs-identifier hs-var">doubleStruck'</span></a></span><span>
+</span><span id="line-60"></span><span>
+</span><span id="line-61"></span><span class="hs-comment">-- | Convert the given number (@0@&#8211;@9@) to its corresponding character in</span><span>
+</span><span id="line-62"></span><span class="hs-comment">-- /double-struck/ style. Unspecified result for numbers outside this range.</span><span>
+</span><span id="line-63"></span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#intToDigitDoubleStruck%27"><span class="hs-identifier hs-type">intToDigitDoubleStruck'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-64"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-65"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-66"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding character in double-struck style. Unspecified outside the digit range.</span></span><span>
+</span><span id="line-67"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-68"></span><span id="intToDigitDoubleStruck%27"><span class="annot"><span class="annottext">intToDigitDoubleStruck' :: Int -&gt; Char
+</span><a href="Data.Char.Math.DoubleStruck.html#intToDigitDoubleStruck%27"><span class="hs-identifier hs-var hs-var">intToDigitDoubleStruck'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.DoubleStruck.html#digitDoubleStruck%27"><span class="hs-identifier hs-var">digitDoubleStruck'</span></a></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Char) -&gt; (Int -&gt; Char) -&gt; Int -&gt; Char
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">intToDigit</span></span><span>
+</span><span id="line-69"></span><span>
+</span><span id="line-70"></span><span class="hs-comment">-- | Convert the given number (@0@&#8211;@9@) to its corresponding character</span><span>
+</span><span id="line-71"></span><span class="hs-comment">-- in /double-struck/ style wrapped in a 'Just' data constructor. For</span><span>
+</span><span id="line-72"></span><span class="hs-comment">-- numbers outside this range, 'Nothing' is returned.</span><span>
+</span><span id="line-73"></span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#intToDigitDoubleStruck"><span class="hs-identifier hs-type">intToDigitDoubleStruck</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-74"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-75"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-76"></span><span>  </span><span class="hs-comment">-- | The corresponding symbol in /monospace/ style wrapped in a 'Just',</span><span>
+</span><span id="line-77"></span><span>  </span><span class="hs-comment">-- 'Nothing' if the character is outside the range.</span><span>
+</span><span id="line-78"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-79"></span><span id="intToDigitDoubleStruck"><span class="annot"><span class="annottext">intToDigitDoubleStruck :: Int -&gt; Maybe Char
+</span><a href="Data.Char.Math.DoubleStruck.html#intToDigitDoubleStruck"><span class="hs-identifier hs-var hs-var">intToDigitDoubleStruck</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; (Int -&gt; Char) -&gt; Int -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bool
+</span><a href="Data.Char.Math.Internal.html#_isValidInt"><span class="hs-identifier hs-var">_isValidInt</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="Data.Char.Math.DoubleStruck.html#intToDigitDoubleStruck%27"><span class="hs-identifier hs-var">intToDigitDoubleStruck'</span></a></span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span class="hs-comment">-- | Converts the given digit (@0@&#8211;@9@) charcters to its equivalent in</span><span>
+</span><span id="line-82"></span><span class="hs-comment">-- /double-struck/ style. Unspecified result for characters outside the range.</span><span>
+</span><span id="line-83"></span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#digitDoubleStruck%27"><span class="hs-identifier hs-type">digitDoubleStruck'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-84"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given digit character to convert.</span></span><span>
+</span><span id="line-85"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-86"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding character in double-struck style. Unspecified outside the digit range.</span></span><span>
+</span><span id="line-87"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-88"></span><span id="digitDoubleStruck%27"><span class="annot"><span class="annottext">digitDoubleStruck' :: Char -&gt; Char
+</span><a href="Data.Char.Math.DoubleStruck.html#digitDoubleStruck%27"><span class="hs-identifier hs-var hs-var">digitDoubleStruck'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.DoubleStruck.html#doubleStruck%27"><span class="hs-identifier hs-var">doubleStruck'</span></a></span><span>
+</span><span id="line-89"></span><span>
+</span><span id="line-90"></span><span class="hs-comment">-- | Converts the given digit (@0@&#8211;@9@) charcters to its equivalent in</span><span>
+</span><span id="line-91"></span><span class="hs-comment">-- /double-struck/ style wrapped in a 'Just' data constructor. 'Nothing'</span><span>
+</span><span id="line-92"></span><span class="hs-comment">-- for characters outside the range.</span><span>
+</span><span id="line-93"></span><span class="annot"><a href="Data.Char.Math.DoubleStruck.html#digitDoubleStruck"><span class="hs-identifier hs-type">digitDoubleStruck</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-94"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given digit character to convert.</span></span><span>
+</span><span id="line-95"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-96"></span><span>  </span><span class="hs-comment">-- | The corresponding symbol in double-struck style wrapped in a 'Just',</span><span>
+</span><span id="line-97"></span><span>  </span><span class="hs-comment">-- 'Nothing' if the character is outside the range.</span><span>
+</span><span id="line-98"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-99"></span><span id="digitDoubleStruck"><span class="annot"><span class="annottext">digitDoubleStruck :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Math.DoubleStruck.html#digitDoubleStruck"><span class="hs-identifier hs-var hs-var">digitDoubleStruck</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; (Char -&gt; Char) -&gt; Char -&gt; Maybe Char
+forall a b. (a -&gt; Bool) -&gt; (a -&gt; b) -&gt; a -&gt; Maybe b
+</span><a href="Data.Char.Math.Internal.html#_withCondition"><span class="hs-identifier hs-var">_withCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><span class="hs-identifier hs-var">isDigit</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><a href="Data.Char.Math.DoubleStruck.html#digitDoubleStruck%27"><span class="hs-identifier hs-var">digitDoubleStruck'</span></a></span><span>
+</span><span id="line-100"></span></pre></body></html>

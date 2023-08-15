@@ -1,0 +1,597 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="local-6989586621679287385"><span id="local-6989586621679287386"><span id="local-6989586621679287387"><span id="local-6989586621679287388"><span id="local-6989586621679287389"><span id="local-6989586621679287390"><span id="local-6989586621679287391"><span id="local-6989586621679287392"><span id="local-6989586621679287393"><span id="local-6989586621679287394"><span id="local-6989586621679287395"><span id="local-6989586621679287396"><span id="local-6989586621679287397"><span id="local-6989586621679287398"><span id="local-6989586621679287399"><span id="local-6989586621679287400"><span id="local-6989586621679287401"><span id="local-6989586621679287402"><span id="local-6989586621679287403"><span id="local-6989586621679287404"><span id="local-6989586621679287405"><span id="local-6989586621679287406"><span id="local-6989586621679287407"></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications #-}</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Module      : Data.Char.Number.Mayan</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Description : A module to print Mayan numerals.</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- Unicode uses a &lt;https://www.unicode.org/charts/PDF/U1D2E0.pdf code block&gt; for Mayan numerals. Mayan numerals are written top to bottom,</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- so vertically. This module aims to make it more convenient to write Mayan numerals by offering</span><span>
+</span><span id="line-15"></span><span class="hs-comment">-- functions to convert numbers into a 'Text' object for Mayan numbers. Mayan numerals can /not/</span><span>
+</span><span id="line-16"></span><span class="hs-comment">-- present /negative/ numbers.</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Number.Mayan</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Define Mayan literals</span></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Mayan.html#MayanLiteral"><span class="hs-identifier">MayanLiteral</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Number.Mayan.html#Zero"><span class="hs-identifier">Zero</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#One"><span class="hs-identifier">One</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Two"><span class="hs-identifier">Two</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Three"><span class="hs-identifier">Three</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Four"><span class="hs-identifier">Four</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Five"><span class="hs-identifier">Five</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Six"><span class="hs-identifier">Six</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Seven"><span class="hs-identifier">Seven</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Eight"><span class="hs-identifier">Eight</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Nine"><span class="hs-identifier">Nine</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Ten"><span class="hs-identifier">Ten</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Eleven"><span class="hs-identifier">Eleven</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Twelve"><span class="hs-identifier">Twelve</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Thirteen"><span class="hs-identifier">Thirteen</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Fourteen"><span class="hs-identifier">Fourteen</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Fifteen"><span class="hs-identifier">Fifteen</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Sixteen"><span class="hs-identifier">Sixteen</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Seventeen"><span class="hs-identifier">Seventeen</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Eighteen"><span class="hs-identifier">Eighteen</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#Nineteen"><span class="hs-identifier">Nineteen</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Converting integers to Mayan numbers.</span></span><span>
+</span><span id="line-22"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Mayan.html#toMayanVertical"><span class="hs-identifier">toMayanVertical</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Mayan.html#toMayanVertical%27"><span class="hs-identifier">toMayanVertical'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Mayan.html#toMayanVertical%27%27"><span class="hs-identifier">toMayanVertical''</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Mayan.html#toMayan"><span class="hs-identifier">toMayan</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-26"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Mayan.html#toMayan%27"><span class="hs-identifier">toMayan'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-27"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Mayan.html#toMayan%27%27"><span class="hs-identifier">toMayan''</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier">UnicodeCharacter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier">fromUnicodeChar</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar%27"><span class="hs-identifier">fromUnicodeChar'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier">isInCharRange</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier">toUnicodeChar</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier">UnicodeText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier">isInTextRange</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier">generateIsInTextRange'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapFromEnum"><span class="hs-identifier">mapFromEnum</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapToEnum"><span class="hs-identifier">mapToEnum</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapToEnumSafe"><span class="hs-identifier">mapToEnumSafe</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">pack</span></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitraryBoundedEnum</span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="annot"><span class="hs-comment">-- | The Mayan numerals, as defined in the Unicode block.</span></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">data</span><span> </span><span id="MayanLiteral"><span class="annot"><a href="Data.Char.Number.Mayan.html#MayanLiteral"><span class="hs-identifier hs-var">MayanLiteral</span></a></span></span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /zero/: &#119520;.</span></span><span>
+</span><span id="line-42"></span><span>    </span><span id="Zero"><span class="annot"><a href="Data.Char.Number.Mayan.html#Zero"><span class="hs-identifier hs-var">Zero</span></a></span></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /one/: &#119521;.</span></span><span>
+</span><span id="line-44"></span><span>    </span><span id="One"><span class="annot"><a href="Data.Char.Number.Mayan.html#One"><span class="hs-identifier hs-var">One</span></a></span></span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /two/: &#119522;.</span></span><span>
+</span><span id="line-46"></span><span>    </span><span id="Two"><span class="annot"><a href="Data.Char.Number.Mayan.html#Two"><span class="hs-identifier hs-var">Two</span></a></span></span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /three/: &#119523;.</span></span><span>
+</span><span id="line-48"></span><span>    </span><span id="Three"><span class="annot"><a href="Data.Char.Number.Mayan.html#Three"><span class="hs-identifier hs-var">Three</span></a></span></span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /four/: &#119524;.</span></span><span>
+</span><span id="line-50"></span><span>    </span><span id="Four"><span class="annot"><a href="Data.Char.Number.Mayan.html#Four"><span class="hs-identifier hs-var">Four</span></a></span></span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /five/: &#119525;.</span></span><span>
+</span><span id="line-52"></span><span>    </span><span id="Five"><span class="annot"><a href="Data.Char.Number.Mayan.html#Five"><span class="hs-identifier hs-var">Five</span></a></span></span><span>
+</span><span id="line-53"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /six/: &#119526;.</span></span><span>
+</span><span id="line-54"></span><span>    </span><span id="Six"><span class="annot"><a href="Data.Char.Number.Mayan.html#Six"><span class="hs-identifier hs-var">Six</span></a></span></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /seven/: &#119527;.</span></span><span>
+</span><span id="line-56"></span><span>    </span><span id="Seven"><span class="annot"><a href="Data.Char.Number.Mayan.html#Seven"><span class="hs-identifier hs-var">Seven</span></a></span></span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /eight/: &#119528;.</span></span><span>
+</span><span id="line-58"></span><span>    </span><span id="Eight"><span class="annot"><a href="Data.Char.Number.Mayan.html#Eight"><span class="hs-identifier hs-var">Eight</span></a></span></span><span>
+</span><span id="line-59"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /nine/: &#119529;.</span></span><span>
+</span><span id="line-60"></span><span>    </span><span id="Nine"><span class="annot"><a href="Data.Char.Number.Mayan.html#Nine"><span class="hs-identifier hs-var">Nine</span></a></span></span><span>
+</span><span id="line-61"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /ten/: &#119530;.</span></span><span>
+</span><span id="line-62"></span><span>    </span><span id="Ten"><span class="annot"><a href="Data.Char.Number.Mayan.html#Ten"><span class="hs-identifier hs-var">Ten</span></a></span></span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /eleven/: &#119531;.</span></span><span>
+</span><span id="line-64"></span><span>    </span><span id="Eleven"><span class="annot"><a href="Data.Char.Number.Mayan.html#Eleven"><span class="hs-identifier hs-var">Eleven</span></a></span></span><span>
+</span><span id="line-65"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /twelve/: &#119532;.</span></span><span>
+</span><span id="line-66"></span><span>    </span><span id="Twelve"><span class="annot"><a href="Data.Char.Number.Mayan.html#Twelve"><span class="hs-identifier hs-var">Twelve</span></a></span></span><span>
+</span><span id="line-67"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /thirteen/: &#119533;.</span></span><span>
+</span><span id="line-68"></span><span>    </span><span id="Thirteen"><span class="annot"><a href="Data.Char.Number.Mayan.html#Thirteen"><span class="hs-identifier hs-var">Thirteen</span></a></span></span><span>
+</span><span id="line-69"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /fourteen/: &#119534;.</span></span><span>
+</span><span id="line-70"></span><span>    </span><span id="Fourteen"><span class="annot"><a href="Data.Char.Number.Mayan.html#Fourteen"><span class="hs-identifier hs-var">Fourteen</span></a></span></span><span>
+</span><span id="line-71"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /fifteen/: &#119535;.</span></span><span>
+</span><span id="line-72"></span><span>    </span><span id="Fifteen"><span class="annot"><a href="Data.Char.Number.Mayan.html#Fifteen"><span class="hs-identifier hs-var">Fifteen</span></a></span></span><span>
+</span><span id="line-73"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /sixteen/: &#119536;.</span></span><span>
+</span><span id="line-74"></span><span>    </span><span id="Sixteen"><span class="annot"><a href="Data.Char.Number.Mayan.html#Sixteen"><span class="hs-identifier hs-var">Sixteen</span></a></span></span><span>
+</span><span id="line-75"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /seventeen/: &#119537;.</span></span><span>
+</span><span id="line-76"></span><span>    </span><span id="Seventeen"><span class="annot"><a href="Data.Char.Number.Mayan.html#Seventeen"><span class="hs-identifier hs-var">Seventeen</span></a></span></span><span>
+</span><span id="line-77"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /eighteen/: &#119538;.</span></span><span>
+</span><span id="line-78"></span><span>    </span><span id="Eighteen"><span class="annot"><a href="Data.Char.Number.Mayan.html#Eighteen"><span class="hs-identifier hs-var">Eighteen</span></a></span></span><span>
+</span><span id="line-79"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The unicode character for the Mayan numeral /nineteen/: &#119539;.</span></span><span>
+</span><span id="line-80"></span><span>    </span><span id="Nineteen"><span class="annot"><a href="Data.Char.Number.Mayan.html#Nineteen"><span class="hs-identifier hs-var">Nineteen</span></a></span></span><span>
+</span><span id="line-81"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679287447"><span id="local-6989586621679287449"><span class="annot"><span class="annottext">MayanLiteral
+MayanLiteral -&gt; MayanLiteral -&gt; Bounded MayanLiteral
+forall a. a -&gt; a -&gt; Bounded a
+$cminBound :: MayanLiteral
+minBound :: MayanLiteral
+$cmaxBound :: MayanLiteral
+maxBound :: MayanLiteral
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679287455"><span id="local-6989586621679287457"><span id="local-6989586621679287459"><span id="local-6989586621679287461"><span id="local-6989586621679287463"><span id="local-6989586621679287469"><span id="local-6989586621679287474"><span id="local-6989586621679287477"><span id="local-6989586621679287480"><span id="local-6989586621679287483"><span id="local-6989586621679287486"><span id="local-6989586621679287489"><span id="local-6989586621679287494"><span id="local-6989586621679287499"><span class="annot"><span class="annottext">Typeable MayanLiteral
+Typeable MayanLiteral
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; MayanLiteral -&gt; c MayanLiteral)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MayanLiteral)
+-&gt; (MayanLiteral -&gt; Constr)
+-&gt; (MayanLiteral -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MayanLiteral))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c MayanLiteral))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; MayanLiteral -&gt; MayanLiteral)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MayanLiteral -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MayanLiteral -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; MayanLiteral -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MayanLiteral -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; MayanLiteral -&gt; m MayanLiteral)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; MayanLiteral -&gt; m MayanLiteral)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; MayanLiteral -&gt; m MayanLiteral)
+-&gt; Data MayanLiteral
+MayanLiteral -&gt; Constr
+MayanLiteral -&gt; DataType
+(forall b. Data b =&gt; b -&gt; b) -&gt; MayanLiteral -&gt; MayanLiteral
+forall a.
+Typeable a
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MayanLiteral -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; MayanLiteral -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MayanLiteral -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MayanLiteral -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MayanLiteral -&gt; m MayanLiteral
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MayanLiteral -&gt; m MayanLiteral
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MayanLiteral
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; MayanLiteral -&gt; c MayanLiteral
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MayanLiteral)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c MayanLiteral)
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; MayanLiteral -&gt; c MayanLiteral
+gfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; MayanLiteral -&gt; c MayanLiteral
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MayanLiteral
+gunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c MayanLiteral
+$ctoConstr :: MayanLiteral -&gt; Constr
+toConstr :: MayanLiteral -&gt; Constr
+$cdataTypeOf :: MayanLiteral -&gt; DataType
+dataTypeOf :: MayanLiteral -&gt; DataType
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MayanLiteral)
+dataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c MayanLiteral)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c MayanLiteral)
+dataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c MayanLiteral)
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; MayanLiteral -&gt; MayanLiteral
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; MayanLiteral -&gt; MayanLiteral
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MayanLiteral -&gt; r
+gmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MayanLiteral -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MayanLiteral -&gt; r
+gmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; MayanLiteral -&gt; r
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; MayanLiteral -&gt; [u]
+gmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; MayanLiteral -&gt; [u]
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MayanLiteral -&gt; u
+gmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; MayanLiteral -&gt; u
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MayanLiteral -&gt; m MayanLiteral
+gmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MayanLiteral -&gt; m MayanLiteral
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MayanLiteral -&gt; m MayanLiteral
+gmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MayanLiteral -&gt; m MayanLiteral
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MayanLiteral -&gt; m MayanLiteral
+gmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; MayanLiteral -&gt; m MayanLiteral
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679287505"><span id="local-6989586621679287513"><span id="local-6989586621679287519"><span id="local-6989586621679287529"><span id="local-6989586621679287531"><span id="local-6989586621679287535"><span id="local-6989586621679287539"><span id="local-6989586621679287543"><span class="annot"><span class="annottext">Int -&gt; MayanLiteral
+MayanLiteral -&gt; Int
+MayanLiteral -&gt; [MayanLiteral]
+MayanLiteral -&gt; MayanLiteral
+MayanLiteral -&gt; MayanLiteral -&gt; [MayanLiteral]
+MayanLiteral -&gt; MayanLiteral -&gt; MayanLiteral -&gt; [MayanLiteral]
+(MayanLiteral -&gt; MayanLiteral)
+-&gt; (MayanLiteral -&gt; MayanLiteral)
+-&gt; (Int -&gt; MayanLiteral)
+-&gt; (MayanLiteral -&gt; Int)
+-&gt; (MayanLiteral -&gt; [MayanLiteral])
+-&gt; (MayanLiteral -&gt; MayanLiteral -&gt; [MayanLiteral])
+-&gt; (MayanLiteral -&gt; MayanLiteral -&gt; [MayanLiteral])
+-&gt; (MayanLiteral -&gt; MayanLiteral -&gt; MayanLiteral -&gt; [MayanLiteral])
+-&gt; Enum MayanLiteral
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+$csucc :: MayanLiteral -&gt; MayanLiteral
+succ :: MayanLiteral -&gt; MayanLiteral
+$cpred :: MayanLiteral -&gt; MayanLiteral
+pred :: MayanLiteral -&gt; MayanLiteral
+$ctoEnum :: Int -&gt; MayanLiteral
+toEnum :: Int -&gt; MayanLiteral
+$cfromEnum :: MayanLiteral -&gt; Int
+fromEnum :: MayanLiteral -&gt; Int
+$cenumFrom :: MayanLiteral -&gt; [MayanLiteral]
+enumFrom :: MayanLiteral -&gt; [MayanLiteral]
+$cenumFromThen :: MayanLiteral -&gt; MayanLiteral -&gt; [MayanLiteral]
+enumFromThen :: MayanLiteral -&gt; MayanLiteral -&gt; [MayanLiteral]
+$cenumFromTo :: MayanLiteral -&gt; MayanLiteral -&gt; [MayanLiteral]
+enumFromTo :: MayanLiteral -&gt; MayanLiteral -&gt; [MayanLiteral]
+$cenumFromThenTo :: MayanLiteral -&gt; MayanLiteral -&gt; MayanLiteral -&gt; [MayanLiteral]
+enumFromThenTo :: MayanLiteral -&gt; MayanLiteral -&gt; MayanLiteral -&gt; [MayanLiteral]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679287547"><span id="local-6989586621679287549"><span class="annot"><span class="annottext">MayanLiteral -&gt; MayanLiteral -&gt; Bool
+(MayanLiteral -&gt; MayanLiteral -&gt; Bool)
+-&gt; (MayanLiteral -&gt; MayanLiteral -&gt; Bool) -&gt; Eq MayanLiteral
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: MayanLiteral -&gt; MayanLiteral -&gt; Bool
+== :: MayanLiteral -&gt; MayanLiteral -&gt; Bool
+$c/= :: MayanLiteral -&gt; MayanLiteral -&gt; Bool
+/= :: MayanLiteral -&gt; MayanLiteral -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679287554"><span id="local-6989586621679287556"><span class="annot"><span class="annottext">(forall x. MayanLiteral -&gt; Rep MayanLiteral x)
+-&gt; (forall x. Rep MayanLiteral x -&gt; MayanLiteral)
+-&gt; Generic MayanLiteral
+forall x. Rep MayanLiteral x -&gt; MayanLiteral
+forall x. MayanLiteral -&gt; Rep MayanLiteral x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cfrom :: forall x. MayanLiteral -&gt; Rep MayanLiteral x
+from :: forall x. MayanLiteral -&gt; Rep MayanLiteral x
+$cto :: forall x. Rep MayanLiteral x -&gt; MayanLiteral
+to :: forall x. Rep MayanLiteral x -&gt; MayanLiteral
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679287562"><span id="local-6989586621679287564"><span id="local-6989586621679287566"><span id="local-6989586621679287570"><span id="local-6989586621679287573"><span id="local-6989586621679287576"><span id="local-6989586621679287579"><span class="annot"><span class="annottext">Eq MayanLiteral
+Eq MayanLiteral
+-&gt; (MayanLiteral -&gt; MayanLiteral -&gt; Ordering)
+-&gt; (MayanLiteral -&gt; MayanLiteral -&gt; Bool)
+-&gt; (MayanLiteral -&gt; MayanLiteral -&gt; Bool)
+-&gt; (MayanLiteral -&gt; MayanLiteral -&gt; Bool)
+-&gt; (MayanLiteral -&gt; MayanLiteral -&gt; Bool)
+-&gt; (MayanLiteral -&gt; MayanLiteral -&gt; MayanLiteral)
+-&gt; (MayanLiteral -&gt; MayanLiteral -&gt; MayanLiteral)
+-&gt; Ord MayanLiteral
+MayanLiteral -&gt; MayanLiteral -&gt; Bool
+MayanLiteral -&gt; MayanLiteral -&gt; Ordering
+MayanLiteral -&gt; MayanLiteral -&gt; MayanLiteral
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: MayanLiteral -&gt; MayanLiteral -&gt; Ordering
+compare :: MayanLiteral -&gt; MayanLiteral -&gt; Ordering
+$c&lt; :: MayanLiteral -&gt; MayanLiteral -&gt; Bool
+&lt; :: MayanLiteral -&gt; MayanLiteral -&gt; Bool
+$c&lt;= :: MayanLiteral -&gt; MayanLiteral -&gt; Bool
+&lt;= :: MayanLiteral -&gt; MayanLiteral -&gt; Bool
+$c&gt; :: MayanLiteral -&gt; MayanLiteral -&gt; Bool
+&gt; :: MayanLiteral -&gt; MayanLiteral -&gt; Bool
+$c&gt;= :: MayanLiteral -&gt; MayanLiteral -&gt; Bool
+&gt;= :: MayanLiteral -&gt; MayanLiteral -&gt; Bool
+$cmax :: MayanLiteral -&gt; MayanLiteral -&gt; MayanLiteral
+max :: MayanLiteral -&gt; MayanLiteral -&gt; MayanLiteral
+$cmin :: MayanLiteral -&gt; MayanLiteral -&gt; MayanLiteral
+min :: MayanLiteral -&gt; MayanLiteral -&gt; MayanLiteral
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679287583"><span id="local-6989586621679287587"><span id="local-6989586621679287590"><span id="local-6989586621679287613"><span class="annot"><span class="annottext">ReadPrec [MayanLiteral]
+ReadPrec MayanLiteral
+Int -&gt; ReadS MayanLiteral
+ReadS [MayanLiteral]
+(Int -&gt; ReadS MayanLiteral)
+-&gt; ReadS [MayanLiteral]
+-&gt; ReadPrec MayanLiteral
+-&gt; ReadPrec [MayanLiteral]
+-&gt; Read MayanLiteral
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+$creadsPrec :: Int -&gt; ReadS MayanLiteral
+readsPrec :: Int -&gt; ReadS MayanLiteral
+$creadList :: ReadS [MayanLiteral]
+readList :: ReadS [MayanLiteral]
+$creadPrec :: ReadPrec MayanLiteral
+readPrec :: ReadPrec MayanLiteral
+$creadListPrec :: ReadPrec [MayanLiteral]
+readListPrec :: ReadPrec [MayanLiteral]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679287617"><span id="local-6989586621679287619"><span id="local-6989586621679287623"><span class="annot"><span class="annottext">Int -&gt; MayanLiteral -&gt; ShowS
+[MayanLiteral] -&gt; ShowS
+MayanLiteral -&gt; String
+(Int -&gt; MayanLiteral -&gt; ShowS)
+-&gt; (MayanLiteral -&gt; String)
+-&gt; ([MayanLiteral] -&gt; ShowS)
+-&gt; Show MayanLiteral
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; MayanLiteral -&gt; ShowS
+showsPrec :: Int -&gt; MayanLiteral -&gt; ShowS
+$cshow :: MayanLiteral -&gt; String
+show :: MayanLiteral -&gt; String
+$cshowList :: [MayanLiteral] -&gt; ShowS
+showList :: [MayanLiteral] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679287627"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#MayanLiteral"><span class="hs-identifier hs-type">MayanLiteral</span></a></span></span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span class="annot"><a href="Data.Char.Number.Mayan.html#_mayanOffset"><span class="hs-identifier hs-type">_mayanOffset</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-86"></span><span id="_mayanOffset"><span class="annot"><span class="annottext">_mayanOffset :: Int
+</span><a href="Data.Char.Number.Mayan.html#_mayanOffset"><span class="hs-identifier hs-var hs-var">_mayanOffset</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1d2e0</span></span><span>
+</span><span id="line-87"></span><span>
+</span><span id="line-88"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679287680"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#MayanLiteral"><span class="hs-identifier hs-type">MayanLiteral</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-89"></span><span>  </span><span id="local-6989586621679287686"><span class="annot"><span class="annottext">arbitrary :: Gen MayanLiteral
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen MayanLiteral
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-90"></span><span>
+</span><span id="line-91"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679287690"><span id="local-6989586621679287697"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#MayanLiteral"><span class="hs-identifier hs-type">MayanLiteral</span></a></span></span></span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier hs-type">UnicodeCharacter</span></a></span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#MayanLiteral"><span class="hs-identifier hs-type">MayanLiteral</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-94"></span><span>  </span><span id="local-6989586621679287752"><span class="annot"><span class="annottext">toUnicodeChar :: MayanLiteral -&gt; Char
+</span><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; MayanLiteral -&gt; Char
+forall a. Enum a =&gt; Int -&gt; a -&gt; Char
+</span><a href="Data.Char.Core.html#mapFromEnum"><span class="hs-identifier hs-var">mapFromEnum</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Number.Mayan.html#_mayanOffset"><span class="hs-identifier hs-var">_mayanOffset</span></a></span><span>
+</span><span id="line-95"></span><span>  </span><span id="local-6989586621679287755"><span class="annot"><span class="annottext">fromUnicodeChar :: Char -&gt; Maybe MayanLiteral
+</span><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Maybe MayanLiteral
+forall a. (Bounded a, Enum a) =&gt; Int -&gt; Char -&gt; Maybe a
+</span><a href="Data.Char.Core.html#mapToEnumSafe"><span class="hs-identifier hs-var">mapToEnumSafe</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Number.Mayan.html#_mayanOffset"><span class="hs-identifier hs-var">_mayanOffset</span></a></span><span>
+</span><span id="line-96"></span><span>  </span><span id="local-6989586621679287757"><span class="annot"><span class="annottext">fromUnicodeChar' :: Char -&gt; MayanLiteral
+</span><a href="Data.Char.Core.html#fromUnicodeChar%27"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; MayanLiteral
+forall a. Enum a =&gt; Int -&gt; Char -&gt; a
+</span><a href="Data.Char.Core.html#mapToEnum"><span class="hs-identifier hs-var">mapToEnum</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Number.Mayan.html#_mayanOffset"><span class="hs-identifier hs-var">_mayanOffset</span></a></span><span>
+</span><span id="line-97"></span><span>  </span><span id="local-6989586621679287761"><span class="annot"><span class="annottext">isInCharRange :: Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInCharRange</span></a></span></span><span> </span><span id="local-6989586621679287762"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679287762"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1d2e0'</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679287762"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679287762"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1d2f3'</span></span><span>
+</span><span id="line-98"></span><span>
+</span><span id="line-99"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679287766"><span id="local-6989586621679287771"><span id="local-6989586621679287775"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Number.Mayan.html#MayanLiteral"><span class="hs-identifier hs-type">MayanLiteral</span></a></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-100"></span><span>  </span><span id="local-6989586621679287780"><span class="annot"><span class="annottext">isInTextRange :: Text -&gt; Bool
+</span><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInTextRange</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. UnicodeCharacter a =&gt; Text -&gt; Bool
+</span><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier hs-var">generateIsInTextRange'</span></a></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Data.Char.Number.Mayan.html#MayanLiteral"><span class="hs-identifier hs-type">MayanLiteral</span></a></span><span>
+</span><span id="line-101"></span><span>
+</span><span id="line-102"></span><span class="hs-comment">-- | Convert the given 'Integral' number to a 'Text' object that writes the Mayan number to to bottom.</span><span>
+</span><span id="line-103"></span><span class="hs-comment">-- This function will return a 'Nothing' in case the number is negative (since it can not be presented</span><span>
+</span><span id="line-104"></span><span class="hs-comment">-- in Mayan).</span><span>
+</span><span id="line-105"></span><span id="local-6989586621679287341"><span class="annot"><a href="Data.Char.Number.Mayan.html#toMayanVertical"><span class="hs-identifier hs-type">toMayanVertical</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-106"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679287341"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-107"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert to a /vertical/ 'String' object.</span></span><span>
+</span><span id="line-108"></span><span>  </span><span class="annot"><a href="#local-6989586621679287341"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-109"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'Text' that contains the Mayan number wrapped in a 'Just' if we can represent the number; 'Nothing' otherwise.</span></span><span>
+</span><span id="line-110"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-111"></span><span id="toMayanVertical"><span class="annot"><span class="annottext">toMayanVertical :: forall i. Integral i =&gt; i -&gt; Maybe Text
+</span><a href="Data.Char.Number.Mayan.html#toMayanVertical"><span class="hs-identifier hs-var hs-var">toMayanVertical</span></a></span></span><span> </span><span id="local-6989586621679287791"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679287791"><span class="hs-identifier hs-var">n</span></a></span></span><span>
+</span><span id="line-112"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679287791"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Text
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-113"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe Text
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; Text
+forall i. Integral i =&gt; i -&gt; Text
+</span><a href="Data.Char.Number.Mayan.html#toMayanVertical%27"><span class="hs-identifier hs-var">toMayanVertical'</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679287791"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-114"></span><span>
+</span><span id="line-115"></span><span class="annot"><span class="hs-comment">-- | Convert the given 'Integral' number to a 'Text' object that writes the Mayan number to to bottom.</span></span><span>
+</span><span id="line-116"></span><span id="local-6989586621679287346"><span class="annot"><a href="Data.Char.Number.Mayan.html#toMayanVertical%27"><span class="hs-identifier hs-type">toMayanVertical'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-117"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679287346"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-118"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert to a /vertical/ 'String' object.</span></span><span>
+</span><span id="line-119"></span><span>  </span><span class="annot"><a href="#local-6989586621679287346"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-120"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'Text' that contains the Mayan number.</span></span><span>
+</span><span id="line-121"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-122"></span><span id="toMayanVertical%27"><span class="annot"><span class="annottext">toMayanVertical' :: forall i. Integral i =&gt; i -&gt; Text
+</span><a href="Data.Char.Number.Mayan.html#toMayanVertical%27"><span class="hs-identifier hs-var hs-var">toMayanVertical'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
+</span><span class="hs-identifier hs-var">pack</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Text) -&gt; (i -&gt; String) -&gt; i -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">i -&gt; String
+forall i. Integral i =&gt; i -&gt; String
+</span><a href="Data.Char.Number.Mayan.html#toMayanVertical%27%27"><span class="hs-identifier hs-var">toMayanVertical''</span></a></span><span>
+</span><span id="line-123"></span><span>
+</span><span id="line-124"></span><span class="annot"><span class="hs-comment">-- | Convert the given 'Integral' number to a 'String' object that writes the Mayan number to to bottom.</span></span><span>
+</span><span id="line-125"></span><span id="local-6989586621679287351"><span class="annot"><a href="Data.Char.Number.Mayan.html#toMayanVertical%27%27"><span class="hs-identifier hs-type">toMayanVertical''</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-126"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679287351"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-127"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert to a /vertical/ 'String' object.</span></span><span>
+</span><span id="line-128"></span><span>  </span><span class="annot"><a href="#local-6989586621679287351"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-129"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'String' that contains the Mayan number.</span></span><span>
+</span><span id="line-130"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">String</span></span></span><span>
+</span><span id="line-131"></span><span id="toMayanVertical%27%27"><span class="annot"><span class="annottext">toMayanVertical'' :: forall i. Integral i =&gt; i -&gt; String
+</span><a href="Data.Char.Number.Mayan.html#toMayanVertical%27%27"><span class="hs-identifier hs-var hs-var">toMayanVertical''</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+</span><span class="hs-identifier hs-var">unlines</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String) -&gt; (i -&gt; [String]) -&gt; i -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; String) -&gt; String -&gt; [String]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; String
+forall a. a -&gt; [a]
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; [String]) -&gt; (i -&gt; String) -&gt; i -&gt; [String]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">i -&gt; String
+forall i. Integral i =&gt; i -&gt; String
+</span><a href="Data.Char.Number.Mayan.html#toMayan%27%27"><span class="hs-identifier hs-var">toMayan''</span></a></span><span>
+</span><span id="line-132"></span><span>
+</span><span id="line-133"></span><span class="hs-comment">-- | Convert the given 'Integral' number to a 'Text' object that writes the Mayan number from left-to-right.</span><span>
+</span><span id="line-134"></span><span class="hs-comment">-- The object is wrapped in a 'Just' data constructor. If the number is negative, and thus can not be</span><span>
+</span><span id="line-135"></span><span class="hs-comment">-- represented, 'Nothing' is returned.</span><span>
+</span><span id="line-136"></span><span id="local-6989586621679287801"><span class="annot"><a href="Data.Char.Number.Mayan.html#toMayan"><span class="hs-identifier hs-type">toMayan</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-137"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679287801"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-138"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert to a /horizontal/ 'String' object.</span></span><span>
+</span><span id="line-139"></span><span>  </span><span class="annot"><a href="#local-6989586621679287801"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-140"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'Text' that contains the Mayan number wrapped in a 'Just' if we can represent the number; 'Nothing' otherwise.</span></span><span>
+</span><span id="line-141"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-142"></span><span id="toMayan"><span class="annot"><span class="annottext">toMayan :: forall i. Integral i =&gt; i -&gt; Maybe Text
+</span><a href="Data.Char.Number.Mayan.html#toMayan"><span class="hs-identifier hs-var hs-var">toMayan</span></a></span></span><span> </span><span id="local-6989586621679287809"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679287809"><span class="hs-identifier hs-var">n</span></a></span></span><span>
+</span><span id="line-143"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679287809"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Text
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-144"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe Text
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; Text
+forall i. Integral i =&gt; i -&gt; Text
+</span><a href="Data.Char.Number.Mayan.html#toMayan%27"><span class="hs-identifier hs-var">toMayan'</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679287809"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-145"></span><span>
+</span><span id="line-146"></span><span class="annot"><span class="hs-comment">-- | Convert the given 'Integral' number to a 'Text' object that writes the Mayan number from left-to-right.</span></span><span>
+</span><span id="line-147"></span><span id="local-6989586621679287810"><span class="annot"><a href="Data.Char.Number.Mayan.html#toMayan%27"><span class="hs-identifier hs-type">toMayan'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-148"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679287810"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-149"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert to a /horizontal/ 'String' object.</span></span><span>
+</span><span id="line-150"></span><span>  </span><span class="annot"><a href="#local-6989586621679287810"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-151"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'Text' that contains the Mayan number.</span></span><span>
+</span><span id="line-152"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-153"></span><span id="toMayan%27"><span class="annot"><span class="annottext">toMayan' :: forall i. Integral i =&gt; i -&gt; Text
+</span><a href="Data.Char.Number.Mayan.html#toMayan%27"><span class="hs-identifier hs-var hs-var">toMayan'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
+</span><span class="hs-identifier hs-var">pack</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Text) -&gt; (i -&gt; String) -&gt; i -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">i -&gt; String
+forall i. Integral i =&gt; i -&gt; String
+</span><a href="Data.Char.Number.Mayan.html#toMayan%27%27"><span class="hs-identifier hs-var">toMayan''</span></a></span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span class="annot"><span class="hs-comment">-- | Convert the given 'Integral' number to a 'String' object that writes the Mayan number from left-to-right.</span></span><span>
+</span><span id="line-156"></span><span id="local-6989586621679287813"><span class="annot"><a href="Data.Char.Number.Mayan.html#toMayan%27%27"><span class="hs-identifier hs-type">toMayan''</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-157"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679287813"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-158"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert to a /horizontal/ 'String' object.</span></span><span>
+</span><span id="line-159"></span><span>  </span><span class="annot"><a href="#local-6989586621679287813"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-160"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'String' that contains the Mayan number.</span></span><span>
+</span><span id="line-161"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">String</span></span></span><span>
+</span><span id="line-162"></span><span id="toMayan%27%27"><span class="annot"><span class="annottext">toMayan'' :: forall i. Integral i =&gt; i -&gt; String
+</span><a href="Data.Char.Number.Mayan.html#toMayan%27%27"><span class="hs-identifier hs-var hs-var">toMayan''</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; i -&gt; String
+forall {t}. Integral t =&gt; String -&gt; t -&gt; String
+</span><a href="#local-6989586621679287816"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-163"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-164"></span><span>    </span><span id="local-6989586621679287816"><span class="annot"><span class="annottext">go :: String -&gt; t -&gt; String
+</span><a href="#local-6989586621679287816"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621679287828"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679287828"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span id="local-6989586621679287829"><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679287829"><span class="hs-identifier hs-var">n</span></a></span></span><span>
+</span><span id="line-165"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679287829"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">t -&gt; t -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">t
+</span><span class="hs-number">19</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">t -&gt; Char
+</span><a href="#local-6989586621679287830"><span class="hs-identifier hs-var">ch</span></a></span><span> </span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679287829"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; ShowS
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679287828"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-166"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; t -&gt; String
+</span><a href="#local-6989586621679287816"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">t -&gt; Char
+</span><a href="#local-6989586621679287830"><span class="hs-identifier hs-var">ch</span></a></span><span> </span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679287831"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; ShowS
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679287828"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679287832"><span class="hs-identifier hs-var">q</span></a></span><span>
+</span><span id="line-167"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-168"></span><span>        </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span id="local-6989586621679287832"><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679287832"><span class="hs-identifier hs-var">q</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679287831"><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679287831"><span class="hs-identifier hs-var">r</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679287829"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">t -&gt; t -&gt; (t, t)
+forall a. Integral a =&gt; a -&gt; a -&gt; (a, a)
+</span><span class="hs-operator hs-var">`quotRem`</span></span><span> </span><span class="annot"><span class="annottext">t
+</span><span class="hs-number">20</span></span><span>
+</span><span id="line-169"></span><span>        </span><span id="local-6989586621679287830"><span class="annot"><span class="annottext">ch :: t -&gt; Char
+</span><a href="#local-6989586621679287830"><span class="hs-identifier hs-var hs-var">ch</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MayanLiteral -&gt; Char
+forall a. UnicodeCharacter a =&gt; a -&gt; Char
+</span><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var">toUnicodeChar</span></a></span><span> </span><span class="annot"><span class="annottext">(MayanLiteral -&gt; Char) -&gt; (t -&gt; MayanLiteral) -&gt; t -&gt; Char
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">forall a. Enum a =&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Data.Char.Number.Mayan.html#MayanLiteral"><span class="hs-identifier hs-type">MayanLiteral</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; MayanLiteral) -&gt; (t -&gt; Int) -&gt; t -&gt; MayanLiteral
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">t -&gt; Int
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span>
+</span><span id="line-170"></span></pre></body></html>

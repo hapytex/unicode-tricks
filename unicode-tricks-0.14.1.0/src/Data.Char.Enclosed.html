@@ -1,0 +1,435 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Module      : Data.Char.Enclosed</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- Description : A module to map alphanumerical characters to their equivalent in an enclosed forms.</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-9"></span><span class="hs-comment">--</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Unicode defines two blocks of enclosed alphanumerical characters. The &lt;http://unicode.org/charts/PDF/U2460.pdf U2460 block&gt;, and the &lt;http://unicode.org/charts/PDF/U1F100.pdf 1F100 block&gt;.</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- This module aims to make it more convenient to map numbers, upper case and lower case values to their corresponding enclosed characters.</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Enclosed</span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Numbers with comma</span></span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#numberWithComma"><span class="hs-identifier">numberWithComma</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#numberWithComma%27"><span class="hs-identifier">numberWithComma'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Circled alphanumerical characters</span></span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#circledAlpha"><span class="hs-identifier">circledAlpha</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#circledAlpha%27"><span class="hs-identifier">circledAlpha'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#circledNumber"><span class="hs-identifier">circledNumber</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#circledNumber%27"><span class="hs-identifier">circledNumber'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Parenthesized alphanumerical characters</span></span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#parenthesizedAlpha"><span class="hs-identifier">parenthesizedAlpha</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#parenthesizedAlpha%27"><span class="hs-identifier">parenthesizedAlpha'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-26"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#parenthesizedNumber"><span class="hs-identifier">parenthesizedNumber</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-27"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#parenthesizedNumber%27"><span class="hs-identifier">parenthesizedNumber'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Numbers with period</span></span><span>
+</span><span id="line-30"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#numberWithPeriod"><span class="hs-identifier">numberWithPeriod</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-31"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#numberWithPeriod%27"><span class="hs-identifier">numberWithPeriod'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Double circled numbers</span></span><span>
+</span><span id="line-34"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#doubleCircledNumber"><span class="hs-identifier">doubleCircledNumber</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-35"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#doubleCircledNumber%27"><span class="hs-identifier">doubleCircledNumber'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Regional indicators</span></span><span>
+</span><span id="line-38"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#regionalIndicatorUppercase"><span class="hs-identifier">regionalIndicatorUppercase</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-39"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#regionalIndicatorUppercase%27"><span class="hs-identifier">regionalIndicatorUppercase'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Squared Latin letters</span></span><span>
+</span><span id="line-42"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#squaredUppercase"><span class="hs-identifier">squaredUppercase</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-43"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#squaredUppercase%27"><span class="hs-identifier">squaredUppercase'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span>    </span><span class="annot"><span class="hs-comment">-- * White on black circled Latin letters</span></span><span>
+</span><span id="line-46"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#whiteOnBlackCircledUppercase"><span class="hs-identifier">whiteOnBlackCircledUppercase</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-47"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#whiteOnBlackCircledUppercase%27"><span class="hs-identifier">whiteOnBlackCircledUppercase'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span>    </span><span class="annot"><span class="hs-comment">-- * White on black squared Latin letters</span></span><span>
+</span><span id="line-50"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#whiteOnBlackSquaredUppercase"><span class="hs-identifier">whiteOnBlackSquaredUppercase</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-51"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#whiteOnBlackSquaredUppercase%27"><span class="hs-identifier">whiteOnBlackSquaredUppercase'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span>    </span><span class="annot"><span class="hs-comment">-- * White numbers on a black circle</span></span><span>
+</span><span id="line-54"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#numberWhiteOnBlackCircle"><span class="hs-identifier">numberWhiteOnBlackCircle</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-55"></span><span>    </span><span class="annot"><a href="Data.Char.Enclosed.html#numberWhiteOnBlackCircle%27"><span class="hs-identifier">numberWhiteOnBlackCircle'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-57"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#liftDigit"><span class="hs-identifier">liftDigit</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#liftDigit%27"><span class="hs-identifier">liftDigit'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#liftNumber"><span class="hs-identifier">liftNumber</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#liftNumber%27"><span class="hs-identifier">liftNumber'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#liftNumberFrom"><span class="hs-identifier">liftNumberFrom</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#liftNumberFrom%27"><span class="hs-identifier">liftNumberFrom'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#liftUpperLowercase"><span class="hs-identifier">liftUpperLowercase</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#liftUpperLowercase%27"><span class="hs-identifier">liftUpperLowercase'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#liftUppercase"><span class="hs-identifier">liftUppercase</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#liftUppercase%27"><span class="hs-identifier">liftUppercase'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-60"></span><span>
+</span><span id="line-61"></span><span class="hs-comment">-- | Convert the given number to a 'Char'acter where the number is circled</span><span>
+</span><span id="line-62"></span><span class="hs-comment">-- wrapped in a 'Just'. This works for numbers in the @0-20@ range. For numbers</span><span>
+</span><span id="line-63"></span><span class="hs-comment">-- outside this range 'Nothing' is returned.</span><span>
+</span><span id="line-64"></span><span class="annot"><a href="Data.Char.Enclosed.html#circledNumber"><span class="hs-identifier hs-type">circledNumber</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-65"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-66"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-67"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A 'Char'acter that is circled variant of the given number wrapped in a 'Just' data constructor if it exists; 'Nothing' otherwise.</span></span><span>
+</span><span id="line-68"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-69"></span><span id="circledNumber"><span class="annot"><span class="annottext">circledNumber :: Int -&gt; Maybe Char
+</span><a href="Data.Char.Enclosed.html#circledNumber"><span class="hs-identifier hs-var hs-var">circledNumber</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x24ea'</span></span><span>
+</span><span id="line-70"></span><span class="annot"><a href="Data.Char.Enclosed.html#circledNumber"><span class="hs-identifier hs-var">circledNumber</span></a></span><span> </span><span id="local-6989586621679280927"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280927"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Maybe Char
+</span><a href="Data.Char.Core.html#liftNumber"><span class="hs-identifier hs-var">liftNumber</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">20</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x245f</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280927"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-71"></span><span>
+</span><span id="line-72"></span><span class="hs-comment">-- | Convert the given number to a 'Char'acter where the number is circled.</span><span>
+</span><span id="line-73"></span><span class="hs-comment">-- This works for numbers in the @0-20@ range. For numbers outside this range,</span><span>
+</span><span id="line-74"></span><span class="hs-comment">-- the behavior is unspecified.</span><span>
+</span><span id="line-75"></span><span class="annot"><a href="Data.Char.Enclosed.html#circledNumber%27"><span class="hs-identifier hs-type">circledNumber'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-76"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-77"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-78"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A character that is the circled variant of the given number.</span></span><span>
+</span><span id="line-79"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-80"></span><span id="circledNumber%27"><span class="annot"><span class="annottext">circledNumber' :: Int -&gt; Char
+</span><a href="Data.Char.Enclosed.html#circledNumber%27"><span class="hs-identifier hs-var hs-var">circledNumber'</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x24ea'</span></span><span>
+</span><span id="line-81"></span><span class="annot"><a href="Data.Char.Enclosed.html#circledNumber%27"><span class="hs-identifier hs-var">circledNumber'</span></a></span><span> </span><span id="local-6989586621679280928"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280928"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Char
+</span><a href="Data.Char.Core.html#liftNumber%27"><span class="hs-identifier hs-var">liftNumber'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x245f</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280928"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span class="hs-comment">-- | Convert the given upper case or lower case 'Char'acter to a character that</span><span>
+</span><span id="line-84"></span><span class="hs-comment">-- is circled. The result is wrapped in a 'Just' data constructor. If the value</span><span>
+</span><span id="line-85"></span><span class="hs-comment">-- is outside the @A-Z,a-z@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-86"></span><span class="annot"><a href="Data.Char.Enclosed.html#circledAlpha"><span class="hs-identifier hs-type">circledAlpha</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-87"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Char'acter to convert.</span></span><span>
+</span><span id="line-88"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-89"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter wrapped in a 'Just' data constructor. If outside the range, 'Nothing'.</span></span><span>
+</span><span id="line-90"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-91"></span><span id="circledAlpha"><span class="annot"><span class="annottext">circledAlpha :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Enclosed.html#circledAlpha"><span class="hs-identifier hs-var hs-var">circledAlpha</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Core.html#liftUpperLowercase"><span class="hs-identifier hs-var">liftUpperLowercase</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x24b6</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x24d0</span></span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span class="hs-comment">-- | Convert the given upper case or lower case 'Char'acter to a character that</span><span>
+</span><span id="line-94"></span><span class="hs-comment">-- is circled. If the value is outside the @A-Z,a-z@ range, the result is</span><span>
+</span><span id="line-95"></span><span class="hs-comment">-- unspecified.</span><span>
+</span><span id="line-96"></span><span class="annot"><a href="Data.Char.Enclosed.html#circledAlpha%27"><span class="hs-identifier hs-type">circledAlpha'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-97"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Char'acter to convert.</span></span><span>
+</span><span id="line-98"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-99"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter. If outside the range, unspecified result.</span></span><span>
+</span><span id="line-100"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-101"></span><span id="circledAlpha%27"><span class="annot"><span class="annottext">circledAlpha' :: Char -&gt; Char
+</span><a href="Data.Char.Enclosed.html#circledAlpha%27"><span class="hs-identifier hs-var hs-var">circledAlpha'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Core.html#liftUpperLowercase%27"><span class="hs-identifier hs-var">liftUpperLowercase'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x24b6</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x24d0</span></span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span class="hs-comment">-- | Convert the given number to a 'Char'acter where the number is</span><span>
+</span><span id="line-104"></span><span class="hs-comment">-- parenthesized wrapped in a 'Just' data constructor. If the number is outside</span><span>
+</span><span id="line-105"></span><span class="hs-comment">-- the @1-20@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-106"></span><span class="annot"><a href="Data.Char.Enclosed.html#parenthesizedNumber"><span class="hs-identifier hs-type">parenthesizedNumber</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-107"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-108"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-109"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter wrapped in a 'Just' data constructor. If outside the range, 'Nothing'.</span></span><span>
+</span><span id="line-110"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-111"></span><span id="parenthesizedNumber"><span class="annot"><span class="annottext">parenthesizedNumber :: Int -&gt; Maybe Char
+</span><a href="Data.Char.Enclosed.html#parenthesizedNumber"><span class="hs-identifier hs-var hs-var">parenthesizedNumber</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; Maybe Char
+</span><a href="Data.Char.Core.html#liftNumberFrom"><span class="hs-identifier hs-var">liftNumberFrom</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">20</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x2474</span></span><span>
+</span><span id="line-112"></span><span>
+</span><span id="line-113"></span><span class="hs-comment">-- | Convert the given number to a 'Char'acter where the number is</span><span>
+</span><span id="line-114"></span><span class="hs-comment">-- parenthesized. If the number is outside the @1-20@ range, the result is</span><span>
+</span><span id="line-115"></span><span class="hs-comment">-- unspecified.</span><span>
+</span><span id="line-116"></span><span class="annot"><a href="Data.Char.Enclosed.html#parenthesizedNumber%27"><span class="hs-identifier hs-type">parenthesizedNumber'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-117"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-118"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-119"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter. If outside the range, unspecified result.</span></span><span>
+</span><span id="line-120"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-121"></span><span id="parenthesizedNumber%27"><span class="annot"><span class="annottext">parenthesizedNumber' :: Int -&gt; Char
+</span><a href="Data.Char.Enclosed.html#parenthesizedNumber%27"><span class="hs-identifier hs-var hs-var">parenthesizedNumber'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Char
+</span><a href="Data.Char.Core.html#liftNumberFrom%27"><span class="hs-identifier hs-var">liftNumberFrom'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x2474</span></span><span>
+</span><span id="line-122"></span><span>
+</span><span id="line-123"></span><span class="hs-comment">-- | Convert the given number to a 'Char'acter where the number is succeeded by a</span><span>
+</span><span id="line-124"></span><span class="hs-comment">-- period (@.@) wrapped in a 'Just' data constructor. If the number is outside the</span><span>
+</span><span id="line-125"></span><span class="hs-comment">-- @0-20@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-126"></span><span class="annot"><a href="Data.Char.Enclosed.html#numberWithPeriod"><span class="hs-identifier hs-type">numberWithPeriod</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-127"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-128"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-129"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter wrapped in a 'Just' data constructor. If outside the range, 'Nothing'.</span></span><span>
+</span><span id="line-130"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-131"></span><span id="numberWithPeriod"><span class="annot"><span class="annottext">numberWithPeriod :: Int -&gt; Maybe Char
+</span><a href="Data.Char.Enclosed.html#numberWithPeriod"><span class="hs-identifier hs-var hs-var">numberWithPeriod</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f100'</span></span><span>
+</span><span id="line-132"></span><span class="annot"><a href="Data.Char.Enclosed.html#numberWithPeriod"><span class="hs-identifier hs-var">numberWithPeriod</span></a></span><span> </span><span id="local-6989586621679280929"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280929"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Maybe Char
+</span><a href="Data.Char.Core.html#liftNumber"><span class="hs-identifier hs-var">liftNumber</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">20</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x2487</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280929"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-133"></span><span>
+</span><span id="line-134"></span><span class="hs-comment">-- | Convert the given number to 'Char'acter where the number is succeeded by a</span><span>
+</span><span id="line-135"></span><span class="hs-comment">-- period (@.@). If the number is outside the @0-20@ range, the result is</span><span>
+</span><span id="line-136"></span><span class="hs-comment">-- unspecified.</span><span>
+</span><span id="line-137"></span><span class="annot"><a href="Data.Char.Enclosed.html#numberWithPeriod%27"><span class="hs-identifier hs-type">numberWithPeriod'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-138"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-139"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-140"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter. If outside the range, unspecified result.</span></span><span>
+</span><span id="line-141"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-142"></span><span id="numberWithPeriod%27"><span class="annot"><span class="annottext">numberWithPeriod' :: Int -&gt; Char
+</span><a href="Data.Char.Enclosed.html#numberWithPeriod%27"><span class="hs-identifier hs-var hs-var">numberWithPeriod'</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f100'</span></span><span>
+</span><span id="line-143"></span><span class="annot"><a href="Data.Char.Enclosed.html#numberWithPeriod%27"><span class="hs-identifier hs-var">numberWithPeriod'</span></a></span><span> </span><span id="local-6989586621679280930"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280930"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Char
+</span><a href="Data.Char.Core.html#liftNumber%27"><span class="hs-identifier hs-var">liftNumber'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x2487</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280930"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-144"></span><span>
+</span><span id="line-145"></span><span class="hs-comment">-- | Convert the given number to a 'Char'acter where the number is double</span><span>
+</span><span id="line-146"></span><span class="hs-comment">-- circled. The result is wrapped in a 'Just' data constructor.</span><span>
+</span><span id="line-147"></span><span class="hs-comment">-- If the given number is outside the @1-10@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-148"></span><span class="annot"><a href="Data.Char.Enclosed.html#doubleCircledNumber"><span class="hs-identifier hs-type">doubleCircledNumber</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-149"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-150"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-151"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter wrapped in a 'Just' data constructor. If outside the range, 'Nothing'.</span></span><span>
+</span><span id="line-152"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-153"></span><span id="doubleCircledNumber"><span class="annot"><span class="annottext">doubleCircledNumber :: Int -&gt; Maybe Char
+</span><a href="Data.Char.Enclosed.html#doubleCircledNumber"><span class="hs-identifier hs-var hs-var">doubleCircledNumber</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; Maybe Char
+</span><a href="Data.Char.Core.html#liftNumberFrom"><span class="hs-identifier hs-var">liftNumberFrom</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">10</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x24f5</span></span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span class="hs-comment">-- | Convert the given number to a 'Char'acter where the number is double</span><span>
+</span><span id="line-156"></span><span class="hs-comment">-- circled. If the given number is outside the @1-10@ range, the result is</span><span>
+</span><span id="line-157"></span><span class="hs-comment">-- unspecified.</span><span>
+</span><span id="line-158"></span><span class="annot"><a href="Data.Char.Enclosed.html#doubleCircledNumber%27"><span class="hs-identifier hs-type">doubleCircledNumber'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-159"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-160"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-161"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter. If outside the range, unspecified result.</span></span><span>
+</span><span id="line-162"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-163"></span><span id="doubleCircledNumber%27"><span class="annot"><span class="annottext">doubleCircledNumber' :: Int -&gt; Char
+</span><a href="Data.Char.Enclosed.html#doubleCircledNumber%27"><span class="hs-identifier hs-var hs-var">doubleCircledNumber'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Char
+</span><a href="Data.Char.Core.html#liftNumberFrom%27"><span class="hs-identifier hs-var">liftNumberFrom'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x24f5</span></span><span>
+</span><span id="line-164"></span><span>
+</span><span id="line-165"></span><span class="hs-comment">-- | Convert the given number to a 'Char'acter where the number is succeeded by</span><span>
+</span><span id="line-166"></span><span class="hs-comment">-- a comma (@,@). The result is wrapped in a 'Just' data constructor. If the</span><span>
+</span><span id="line-167"></span><span class="hs-comment">-- given number is outside the @0-9@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-168"></span><span class="annot"><a href="Data.Char.Enclosed.html#numberWithComma"><span class="hs-identifier hs-type">numberWithComma</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-169"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-170"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-171"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter wrapped in a 'Just' data constructor. If outside the range, 'Nothing'.</span></span><span>
+</span><span id="line-172"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-173"></span><span id="numberWithComma"><span class="annot"><span class="annottext">numberWithComma :: Int -&gt; Maybe Char
+</span><a href="Data.Char.Enclosed.html#numberWithComma"><span class="hs-identifier hs-var hs-var">numberWithComma</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Maybe Char
+</span><a href="Data.Char.Core.html#liftDigit"><span class="hs-identifier hs-var">liftDigit</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f101</span></span><span>
+</span><span id="line-174"></span><span>
+</span><span id="line-175"></span><span class="hs-comment">-- | Convert the given number to a 'Char'acter where the number is succeeded by</span><span>
+</span><span id="line-176"></span><span class="hs-comment">-- a comma (@,@). If the given number is outside the @0-9@ range, the result is</span><span>
+</span><span id="line-177"></span><span class="hs-comment">-- unspecified.</span><span>
+</span><span id="line-178"></span><span class="annot"><a href="Data.Char.Enclosed.html#numberWithComma%27"><span class="hs-identifier hs-type">numberWithComma'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-179"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-180"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-181"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter. If outside the range, unspecified result.</span></span><span>
+</span><span id="line-182"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-183"></span><span id="numberWithComma%27"><span class="annot"><span class="annottext">numberWithComma' :: Int -&gt; Char
+</span><a href="Data.Char.Enclosed.html#numberWithComma%27"><span class="hs-identifier hs-var hs-var">numberWithComma'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Char
+</span><a href="Data.Char.Core.html#liftDigit%27"><span class="hs-identifier hs-var">liftDigit'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f101</span></span><span>
+</span><span id="line-184"></span><span>
+</span><span id="line-185"></span><span class="hs-comment">-- | Convert the given upper case or lower case 'Char'acter to a 'Char'acter</span><span>
+</span><span id="line-186"></span><span class="hs-comment">-- where it is parenthesized. The result is wrapped in a 'Just' data constructor.</span><span>
+</span><span id="line-187"></span><span class="hs-comment">-- If the value is outside the @A-Z,a-z@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-188"></span><span class="annot"><a href="Data.Char.Enclosed.html#parenthesizedAlpha"><span class="hs-identifier hs-type">parenthesizedAlpha</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-189"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Char'acter to convert.</span></span><span>
+</span><span id="line-190"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-191"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter wrapped in a 'Just' data constructor. If outside the range, 'Nothing'.</span></span><span>
+</span><span id="line-192"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-193"></span><span id="parenthesizedAlpha"><span class="annot"><span class="annottext">parenthesizedAlpha :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Enclosed.html#parenthesizedAlpha"><span class="hs-identifier hs-var hs-var">parenthesizedAlpha</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Core.html#liftUpperLowercase"><span class="hs-identifier hs-var">liftUpperLowercase</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f110</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x249c</span></span><span>
+</span><span id="line-194"></span><span>
+</span><span id="line-195"></span><span class="hs-comment">-- | Convert the given upper case or lower case character to a 'Char'acter</span><span>
+</span><span id="line-196"></span><span class="hs-comment">-- where it is parenthesized. If the value is outside the @A-Z,a-z@ range,</span><span>
+</span><span id="line-197"></span><span class="hs-comment">-- the result is unspecified.</span><span>
+</span><span id="line-198"></span><span class="annot"><a href="Data.Char.Enclosed.html#parenthesizedAlpha%27"><span class="hs-identifier hs-type">parenthesizedAlpha'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-199"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Char'acter to convert.</span></span><span>
+</span><span id="line-200"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-201"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter. If outside the range, unspecified result.</span></span><span>
+</span><span id="line-202"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-203"></span><span id="parenthesizedAlpha%27"><span class="annot"><span class="annottext">parenthesizedAlpha' :: Char -&gt; Char
+</span><a href="Data.Char.Enclosed.html#parenthesizedAlpha%27"><span class="hs-identifier hs-var hs-var">parenthesizedAlpha'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Core.html#liftUpperLowercase%27"><span class="hs-identifier hs-var">liftUpperLowercase'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f110</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x249c</span></span><span>
+</span><span id="line-204"></span><span>
+</span><span id="line-205"></span><span class="hs-comment">-- | Convert the given upper case character to a 'Char'acter where it is</span><span>
+</span><span id="line-206"></span><span class="hs-comment">-- squared (put in a square box). The result is wrapped in a 'Just' data</span><span>
+</span><span id="line-207"></span><span class="hs-comment">-- constructor. If the value is outside the @A-Z@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-208"></span><span class="annot"><a href="Data.Char.Enclosed.html#squaredUppercase"><span class="hs-identifier hs-type">squaredUppercase</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-209"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Char'acter to convert.</span></span><span>
+</span><span id="line-210"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-211"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter wrapped in a 'Just' data constructor. If outside the range, 'Nothing'.</span></span><span>
+</span><span id="line-212"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-213"></span><span id="squaredUppercase"><span class="annot"><span class="annottext">squaredUppercase :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Enclosed.html#squaredUppercase"><span class="hs-identifier hs-var hs-var">squaredUppercase</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Core.html#liftUppercase"><span class="hs-identifier hs-var">liftUppercase</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f130</span></span><span>
+</span><span id="line-214"></span><span>
+</span><span id="line-215"></span><span class="hs-comment">-- | Convert the given upper case character to a 'Char'acter where it is squared</span><span>
+</span><span id="line-216"></span><span class="hs-comment">-- (put in a square box). If the value is outside the @A-Z@ range, the result is</span><span>
+</span><span id="line-217"></span><span class="hs-comment">-- unspecified.</span><span>
+</span><span id="line-218"></span><span class="annot"><a href="Data.Char.Enclosed.html#squaredUppercase%27"><span class="hs-identifier hs-type">squaredUppercase'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-219"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Char'acter to convert.</span></span><span>
+</span><span id="line-220"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-221"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter. If outside the range, unspecified result.</span></span><span>
+</span><span id="line-222"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-223"></span><span id="squaredUppercase%27"><span class="annot"><span class="annottext">squaredUppercase' :: Char -&gt; Char
+</span><a href="Data.Char.Enclosed.html#squaredUppercase%27"><span class="hs-identifier hs-var hs-var">squaredUppercase'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Core.html#liftUppercase%27"><span class="hs-identifier hs-var">liftUppercase'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f130</span></span><span>
+</span><span id="line-224"></span><span>
+</span><span id="line-225"></span><span class="hs-comment">-- | Convert the given upper case character to a character where the character</span><span>
+</span><span id="line-226"></span><span class="hs-comment">-- is written in white on a black circle. The result is wrapped in a 'Just' data</span><span>
+</span><span id="line-227"></span><span class="hs-comment">-- constructor. If the given value is outside the @A-Z@ range, 'Nothing' is</span><span>
+</span><span id="line-228"></span><span class="hs-comment">-- returned.</span><span>
+</span><span id="line-229"></span><span class="annot"><a href="Data.Char.Enclosed.html#whiteOnBlackCircledUppercase"><span class="hs-identifier hs-type">whiteOnBlackCircledUppercase</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-230"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Char'acter to convert.</span></span><span>
+</span><span id="line-231"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-232"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter wrapped in a 'Just' data constructor. If outside the range, 'Nothing'.</span></span><span>
+</span><span id="line-233"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-234"></span><span id="whiteOnBlackCircledUppercase"><span class="annot"><span class="annottext">whiteOnBlackCircledUppercase :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Enclosed.html#whiteOnBlackCircledUppercase"><span class="hs-identifier hs-var hs-var">whiteOnBlackCircledUppercase</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Core.html#liftUppercase"><span class="hs-identifier hs-var">liftUppercase</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f150</span></span><span>
+</span><span id="line-235"></span><span>
+</span><span id="line-236"></span><span class="hs-comment">-- | Convert the given upper case character to a character where the character</span><span>
+</span><span id="line-237"></span><span class="hs-comment">-- is written in white on a black circle. If the given value is outside the</span><span>
+</span><span id="line-238"></span><span class="hs-comment">-- @A-Z@ range, the result is unspecified.</span><span>
+</span><span id="line-239"></span><span class="annot"><a href="Data.Char.Enclosed.html#whiteOnBlackCircledUppercase%27"><span class="hs-identifier hs-type">whiteOnBlackCircledUppercase'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-240"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Char'acter to convert.</span></span><span>
+</span><span id="line-241"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-242"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter. If outside the range, unspecified result.</span></span><span>
+</span><span id="line-243"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-244"></span><span id="whiteOnBlackCircledUppercase%27"><span class="annot"><span class="annottext">whiteOnBlackCircledUppercase' :: Char -&gt; Char
+</span><a href="Data.Char.Enclosed.html#whiteOnBlackCircledUppercase%27"><span class="hs-identifier hs-var hs-var">whiteOnBlackCircledUppercase'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Core.html#liftUppercase%27"><span class="hs-identifier hs-var">liftUppercase'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f150</span></span><span>
+</span><span id="line-245"></span><span>
+</span><span id="line-246"></span><span class="hs-comment">-- | Convert the given upper case character to a character where the character</span><span>
+</span><span id="line-247"></span><span class="hs-comment">-- is written in white on a black square. The result is wrapped in a 'Just' data</span><span>
+</span><span id="line-248"></span><span class="hs-comment">-- constructor. If the given value is outside the @A-Z@ range, 'Nothing' is</span><span>
+</span><span id="line-249"></span><span class="hs-comment">-- returned.</span><span>
+</span><span id="line-250"></span><span class="annot"><a href="Data.Char.Enclosed.html#whiteOnBlackSquaredUppercase"><span class="hs-identifier hs-type">whiteOnBlackSquaredUppercase</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-251"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Char'acter to convert.</span></span><span>
+</span><span id="line-252"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-253"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter wrapped in a 'Just' data constructor. If outside the range, 'Nothing'.</span></span><span>
+</span><span id="line-254"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-255"></span><span id="whiteOnBlackSquaredUppercase"><span class="annot"><span class="annottext">whiteOnBlackSquaredUppercase :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Enclosed.html#whiteOnBlackSquaredUppercase"><span class="hs-identifier hs-var hs-var">whiteOnBlackSquaredUppercase</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Core.html#liftUppercase"><span class="hs-identifier hs-var">liftUppercase</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f170</span></span><span>
+</span><span id="line-256"></span><span>
+</span><span id="line-257"></span><span class="hs-comment">-- | Convert the given upper case character to a character where the character</span><span>
+</span><span id="line-258"></span><span class="hs-comment">-- is written in white on a black square. If the given value is outside the</span><span>
+</span><span id="line-259"></span><span class="hs-comment">-- @A-Z@ range, the result is unspecified.</span><span>
+</span><span id="line-260"></span><span class="annot"><a href="Data.Char.Enclosed.html#whiteOnBlackSquaredUppercase%27"><span class="hs-identifier hs-type">whiteOnBlackSquaredUppercase'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-261"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Char'acter to convert.</span></span><span>
+</span><span id="line-262"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-263"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter. If outside the range, unspecified result.</span></span><span>
+</span><span id="line-264"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-265"></span><span id="whiteOnBlackSquaredUppercase%27"><span class="annot"><span class="annottext">whiteOnBlackSquaredUppercase' :: Char -&gt; Char
+</span><a href="Data.Char.Enclosed.html#whiteOnBlackSquaredUppercase%27"><span class="hs-identifier hs-var hs-var">whiteOnBlackSquaredUppercase'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Core.html#liftUppercase%27"><span class="hs-identifier hs-var">liftUppercase'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f170</span></span><span>
+</span><span id="line-266"></span><span>
+</span><span id="line-267"></span><span class="hs-comment">-- | Convert the given number to a character where the number is written in</span><span>
+</span><span id="line-268"></span><span class="hs-comment">-- white on a black circle. The result is wrapped in a 'Just' data constructor.</span><span>
+</span><span id="line-269"></span><span class="hs-comment">-- If the given value is outside the @0,11-20@ range, 'Nothing' is returned.</span><span>
+</span><span id="line-270"></span><span class="annot"><a href="Data.Char.Enclosed.html#numberWhiteOnBlackCircle"><span class="hs-identifier hs-type">numberWhiteOnBlackCircle</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-271"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-272"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-273"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter wrapped in a 'Just' data constructor. If outside the range, 'Nothing'.</span></span><span>
+</span><span id="line-274"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-275"></span><span id="numberWhiteOnBlackCircle"><span class="annot"><span class="annottext">numberWhiteOnBlackCircle :: Int -&gt; Maybe Char
+</span><a href="Data.Char.Enclosed.html#numberWhiteOnBlackCircle"><span class="hs-identifier hs-var hs-var">numberWhiteOnBlackCircle</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x24ff'</span></span><span>
+</span><span id="line-276"></span><span class="annot"><a href="Data.Char.Enclosed.html#numberWhiteOnBlackCircle"><span class="hs-identifier hs-var">numberWhiteOnBlackCircle</span></a></span><span> </span><span id="local-6989586621679280931"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280931"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; Maybe Char
+</span><a href="Data.Char.Core.html#liftNumberFrom"><span class="hs-identifier hs-var">liftNumberFrom</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">11</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">20</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x24eb</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280931"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-277"></span><span>
+</span><span id="line-278"></span><span class="hs-comment">-- | Convert the given number to a character where the number is written in</span><span>
+</span><span id="line-279"></span><span class="hs-comment">-- white on a black circle. If the given value is outside the @0,11-20@ range,</span><span>
+</span><span id="line-280"></span><span class="hs-comment">-- the result is unspecified.</span><span>
+</span><span id="line-281"></span><span class="annot"><a href="Data.Char.Enclosed.html#numberWhiteOnBlackCircle%27"><span class="hs-identifier hs-type">numberWhiteOnBlackCircle'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-282"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-283"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-284"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter. If outside the range, unspecified result.</span></span><span>
+</span><span id="line-285"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-286"></span><span id="numberWhiteOnBlackCircle%27"><span class="annot"><span class="annottext">numberWhiteOnBlackCircle' :: Int -&gt; Char
+</span><a href="Data.Char.Enclosed.html#numberWhiteOnBlackCircle%27"><span class="hs-identifier hs-var hs-var">numberWhiteOnBlackCircle'</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x24ff'</span></span><span>
+</span><span id="line-287"></span><span class="annot"><a href="Data.Char.Enclosed.html#numberWhiteOnBlackCircle%27"><span class="hs-identifier hs-var">numberWhiteOnBlackCircle'</span></a></span><span> </span><span id="local-6989586621679280932"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280932"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Char
+</span><a href="Data.Char.Core.html#liftNumberFrom%27"><span class="hs-identifier hs-var">liftNumberFrom'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">11</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x24eb</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280932"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-288"></span><span>
+</span><span id="line-289"></span><span class="hs-comment">-- | Convert the given upper case character to a regional indicator character.</span><span>
+</span><span id="line-290"></span><span class="hs-comment">-- The result is wrapped in a 'Just' data constructor. If the value is outside</span><span>
+</span><span id="line-291"></span><span class="hs-comment">-- the @A-Z@ range, 'Nothing' is returned. The regional indicators are used for</span><span>
+</span><span id="line-292"></span><span class="hs-comment">-- flag emojis. Two consecutive regional indicators that together form an ISO</span><span>
+</span><span id="line-293"></span><span class="hs-comment">-- 63166 Alpha-2 code, then this will result in the corresponding flag Emoji.</span><span>
+</span><span id="line-294"></span><span class="hs-comment">-- Deprecated countries like the Soviet Union (SU) and Yugoslavia (YU) do not</span><span>
+</span><span id="line-295"></span><span class="hs-comment">-- have a flag emoji. Antarctica (AQ), the European Union (EU) and the United</span><span>
+</span><span id="line-296"></span><span class="hs-comment">-- Nations (UN) have a flag emoji.</span><span>
+</span><span id="line-297"></span><span class="annot"><a href="Data.Char.Enclosed.html#regionalIndicatorUppercase"><span class="hs-identifier hs-type">regionalIndicatorUppercase</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-298"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Char'acter to convert.</span></span><span>
+</span><span id="line-299"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-300"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter wrapped in a 'Just' data constructor. If outside the range, 'Nothing'.</span></span><span>
+</span><span id="line-301"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-302"></span><span id="regionalIndicatorUppercase"><span class="annot"><span class="annottext">regionalIndicatorUppercase :: Char -&gt; Maybe Char
+</span><a href="Data.Char.Enclosed.html#regionalIndicatorUppercase"><span class="hs-identifier hs-var hs-var">regionalIndicatorUppercase</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Maybe Char
+</span><a href="Data.Char.Core.html#liftUppercase"><span class="hs-identifier hs-var">liftUppercase</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f1e6</span></span><span>
+</span><span id="line-303"></span><span>
+</span><span id="line-304"></span><span class="hs-comment">-- | Convert the given upper case character to a regional indicator character.</span><span>
+</span><span id="line-305"></span><span class="hs-comment">-- If the value is outside the @A-Z@ range, the result is unspecified.</span><span>
+</span><span id="line-306"></span><span class="hs-comment">--</span><span>
+</span><span id="line-307"></span><span class="hs-comment">-- The regional indicators are used for flag emojis. Two consecutive regional</span><span>
+</span><span id="line-308"></span><span class="hs-comment">-- indicators that together form an ISO 63166 Alpha-2 code, then this will</span><span>
+</span><span id="line-309"></span><span class="hs-comment">-- result in the corresponding flag Emoji. Deprecated countries like the Soviet</span><span>
+</span><span id="line-310"></span><span class="hs-comment">-- Union (SU) and Yugoslavia (YU) do not have a flag emoji. Antarctica (AQ),</span><span>
+</span><span id="line-311"></span><span class="hs-comment">-- the European Union (EU) and the United Nations (UN) have a flag emoji.</span><span>
+</span><span id="line-312"></span><span class="annot"><a href="Data.Char.Enclosed.html#regionalIndicatorUppercase%27"><span class="hs-identifier hs-type">regionalIndicatorUppercase'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-313"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Char'acter to convert.</span></span><span>
+</span><span id="line-314"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-315"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter. If outside the range, unspecified result.</span></span><span>
+</span><span id="line-316"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-317"></span><span id="regionalIndicatorUppercase%27"><span class="annot"><span class="annottext">regionalIndicatorUppercase' :: Char -&gt; Char
+</span><a href="Data.Char.Enclosed.html#regionalIndicatorUppercase%27"><span class="hs-identifier hs-var hs-var">regionalIndicatorUppercase'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Char
+</span><a href="Data.Char.Core.html#liftUppercase%27"><span class="hs-identifier hs-var">liftUppercase'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f1e6</span></span><span>
+</span><span id="line-318"></span></pre></body></html>

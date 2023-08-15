@@ -1,0 +1,482 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="local-6989586621679278190"><span id="local-6989586621679278191"><span id="local-6989586621679278192"><span id="local-6989586621679278193"><span id="local-6989586621679278194"><span id="local-6989586621679278195"><span id="local-6989586621679278196"><span id="local-6989586621679278197"><span id="local-6989586621679278198"><span id="local-6989586621679278199"></span></span></span></span></span></span></span></span></span></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Module      : Data.Char.Emoji.Science</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Description : A module to render and parse emoji related to science.</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- Unicode defines nine Emoji related to science. This module has a data type together with functions</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- to convert this to and from a text fragment.</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Emoji.Science</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Defining science emoji.</span></span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Data.Char.Emoji.Science.html#ScienceEmoji"><span class="hs-identifier">ScienceEmoji</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Emoji.Science.html#Alembic"><span class="hs-identifier">Alembic</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Science.html#TestTube"><span class="hs-identifier">TestTube</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Science.html#PetriDish"><span class="hs-identifier">PetriDish</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Science.html#DnaDoubleHelix"><span class="hs-identifier">DnaDoubleHelix</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Science.html#Microscope"><span class="hs-identifier">Microscope</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Science.html#Telescope"><span class="hs-identifier">Telescope</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Science.html#SatelliteAntenna"><span class="hs-identifier">SatelliteAntenna</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Char</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">chr</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ord</span></span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier">UnicodeText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier">fromUnicodeText</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier">isInTextRange</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier">toUnicodeText</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">singleton</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">unpack</span></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitraryBoundedEnum</span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="annot"><span class="hs-comment">-- | There are nine emoji that depict science.</span></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">data</span><span> </span><span id="ScienceEmoji"><span class="annot"><a href="Data.Char.Emoji.Science.html#ScienceEmoji"><span class="hs-identifier hs-var">ScienceEmoji</span></a></span></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Alembic"><span class="annot"><a href="Data.Char.Emoji.Science.html#Alembic"><span class="hs-identifier hs-var">Alembic</span></a></span></span><span> </span><span class="hs-comment">-- An /alembic/ is an apparatus for destillation. Normally this is depicted as &#9879;&#65039;.</span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | A /test tube/ is used to conduct chemical experiments. Normally this is depicted as &#129514;.</span></span><span>
+</span><span id="line-34"></span><span>    </span><span id="TestTube"><span class="annot"><a href="Data.Char.Emoji.Science.html#TestTube"><span class="hs-identifier hs-var">TestTube</span></a></span></span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | A /petri dish/ is used to culture microbes. Normally this is depicted as &#129515;.</span></span><span>
+</span><span id="line-36"></span><span>    </span><span id="PetriDish"><span class="annot"><a href="Data.Char.Emoji.Science.html#PetriDish"><span class="hs-identifier hs-var">PetriDish</span></a></span></span><span>
+</span><span id="line-37"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | A double helix of DNA is the genetic blueprint of life. Normally this is depicted as &#129516;.</span></span><span>
+</span><span id="line-38"></span><span>    </span><span id="DnaDoubleHelix"><span class="annot"><a href="Data.Char.Emoji.Science.html#DnaDoubleHelix"><span class="hs-identifier hs-var">DnaDoubleHelix</span></a></span></span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | A /microscope/ is used to magnify small objects. Normally this is depicted as &#128300;.</span></span><span>
+</span><span id="line-40"></span><span>    </span><span id="Microscope"><span class="annot"><a href="Data.Char.Emoji.Science.html#Microscope"><span class="hs-identifier hs-var">Microscope</span></a></span></span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | A /telescope/ is used to gaze at stars and planets in the night sky. Normally this is depicted as &#128301;.</span></span><span>
+</span><span id="line-42"></span><span>    </span><span id="Telescope"><span class="annot"><a href="Data.Char.Emoji.Science.html#Telescope"><span class="hs-identifier hs-var">Telescope</span></a></span></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | A /dish satellite/ is used to send and receive to or from communication satellites. This is normally depicited as &#128225;.</span></span><span>
+</span><span id="line-44"></span><span>    </span><span id="SatelliteAntenna"><span class="annot"><a href="Data.Char.Emoji.Science.html#SatelliteAntenna"><span class="hs-identifier hs-var">SatelliteAntenna</span></a></span></span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679278217"><span id="local-6989586621679278219"><span class="annot"><span class="annottext">ScienceEmoji
+ScienceEmoji -&gt; ScienceEmoji -&gt; Bounded ScienceEmoji
+forall a. a -&gt; a -&gt; Bounded a
+$cminBound :: ScienceEmoji
+minBound :: ScienceEmoji
+$cmaxBound :: ScienceEmoji
+maxBound :: ScienceEmoji
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679278225"><span id="local-6989586621679278227"><span id="local-6989586621679278229"><span id="local-6989586621679278231"><span id="local-6989586621679278233"><span id="local-6989586621679278239"><span id="local-6989586621679278244"><span id="local-6989586621679278247"><span id="local-6989586621679278250"><span id="local-6989586621679278253"><span id="local-6989586621679278256"><span id="local-6989586621679278259"><span id="local-6989586621679278264"><span id="local-6989586621679278269"><span class="annot"><span class="annottext">Typeable ScienceEmoji
+Typeable ScienceEmoji
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; ScienceEmoji -&gt; c ScienceEmoji)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ScienceEmoji)
+-&gt; (ScienceEmoji -&gt; Constr)
+-&gt; (ScienceEmoji -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ScienceEmoji))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c ScienceEmoji))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; ScienceEmoji -&gt; ScienceEmoji)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ScienceEmoji -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ScienceEmoji -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ScienceEmoji -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ScienceEmoji -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; ScienceEmoji -&gt; m ScienceEmoji)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; ScienceEmoji -&gt; m ScienceEmoji)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; ScienceEmoji -&gt; m ScienceEmoji)
+-&gt; Data ScienceEmoji
+ScienceEmoji -&gt; Constr
+ScienceEmoji -&gt; DataType
+(forall b. Data b =&gt; b -&gt; b) -&gt; ScienceEmoji -&gt; ScienceEmoji
+forall a.
+Typeable a
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ScienceEmoji -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ScienceEmoji -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ScienceEmoji -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ScienceEmoji -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ScienceEmoji -&gt; m ScienceEmoji
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ScienceEmoji -&gt; m ScienceEmoji
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ScienceEmoji
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ScienceEmoji -&gt; c ScienceEmoji
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ScienceEmoji)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c ScienceEmoji)
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ScienceEmoji -&gt; c ScienceEmoji
+gfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; ScienceEmoji -&gt; c ScienceEmoji
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ScienceEmoji
+gunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c ScienceEmoji
+$ctoConstr :: ScienceEmoji -&gt; Constr
+toConstr :: ScienceEmoji -&gt; Constr
+$cdataTypeOf :: ScienceEmoji -&gt; DataType
+dataTypeOf :: ScienceEmoji -&gt; DataType
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ScienceEmoji)
+dataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c ScienceEmoji)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c ScienceEmoji)
+dataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c ScienceEmoji)
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; ScienceEmoji -&gt; ScienceEmoji
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; ScienceEmoji -&gt; ScienceEmoji
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ScienceEmoji -&gt; r
+gmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ScienceEmoji -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ScienceEmoji -&gt; r
+gmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; ScienceEmoji -&gt; r
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ScienceEmoji -&gt; [u]
+gmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; ScienceEmoji -&gt; [u]
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ScienceEmoji -&gt; u
+gmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; ScienceEmoji -&gt; u
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ScienceEmoji -&gt; m ScienceEmoji
+gmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ScienceEmoji -&gt; m ScienceEmoji
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ScienceEmoji -&gt; m ScienceEmoji
+gmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ScienceEmoji -&gt; m ScienceEmoji
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ScienceEmoji -&gt; m ScienceEmoji
+gmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; ScienceEmoji -&gt; m ScienceEmoji
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679278275"><span id="local-6989586621679278283"><span id="local-6989586621679278289"><span id="local-6989586621679278303"><span id="local-6989586621679278305"><span id="local-6989586621679278309"><span id="local-6989586621679278313"><span id="local-6989586621679278317"><span class="annot"><span class="annottext">Int -&gt; ScienceEmoji
+ScienceEmoji -&gt; Int
+ScienceEmoji -&gt; [ScienceEmoji]
+ScienceEmoji -&gt; ScienceEmoji
+ScienceEmoji -&gt; ScienceEmoji -&gt; [ScienceEmoji]
+ScienceEmoji -&gt; ScienceEmoji -&gt; ScienceEmoji -&gt; [ScienceEmoji]
+(ScienceEmoji -&gt; ScienceEmoji)
+-&gt; (ScienceEmoji -&gt; ScienceEmoji)
+-&gt; (Int -&gt; ScienceEmoji)
+-&gt; (ScienceEmoji -&gt; Int)
+-&gt; (ScienceEmoji -&gt; [ScienceEmoji])
+-&gt; (ScienceEmoji -&gt; ScienceEmoji -&gt; [ScienceEmoji])
+-&gt; (ScienceEmoji -&gt; ScienceEmoji -&gt; [ScienceEmoji])
+-&gt; (ScienceEmoji -&gt; ScienceEmoji -&gt; ScienceEmoji -&gt; [ScienceEmoji])
+-&gt; Enum ScienceEmoji
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+$csucc :: ScienceEmoji -&gt; ScienceEmoji
+succ :: ScienceEmoji -&gt; ScienceEmoji
+$cpred :: ScienceEmoji -&gt; ScienceEmoji
+pred :: ScienceEmoji -&gt; ScienceEmoji
+$ctoEnum :: Int -&gt; ScienceEmoji
+toEnum :: Int -&gt; ScienceEmoji
+$cfromEnum :: ScienceEmoji -&gt; Int
+fromEnum :: ScienceEmoji -&gt; Int
+$cenumFrom :: ScienceEmoji -&gt; [ScienceEmoji]
+enumFrom :: ScienceEmoji -&gt; [ScienceEmoji]
+$cenumFromThen :: ScienceEmoji -&gt; ScienceEmoji -&gt; [ScienceEmoji]
+enumFromThen :: ScienceEmoji -&gt; ScienceEmoji -&gt; [ScienceEmoji]
+$cenumFromTo :: ScienceEmoji -&gt; ScienceEmoji -&gt; [ScienceEmoji]
+enumFromTo :: ScienceEmoji -&gt; ScienceEmoji -&gt; [ScienceEmoji]
+$cenumFromThenTo :: ScienceEmoji -&gt; ScienceEmoji -&gt; ScienceEmoji -&gt; [ScienceEmoji]
+enumFromThenTo :: ScienceEmoji -&gt; ScienceEmoji -&gt; ScienceEmoji -&gt; [ScienceEmoji]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679278321"><span id="local-6989586621679278323"><span class="annot"><span class="annottext">ScienceEmoji -&gt; ScienceEmoji -&gt; Bool
+(ScienceEmoji -&gt; ScienceEmoji -&gt; Bool)
+-&gt; (ScienceEmoji -&gt; ScienceEmoji -&gt; Bool) -&gt; Eq ScienceEmoji
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: ScienceEmoji -&gt; ScienceEmoji -&gt; Bool
+== :: ScienceEmoji -&gt; ScienceEmoji -&gt; Bool
+$c/= :: ScienceEmoji -&gt; ScienceEmoji -&gt; Bool
+/= :: ScienceEmoji -&gt; ScienceEmoji -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679278328"><span id="local-6989586621679278330"><span class="annot"><span class="annottext">(forall x. ScienceEmoji -&gt; Rep ScienceEmoji x)
+-&gt; (forall x. Rep ScienceEmoji x -&gt; ScienceEmoji)
+-&gt; Generic ScienceEmoji
+forall x. Rep ScienceEmoji x -&gt; ScienceEmoji
+forall x. ScienceEmoji -&gt; Rep ScienceEmoji x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cfrom :: forall x. ScienceEmoji -&gt; Rep ScienceEmoji x
+from :: forall x. ScienceEmoji -&gt; Rep ScienceEmoji x
+$cto :: forall x. Rep ScienceEmoji x -&gt; ScienceEmoji
+to :: forall x. Rep ScienceEmoji x -&gt; ScienceEmoji
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679278336"><span id="local-6989586621679278338"><span id="local-6989586621679278340"><span id="local-6989586621679278344"><span id="local-6989586621679278347"><span id="local-6989586621679278350"><span id="local-6989586621679278353"><span class="annot"><span class="annottext">Eq ScienceEmoji
+Eq ScienceEmoji
+-&gt; (ScienceEmoji -&gt; ScienceEmoji -&gt; Ordering)
+-&gt; (ScienceEmoji -&gt; ScienceEmoji -&gt; Bool)
+-&gt; (ScienceEmoji -&gt; ScienceEmoji -&gt; Bool)
+-&gt; (ScienceEmoji -&gt; ScienceEmoji -&gt; Bool)
+-&gt; (ScienceEmoji -&gt; ScienceEmoji -&gt; Bool)
+-&gt; (ScienceEmoji -&gt; ScienceEmoji -&gt; ScienceEmoji)
+-&gt; (ScienceEmoji -&gt; ScienceEmoji -&gt; ScienceEmoji)
+-&gt; Ord ScienceEmoji
+ScienceEmoji -&gt; ScienceEmoji -&gt; Bool
+ScienceEmoji -&gt; ScienceEmoji -&gt; Ordering
+ScienceEmoji -&gt; ScienceEmoji -&gt; ScienceEmoji
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: ScienceEmoji -&gt; ScienceEmoji -&gt; Ordering
+compare :: ScienceEmoji -&gt; ScienceEmoji -&gt; Ordering
+$c&lt; :: ScienceEmoji -&gt; ScienceEmoji -&gt; Bool
+&lt; :: ScienceEmoji -&gt; ScienceEmoji -&gt; Bool
+$c&lt;= :: ScienceEmoji -&gt; ScienceEmoji -&gt; Bool
+&lt;= :: ScienceEmoji -&gt; ScienceEmoji -&gt; Bool
+$c&gt; :: ScienceEmoji -&gt; ScienceEmoji -&gt; Bool
+&gt; :: ScienceEmoji -&gt; ScienceEmoji -&gt; Bool
+$c&gt;= :: ScienceEmoji -&gt; ScienceEmoji -&gt; Bool
+&gt;= :: ScienceEmoji -&gt; ScienceEmoji -&gt; Bool
+$cmax :: ScienceEmoji -&gt; ScienceEmoji -&gt; ScienceEmoji
+max :: ScienceEmoji -&gt; ScienceEmoji -&gt; ScienceEmoji
+$cmin :: ScienceEmoji -&gt; ScienceEmoji -&gt; ScienceEmoji
+min :: ScienceEmoji -&gt; ScienceEmoji -&gt; ScienceEmoji
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679278357"><span id="local-6989586621679278361"><span id="local-6989586621679278364"><span id="local-6989586621679278374"><span class="annot"><span class="annottext">ReadPrec [ScienceEmoji]
+ReadPrec ScienceEmoji
+Int -&gt; ReadS ScienceEmoji
+ReadS [ScienceEmoji]
+(Int -&gt; ReadS ScienceEmoji)
+-&gt; ReadS [ScienceEmoji]
+-&gt; ReadPrec ScienceEmoji
+-&gt; ReadPrec [ScienceEmoji]
+-&gt; Read ScienceEmoji
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+$creadsPrec :: Int -&gt; ReadS ScienceEmoji
+readsPrec :: Int -&gt; ReadS ScienceEmoji
+$creadList :: ReadS [ScienceEmoji]
+readList :: ReadS [ScienceEmoji]
+$creadPrec :: ReadPrec ScienceEmoji
+readPrec :: ReadPrec ScienceEmoji
+$creadListPrec :: ReadPrec [ScienceEmoji]
+readListPrec :: ReadPrec [ScienceEmoji]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679278378"><span id="local-6989586621679278380"><span id="local-6989586621679278384"><span class="annot"><span class="annottext">Int -&gt; ScienceEmoji -&gt; ShowS
+[ScienceEmoji] -&gt; ShowS
+ScienceEmoji -&gt; [Char]
+(Int -&gt; ScienceEmoji -&gt; ShowS)
+-&gt; (ScienceEmoji -&gt; [Char])
+-&gt; ([ScienceEmoji] -&gt; ShowS)
+-&gt; Show ScienceEmoji
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; [Char]) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; ScienceEmoji -&gt; ShowS
+showsPrec :: Int -&gt; ScienceEmoji -&gt; ShowS
+$cshow :: ScienceEmoji -&gt; [Char]
+show :: ScienceEmoji -&gt; [Char]
+$cshowList :: [ScienceEmoji] -&gt; ShowS
+showList :: [ScienceEmoji] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679278389"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Science.html#ScienceEmoji"><span class="hs-identifier hs-type">ScienceEmoji</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-48"></span><span>  </span><span id="local-6989586621679278395"><span class="annot"><span class="annottext">arbitrary :: Gen ScienceEmoji
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen ScienceEmoji
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679278399"><span id="local-6989586621679278406"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Science.html#ScienceEmoji"><span class="hs-identifier hs-type">ScienceEmoji</span></a></span></span></span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679278429"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Science.html#ScienceEmoji"><span class="hs-identifier hs-type">ScienceEmoji</span></a></span></span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679278456"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Science.html#ScienceEmoji"><span class="hs-identifier hs-type">ScienceEmoji</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-55"></span><span>  </span><span id="local-6989586621679278469"><span class="annot"><span class="annottext">toUnicodeText :: ScienceEmoji -&gt; Text
+</span><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeText</span></a></span></span><span> </span><span class="annot"><span class="annottext">ScienceEmoji
+</span><a href="Data.Char.Emoji.Science.html#Alembic"><span class="hs-identifier hs-var">Alembic</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x2697\xfe0f&quot;</span></span><span>
+</span><span id="line-56"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var">toUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">ScienceEmoji
+</span><a href="Data.Char.Emoji.Science.html#Microscope"><span class="hs-identifier hs-var">Microscope</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f52c&quot;</span></span><span>
+</span><span id="line-57"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var">toUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">ScienceEmoji
+</span><a href="Data.Char.Emoji.Science.html#Telescope"><span class="hs-identifier hs-var">Telescope</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f52d&quot;</span></span><span>
+</span><span id="line-58"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var">toUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">ScienceEmoji
+</span><a href="Data.Char.Emoji.Science.html#SatelliteAntenna"><span class="hs-identifier hs-var">SatelliteAntenna</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f4e1&quot;</span></span><span>
+</span><span id="line-59"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeText"><span class="hs-identifier hs-var">toUnicodeText</span></a></span><span> </span><span id="local-6989586621679278470"><span class="annot"><span class="annottext">ScienceEmoji
+</span><a href="#local-6989586621679278470"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Text
+</span><span class="hs-identifier hs-var">singleton</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ScienceEmoji -&gt; Int
+forall a. Enum a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">ScienceEmoji
+</span><a href="#local-6989586621679278470"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f9e9</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-60"></span><span>  </span><span id="local-6989586621679278492"><span class="annot"><span class="annottext">fromUnicodeText :: Text -&gt; Maybe ScienceEmoji
+</span><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeText</span></a></span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x2697\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ScienceEmoji -&gt; Maybe ScienceEmoji
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">ScienceEmoji
+</span><a href="Data.Char.Emoji.Science.html#Alembic"><span class="hs-identifier hs-var">Alembic</span></a></span><span>
+</span><span id="line-61"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var">fromUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f52c&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ScienceEmoji -&gt; Maybe ScienceEmoji
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">ScienceEmoji
+</span><a href="Data.Char.Emoji.Science.html#Microscope"><span class="hs-identifier hs-var">Microscope</span></a></span><span>
+</span><span id="line-62"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var">fromUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f52d&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ScienceEmoji -&gt; Maybe ScienceEmoji
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">ScienceEmoji
+</span><a href="Data.Char.Emoji.Science.html#Telescope"><span class="hs-identifier hs-var">Telescope</span></a></span><span>
+</span><span id="line-63"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var">fromUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f4e1&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ScienceEmoji -&gt; Maybe ScienceEmoji
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">ScienceEmoji
+</span><a href="Data.Char.Emoji.Science.html#SatelliteAntenna"><span class="hs-identifier hs-var">SatelliteAntenna</span></a></span><span>
+</span><span id="line-64"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var">fromUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f9ea&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ScienceEmoji -&gt; Maybe ScienceEmoji
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">ScienceEmoji
+</span><a href="Data.Char.Emoji.Science.html#TestTube"><span class="hs-identifier hs-var">TestTube</span></a></span><span>
+</span><span id="line-65"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var">fromUnicodeText</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f9eb&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ScienceEmoji -&gt; Maybe ScienceEmoji
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">ScienceEmoji
+</span><a href="Data.Char.Emoji.Science.html#PetriDish"><span class="hs-identifier hs-var">PetriDish</span></a></span><span>
+</span><span id="line-66"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeText"><span class="hs-identifier hs-var">fromUnicodeText</span></a></span><span> </span><span id="local-6989586621679278493"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679278493"><span class="hs-identifier hs-var">t</span></a></span></span><span>
+</span><span id="line-67"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">[</span><span id="local-6989586621679278494"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679278494"><span class="hs-identifier hs-var">c</span></a></span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Char]
+</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679278493"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f9ea'</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679278494"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679278494"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f9ec'</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ScienceEmoji -&gt; Maybe ScienceEmoji
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; ScienceEmoji
+forall a. Enum a =&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char -&gt; Int
+</span><span class="hs-identifier hs-var">ord</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679278494"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1f9e9</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-68"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe ScienceEmoji
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-69"></span><span>  </span><span id="local-6989586621679278512"><span class="annot"><span class="annottext">isInTextRange :: Text -&gt; Bool
+</span><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInTextRange</span></a></span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x2697\xfe0f&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-70"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f52c&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-71"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f52d&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-72"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f4e1&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-73"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f9ea&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-74"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\x1f9eb&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-75"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var">isInTextRange</span></a></span><span> </span><span id="local-6989586621679278513"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679278513"><span class="hs-identifier hs-var">t</span></a></span></span><span>
+</span><span id="line-76"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">[</span><span id="local-6989586621679278514"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679278514"><span class="hs-identifier hs-var">c</span></a></span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Char]
+</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679278513"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f9ea'</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679278514"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679278514"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1f9ec'</span></span><span>
+</span><span id="line-77"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-78"></span></pre></body></html>

@@ -1,0 +1,519 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="local-6989586621679280494"><span id="local-6989586621679280495"><span id="local-6989586621679280496"><span id="local-6989586621679280497"><span id="local-6989586621679280498"><span id="local-6989586621679280499"><span id="local-6989586621679280500"><span id="local-6989586621679280501"><span id="local-6989586621679280502"><span id="local-6989586621679280503"><span id="local-6989586621679280504"><span id="local-6989586621679280505"><span id="local-6989586621679280506"><span id="local-6989586621679280507"><span id="local-6989586621679280508"></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE PatternSynonyms #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications #-}</span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Module      : Data.Char.Emoji.Zodiac</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Description : A module that defines zodiac emoji together with the English names as pattern synonyms.</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-13"></span><span class="hs-comment">--</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- Unicode has emojis for the twelve zodiac signs. In this module a data type is used to present the zodiac</span><span>
+</span><span id="line-15"></span><span class="hs-comment">-- emoji and also defines pattern synonyms for these.</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Emoji.Zodiac</span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Zodiac datatype</span></span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier">Zodiac</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Aries"><span class="hs-identifier">Aries</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Taurus"><span class="hs-identifier">Taurus</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Gemini"><span class="hs-identifier">Gemini</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Cancer"><span class="hs-identifier">Cancer</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Leo"><span class="hs-identifier">Leo</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Virgo"><span class="hs-identifier">Virgo</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Libra"><span class="hs-identifier">Libra</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Scorpio"><span class="hs-identifier">Scorpio</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Sagittarius"><span class="hs-identifier">Sagittarius</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Capricorn"><span class="hs-identifier">Capricorn</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Aquarius"><span class="hs-identifier">Aquarius</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Pisces"><span class="hs-identifier">Pisces</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Pattern aliasses</span></span><span>
+</span><span id="line-21"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Ram"><span class="hs-identifier">Ram</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Bull"><span class="hs-identifier">Bull</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-23"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Twins"><span class="hs-identifier">Twins</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Crab"><span class="hs-identifier">Crab</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Lion"><span class="hs-identifier">Lion</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-26"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Maiden"><span class="hs-identifier">Maiden</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-27"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Scales"><span class="hs-identifier">Scales</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-28"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Scorpius"><span class="hs-identifier">Scorpius</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-29"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Scorpion"><span class="hs-identifier">Scorpion</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-30"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Centaur"><span class="hs-identifier">Centaur</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-31"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Archer"><span class="hs-identifier">Archer</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-32"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Capricornus"><span class="hs-identifier">Capricornus</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-33"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#MountainGoat"><span class="hs-identifier">MountainGoat</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-34"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#GoatHorned"><span class="hs-identifier">GoatHorned</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-35"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#SeaGoat"><span class="hs-identifier">SeaGoat</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-36"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#WaterBearer"><span class="hs-identifier">WaterBearer</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-37"></span><span>    </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Fish"><span class="hs-identifier">Fish</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-38"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier">UnicodeCharacter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier">fromUnicodeChar</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar%27"><span class="hs-identifier">fromUnicodeChar'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier">isInCharRange</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier">toUnicodeChar</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier">UnicodeText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier">isInTextRange</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier">generateIsInTextRange'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapFromEnum"><span class="hs-identifier">mapFromEnum</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapToEnum"><span class="hs-identifier">mapToEnum</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#mapToEnumSafe"><span class="hs-identifier">mapToEnumSafe</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitraryBoundedEnum</span></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#_zodiacOffset"><span class="hs-identifier hs-type">_zodiacOffset</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-49"></span><span id="_zodiacOffset"><span class="annot"><span class="annottext">_zodiacOffset :: Int
+</span><a href="Data.Char.Emoji.Zodiac.html#_zodiacOffset"><span class="hs-identifier hs-var hs-var">_zodiacOffset</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x2648</span></span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- | A data type to deal with the /zodiac sign/ emoji. The data type lists the</span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- different zodiac signs as data constructors, and the instance of the</span><span>
+</span><span id="line-53"></span><span class="hs-comment">-- 'UnicodeCharacter' allows to convert it from and to a 'Char'acter.</span><span>
+</span><span id="line-54"></span><span class="hs-keyword">data</span><span> </span><span id="Zodiac"><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-var">Zodiac</span></a></span></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-comment">-- | The /aries/ zodiac sign, /ram/ in English, is denoted as &#9800;.</span></span><span>
+</span><span id="line-56"></span><span>    </span><span id="Aries"><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Aries"><span class="hs-identifier hs-var">Aries</span></a></span></span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /taurus/ zodiac sign, /bull/ in English, is denoted as &#9801;.</span></span><span>
+</span><span id="line-58"></span><span>    </span><span id="Taurus"><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Taurus"><span class="hs-identifier hs-var">Taurus</span></a></span></span><span>
+</span><span id="line-59"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /gemini/ zodiac sign, /twins/ in English, is denoted as &#9802;.</span></span><span>
+</span><span id="line-60"></span><span>    </span><span id="Gemini"><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Gemini"><span class="hs-identifier hs-var">Gemini</span></a></span></span><span>
+</span><span id="line-61"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /cancer/ zodiac sign, /crab/ in English, is denoted as &#9803;.</span></span><span>
+</span><span id="line-62"></span><span>    </span><span id="Cancer"><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Cancer"><span class="hs-identifier hs-var">Cancer</span></a></span></span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /leo/ zodiac sign, /lion/ in English, is denoted as &#9804;.</span></span><span>
+</span><span id="line-64"></span><span>    </span><span id="Leo"><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Leo"><span class="hs-identifier hs-var">Leo</span></a></span></span><span>
+</span><span id="line-65"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /virgo/ zodiac sign, /maiden/ in English, is denoted as &#9805;.</span></span><span>
+</span><span id="line-66"></span><span>    </span><span id="Virgo"><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Virgo"><span class="hs-identifier hs-var">Virgo</span></a></span></span><span>
+</span><span id="line-67"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /libra/ zodiac sign, /scales/ in English, is denoted as &#9806;.</span></span><span>
+</span><span id="line-68"></span><span>    </span><span id="Libra"><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Libra"><span class="hs-identifier hs-var">Libra</span></a></span></span><span>
+</span><span id="line-69"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /scorpio/ zodiac sign, /scorpion/ in English, is denoted as &#9807;.</span></span><span>
+</span><span id="line-70"></span><span>    </span><span id="Scorpio"><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Scorpio"><span class="hs-identifier hs-var">Scorpio</span></a></span></span><span>
+</span><span id="line-71"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /saggitarius/ zodiac sign, /archer/ in English, is denoted as &#9808;.</span></span><span>
+</span><span id="line-72"></span><span>    </span><span id="Sagittarius"><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Sagittarius"><span class="hs-identifier hs-var">Sagittarius</span></a></span></span><span>
+</span><span id="line-73"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /capricorn/ zodiac sign, /sea-goat/ in English, is denoted as &#9809;.</span></span><span>
+</span><span id="line-74"></span><span>    </span><span id="Capricorn"><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Capricorn"><span class="hs-identifier hs-var">Capricorn</span></a></span></span><span>
+</span><span id="line-75"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /aquarius/ zodiac sign, /water-bearer/ in English, is denoted as &#9810;.</span></span><span>
+</span><span id="line-76"></span><span>    </span><span id="Aquarius"><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Aquarius"><span class="hs-identifier hs-var">Aquarius</span></a></span></span><span>
+</span><span id="line-77"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | The /pices/ zodiac sign, /fish/ in English, is denoted as &#9811;.</span></span><span>
+</span><span id="line-78"></span><span>    </span><span id="Pisces"><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Pisces"><span class="hs-identifier hs-var">Pisces</span></a></span></span><span>
+</span><span id="line-79"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679280551"><span id="local-6989586621679280553"><span class="annot"><span class="annottext">Zodiac
+Zodiac -&gt; Zodiac -&gt; Bounded Zodiac
+forall a. a -&gt; a -&gt; Bounded a
+$cminBound :: Zodiac
+minBound :: Zodiac
+$cmaxBound :: Zodiac
+maxBound :: Zodiac
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280559"><span id="local-6989586621679280561"><span id="local-6989586621679280563"><span id="local-6989586621679280565"><span id="local-6989586621679280567"><span id="local-6989586621679280573"><span id="local-6989586621679280578"><span id="local-6989586621679280581"><span id="local-6989586621679280584"><span id="local-6989586621679280587"><span id="local-6989586621679280590"><span id="local-6989586621679280593"><span id="local-6989586621679280598"><span id="local-6989586621679280603"><span class="annot"><span class="annottext">Typeable Zodiac
+Typeable Zodiac
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; Zodiac -&gt; c Zodiac)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Zodiac)
+-&gt; (Zodiac -&gt; Constr)
+-&gt; (Zodiac -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Zodiac))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Zodiac))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; Zodiac -&gt; Zodiac)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Zodiac -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Zodiac -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Zodiac -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Zodiac -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Zodiac -&gt; m Zodiac)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Zodiac -&gt; m Zodiac)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Zodiac -&gt; m Zodiac)
+-&gt; Data Zodiac
+Zodiac -&gt; Constr
+Zodiac -&gt; DataType
+(forall b. Data b =&gt; b -&gt; b) -&gt; Zodiac -&gt; Zodiac
+forall a.
+Typeable a
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Zodiac -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Zodiac -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Zodiac -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Zodiac -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Zodiac -&gt; m Zodiac
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Zodiac -&gt; m Zodiac
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Zodiac
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Zodiac -&gt; c Zodiac
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Zodiac)
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Zodiac)
+$cgfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Zodiac -&gt; c Zodiac
+gfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Zodiac -&gt; c Zodiac
+$cgunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Zodiac
+gunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c Zodiac
+$ctoConstr :: Zodiac -&gt; Constr
+toConstr :: Zodiac -&gt; Constr
+$cdataTypeOf :: Zodiac -&gt; DataType
+dataTypeOf :: Zodiac -&gt; DataType
+$cdataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Zodiac)
+dataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c Zodiac)
+$cdataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Zodiac)
+dataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c Zodiac)
+$cgmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; Zodiac -&gt; Zodiac
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; Zodiac -&gt; Zodiac
+$cgmapQl :: forall r r'.
+(r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Zodiac -&gt; r
+gmapQl :: forall r r'.
+(r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Zodiac -&gt; r
+$cgmapQr :: forall r r'.
+(r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Zodiac -&gt; r
+gmapQr :: forall r r'.
+(r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Zodiac -&gt; r
+$cgmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Zodiac -&gt; [u]
+gmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Zodiac -&gt; [u]
+$cgmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Zodiac -&gt; u
+gmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Zodiac -&gt; u
+$cgmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Zodiac -&gt; m Zodiac
+gmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Zodiac -&gt; m Zodiac
+$cgmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Zodiac -&gt; m Zodiac
+gmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Zodiac -&gt; m Zodiac
+$cgmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Zodiac -&gt; m Zodiac
+gmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Zodiac -&gt; m Zodiac
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280609"><span id="local-6989586621679280617"><span id="local-6989586621679280623"><span id="local-6989586621679280633"><span id="local-6989586621679280635"><span id="local-6989586621679280639"><span id="local-6989586621679280643"><span id="local-6989586621679280647"><span class="annot"><span class="annottext">Int -&gt; Zodiac
+Zodiac -&gt; Int
+Zodiac -&gt; [Zodiac]
+Zodiac -&gt; Zodiac
+Zodiac -&gt; Zodiac -&gt; [Zodiac]
+Zodiac -&gt; Zodiac -&gt; Zodiac -&gt; [Zodiac]
+(Zodiac -&gt; Zodiac)
+-&gt; (Zodiac -&gt; Zodiac)
+-&gt; (Int -&gt; Zodiac)
+-&gt; (Zodiac -&gt; Int)
+-&gt; (Zodiac -&gt; [Zodiac])
+-&gt; (Zodiac -&gt; Zodiac -&gt; [Zodiac])
+-&gt; (Zodiac -&gt; Zodiac -&gt; [Zodiac])
+-&gt; (Zodiac -&gt; Zodiac -&gt; Zodiac -&gt; [Zodiac])
+-&gt; Enum Zodiac
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+$csucc :: Zodiac -&gt; Zodiac
+succ :: Zodiac -&gt; Zodiac
+$cpred :: Zodiac -&gt; Zodiac
+pred :: Zodiac -&gt; Zodiac
+$ctoEnum :: Int -&gt; Zodiac
+toEnum :: Int -&gt; Zodiac
+$cfromEnum :: Zodiac -&gt; Int
+fromEnum :: Zodiac -&gt; Int
+$cenumFrom :: Zodiac -&gt; [Zodiac]
+enumFrom :: Zodiac -&gt; [Zodiac]
+$cenumFromThen :: Zodiac -&gt; Zodiac -&gt; [Zodiac]
+enumFromThen :: Zodiac -&gt; Zodiac -&gt; [Zodiac]
+$cenumFromTo :: Zodiac -&gt; Zodiac -&gt; [Zodiac]
+enumFromTo :: Zodiac -&gt; Zodiac -&gt; [Zodiac]
+$cenumFromThenTo :: Zodiac -&gt; Zodiac -&gt; Zodiac -&gt; [Zodiac]
+enumFromThenTo :: Zodiac -&gt; Zodiac -&gt; Zodiac -&gt; [Zodiac]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280651"><span id="local-6989586621679280653"><span class="annot"><span class="annottext">Zodiac -&gt; Zodiac -&gt; Bool
+(Zodiac -&gt; Zodiac -&gt; Bool)
+-&gt; (Zodiac -&gt; Zodiac -&gt; Bool) -&gt; Eq Zodiac
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Zodiac -&gt; Zodiac -&gt; Bool
+== :: Zodiac -&gt; Zodiac -&gt; Bool
+$c/= :: Zodiac -&gt; Zodiac -&gt; Bool
+/= :: Zodiac -&gt; Zodiac -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280658"><span id="local-6989586621679280660"><span class="annot"><span class="annottext">(forall x. Zodiac -&gt; Rep Zodiac x)
+-&gt; (forall x. Rep Zodiac x -&gt; Zodiac) -&gt; Generic Zodiac
+forall x. Rep Zodiac x -&gt; Zodiac
+forall x. Zodiac -&gt; Rep Zodiac x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cfrom :: forall x. Zodiac -&gt; Rep Zodiac x
+from :: forall x. Zodiac -&gt; Rep Zodiac x
+$cto :: forall x. Rep Zodiac x -&gt; Zodiac
+to :: forall x. Rep Zodiac x -&gt; Zodiac
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280666"><span id="local-6989586621679280668"><span id="local-6989586621679280670"><span id="local-6989586621679280674"><span id="local-6989586621679280677"><span id="local-6989586621679280680"><span id="local-6989586621679280683"><span class="annot"><span class="annottext">Eq Zodiac
+Eq Zodiac
+-&gt; (Zodiac -&gt; Zodiac -&gt; Ordering)
+-&gt; (Zodiac -&gt; Zodiac -&gt; Bool)
+-&gt; (Zodiac -&gt; Zodiac -&gt; Bool)
+-&gt; (Zodiac -&gt; Zodiac -&gt; Bool)
+-&gt; (Zodiac -&gt; Zodiac -&gt; Bool)
+-&gt; (Zodiac -&gt; Zodiac -&gt; Zodiac)
+-&gt; (Zodiac -&gt; Zodiac -&gt; Zodiac)
+-&gt; Ord Zodiac
+Zodiac -&gt; Zodiac -&gt; Bool
+Zodiac -&gt; Zodiac -&gt; Ordering
+Zodiac -&gt; Zodiac -&gt; Zodiac
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: Zodiac -&gt; Zodiac -&gt; Ordering
+compare :: Zodiac -&gt; Zodiac -&gt; Ordering
+$c&lt; :: Zodiac -&gt; Zodiac -&gt; Bool
+&lt; :: Zodiac -&gt; Zodiac -&gt; Bool
+$c&lt;= :: Zodiac -&gt; Zodiac -&gt; Bool
+&lt;= :: Zodiac -&gt; Zodiac -&gt; Bool
+$c&gt; :: Zodiac -&gt; Zodiac -&gt; Bool
+&gt; :: Zodiac -&gt; Zodiac -&gt; Bool
+$c&gt;= :: Zodiac -&gt; Zodiac -&gt; Bool
+&gt;= :: Zodiac -&gt; Zodiac -&gt; Bool
+$cmax :: Zodiac -&gt; Zodiac -&gt; Zodiac
+max :: Zodiac -&gt; Zodiac -&gt; Zodiac
+$cmin :: Zodiac -&gt; Zodiac -&gt; Zodiac
+min :: Zodiac -&gt; Zodiac -&gt; Zodiac
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280687"><span id="local-6989586621679280691"><span id="local-6989586621679280694"><span id="local-6989586621679280709"><span class="annot"><span class="annottext">ReadPrec [Zodiac]
+ReadPrec Zodiac
+Int -&gt; ReadS Zodiac
+ReadS [Zodiac]
+(Int -&gt; ReadS Zodiac)
+-&gt; ReadS [Zodiac]
+-&gt; ReadPrec Zodiac
+-&gt; ReadPrec [Zodiac]
+-&gt; Read Zodiac
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+$creadsPrec :: Int -&gt; ReadS Zodiac
+readsPrec :: Int -&gt; ReadS Zodiac
+$creadList :: ReadS [Zodiac]
+readList :: ReadS [Zodiac]
+$creadPrec :: ReadPrec Zodiac
+readPrec :: ReadPrec Zodiac
+$creadListPrec :: ReadPrec [Zodiac]
+readListPrec :: ReadPrec [Zodiac]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280713"><span id="local-6989586621679280715"><span id="local-6989586621679280719"><span class="annot"><span class="annottext">Int -&gt; Zodiac -&gt; ShowS
+[Zodiac] -&gt; ShowS
+Zodiac -&gt; String
+(Int -&gt; Zodiac -&gt; ShowS)
+-&gt; (Zodiac -&gt; String) -&gt; ([Zodiac] -&gt; ShowS) -&gt; Show Zodiac
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Zodiac -&gt; ShowS
+showsPrec :: Int -&gt; Zodiac -&gt; ShowS
+$cshow :: Zodiac -&gt; String
+show :: Zodiac -&gt; String
+$cshowList :: [Zodiac] -&gt; ShowS
+showList :: [Zodiac] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679280724"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-82"></span><span>  </span><span id="local-6989586621679280730"><span class="annot"><span class="annottext">arbitrary :: Gen Zodiac
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen Zodiac
+forall a. (Bounded a, Enum a) =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitraryBoundedEnum</span></span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679280734"><span id="local-6989586621679280741"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span></span></span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679280774"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span></span><span>
+</span><span id="line-87"></span><span>
+</span><span id="line-88"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier hs-type">UnicodeCharacter</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-89"></span><span>  </span><span id="local-6989586621679280815"><span class="annot"><span class="annottext">toUnicodeChar :: Zodiac -&gt; Char
+</span><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Zodiac -&gt; Char
+forall a. Enum a =&gt; Int -&gt; a -&gt; Char
+</span><a href="Data.Char.Core.html#mapFromEnum"><span class="hs-identifier hs-var">mapFromEnum</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Emoji.Zodiac.html#_zodiacOffset"><span class="hs-identifier hs-var">_zodiacOffset</span></a></span><span>
+</span><span id="line-90"></span><span>  </span><span id="local-6989586621679280818"><span class="annot"><span class="annottext">fromUnicodeChar :: Char -&gt; Maybe Zodiac
+</span><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Maybe Zodiac
+forall a. (Bounded a, Enum a) =&gt; Int -&gt; Char -&gt; Maybe a
+</span><a href="Data.Char.Core.html#mapToEnumSafe"><span class="hs-identifier hs-var">mapToEnumSafe</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Emoji.Zodiac.html#_zodiacOffset"><span class="hs-identifier hs-var">_zodiacOffset</span></a></span><span>
+</span><span id="line-91"></span><span>  </span><span id="local-6989586621679280820"><span class="annot"><span class="annottext">fromUnicodeChar' :: Char -&gt; Zodiac
+</span><a href="Data.Char.Core.html#fromUnicodeChar%27"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; Zodiac
+forall a. Enum a =&gt; Int -&gt; Char -&gt; a
+</span><a href="Data.Char.Core.html#mapToEnum"><span class="hs-identifier hs-var">mapToEnum</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Data.Char.Emoji.Zodiac.html#_zodiacOffset"><span class="hs-identifier hs-var">_zodiacOffset</span></a></span><span>
+</span><span id="line-92"></span><span>  </span><span id="local-6989586621679280824"><span class="annot"><span class="annottext">isInCharRange :: Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInCharRange</span></a></span></span><span> </span><span id="local-6989586621679280825"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679280825"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2648'</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679280825"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679280825"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2654'</span></span><span>
+</span><span id="line-93"></span><span>
+</span><span id="line-94"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679280829"><span id="local-6989586621679280834"><span id="local-6989586621679280838"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-95"></span><span>  </span><span id="local-6989586621679280843"><span class="annot"><span class="annottext">isInTextRange :: Text -&gt; Bool
+</span><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInTextRange</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. UnicodeCharacter a =&gt; Text -&gt; Bool
+</span><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier hs-var">generateIsInTextRange'</span></a></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-96"></span><span>
+</span><span id="line-97"></span><span class="annot"><span class="hs-comment">-- | The English name for the 'Aries' zodiac sign.</span></span><span>
+</span><span id="line-98"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Ram"><span class="hs-identifier hs-type">Ram</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-99"></span><span class="hs-keyword">pattern</span><span> </span><span id="Ram"><span id="%24mRam"><span id="%24bRam"><span class="annot"><span class="annottext">$mRam :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bRam :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#Ram"><span class="hs-identifier hs-var hs-var hs-var">Ram</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Aries"><span class="hs-identifier hs-type">Aries</span></a></span><span>
+</span><span id="line-100"></span><span>
+</span><span id="line-101"></span><span class="annot"><span class="hs-comment">-- | The English name for the 'Taurus' zodiac sign.</span></span><span>
+</span><span id="line-102"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Bull"><span class="hs-identifier hs-type">Bull</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-103"></span><span class="hs-keyword">pattern</span><span> </span><span id="Bull"><span id="%24mBull"><span id="%24bBull"><span class="annot"><span class="annottext">$mBull :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bBull :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#Bull"><span class="hs-identifier hs-var hs-var hs-var">Bull</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Taurus"><span class="hs-identifier hs-type">Taurus</span></a></span><span>
+</span><span id="line-104"></span><span>
+</span><span id="line-105"></span><span class="annot"><span class="hs-comment">-- | The English name for the 'Gemini' zodiac sign.</span></span><span>
+</span><span id="line-106"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Twins"><span class="hs-identifier hs-type">Twins</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-107"></span><span class="hs-keyword">pattern</span><span> </span><span id="Twins"><span id="%24mTwins"><span id="%24bTwins"><span class="annot"><span class="annottext">$mTwins :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bTwins :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#Twins"><span class="hs-identifier hs-var hs-var hs-var">Twins</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Gemini"><span class="hs-identifier hs-type">Gemini</span></a></span><span>
+</span><span id="line-108"></span><span>
+</span><span id="line-109"></span><span class="annot"><span class="hs-comment">-- | The English name for the 'Cancer' zodiac sign.</span></span><span>
+</span><span id="line-110"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Crab"><span class="hs-identifier hs-type">Crab</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-111"></span><span class="hs-keyword">pattern</span><span> </span><span id="Crab"><span id="%24mCrab"><span id="%24bCrab"><span class="annot"><span class="annottext">$mCrab :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bCrab :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#Crab"><span class="hs-identifier hs-var hs-var hs-var">Crab</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Cancer"><span class="hs-identifier hs-type">Cancer</span></a></span><span>
+</span><span id="line-112"></span><span>
+</span><span id="line-113"></span><span class="annot"><span class="hs-comment">-- | The English name for the 'Leo' zodiac sign.</span></span><span>
+</span><span id="line-114"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Lion"><span class="hs-identifier hs-type">Lion</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-115"></span><span class="hs-keyword">pattern</span><span> </span><span id="Lion"><span id="%24mLion"><span id="%24bLion"><span class="annot"><span class="annottext">$mLion :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bLion :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#Lion"><span class="hs-identifier hs-var hs-var hs-var">Lion</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Leo"><span class="hs-identifier hs-type">Leo</span></a></span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span class="annot"><span class="hs-comment">-- | The English name for the 'Virgo' zodiac sign.</span></span><span>
+</span><span id="line-118"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Maiden"><span class="hs-identifier hs-type">Maiden</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-119"></span><span class="hs-keyword">pattern</span><span> </span><span id="Maiden"><span id="%24mMaiden"><span id="%24bMaiden"><span class="annot"><span class="annottext">$mMaiden :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bMaiden :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#Maiden"><span class="hs-identifier hs-var hs-var hs-var">Maiden</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Virgo"><span class="hs-identifier hs-type">Virgo</span></a></span><span>
+</span><span id="line-120"></span><span>
+</span><span id="line-121"></span><span class="annot"><span class="hs-comment">-- | The English name for the 'Libra' zodiac sign.</span></span><span>
+</span><span id="line-122"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Scales"><span class="hs-identifier hs-type">Scales</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-123"></span><span class="hs-keyword">pattern</span><span> </span><span id="Scales"><span id="%24mScales"><span id="%24bScales"><span class="annot"><span class="annottext">$mScales :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bScales :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#Scales"><span class="hs-identifier hs-var hs-var hs-var">Scales</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Libra"><span class="hs-identifier hs-type">Libra</span></a></span><span>
+</span><span id="line-124"></span><span>
+</span><span id="line-125"></span><span class="annot"><span class="hs-comment">-- | The name of the constellation of the 'Scorpio' zodiac sign.</span></span><span>
+</span><span id="line-126"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Scorpius"><span class="hs-identifier hs-type">Scorpius</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-127"></span><span class="hs-keyword">pattern</span><span> </span><span id="Scorpius"><span id="%24mScorpius"><span id="%24bScorpius"><span class="annot"><span class="annottext">$mScorpius :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bScorpius :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#Scorpius"><span class="hs-identifier hs-var hs-var hs-var">Scorpius</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Scorpio"><span class="hs-identifier hs-type">Scorpio</span></a></span><span>
+</span><span id="line-128"></span><span>
+</span><span id="line-129"></span><span class="annot"><span class="hs-comment">-- | The English name for the 'Scorpio' zodiac sign.</span></span><span>
+</span><span id="line-130"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Scorpion"><span class="hs-identifier hs-type">Scorpion</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-131"></span><span class="hs-keyword">pattern</span><span> </span><span id="Scorpion"><span id="%24mScorpion"><span id="%24bScorpion"><span class="annot"><span class="annottext">$mScorpion :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bScorpion :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#Scorpion"><span class="hs-identifier hs-var hs-var hs-var">Scorpion</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Scorpio"><span class="hs-identifier hs-type">Scorpio</span></a></span><span>
+</span><span id="line-132"></span><span>
+</span><span id="line-133"></span><span class="annot"><span class="hs-comment">-- | An English name for the 'Sagittarius' zodiac sign.</span></span><span>
+</span><span id="line-134"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Centaur"><span class="hs-identifier hs-type">Centaur</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-135"></span><span class="hs-keyword">pattern</span><span> </span><span id="Centaur"><span id="%24mCentaur"><span id="%24bCentaur"><span class="annot"><span class="annottext">$mCentaur :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bCentaur :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#Centaur"><span class="hs-identifier hs-var hs-var hs-var">Centaur</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Sagittarius"><span class="hs-identifier hs-type">Sagittarius</span></a></span><span>
+</span><span id="line-136"></span><span>
+</span><span id="line-137"></span><span class="annot"><span class="hs-comment">-- | An English name for the 'Sagittarius' zodiac sign.</span></span><span>
+</span><span id="line-138"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Archer"><span class="hs-identifier hs-type">Archer</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-139"></span><span class="hs-keyword">pattern</span><span> </span><span id="Archer"><span id="%24mArcher"><span id="%24bArcher"><span class="annot"><span class="annottext">$mArcher :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bArcher :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#Archer"><span class="hs-identifier hs-var hs-var hs-var">Archer</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Sagittarius"><span class="hs-identifier hs-type">Sagittarius</span></a></span><span>
+</span><span id="line-140"></span><span>
+</span><span id="line-141"></span><span class="annot"><span class="hs-comment">-- | The name of the constellation of the 'Capricorn' zodiac sign.</span></span><span>
+</span><span id="line-142"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Capricornus"><span class="hs-identifier hs-type">Capricornus</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-143"></span><span class="hs-keyword">pattern</span><span> </span><span id="Capricornus"><span id="%24mCapricornus"><span id="%24bCapricornus"><span class="annot"><span class="annottext">$mCapricornus :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bCapricornus :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#Capricornus"><span class="hs-identifier hs-var hs-var hs-var">Capricornus</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Capricorn"><span class="hs-identifier hs-type">Capricorn</span></a></span><span>
+</span><span id="line-144"></span><span>
+</span><span id="line-145"></span><span class="annot"><span class="hs-comment">-- | An English name for the 'Capricorn' zodiac sign.</span></span><span>
+</span><span id="line-146"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#MountainGoat"><span class="hs-identifier hs-type">MountainGoat</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-147"></span><span class="hs-keyword">pattern</span><span> </span><span id="MountainGoat"><span id="%24mMountainGoat"><span id="%24bMountainGoat"><span class="annot"><span class="annottext">$mMountainGoat :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bMountainGoat :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#MountainGoat"><span class="hs-identifier hs-var hs-var hs-var">MountainGoat</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Capricorn"><span class="hs-identifier hs-type">Capricorn</span></a></span><span>
+</span><span id="line-148"></span><span>
+</span><span id="line-149"></span><span class="annot"><span class="hs-comment">-- | An English name for the 'Capricorn' zodiac sign.</span></span><span>
+</span><span id="line-150"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#GoatHorned"><span class="hs-identifier hs-type">GoatHorned</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-151"></span><span class="hs-keyword">pattern</span><span> </span><span id="GoatHorned"><span id="%24mGoatHorned"><span id="%24bGoatHorned"><span class="annot"><span class="annottext">$mGoatHorned :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bGoatHorned :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#GoatHorned"><span class="hs-identifier hs-var hs-var hs-var">GoatHorned</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Capricorn"><span class="hs-identifier hs-type">Capricorn</span></a></span><span>
+</span><span id="line-152"></span><span>
+</span><span id="line-153"></span><span class="annot"><span class="hs-comment">-- | An English name for the 'Capricorn' zodiac sign.</span></span><span>
+</span><span id="line-154"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#SeaGoat"><span class="hs-identifier hs-type">SeaGoat</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-155"></span><span class="hs-keyword">pattern</span><span> </span><span id="SeaGoat"><span id="%24mSeaGoat"><span id="%24bSeaGoat"><span class="annot"><span class="annottext">$mSeaGoat :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bSeaGoat :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#SeaGoat"><span class="hs-identifier hs-var hs-var hs-var">SeaGoat</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Capricorn"><span class="hs-identifier hs-type">Capricorn</span></a></span><span>
+</span><span id="line-156"></span><span>
+</span><span id="line-157"></span><span class="annot"><span class="hs-comment">-- | The English name for the 'Aquarius' zodiac sign.</span></span><span>
+</span><span id="line-158"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#WaterBearer"><span class="hs-identifier hs-type">WaterBearer</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-159"></span><span class="hs-keyword">pattern</span><span> </span><span id="WaterBearer"><span id="%24mWaterBearer"><span id="%24bWaterBearer"><span class="annot"><span class="annottext">$mWaterBearer :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bWaterBearer :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#WaterBearer"><span class="hs-identifier hs-var hs-var hs-var">WaterBearer</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Aquarius"><span class="hs-identifier hs-type">Aquarius</span></a></span><span>
+</span><span id="line-160"></span><span>
+</span><span id="line-161"></span><span class="annot"><span class="hs-comment">-- | The English name for the 'Pisces' zodiac sign.</span></span><span>
+</span><span id="line-162"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Fish"><span class="hs-identifier hs-type">Fish</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Zodiac"><span class="hs-identifier hs-type">Zodiac</span></a></span><span>
+</span><span id="line-163"></span><span class="hs-keyword">pattern</span><span> </span><span id="Fish"><span id="%24mFish"><span id="%24bFish"><span class="annot"><span class="annottext">$mFish :: forall {r}. Zodiac -&gt; ((# #) -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bFish :: Zodiac
+</span><a href="Data.Char.Emoji.Zodiac.html#Fish"><span class="hs-identifier hs-var hs-var hs-var">Fish</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Data.Char.Emoji.Zodiac.html#Pisces"><span class="hs-identifier hs-type">Pisces</span></a></span><span>
+</span><span id="line-164"></span></pre></body></html>

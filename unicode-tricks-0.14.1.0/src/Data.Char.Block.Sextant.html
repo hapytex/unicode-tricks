@@ -1,0 +1,994 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="local-6989586621679267572"><span id="local-6989586621679267573"></span></span><span class="hs-pragma">{-# LANGUAGE CPP #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE DeriveTraversable #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE FlexibleInstances #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE PatternSynonyms #-}</span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-8"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications #-}</span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- Module      : Data.Char.Block.Sextant</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- Description : A module used to render blocks divided in three horizontal rows in unicode.</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-15"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-16"></span><span class="hs-comment">--</span><span>
+</span><span id="line-17"></span><span class="hs-comment">-- Unicode has 3-by-2 blocks, this module aims to make it more convenient to render such blocks.</span><span>
+</span><span id="line-18"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Block.Sextant</span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Datastructures to store the state of the sextant.</span></span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier">Sextant</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier">Sextant</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Block.Sextant.html#upper"><span class="hs-identifier">upper</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Block.Sextant.html#middle"><span class="hs-identifier">middle</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Block.Sextant.html#lower"><span class="hs-identifier">lower</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><a href="Data.Char.Block.Sextant.html#isSextant"><span class="hs-identifier">isSextant</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><span class="hs-comment">-- * A unicode character that is (partially) filled sextant.</span></span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><a href="Data.Char.Block.Sextant.html#filled"><span class="hs-identifier">filled</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Convert a 'Char'acter to a (partially) filled sextant.</span></span><span>
+</span><span id="line-27"></span><span>    </span><span class="annot"><a href="Data.Char.Block.Sextant.html#fromSextant"><span class="hs-identifier">fromSextant</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-28"></span><span>    </span><span class="annot"><a href="Data.Char.Block.Sextant.html#fromSextant%27"><span class="hs-identifier">fromSextant'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.DeepSeq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NFData</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">NFData1</span></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Bits</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">shiftL</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">shiftR</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(.&amp;.)</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(.|.)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Char</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">chr</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ord</span></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Block.html"><span class="hs-identifier">Data.Char.Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier">Row</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Block.html#rowValue"><span class="hs-identifier">rowValue</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Block.html#toRow%27"><span class="hs-identifier">toRow'</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Block.html#EmptyBlock"><span class="hs-identifier">EmptyBlock</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Block.html#EmptyRow"><span class="hs-identifier">EmptyRow</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Block.html#FullBlock"><span class="hs-identifier">FullBlock</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Block.html#FullRow"><span class="hs-identifier">FullRow</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Block.html#LeftHalfBlock"><span class="hs-identifier">LeftHalfBlock</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Block.html#LeftRow"><span class="hs-identifier">LeftRow</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Block.html#RightHalfBlock"><span class="hs-identifier">RightHalfBlock</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Data.Char.Block.html#RightRow"><span class="hs-identifier">RightRow</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#MirrorHorizontal"><span class="hs-identifier">MirrorHorizontal</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#mirrorHorizontal"><span class="hs-identifier">mirrorHorizontal</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#MirrorVertical"><span class="hs-identifier">MirrorVertical</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#mirrorVertical"><span class="hs-identifier">mirrorVertical</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier">UnicodeCharacter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier">fromUnicodeChar</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#fromUnicodeChar%27"><span class="hs-identifier">fromUnicodeChar'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier">isInCharRange</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier">toUnicodeChar</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier">UnicodeText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier">isInTextRange</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier">generateIsInTextRange'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Data</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Functor.Classes</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Eq1</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">liftEq</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Ord1</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">liftCompare</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Hashable.Lifted</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Hashable1</span></span><span class="hs-special">)</span><span class="hs-cpp">
+#if __GLASGOW_HASKELL__ &lt; 803
+</span><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">Data.Semigroup</span><span class="hs-special">(</span><span class="hs-special">(</span><span class="hs-operator">&lt;&gt;</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-cpp">
+#endif
+</span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Generic1</span></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Test.QuickCheck.Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">arbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Arbitrary1</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">liftArbitrary</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitrary1</span></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="annot"><span class="hs-comment">-- | A data type that determines the state of the four subparts of the block.</span></span><span>
+</span><span id="line-49"></span><span class="hs-keyword">data</span><span> </span><span id="Sextant"><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-var">Sextant</span></a></span></span><span> </span><span id="local-6989586621679267326"><span class="annot"><a href="#local-6989586621679267326"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Sextant"><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-var">Sextant</span></a></span></span><span>
+</span><span id="line-50"></span><span>  </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="hs-comment">-- | The upper part of the sextant.</span></span><span>
+</span><span id="line-51"></span><span>    </span><span id="upper"><span class="annot"><span class="annottext">forall a. Sextant a -&gt; Row a
+</span><a href="Data.Char.Block.Sextant.html#upper"><span class="hs-identifier hs-var hs-var">upper</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679267326"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-52"></span><span>    </span><span class="annot"><span class="hs-comment">-- | The middle part of the sextant.</span></span><span>
+</span><span id="line-53"></span><span>    </span><span id="middle"><span class="annot"><span class="annottext">forall a. Sextant a -&gt; Row a
+</span><a href="Data.Char.Block.Sextant.html#middle"><span class="hs-identifier hs-var hs-var">middle</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679267326"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-54"></span><span>    </span><span class="annot"><span class="hs-comment">-- | The lower part of the sextant.</span></span><span>
+</span><span id="line-55"></span><span>    </span><span id="lower"><span class="annot"><span class="annottext">forall a. Sextant a -&gt; Row a
+</span><a href="Data.Char.Block.Sextant.html#lower"><span class="hs-identifier hs-var hs-var">lower</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Char.Block.html#Row"><span class="hs-identifier hs-type">Row</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679267326"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679267618"><span id="local-6989586621679267624"><span class="annot"><span class="annottext">Sextant a
+Sextant a -&gt; Sextant a -&gt; Bounded (Sextant a)
+forall a. a -&gt; a -&gt; Bounded a
+forall a. Bounded a =&gt; Sextant a
+$cminBound :: forall a. Bounded a =&gt; Sextant a
+minBound :: Sextant a
+$cmaxBound :: forall a. Bounded a =&gt; Sextant a
+maxBound :: Sextant a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679267636"><span id="local-6989586621679267642"><span id="local-6989586621679267647"><span id="local-6989586621679267649"><span id="local-6989586621679267651"><span id="local-6989586621679267657"><span id="local-6989586621679267663"><span id="local-6989586621679267666"><span id="local-6989586621679267669"><span id="local-6989586621679267672"><span id="local-6989586621679267675"><span id="local-6989586621679267678"><span id="local-6989586621679267683"><span id="local-6989586621679267688"><span class="annot"><span class="annottext">Typeable (Sextant a)
+Typeable (Sextant a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; Sextant a -&gt; c (Sextant a))
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Sextant a))
+-&gt; (Sextant a -&gt; Constr)
+-&gt; (Sextant a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Sextant a)))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e))
+    -&gt; Maybe (c (Sextant a)))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; Sextant a -&gt; Sextant a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Sextant a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r)
+    -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Sextant a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Sextant a -&gt; [u])
+-&gt; (forall u.
+    Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Sextant a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Sextant a -&gt; m (Sextant a))
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Sextant a -&gt; m (Sextant a))
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; Sextant a -&gt; m (Sextant a))
+-&gt; Data (Sextant a)
+Sextant a -&gt; Constr
+Sextant a -&gt; DataType
+(forall b. Data b =&gt; b -&gt; b) -&gt; Sextant a -&gt; Sextant a
+forall {a}. Data a =&gt; Typeable (Sextant a)
+forall a. Data a =&gt; Sextant a -&gt; Constr
+forall a. Data a =&gt; Sextant a -&gt; DataType
+forall a.
+Data a =&gt;
+(forall b. Data b =&gt; b -&gt; b) -&gt; Sextant a -&gt; Sextant a
+forall a u.
+Data a =&gt;
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Sextant a -&gt; u
+forall a u.
+Data a =&gt;
+(forall d. Data d =&gt; d -&gt; u) -&gt; Sextant a -&gt; [u]
+forall a r r'.
+Data a =&gt;
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Sextant a -&gt; r
+forall a r r'.
+Data a =&gt;
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Sextant a -&gt; r
+forall a (m :: * -&gt; *).
+(Data a, Monad m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Sextant a -&gt; m (Sextant a)
+forall a (m :: * -&gt; *).
+(Data a, MonadPlus m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Sextant a -&gt; m (Sextant a)
+forall a (c :: * -&gt; *).
+Data a =&gt;
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Sextant a)
+forall a (c :: * -&gt; *).
+Data a =&gt;
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Sextant a -&gt; c (Sextant a)
+forall a (t :: * -&gt; *) (c :: * -&gt; *).
+(Data a, Typeable t) =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Sextant a))
+forall a (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+(Data a, Typeable t) =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c (Sextant a))
+forall a.
+Typeable a
+-&gt; (forall (c :: * -&gt; *).
+    (forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+    -&gt; (forall g. g -&gt; c g) -&gt; a -&gt; c a)
+-&gt; (forall (c :: * -&gt; *).
+    (forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+    -&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c a)
+-&gt; (a -&gt; Constr)
+-&gt; (a -&gt; DataType)
+-&gt; (forall (t :: * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d. Data d =&gt; c (t d)) -&gt; Maybe (c a))
+-&gt; (forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+    Typeable t =&gt;
+    (forall d e. (Data d, Data e) =&gt; c (t d e)) -&gt; Maybe (c a))
+-&gt; ((forall b. Data b =&gt; b -&gt; b) -&gt; a -&gt; a)
+-&gt; (forall r r'.
+    (r -&gt; r' -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall r r'.
+    (r' -&gt; r -&gt; r) -&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; a -&gt; r)
+-&gt; (forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; [u])
+-&gt; (forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; a -&gt; u)
+-&gt; (forall (m :: * -&gt; *).
+    Monad m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; (forall (m :: * -&gt; *).
+    MonadPlus m =&gt;
+    (forall d. Data d =&gt; d -&gt; m d) -&gt; a -&gt; m a)
+-&gt; Data a
+forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Sextant a -&gt; u
+forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Sextant a -&gt; [u]
+forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Sextant a -&gt; r
+forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Sextant a -&gt; r
+forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Sextant a -&gt; m (Sextant a)
+forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Sextant a -&gt; m (Sextant a)
+forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Sextant a)
+forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Sextant a -&gt; c (Sextant a)
+forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Sextant a))
+forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c (Sextant a))
+$cgfoldl :: forall a (c :: * -&gt; *).
+Data a =&gt;
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Sextant a -&gt; c (Sextant a)
+gfoldl :: forall (c :: * -&gt; *).
+(forall d b. Data d =&gt; c (d -&gt; b) -&gt; d -&gt; c b)
+-&gt; (forall g. g -&gt; c g) -&gt; Sextant a -&gt; c (Sextant a)
+$cgunfold :: forall a (c :: * -&gt; *).
+Data a =&gt;
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Sextant a)
+gunfold :: forall (c :: * -&gt; *).
+(forall b r. Data b =&gt; c (b -&gt; r) -&gt; c r)
+-&gt; (forall r. r -&gt; c r) -&gt; Constr -&gt; c (Sextant a)
+$ctoConstr :: forall a. Data a =&gt; Sextant a -&gt; Constr
+toConstr :: Sextant a -&gt; Constr
+$cdataTypeOf :: forall a. Data a =&gt; Sextant a -&gt; DataType
+dataTypeOf :: Sextant a -&gt; DataType
+$cdataCast1 :: forall a (t :: * -&gt; *) (c :: * -&gt; *).
+(Data a, Typeable t) =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Sextant a))
+dataCast1 :: forall (t :: * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d. Data d =&gt; c (t d)) -&gt; Maybe (c (Sextant a))
+$cdataCast2 :: forall a (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+(Data a, Typeable t) =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c (Sextant a))
+dataCast2 :: forall (t :: * -&gt; * -&gt; *) (c :: * -&gt; *).
+Typeable t =&gt;
+(forall d e. (Data d, Data e) =&gt; c (t d e))
+-&gt; Maybe (c (Sextant a))
+$cgmapT :: forall a.
+Data a =&gt;
+(forall b. Data b =&gt; b -&gt; b) -&gt; Sextant a -&gt; Sextant a
+gmapT :: (forall b. Data b =&gt; b -&gt; b) -&gt; Sextant a -&gt; Sextant a
+$cgmapQl :: forall a r r'.
+Data a =&gt;
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Sextant a -&gt; r
+gmapQl :: forall r r'.
+(r -&gt; r' -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Sextant a -&gt; r
+$cgmapQr :: forall a r r'.
+Data a =&gt;
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Sextant a -&gt; r
+gmapQr :: forall r r'.
+(r' -&gt; r -&gt; r)
+-&gt; r -&gt; (forall d. Data d =&gt; d -&gt; r') -&gt; Sextant a -&gt; r
+$cgmapQ :: forall a u.
+Data a =&gt;
+(forall d. Data d =&gt; d -&gt; u) -&gt; Sextant a -&gt; [u]
+gmapQ :: forall u. (forall d. Data d =&gt; d -&gt; u) -&gt; Sextant a -&gt; [u]
+$cgmapQi :: forall a u.
+Data a =&gt;
+Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Sextant a -&gt; u
+gmapQi :: forall u. Int -&gt; (forall d. Data d =&gt; d -&gt; u) -&gt; Sextant a -&gt; u
+$cgmapM :: forall a (m :: * -&gt; *).
+(Data a, Monad m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Sextant a -&gt; m (Sextant a)
+gmapM :: forall (m :: * -&gt; *).
+Monad m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Sextant a -&gt; m (Sextant a)
+$cgmapMp :: forall a (m :: * -&gt; *).
+(Data a, MonadPlus m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Sextant a -&gt; m (Sextant a)
+gmapMp :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Sextant a -&gt; m (Sextant a)
+$cgmapMo :: forall a (m :: * -&gt; *).
+(Data a, MonadPlus m) =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Sextant a -&gt; m (Sextant a)
+gmapMo :: forall (m :: * -&gt; *).
+MonadPlus m =&gt;
+(forall d. Data d =&gt; d -&gt; m d) -&gt; Sextant a -&gt; m (Sextant a)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Data</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679267696"><span id="local-6989586621679267702"><span class="annot"><span class="annottext">Sextant a -&gt; Sextant a -&gt; Bool
+(Sextant a -&gt; Sextant a -&gt; Bool)
+-&gt; (Sextant a -&gt; Sextant a -&gt; Bool) -&gt; Eq (Sextant a)
+forall a. Eq a =&gt; Sextant a -&gt; Sextant a -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: forall a. Eq a =&gt; Sextant a -&gt; Sextant a -&gt; Bool
+== :: Sextant a -&gt; Sextant a -&gt; Bool
+$c/= :: forall a. Eq a =&gt; Sextant a -&gt; Sextant a -&gt; Bool
+/= :: Sextant a -&gt; Sextant a -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679267707"><span id="local-6989586621679267713"><span id="local-6989586621679267725"><span id="local-6989586621679267730"><span id="local-6989586621679267735"><span id="local-6989586621679267738"><span id="local-6989586621679267741"><span id="local-6989586621679267744"><span id="local-6989586621679267747"><span id="local-6989586621679267750"><span id="local-6989586621679267753"><span id="local-6989586621679267758"><span id="local-6989586621679267761"><span id="local-6989586621679267766"><span id="local-6989586621679267771"><span id="local-6989586621679267776"><span id="local-6989586621679267781"><span class="annot"><span class="annottext">(forall m. Monoid m =&gt; Sextant m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Sextant a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Sextant a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Sextant a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Sextant a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Sextant a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Sextant a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; Sextant a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; Sextant a -&gt; a)
+-&gt; (forall a. Sextant a -&gt; [a])
+-&gt; (forall a. Sextant a -&gt; Bool)
+-&gt; (forall a. Sextant a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; Sextant a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; Sextant a -&gt; a)
+-&gt; (forall a. Ord a =&gt; Sextant a -&gt; a)
+-&gt; (forall a. Num a =&gt; Sextant a -&gt; a)
+-&gt; (forall a. Num a =&gt; Sextant a -&gt; a)
+-&gt; Foldable Sextant
+forall a. Eq a =&gt; a -&gt; Sextant a -&gt; Bool
+forall a. Num a =&gt; Sextant a -&gt; a
+forall a. Ord a =&gt; Sextant a -&gt; a
+forall m. Monoid m =&gt; Sextant m -&gt; m
+forall a. Sextant a -&gt; Bool
+forall a. Sextant a -&gt; Int
+forall a. Sextant a -&gt; [a]
+forall a. (a -&gt; a -&gt; a) -&gt; Sextant a -&gt; a
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Sextant a -&gt; m
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Sextant a -&gt; b
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Sextant a -&gt; b
+forall (t :: * -&gt; *).
+(forall m. Monoid m =&gt; t m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. t a -&gt; [a])
+-&gt; (forall a. t a -&gt; Bool)
+-&gt; (forall a. t a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; t a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; Foldable t
+$cfold :: forall m. Monoid m =&gt; Sextant m -&gt; m
+fold :: forall m. Monoid m =&gt; Sextant m -&gt; m
+$cfoldMap :: forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Sextant a -&gt; m
+foldMap :: forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Sextant a -&gt; m
+$cfoldMap' :: forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Sextant a -&gt; m
+foldMap' :: forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Sextant a -&gt; m
+$cfoldr :: forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Sextant a -&gt; b
+foldr :: forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Sextant a -&gt; b
+$cfoldr' :: forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Sextant a -&gt; b
+foldr' :: forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Sextant a -&gt; b
+$cfoldl :: forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Sextant a -&gt; b
+foldl :: forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Sextant a -&gt; b
+$cfoldl' :: forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Sextant a -&gt; b
+foldl' :: forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Sextant a -&gt; b
+$cfoldr1 :: forall a. (a -&gt; a -&gt; a) -&gt; Sextant a -&gt; a
+foldr1 :: forall a. (a -&gt; a -&gt; a) -&gt; Sextant a -&gt; a
+$cfoldl1 :: forall a. (a -&gt; a -&gt; a) -&gt; Sextant a -&gt; a
+foldl1 :: forall a. (a -&gt; a -&gt; a) -&gt; Sextant a -&gt; a
+$ctoList :: forall a. Sextant a -&gt; [a]
+toList :: forall a. Sextant a -&gt; [a]
+$cnull :: forall a. Sextant a -&gt; Bool
+null :: forall a. Sextant a -&gt; Bool
+$clength :: forall a. Sextant a -&gt; Int
+length :: forall a. Sextant a -&gt; Int
+$celem :: forall a. Eq a =&gt; a -&gt; Sextant a -&gt; Bool
+elem :: forall a. Eq a =&gt; a -&gt; Sextant a -&gt; Bool
+$cmaximum :: forall a. Ord a =&gt; Sextant a -&gt; a
+maximum :: forall a. Ord a =&gt; Sextant a -&gt; a
+$cminimum :: forall a. Ord a =&gt; Sextant a -&gt; a
+minimum :: forall a. Ord a =&gt; Sextant a -&gt; a
+$csum :: forall a. Num a =&gt; Sextant a -&gt; a
+sum :: forall a. Num a =&gt; Sextant a -&gt; a
+$cproduct :: forall a. Num a =&gt; Sextant a -&gt; a
+product :: forall a. Num a =&gt; Sextant a -&gt; a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Foldable</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679267787"><span id="local-6989586621679267793"><span class="annot"><span class="annottext">(forall a b. (a -&gt; b) -&gt; Sextant a -&gt; Sextant b)
+-&gt; (forall a b. a -&gt; Sextant b -&gt; Sextant a) -&gt; Functor Sextant
+forall a b. a -&gt; Sextant b -&gt; Sextant a
+forall a b. (a -&gt; b) -&gt; Sextant a -&gt; Sextant b
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b. a -&gt; f b -&gt; f a) -&gt; Functor f
+$cfmap :: forall a b. (a -&gt; b) -&gt; Sextant a -&gt; Sextant b
+fmap :: forall a b. (a -&gt; b) -&gt; Sextant a -&gt; Sextant b
+$c&lt;$ :: forall a b. a -&gt; Sextant b -&gt; Sextant a
+&lt;$ :: forall a b. a -&gt; Sextant b -&gt; Sextant a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Functor</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679267800"><span id="local-6989586621679267802"><span class="annot"><span class="annottext">(forall x. Sextant a -&gt; Rep (Sextant a) x)
+-&gt; (forall x. Rep (Sextant a) x -&gt; Sextant a)
+-&gt; Generic (Sextant a)
+forall x. Rep (Sextant a) x -&gt; Sextant a
+forall x. Sextant a -&gt; Rep (Sextant a) x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+forall a x. Rep (Sextant a) x -&gt; Sextant a
+forall a x. Sextant a -&gt; Rep (Sextant a) x
+$cfrom :: forall a x. Sextant a -&gt; Rep (Sextant a) x
+from :: forall x. Sextant a -&gt; Rep (Sextant a) x
+$cto :: forall a x. Rep (Sextant a) x -&gt; Sextant a
+to :: forall x. Rep (Sextant a) x -&gt; Sextant a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679267806"><span id="local-6989586621679267808"><span class="annot"><span class="annottext">(forall a. Sextant a -&gt; Rep1 Sextant a)
+-&gt; (forall a. Rep1 Sextant a -&gt; Sextant a) -&gt; Generic1 Sextant
+forall a. Rep1 Sextant a -&gt; Sextant a
+forall a. Sextant a -&gt; Rep1 Sextant a
+forall k (f :: k -&gt; *).
+(forall (a :: k). f a -&gt; Rep1 f a)
+-&gt; (forall (a :: k). Rep1 f a -&gt; f a) -&gt; Generic1 f
+$cfrom1 :: forall a. Sextant a -&gt; Rep1 Sextant a
+from1 :: forall a. Sextant a -&gt; Rep1 Sextant a
+$cto1 :: forall a. Rep1 Sextant a -&gt; Sextant a
+to1 :: forall a. Rep1 Sextant a -&gt; Sextant a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic1</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679267816"><span id="local-6989586621679267822"><span id="local-6989586621679267827"><span id="local-6989586621679267831"><span id="local-6989586621679267834"><span id="local-6989586621679267837"><span id="local-6989586621679267840"><span class="annot"><span class="annottext">Eq (Sextant a)
+Eq (Sextant a)
+-&gt; (Sextant a -&gt; Sextant a -&gt; Ordering)
+-&gt; (Sextant a -&gt; Sextant a -&gt; Bool)
+-&gt; (Sextant a -&gt; Sextant a -&gt; Bool)
+-&gt; (Sextant a -&gt; Sextant a -&gt; Bool)
+-&gt; (Sextant a -&gt; Sextant a -&gt; Bool)
+-&gt; (Sextant a -&gt; Sextant a -&gt; Sextant a)
+-&gt; (Sextant a -&gt; Sextant a -&gt; Sextant a)
+-&gt; Ord (Sextant a)
+Sextant a -&gt; Sextant a -&gt; Bool
+Sextant a -&gt; Sextant a -&gt; Ordering
+Sextant a -&gt; Sextant a -&gt; Sextant a
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+forall {a}. Ord a =&gt; Eq (Sextant a)
+forall a. Ord a =&gt; Sextant a -&gt; Sextant a -&gt; Bool
+forall a. Ord a =&gt; Sextant a -&gt; Sextant a -&gt; Ordering
+forall a. Ord a =&gt; Sextant a -&gt; Sextant a -&gt; Sextant a
+$ccompare :: forall a. Ord a =&gt; Sextant a -&gt; Sextant a -&gt; Ordering
+compare :: Sextant a -&gt; Sextant a -&gt; Ordering
+$c&lt; :: forall a. Ord a =&gt; Sextant a -&gt; Sextant a -&gt; Bool
+&lt; :: Sextant a -&gt; Sextant a -&gt; Bool
+$c&lt;= :: forall a. Ord a =&gt; Sextant a -&gt; Sextant a -&gt; Bool
+&lt;= :: Sextant a -&gt; Sextant a -&gt; Bool
+$c&gt; :: forall a. Ord a =&gt; Sextant a -&gt; Sextant a -&gt; Bool
+&gt; :: Sextant a -&gt; Sextant a -&gt; Bool
+$c&gt;= :: forall a. Ord a =&gt; Sextant a -&gt; Sextant a -&gt; Bool
+&gt;= :: Sextant a -&gt; Sextant a -&gt; Bool
+$cmax :: forall a. Ord a =&gt; Sextant a -&gt; Sextant a -&gt; Sextant a
+max :: Sextant a -&gt; Sextant a -&gt; Sextant a
+$cmin :: forall a. Ord a =&gt; Sextant a -&gt; Sextant a -&gt; Sextant a
+min :: Sextant a -&gt; Sextant a -&gt; Sextant a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679267846"><span id="local-6989586621679267850"><span id="local-6989586621679267853"><span id="local-6989586621679267869"><span class="annot"><span class="annottext">ReadPrec [Sextant a]
+ReadPrec (Sextant a)
+Int -&gt; ReadS (Sextant a)
+ReadS [Sextant a]
+(Int -&gt; ReadS (Sextant a))
+-&gt; ReadS [Sextant a]
+-&gt; ReadPrec (Sextant a)
+-&gt; ReadPrec [Sextant a]
+-&gt; Read (Sextant a)
+forall a. Read a =&gt; ReadPrec [Sextant a]
+forall a. Read a =&gt; ReadPrec (Sextant a)
+forall a. Read a =&gt; Int -&gt; ReadS (Sextant a)
+forall a. Read a =&gt; ReadS [Sextant a]
+forall a.
+(Int -&gt; ReadS a)
+-&gt; ReadS [a] -&gt; ReadPrec a -&gt; ReadPrec [a] -&gt; Read a
+$creadsPrec :: forall a. Read a =&gt; Int -&gt; ReadS (Sextant a)
+readsPrec :: Int -&gt; ReadS (Sextant a)
+$creadList :: forall a. Read a =&gt; ReadS [Sextant a]
+readList :: ReadS [Sextant a]
+$creadPrec :: forall a. Read a =&gt; ReadPrec (Sextant a)
+readPrec :: ReadPrec (Sextant a)
+$creadListPrec :: forall a. Read a =&gt; ReadPrec [Sextant a]
+readListPrec :: ReadPrec [Sextant a]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Read</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679267874"><span id="local-6989586621679267882"><span id="local-6989586621679267886"><span class="annot"><span class="annottext">Int -&gt; Sextant a -&gt; ShowS
+[Sextant a] -&gt; ShowS
+Sextant a -&gt; String
+(Int -&gt; Sextant a -&gt; ShowS)
+-&gt; (Sextant a -&gt; String)
+-&gt; ([Sextant a] -&gt; ShowS)
+-&gt; Show (Sextant a)
+forall a. Show a =&gt; Int -&gt; Sextant a -&gt; ShowS
+forall a. Show a =&gt; [Sextant a] -&gt; ShowS
+forall a. Show a =&gt; Sextant a -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: forall a. Show a =&gt; Int -&gt; Sextant a -&gt; ShowS
+showsPrec :: Int -&gt; Sextant a -&gt; ShowS
+$cshow :: forall a. Show a =&gt; Sextant a -&gt; String
+show :: Sextant a -&gt; String
+$cshowList :: forall a. Show a =&gt; [Sextant a] -&gt; ShowS
+showList :: [Sextant a] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679267894"><span id="local-6989586621679267906"><span id="local-6989586621679267912"><span id="local-6989586621679267917"><span class="annot"><span class="annottext">Functor Sextant
+Foldable Sextant
+Functor Sextant
+-&gt; Foldable Sextant
+-&gt; (forall (f :: * -&gt; *) a b.
+    Applicative f =&gt;
+    (a -&gt; f b) -&gt; Sextant a -&gt; f (Sextant b))
+-&gt; (forall (f :: * -&gt; *) a.
+    Applicative f =&gt;
+    Sextant (f a) -&gt; f (Sextant a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; Sextant a -&gt; m (Sextant b))
+-&gt; (forall (m :: * -&gt; *) a.
+    Monad m =&gt;
+    Sextant (m a) -&gt; m (Sextant a))
+-&gt; Traversable Sextant
+forall (t :: * -&gt; *).
+Functor t
+-&gt; Foldable t
+-&gt; (forall (f :: * -&gt; *) a b.
+    Applicative f =&gt;
+    (a -&gt; f b) -&gt; t a -&gt; f (t b))
+-&gt; (forall (f :: * -&gt; *) a. Applicative f =&gt; t (f a) -&gt; f (t a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; t a -&gt; m (t b))
+-&gt; (forall (m :: * -&gt; *) a. Monad m =&gt; t (m a) -&gt; m (t a))
+-&gt; Traversable t
+forall (m :: * -&gt; *) a. Monad m =&gt; Sextant (m a) -&gt; m (Sextant a)
+forall (f :: * -&gt; *) a.
+Applicative f =&gt;
+Sextant (f a) -&gt; f (Sextant a)
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; Sextant a -&gt; m (Sextant b)
+forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; Sextant a -&gt; f (Sextant b)
+$ctraverse :: forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; Sextant a -&gt; f (Sextant b)
+traverse :: forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; Sextant a -&gt; f (Sextant b)
+$csequenceA :: forall (f :: * -&gt; *) a.
+Applicative f =&gt;
+Sextant (f a) -&gt; f (Sextant a)
+sequenceA :: forall (f :: * -&gt; *) a.
+Applicative f =&gt;
+Sextant (f a) -&gt; f (Sextant a)
+$cmapM :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; Sextant a -&gt; m (Sextant b)
+mapM :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; Sextant a -&gt; m (Sextant b)
+$csequence :: forall (m :: * -&gt; *) a. Monad m =&gt; Sextant (m a) -&gt; m (Sextant a)
+sequence :: forall (m :: * -&gt; *) a. Monad m =&gt; Sextant (m a) -&gt; m (Sextant a)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Traversable</span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-60"></span><span>  </span><span id="local-6989586621679267925"><span class="annot"><span class="annottext">liftEq :: forall a b. (a -&gt; b -&gt; Bool) -&gt; Sextant a -&gt; Sextant b -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">liftEq</span></span></span><span> </span><span id="local-6989586621679267926"><span class="annot"><span class="annottext">a -&gt; b -&gt; Bool
+</span><a href="#local-6989586621679267926"><span class="hs-identifier hs-var">cmp</span></a></span></span><span> </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span id="local-6989586621679267927"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679267927"><span class="hs-identifier hs-var">ua</span></a></span></span><span> </span><span id="local-6989586621679267928"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679267928"><span class="hs-identifier hs-var">ma</span></a></span></span><span> </span><span id="local-6989586621679267929"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679267929"><span class="hs-identifier hs-var">la</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span id="local-6989586621679267930"><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679267930"><span class="hs-identifier hs-var">ub</span></a></span></span><span> </span><span id="local-6989586621679267931"><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679267931"><span class="hs-identifier hs-var">mb</span></a></span></span><span> </span><span id="local-6989586621679267932"><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679267932"><span class="hs-identifier hs-var">lb</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row b -&gt; Bool
+</span><a href="#local-6989586621679267933"><span class="hs-identifier hs-var">cmp'</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679267927"><span class="hs-identifier hs-var">ua</span></a></span><span> </span><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679267930"><span class="hs-identifier hs-var">ub</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row b -&gt; Bool
+</span><a href="#local-6989586621679267933"><span class="hs-identifier hs-var">cmp'</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679267928"><span class="hs-identifier hs-var">ma</span></a></span><span> </span><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679267931"><span class="hs-identifier hs-var">mb</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row b -&gt; Bool
+</span><a href="#local-6989586621679267933"><span class="hs-identifier hs-var">cmp'</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679267929"><span class="hs-identifier hs-var">la</span></a></span><span> </span><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679267932"><span class="hs-identifier hs-var">lb</span></a></span><span>
+</span><span id="line-61"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-62"></span><span>      </span><span id="local-6989586621679267933"><span class="annot"><span class="annottext">cmp' :: Row a -&gt; Row b -&gt; Bool
+</span><a href="#local-6989586621679267933"><span class="hs-identifier hs-var hs-var">cmp'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(a -&gt; b -&gt; Bool) -&gt; Row a -&gt; Row b -&gt; Bool
+forall a b. (a -&gt; b -&gt; Bool) -&gt; Row a -&gt; Row b -&gt; Bool
+forall (f :: * -&gt; *) a b.
+Eq1 f =&gt;
+(a -&gt; b -&gt; Bool) -&gt; f a -&gt; f b -&gt; Bool
+</span><span class="hs-identifier hs-var">liftEq</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; b -&gt; Bool
+</span><a href="#local-6989586621679267926"><span class="hs-identifier hs-var">cmp</span></a></span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679267470"><span id="local-6989586621679267942"><span id="local-6989586621679267949"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="#local-6989586621679267470"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679267470"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span></span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679267968"><span class="annot"><span class="hs-identifier hs-type">Hashable1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span></span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679267479"><span class="annot"><a href="Data.Char.Core.html#MirrorVertical"><span class="hs-identifier hs-type">MirrorVertical</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679267479"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-69"></span><span>  </span><span id="local-6989586621679267992"><span class="annot"><span class="annottext">mirrorVertical :: Sextant a -&gt; Sextant a
+</span><a href="Data.Char.Core.html#mirrorVertical"><span class="hs-identifier hs-var hs-var hs-var hs-var">mirrorVertical</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span id="local-6989586621679267993"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679267993"><span class="hs-identifier hs-var">u</span></a></span></span><span> </span><span id="local-6989586621679267994"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679267994"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span id="local-6989586621679267995"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679267995"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row a -&gt; Row a -&gt; Sextant a
+forall a. Row a -&gt; Row a -&gt; Row a -&gt; Sextant a
+</span><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-var">Sextant</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row a -&gt; Row a
+forall a. MirrorVertical a =&gt; a -&gt; a
+</span><a href="Data.Char.Core.html#mirrorVertical"><span class="hs-identifier hs-var">mirrorVertical</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679267993"><span class="hs-identifier hs-var">u</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row a -&gt; Row a
+forall a. MirrorVertical a =&gt; a -&gt; a
+</span><a href="Data.Char.Core.html#mirrorVertical"><span class="hs-identifier hs-var">mirrorVertical</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679267994"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row a -&gt; Row a
+forall a. MirrorVertical a =&gt; a -&gt; a
+</span><a href="Data.Char.Core.html#mirrorVertical"><span class="hs-identifier hs-var">mirrorVertical</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679267995"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>
+</span><span id="line-71"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679267484"><span class="annot"><a href="Data.Char.Core.html#MirrorHorizontal"><span class="hs-identifier hs-type">MirrorHorizontal</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679267484"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-72"></span><span>  </span><span id="local-6989586621679267999"><span class="annot"><span class="annottext">mirrorHorizontal :: Sextant a -&gt; Sextant a
+</span><a href="Data.Char.Core.html#mirrorHorizontal"><span class="hs-identifier hs-var hs-var hs-var hs-var">mirrorHorizontal</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span id="local-6989586621679268000"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268000"><span class="hs-identifier hs-var">u</span></a></span></span><span> </span><span id="local-6989586621679268001"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268001"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span id="local-6989586621679268002"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268002"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row a -&gt; Row a -&gt; Sextant a
+forall a. Row a -&gt; Row a -&gt; Row a -&gt; Sextant a
+</span><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-var">Sextant</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268002"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268001"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268000"><span class="hs-identifier hs-var">u</span></a></span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679267501"><span id="local-6989586621679268005"><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="#local-6989586621679267501"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679267501"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-75"></span><span>
+</span><span id="line-76"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679268025"><span class="annot"><span class="hs-identifier hs-type">NFData1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span></span><span>
+</span><span id="line-77"></span><span>
+</span><span id="line-78"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-79"></span><span>  </span><span id="local-6989586621679268050"><span class="annot"><span class="annottext">liftCompare :: forall a b.
+(a -&gt; b -&gt; Ordering) -&gt; Sextant a -&gt; Sextant b -&gt; Ordering
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">liftCompare</span></span></span><span> </span><span id="local-6989586621679268051"><span class="annot"><span class="annottext">a -&gt; b -&gt; Ordering
+</span><a href="#local-6989586621679268051"><span class="hs-identifier hs-var">cmp</span></a></span></span><span> </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span id="local-6989586621679268052"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268052"><span class="hs-identifier hs-var">ua</span></a></span></span><span> </span><span id="local-6989586621679268053"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268053"><span class="hs-identifier hs-var">ma</span></a></span></span><span> </span><span id="local-6989586621679268054"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268054"><span class="hs-identifier hs-var">la</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">~</span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span id="local-6989586621679268055"><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679268055"><span class="hs-identifier hs-var">ub</span></a></span></span><span> </span><span id="local-6989586621679268056"><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679268056"><span class="hs-identifier hs-var">mb</span></a></span></span><span> </span><span id="local-6989586621679268057"><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679268057"><span class="hs-identifier hs-var">lb</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row b -&gt; Ordering
+</span><a href="#local-6989586621679268058"><span class="hs-identifier hs-var">cmp'</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268052"><span class="hs-identifier hs-var">ua</span></a></span><span> </span><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679268055"><span class="hs-identifier hs-var">ub</span></a></span><span> </span><span class="annot"><span class="annottext">Ordering -&gt; Ordering -&gt; Ordering
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row b -&gt; Ordering
+</span><a href="#local-6989586621679268058"><span class="hs-identifier hs-var">cmp'</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268053"><span class="hs-identifier hs-var">ma</span></a></span><span> </span><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679268056"><span class="hs-identifier hs-var">mb</span></a></span><span> </span><span class="annot"><span class="annottext">Ordering -&gt; Ordering -&gt; Ordering
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row b -&gt; Ordering
+</span><a href="#local-6989586621679268058"><span class="hs-identifier hs-var">cmp'</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268054"><span class="hs-identifier hs-var">la</span></a></span><span> </span><span class="annot"><span class="annottext">Row b
+</span><a href="#local-6989586621679268057"><span class="hs-identifier hs-var">lb</span></a></span><span>
+</span><span id="line-80"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-81"></span><span>      </span><span id="local-6989586621679268058"><span class="annot"><span class="annottext">cmp' :: Row a -&gt; Row b -&gt; Ordering
+</span><a href="#local-6989586621679268058"><span class="hs-identifier hs-var hs-var">cmp'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(a -&gt; b -&gt; Ordering) -&gt; Row a -&gt; Row b -&gt; Ordering
+forall a b. (a -&gt; b -&gt; Ordering) -&gt; Row a -&gt; Row b -&gt; Ordering
+forall (f :: * -&gt; *) a b.
+Ord1 f =&gt;
+(a -&gt; b -&gt; Ordering) -&gt; f a -&gt; f b -&gt; Ordering
+</span><span class="hs-identifier hs-var">liftCompare</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; b -&gt; Ordering
+</span><a href="#local-6989586621679268051"><span class="hs-identifier hs-var">cmp</span></a></span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679268067"><span id="local-6989586621679268071"><span id="local-6989586621679268074"><span class="annot"><span class="hs-identifier hs-type">Applicative</span></span><span> </span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-84"></span><span>  </span><span id="local-6989586621679268077"><span class="annot"><span class="annottext">pure :: forall a. a -&gt; Sextant a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">pure</span></span></span><span> </span><span id="local-6989586621679268078"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679268078"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row a -&gt; Row a -&gt; Sextant a
+forall a. Row a -&gt; Row a -&gt; Row a -&gt; Sextant a
+</span><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-var">Sextant</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268079"><span class="hs-identifier hs-var">px</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268079"><span class="hs-identifier hs-var">px</span></a></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268079"><span class="hs-identifier hs-var">px</span></a></span><span>
+</span><span id="line-85"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-86"></span><span>      </span><span id="local-6989586621679268079"><span class="annot"><span class="annottext">px :: Row a
+</span><a href="#local-6989586621679268079"><span class="hs-identifier hs-var hs-var">px</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; Row a
+forall a. a -&gt; Row a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679268078"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-87"></span><span>  </span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span id="local-6989586621679268086"><span class="annot"><span class="annottext">Row (a -&gt; b)
+</span><a href="#local-6989586621679268086"><span class="hs-identifier hs-var">fu</span></a></span></span><span> </span><span id="local-6989586621679268087"><span class="annot"><span class="annottext">Row (a -&gt; b)
+</span><a href="#local-6989586621679268087"><span class="hs-identifier hs-var">fm</span></a></span></span><span> </span><span id="local-6989586621679268088"><span class="annot"><span class="annottext">Row (a -&gt; b)
+</span><a href="#local-6989586621679268088"><span class="hs-identifier hs-var">fl</span></a></span></span><span> </span><span id="local-6989586621679268089"><span class="annot"><span class="annottext">&lt;*&gt; :: forall a b. Sextant (a -&gt; b) -&gt; Sextant a -&gt; Sextant b
+</span><span class="hs-operator hs-var hs-var hs-var hs-var">&lt;*&gt;</span></span></span><span> </span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span id="local-6989586621679268090"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268090"><span class="hs-identifier hs-var">u</span></a></span></span><span> </span><span id="local-6989586621679268091"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268091"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span id="local-6989586621679268092"><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268092"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row b -&gt; Row b -&gt; Row b -&gt; Sextant b
+forall a. Row a -&gt; Row a -&gt; Row a -&gt; Sextant a
+</span><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-var">Sextant</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row (a -&gt; b)
+</span><a href="#local-6989586621679268086"><span class="hs-identifier hs-var">fu</span></a></span><span> </span><span class="annot"><span class="annottext">Row (a -&gt; b) -&gt; Row a -&gt; Row b
+forall a b. Row (a -&gt; b) -&gt; Row a -&gt; Row b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268090"><span class="hs-identifier hs-var">u</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row (a -&gt; b)
+</span><a href="#local-6989586621679268087"><span class="hs-identifier hs-var">fm</span></a></span><span> </span><span class="annot"><span class="annottext">Row (a -&gt; b) -&gt; Row a -&gt; Row b
+forall a b. Row (a -&gt; b) -&gt; Row a -&gt; Row b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268091"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row (a -&gt; b)
+</span><a href="#local-6989586621679268088"><span class="hs-identifier hs-var">fl</span></a></span><span> </span><span class="annot"><span class="annottext">Row (a -&gt; b) -&gt; Row a -&gt; Row b
+forall a b. Row (a -&gt; b) -&gt; Row a -&gt; Row b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Row a
+</span><a href="#local-6989586621679268092"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-88"></span><span>
+</span><span id="line-89"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679267532"><span id="local-6989586621679268096"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="#local-6989586621679267532"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679267532"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-90"></span><span>  </span><span id="local-6989586621679268103"><span class="annot"><span class="annottext">arbitrary :: Gen (Sextant a)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen (Sextant a)
+forall (f :: * -&gt; *) a. (Arbitrary1 f, Arbitrary a) =&gt; Gen (f a)
+</span><span class="hs-identifier hs-var">arbitrary1</span></span><span>
+</span><span id="line-91"></span><span>
+</span><span id="line-92"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679268106"><span class="annot"><span class="hs-identifier hs-type">Arbitrary1</span></span><span> </span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-93"></span><span>  </span><span id="local-6989586621679268114"><span class="annot"><span class="annottext">liftArbitrary :: forall a. Gen a -&gt; Gen (Sextant a)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">liftArbitrary</span></span></span><span> </span><span id="local-6989586621679268115"><span class="annot"><span class="annottext">Gen a
+</span><a href="#local-6989586621679268115"><span class="hs-identifier hs-var">arb</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row a -&gt; Row a -&gt; Row a -&gt; Sextant a
+forall a. Row a -&gt; Row a -&gt; Row a -&gt; Sextant a
+</span><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-var">Sextant</span></a></span><span> </span><span class="annot"><span class="annottext">(Row a -&gt; Row a -&gt; Row a -&gt; Sextant a)
+-&gt; Gen (Row a) -&gt; Gen (Row a -&gt; Row a -&gt; Sextant a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen (Row a)
+</span><a href="#local-6989586621679268117"><span class="hs-identifier hs-var">arb'</span></a></span><span> </span><span class="annot"><span class="annottext">Gen (Row a -&gt; Row a -&gt; Sextant a)
+-&gt; Gen (Row a) -&gt; Gen (Row a -&gt; Sextant a)
+forall a b. Gen (a -&gt; b) -&gt; Gen a -&gt; Gen b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen (Row a)
+</span><a href="#local-6989586621679268117"><span class="hs-identifier hs-var">arb'</span></a></span><span> </span><span class="annot"><span class="annottext">Gen (Row a -&gt; Sextant a) -&gt; Gen (Row a) -&gt; Gen (Sextant a)
+forall a b. Gen (a -&gt; b) -&gt; Gen a -&gt; Gen b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Gen (Row a)
+</span><a href="#local-6989586621679268117"><span class="hs-identifier hs-var">arb'</span></a></span><span>
+</span><span id="line-94"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-95"></span><span>      </span><span id="local-6989586621679268117"><span class="annot"><span class="annottext">arb' :: Gen (Row a)
+</span><a href="#local-6989586621679268117"><span class="hs-identifier hs-var hs-var">arb'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen a -&gt; Gen (Row a)
+forall a. Gen a -&gt; Gen (Row a)
+forall (f :: * -&gt; *) a. Arbitrary1 f =&gt; Gen a -&gt; Gen (f a)
+</span><span class="hs-identifier hs-var">liftArbitrary</span></span><span> </span><span class="annot"><span class="annottext">Gen a
+</span><a href="#local-6989586621679268115"><span class="hs-identifier hs-var">arb</span></a></span><span>
+</span><span id="line-96"></span><span>
+</span><span id="line-97"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Data.Char.Core.html#UnicodeCharacter"><span class="hs-identifier hs-type">UnicodeCharacter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-98"></span><span>  </span><span id="local-6989586621679268126"><span class="annot"><span class="annottext">toUnicodeChar :: Sextant Bool -&gt; Char
+</span><a href="Data.Char.Core.html#toUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">toUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Sextant Bool -&gt; Char
+</span><a href="Data.Char.Block.Sextant.html#filled"><span class="hs-identifier hs-var">filled</span></a></span><span>
+</span><span id="line-99"></span><span>  </span><span id="local-6989586621679268127"><span class="annot"><span class="annottext">fromUnicodeChar :: Char -&gt; Maybe (Sextant Bool)
+</span><a href="Data.Char.Core.html#fromUnicodeChar"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe (Sextant Bool)
+</span><a href="Data.Char.Block.Sextant.html#fromSextant"><span class="hs-identifier hs-var">fromSextant</span></a></span><span>
+</span><span id="line-100"></span><span>  </span><span id="local-6989586621679268128"><span class="annot"><span class="annottext">fromUnicodeChar' :: Char -&gt; Sextant Bool
+</span><a href="Data.Char.Core.html#fromUnicodeChar%27"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromUnicodeChar'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Sextant Bool
+</span><a href="Data.Char.Block.Sextant.html#fromSextant%27"><span class="hs-identifier hs-var">fromSextant'</span></a></span><span>
+</span><span id="line-101"></span><span>  </span><span id="local-6989586621679268129"><span class="annot"><span class="annottext">isInCharRange :: Char -&gt; Bool
+</span><a href="Data.Char.Core.html#isInCharRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInCharRange</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="Data.Char.Block.Sextant.html#isSextant"><span class="hs-identifier hs-var">isSextant</span></a></span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679268131"><span id="local-6989586621679268136"><span id="local-6989586621679268140"><span class="annot"><a href="Data.Char.Core.html#UnicodeText"><span class="hs-identifier hs-type">UnicodeText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-104"></span><span>  </span><span id="local-6989586621679268145"><span class="annot"><span class="annottext">isInTextRange :: Text -&gt; Bool
+</span><a href="Data.Char.Core.html#isInTextRange"><span class="hs-identifier hs-var hs-var hs-var hs-var">isInTextRange</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. UnicodeCharacter a =&gt; Text -&gt; Bool
+</span><a href="Data.Char.Core.html#generateIsInTextRange%27"><span class="hs-identifier hs-var">generateIsInTextRange'</span></a></span><span> </span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span><span>
+</span><span id="line-105"></span><span>
+</span><span id="line-106"></span><span class="annot"><span class="hs-comment">-- | Check if the given 'Char'acter is a 'Char'acter that maps on a 'Sextant' value.</span></span><span>
+</span><span id="line-107"></span><span class="annot"><a href="Data.Char.Block.Sextant.html#isSextant"><span class="hs-identifier hs-type">isSextant</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-108"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Char'acter to test.</span></span><span>
+</span><span id="line-109"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-110"></span><span>  </span><span class="annot"><span class="hs-comment">-- | 'True' if the given 'Char'acter is a /sextant/ 'Char'acter; otherwise 'False'.</span></span><span>
+</span><span id="line-111"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-112"></span><span id="isSextant"><span class="annot"><span class="annottext">isSextant :: Char -&gt; Bool
+</span><a href="Data.Char.Block.Sextant.html#isSextant"><span class="hs-identifier hs-var hs-var">isSextant</span></a></span></span><span> </span><span id="local-6989586621679268146"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679268146"><span class="hs-identifier hs-var">ci</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679268147"><span class="hs-identifier hs-var">c1</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679268149"><span class="hs-identifier hs-var">c2</span></a></span><span>
+</span><span id="line-113"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-114"></span><span>    </span><span id="local-6989586621679268147"><span class="annot"><span class="annottext">c1 :: Bool
+</span><a href="#local-6989586621679268147"><span class="hs-identifier hs-var hs-var">c1</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1FB00'</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679268146"><span class="hs-identifier hs-var">ci</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679268146"><span class="hs-identifier hs-var">ci</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x1fb3b'</span></span><span>
+</span><span id="line-115"></span><span>    </span><span id="local-6989586621679268149"><span class="annot"><span class="annottext">c2 :: Bool
+</span><a href="#local-6989586621679268149"><span class="hs-identifier hs-var hs-var">c2</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679268146"><span class="hs-identifier hs-var">ci</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; String -&gt; Bool
+forall a. Eq a =&gt; a -&gt; [a] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-operator hs-var">`elem`</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Block.html#EmptyBlock"><span class="hs-identifier hs-var">EmptyBlock</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Block.html#LeftHalfBlock"><span class="hs-identifier hs-var">LeftHalfBlock</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Block.html#RightHalfBlock"><span class="hs-identifier hs-var">RightHalfBlock</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Block.html#FullBlock"><span class="hs-identifier hs-var">FullBlock</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span class="hs-comment">-- | Convert the given 'Char' to the corresponding 'Sextant' object wrapped</span><span>
+</span><span id="line-118"></span><span class="hs-comment">-- in a 'Just' data constructor. If the given 'Char' is not a sextant character,</span><span>
+</span><span id="line-119"></span><span class="hs-comment">-- 'Nothing' is returned.</span><span>
+</span><span id="line-120"></span><span class="annot"><a href="Data.Char.Block.Sextant.html#fromSextant"><span class="hs-identifier hs-type">fromSextant</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-121"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The 'Char' we wish to convert to a 'Sextant' object.</span></span><span>
+</span><span id="line-122"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-123"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Sextant' object wrapped in a 'Just'; 'Nothing' if the given 'Char' is not a sextant character.</span></span><span>
+</span><span id="line-124"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span><span>
+</span><span id="line-125"></span><span id="fromSextant"><span class="annot"><span class="annottext">fromSextant :: Char -&gt; Maybe (Sextant Bool)
+</span><a href="Data.Char.Block.Sextant.html#fromSextant"><span class="hs-identifier hs-var hs-var">fromSextant</span></a></span></span><span> </span><span id="local-6989586621679268159"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679268159"><span class="hs-identifier hs-var">ci</span></a></span></span><span>
+</span><span id="line-126"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="Data.Char.Block.Sextant.html#isSextant"><span class="hs-identifier hs-var">isSextant</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679268159"><span class="hs-identifier hs-var">ci</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Sextant Bool -&gt; Maybe (Sextant Bool)
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char -&gt; Sextant Bool
+</span><a href="Data.Char.Block.Sextant.html#fromSextant%27"><span class="hs-identifier hs-var">fromSextant'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679268159"><span class="hs-identifier hs-var">ci</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-127"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (Sextant Bool)
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-128"></span><span>
+</span><span id="line-129"></span><span class="hs-comment">-- | Convert the given 'Char' to the corresponding 'Sextant' object wrapped</span><span>
+</span><span id="line-130"></span><span class="hs-comment">-- If the given 'Char' is not a sextant character, it is unspecified what</span><span>
+</span><span id="line-131"></span><span class="hs-comment">-- will happen.</span><span>
+</span><span id="line-132"></span><span class="annot"><a href="Data.Char.Block.Sextant.html#fromSextant%27"><span class="hs-identifier hs-type">fromSextant'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-133"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The 'Char' we wish to convert to a 'Sextant' object.</span></span><span>
+</span><span id="line-134"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-135"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Sextant'; unspecified behavior if the given 'Char' is not a sextant character.</span></span><span>
+</span><span id="line-136"></span><span>  </span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-137"></span><span id="fromSextant%27"><span class="annot"><span class="annottext">fromSextant' :: Char -&gt; Sextant Bool
+</span><a href="Data.Char.Block.Sextant.html#fromSextant%27"><span class="hs-identifier hs-var hs-var">fromSextant'</span></a></span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Block.html#EmptyBlock"><span class="hs-identifier hs-var">EmptyBlock</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Row Bool -&gt; Sextant Bool
+forall a. Row a -&gt; Row a -&gt; Row a -&gt; Sextant a
+</span><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-var">Sextant</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="Data.Char.Block.html#EmptyRow"><span class="hs-identifier hs-var">EmptyRow</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="Data.Char.Block.html#EmptyRow"><span class="hs-identifier hs-var">EmptyRow</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="Data.Char.Block.html#EmptyRow"><span class="hs-identifier hs-var">EmptyRow</span></a></span><span>
+</span><span id="line-138"></span><span class="annot"><a href="Data.Char.Block.Sextant.html#fromSextant%27"><span class="hs-identifier hs-var">fromSextant'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Block.html#LeftHalfBlock"><span class="hs-identifier hs-var">LeftHalfBlock</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Row Bool -&gt; Sextant Bool
+forall a. Row a -&gt; Row a -&gt; Row a -&gt; Sextant a
+</span><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-var">Sextant</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="Data.Char.Block.html#LeftRow"><span class="hs-identifier hs-var">LeftRow</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="Data.Char.Block.html#LeftRow"><span class="hs-identifier hs-var">LeftRow</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="Data.Char.Block.html#LeftRow"><span class="hs-identifier hs-var">LeftRow</span></a></span><span>
+</span><span id="line-139"></span><span class="annot"><a href="Data.Char.Block.Sextant.html#fromSextant%27"><span class="hs-identifier hs-var">fromSextant'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Block.html#RightHalfBlock"><span class="hs-identifier hs-var">RightHalfBlock</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Row Bool -&gt; Sextant Bool
+forall a. Row a -&gt; Row a -&gt; Row a -&gt; Sextant a
+</span><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-var">Sextant</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="Data.Char.Block.html#RightRow"><span class="hs-identifier hs-var">RightRow</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="Data.Char.Block.html#RightRow"><span class="hs-identifier hs-var">RightRow</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="Data.Char.Block.html#RightRow"><span class="hs-identifier hs-var">RightRow</span></a></span><span>
+</span><span id="line-140"></span><span class="annot"><a href="Data.Char.Block.Sextant.html#fromSextant%27"><span class="hs-identifier hs-var">fromSextant'</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Block.html#FullBlock"><span class="hs-identifier hs-var">FullBlock</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Row Bool -&gt; Sextant Bool
+forall a. Row a -&gt; Row a -&gt; Row a -&gt; Sextant a
+</span><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-var">Sextant</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="Data.Char.Block.html#FullRow"><span class="hs-identifier hs-var">FullRow</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="Data.Char.Block.html#FullRow"><span class="hs-identifier hs-var">FullRow</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="Data.Char.Block.html#FullRow"><span class="hs-identifier hs-var">FullRow</span></a></span><span>
+</span><span id="line-141"></span><span class="annot"><a href="Data.Char.Block.Sextant.html#fromSextant%27"><span class="hs-identifier hs-var">fromSextant'</span></a></span><span> </span><span id="local-6989586621679268160"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679268160"><span class="hs-identifier hs-var">ch</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Row Bool -&gt; Row Bool -&gt; Row Bool -&gt; Sextant Bool
+forall a. Row a -&gt; Row a -&gt; Row a -&gt; Sextant a
+</span><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-var">Sextant</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="#local-6989586621679268161"><span class="hs-identifier hs-var">u</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="#local-6989586621679268162"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="#local-6989586621679268163"><span class="hs-identifier hs-var">l</span></a></span><span>
+</span><span id="line-142"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-143"></span><span>    </span><span id="local-6989586621679268167"><span class="annot"><span class="annottext">ci :: Int
+</span><a href="#local-6989586621679268167"><span class="hs-identifier hs-var hs-var">ci</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Int
+</span><span class="hs-identifier hs-var">ord</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679268160"><span class="hs-identifier hs-var">ch</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.&amp;.</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x3f</span></span><span>
+</span><span id="line-144"></span><span>    </span><span id="local-6989586621679268178"><span class="annot"><span class="annottext">ch' :: Int
+</span><a href="#local-6989586621679268178"><span class="hs-identifier hs-var hs-var">ch'</span></a></span></span><span>
+</span><span id="line-145"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679268167"><span class="hs-identifier hs-var">ci</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;=</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x28</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679268167"><span class="hs-identifier hs-var">ci</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">3</span></span><span>
+</span><span id="line-146"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679268167"><span class="hs-identifier hs-var">ci</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x13</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679268167"><span class="hs-identifier hs-var">ci</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span>
+</span><span id="line-147"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679268167"><span class="hs-identifier hs-var">ci</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-148"></span><span>    </span><span id="local-6989586621679268161"><span class="annot"><span class="annottext">u :: Row Bool
+</span><a href="#local-6989586621679268161"><span class="hs-identifier hs-var hs-var">u</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Row Bool
+</span><a href="Data.Char.Block.html#toRow%27"><span class="hs-identifier hs-var">toRow'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679268178"><span class="hs-identifier hs-var">ch'</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.&amp;.</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">3</span></span><span class="hs-special">)</span><span>
+</span><span id="line-149"></span><span>    </span><span id="local-6989586621679268162"><span class="annot"><span class="annottext">m :: Row Bool
+</span><a href="#local-6989586621679268162"><span class="hs-identifier hs-var hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Row Bool
+</span><a href="Data.Char.Block.html#toRow%27"><span class="hs-identifier hs-var">toRow'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">shiftR</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679268178"><span class="hs-identifier hs-var">ch'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.&amp;.</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">3</span></span><span class="hs-special">)</span><span>
+</span><span id="line-150"></span><span>    </span><span id="local-6989586621679268163"><span class="annot"><span class="annottext">l :: Row Bool
+</span><a href="#local-6989586621679268163"><span class="hs-identifier hs-var hs-var">l</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Row Bool
+</span><a href="Data.Char.Block.html#toRow%27"><span class="hs-identifier hs-var">toRow'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">shiftR</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679268178"><span class="hs-identifier hs-var">ch'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">4</span></span><span class="hs-special">)</span><span>
+</span><span id="line-151"></span><span>
+</span><span id="line-152"></span><span class="hs-comment">-- | Convert the given 'Sextant' of 'Bool's to a 'Char' where raster items of the 'Sextant'</span><span>
+</span><span id="line-153"></span><span class="hs-comment">-- are written in black, and the rest in white.</span><span>
+</span><span id="line-154"></span><span class="annot"><a href="Data.Char.Block.Sextant.html#filled"><span class="hs-identifier hs-type">filled</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-155"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'Sextant' of 'Bool's to convert to a 'Char'.</span></span><span>
+</span><span id="line-156"></span><span>  </span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-157"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The corresponding 'Char'acter that presents the sextant.</span></span><span>
+</span><span id="line-158"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-159"></span><span id="filled"><span class="annot"><span class="annottext">filled :: Sextant Bool -&gt; Char
+</span><a href="Data.Char.Block.Sextant.html#filled"><span class="hs-identifier hs-var hs-var">filled</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Block.Sextant.html#Sextant"><span class="hs-identifier hs-type">Sextant</span></a></span><span> </span><span id="local-6989586621679268187"><span class="annot"><span class="annottext">Row Bool
+</span><a href="#local-6989586621679268187"><span class="hs-identifier hs-var">u</span></a></span></span><span> </span><span id="local-6989586621679268188"><span class="annot"><span class="annottext">Row Bool
+</span><a href="#local-6989586621679268188"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span id="local-6989586621679268189"><span class="annot"><span class="annottext">Row Bool
+</span><a href="#local-6989586621679268189"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="#local-6989586621679268190"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">shiftL</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Int
+</span><a href="Data.Char.Block.html#rowValue"><span class="hs-identifier hs-var">rowValue</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="#local-6989586621679268189"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">4</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.|.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">shiftL</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Row Bool -&gt; Int
+</span><a href="Data.Char.Block.html#rowValue"><span class="hs-identifier hs-var">rowValue</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="#local-6989586621679268188"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.|.</span></span><span> </span><span class="annot"><span class="annottext">Row Bool -&gt; Int
+</span><a href="Data.Char.Block.html#rowValue"><span class="hs-identifier hs-var">rowValue</span></a></span><span> </span><span class="annot"><span class="annottext">Row Bool
+</span><a href="#local-6989586621679268187"><span class="hs-identifier hs-var">u</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-160"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-161"></span><span>    </span><span id="local-6989586621679268190"><span class="annot"><span class="annottext">go :: Int -&gt; Char
+</span><a href="#local-6989586621679268190"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x00</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Block.html#EmptyBlock"><span class="hs-identifier hs-var">EmptyBlock</span></a></span><span>
+</span><span id="line-162"></span><span>    </span><span class="annot"><a href="#local-6989586621679268190"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x15</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Block.html#LeftHalfBlock"><span class="hs-identifier hs-var">LeftHalfBlock</span></a></span><span>
+</span><span id="line-163"></span><span>    </span><span class="annot"><a href="#local-6989586621679268190"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x2a</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Block.html#RightHalfBlock"><span class="hs-identifier hs-var">RightHalfBlock</span></a></span><span>
+</span><span id="line-164"></span><span>    </span><span class="annot"><a href="#local-6989586621679268190"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x3f</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="Data.Char.Block.html#FullBlock"><span class="hs-identifier hs-var">FullBlock</span></a></span><span>
+</span><span id="line-165"></span><span>    </span><span class="annot"><a href="#local-6989586621679268190"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679268216"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679268216"><span class="hs-identifier hs-var">i</span></a></span></span><span>
+</span><span id="line-166"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679268216"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;=</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x2a</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1fb00</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.|.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679268216"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x03</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-167"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679268216"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;=</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x15</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1fb00</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.|.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679268216"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x02</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-168"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x1fb00</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.|.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679268216"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x01</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-169"></span></pre></body></html>

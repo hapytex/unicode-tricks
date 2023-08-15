@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Module      : Data.Char.Number.Duodecimal</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- Description : A module used to render duodecimal numbers.</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Maintainer  : hapytexeu+gh@gmail.com</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-9"></span><span class="hs-comment">--</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- The &lt;https://www.unicode.org/charts/PDF/U2150.pdf 2150 unicode block&gt; contains two characters for duodecimal numbers: numbers with base 12.</span><span>
+</span><span id="line-11"></span><span class="hs-comment">--</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- In order to represent digits for 10 and 11, unicode has two codepoints: @TURNED DIGIT TWO@, and @TURNED DIGIT THREE@. This module makes it</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- more convenient to convert an 'Integral' number to these digits, as well as converting a number to its duodecimal representation.</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Char.Number.Duodecimal</span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Characters used for duodecimal numbers</span></span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Duodecimal.html#char10"><span class="hs-identifier">char10</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Duodecimal.html#char11"><span class="hs-identifier">char11</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Convert values to digits</span></span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Duodecimal.html#duodecimalDigit"><span class="hs-identifier">duodecimalDigit</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Duodecimal.html#duodecimalDigit%27"><span class="hs-identifier">duodecimalDigit'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Convert value to a sequence of digits</span></span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Duodecimal.html#duodecimalNumber"><span class="hs-identifier">duodecimalNumber</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>    </span><span class="annot"><a href="Data.Char.Number.Duodecimal.html#duodecimalNumber%27"><span class="hs-identifier">duodecimalNumber'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Bits</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-operator">(.|.)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Char</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">chr</span></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Char.Core.html"><span class="hs-identifier">Data.Char.Core</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Char.Core.html#PlusStyle"><span class="hs-identifier">PlusStyle</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Char.Core.html#positionalNumberSystem"><span class="hs-identifier">positionalNumberSystem</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Default.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">def</span></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span class="annot"><span class="hs-comment">-- | The character used to denote 10: @&#8576;@.</span></span><span>
+</span><span id="line-36"></span><span class="annot"><a href="Data.Char.Number.Duodecimal.html#char10"><span class="hs-identifier hs-type">char10</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-37"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A character used in duodecimal numbers to denote 10.</span></span><span>
+</span><span id="line-38"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-39"></span><span id="char10"><span class="annot"><span class="annottext">char10 :: Char
+</span><a href="Data.Char.Number.Duodecimal.html#char10"><span class="hs-identifier hs-var hs-var">char10</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2180'</span></span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="annot"><span class="hs-comment">-- | The character used to denote 11: @&#8577;@.</span></span><span>
+</span><span id="line-42"></span><span class="annot"><a href="Data.Char.Number.Duodecimal.html#char11"><span class="hs-identifier hs-type">char11</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-43"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A character used in duodecimal numbers to denote 11.</span></span><span>
+</span><span id="line-44"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-45"></span><span id="char11"><span class="annot"><span class="annottext">char11 :: Char
+</span><a href="Data.Char.Number.Duodecimal.html#char11"><span class="hs-identifier hs-var hs-var">char11</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\x2181'</span></span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="annot"><a href="Data.Char.Number.Duodecimal.html#_duodecimalDigit"><span class="hs-identifier hs-type">_duodecimalDigit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-48"></span><span id="_duodecimalDigit"><span class="annot"><span class="annottext">_duodecimalDigit :: Int -&gt; Char
+</span><a href="Data.Char.Number.Duodecimal.html#_duodecimalDigit"><span class="hs-identifier hs-var hs-var">_duodecimalDigit</span></a></span></span><span> </span><span id="local-6989586621679287031"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679287031"><span class="hs-identifier hs-var">n</span></a></span></span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679287031"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">10</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x30</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.|.</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679287031"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><span class="hs-identifier hs-var">chr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0x2180</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Bits a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">.|.</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679287031"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- | Convert the given 'Integral' number to its unicode character. In case the</span><span>
+</span><span id="line-53"></span><span class="hs-comment">-- value is less than @0@, or greater than @11@, the behavior is unspecified.</span><span>
+</span><span id="line-54"></span><span id="local-6989586621679286990"><span class="annot"><a href="Data.Char.Number.Duodecimal.html#duodecimalDigit%27"><span class="hs-identifier hs-type">duodecimalDigit'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-55"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679286990"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-56"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-57"></span><span>  </span><span class="annot"><a href="#local-6989586621679286990"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-58"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A unicode character that represents this digit.</span></span><span>
+</span><span id="line-59"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span></span><span>
+</span><span id="line-60"></span><span id="duodecimalDigit%27"><span class="annot"><span class="annottext">duodecimalDigit' :: forall i. Integral i =&gt; i -&gt; Char
+</span><a href="Data.Char.Number.Duodecimal.html#duodecimalDigit%27"><span class="hs-identifier hs-var hs-var">duodecimalDigit'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="Data.Char.Number.Duodecimal.html#_duodecimalDigit"><span class="hs-identifier hs-var">_duodecimalDigit</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Char) -&gt; (i -&gt; Int) -&gt; i -&gt; Char
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">i -&gt; Int
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span class="hs-comment">-- | Convert the given 'Integral' number to its unicode character wrapped in a</span><span>
+</span><span id="line-63"></span><span class="hs-comment">-- 'Just' data constructor. In case the value is less than @0@ or greater than</span><span>
+</span><span id="line-64"></span><span class="hs-comment">-- @11@, 'Nothing' is returned.</span><span>
+</span><span id="line-65"></span><span id="local-6989586621679286997"><span class="annot"><a href="Data.Char.Number.Duodecimal.html#duodecimalDigit"><span class="hs-identifier hs-type">duodecimalDigit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679286997"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679286997"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span></span><span>
+</span><span id="line-66"></span><span id="duodecimalDigit"><span class="annot"><span class="annottext">duodecimalDigit :: forall i. Integral i =&gt; i -&gt; Maybe Char
+</span><a href="Data.Char.Number.Duodecimal.html#duodecimalDigit"><span class="hs-identifier hs-var hs-var">duodecimalDigit</span></a></span></span><span> </span><span id="local-6989586621679287049"><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679287049"><span class="hs-identifier hs-var">n</span></a></span></span><span>
+</span><span id="line-67"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679287049"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;=</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679287049"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">i -&gt; i -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">12</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Maybe Char
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">i -&gt; Char
+forall i. Integral i =&gt; i -&gt; Char
+</span><a href="Data.Char.Number.Duodecimal.html#duodecimalDigit%27"><span class="hs-identifier hs-var">duodecimalDigit'</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><a href="#local-6989586621679287049"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-68"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Char
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-69"></span><span>
+</span><span id="line-70"></span><span class="hs-comment">-- | Convert the given 'Integral' number to a 'Text' object that contains</span><span>
+</span><span id="line-71"></span><span class="hs-comment">-- a sequence of duodecimal digits that represent that number. The given</span><span>
+</span><span id="line-72"></span><span class="hs-comment">-- 'PlusStyle' specifies if the number is prefixed with @+@ if it is positive.</span><span>
+</span><span id="line-73"></span><span id="local-6989586621679287002"><span class="annot"><a href="Data.Char.Number.Duodecimal.html#duodecimalNumber"><span class="hs-identifier hs-type">duodecimalNumber</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-74"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679287002"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-75"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given 'PlusStyle' to use.</span></span><span>
+</span><span id="line-76"></span><span>  </span><span class="annot"><a href="Data.Char.Core.html#PlusStyle"><span class="hs-identifier hs-type">PlusStyle</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-77"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-78"></span><span>  </span><span class="annot"><a href="#local-6989586621679287002"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-79"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A string of unicode characters representing the value in duodecimal notation.</span></span><span>
+</span><span id="line-80"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-81"></span><span id="duodecimalNumber"><span class="annot"><span class="annottext">duodecimalNumber :: forall i. Integral i =&gt; PlusStyle -&gt; i -&gt; Text
+</span><a href="Data.Char.Number.Duodecimal.html#duodecimalNumber"><span class="hs-identifier hs-var hs-var">duodecimalNumber</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">i -&gt; (Int -&gt; Char) -&gt; Char -&gt; Char -&gt; PlusStyle -&gt; i -&gt; Text
+forall i.
+Integral i =&gt;
+i -&gt; (Int -&gt; Char) -&gt; Char -&gt; Char -&gt; PlusStyle -&gt; i -&gt; Text
+</span><a href="Data.Char.Core.html#positionalNumberSystem"><span class="hs-identifier hs-var">positionalNumberSystem</span></a></span><span> </span><span class="annot"><span class="annottext">i
+</span><span class="hs-number">12</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char
+</span><a href="Data.Char.Number.Duodecimal.html#_duodecimalDigit"><span class="hs-identifier hs-var">_duodecimalDigit</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'+'</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'-'</span></span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span class="hs-comment">-- | Convert the given 'Integral' number to a 'Text' object that contains</span><span>
+</span><span id="line-84"></span><span class="hs-comment">-- sequence of duodecimal digits that represent that number.</span><span>
+</span><span id="line-85"></span><span id="local-6989586621679287007"><span class="annot"><a href="Data.Char.Number.Duodecimal.html#duodecimalNumber%27"><span class="hs-identifier hs-type">duodecimalNumber'</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-86"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679287007"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-87"></span><span>  </span><span class="annot"><span class="hs-comment">-- | The given number to convert.</span></span><span>
+</span><span id="line-88"></span><span>  </span><span class="annot"><a href="#local-6989586621679287007"><span class="hs-identifier hs-type">i</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-89"></span><span>  </span><span class="annot"><span class="hs-comment">-- | A string of unicode characters representing the value in duodecimal notation.</span></span><span>
+</span><span id="line-90"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-91"></span><span id="duodecimalNumber%27"><span class="annot"><span class="annottext">duodecimalNumber' :: forall i. Integral i =&gt; i -&gt; Text
+</span><a href="Data.Char.Number.Duodecimal.html#duodecimalNumber%27"><span class="hs-identifier hs-var hs-var">duodecimalNumber'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PlusStyle -&gt; i -&gt; Text
+forall i. Integral i =&gt; PlusStyle -&gt; i -&gt; Text
+</span><a href="Data.Char.Number.Duodecimal.html#duodecimalNumber"><span class="hs-identifier hs-var">duodecimalNumber</span></a></span><span> </span><span class="annot"><span class="annottext">PlusStyle
+forall a. Default a =&gt; a
+</span><span class="hs-identifier hs-var">def</span></span><span>
+</span><span id="line-92"></span></pre></body></html>
