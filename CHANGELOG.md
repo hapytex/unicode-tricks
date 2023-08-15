@@ -2,6 +2,10 @@
 
 For a full list of changes, see the history on [GitHub](https://github.com/hapytex/unicode-tricks).
 
+## Version 0.14.1.0
+
+Extra superscript and subscript characters in the `Data.Char.Small` module.
+
 ## Version 0.14.0.0
 
 Add US state flags.
